@@ -47,8 +47,8 @@ STRIPE_SECRET_KEY = ''
 #QuickBooks settings
 os.environ['OAUTHLIB_RELAX_TOKEN_SCOPE'] = '1'
 QUICKBOOKS_CLIENT_ID = "ABPRBiMNdM2uQjtIOhbYJ1SipuZNBOYkEOFvExdiCvz1phGysJ"
-QUICKBOOKS_CLIENT_SECRET = "pFc5iMKnfCsX4sgf5DllQkrKS6L4TpaUoAjHob7N"
-QUICKBOOKS_REDIRECT_URI = 'http://localhost:8000/quickbooks/callback'
+QUICKBOOKS_CLIENT_SECRET = ""
+QUICKBOOKS_REDIRECT_URI = ''
 QUICKBOOKS_ENVIRONMENT = 'sandbox'  
 QUICKBOOKS_SCOPES = ['com.intuit.quickbooks.accounting', 'openid', 'profile', 'email']
 
