@@ -1,0 +1,225 @@
+{% extends "base.html" %} {% load static %}
+{% block title %} Location list {% endblock title %}
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+{% load crispy_forms_tags %}
+{% block content %}
+{% include 'navbar.html' %}
+
+<div class="main-content">
+    {% include 'header.html' %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.0/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.bootstrap4.min.css">
+
+    <main>
+
+      <style>
+        .selected {
+          margin-top: 0;
+          margin-left: 0;
+          padding-left: 12px;
+          padding-right: 10px;
+          font-size: 16px;
+          padding: 5px 10px 5px 5px;
+      }
+      .dropdown-item {
+          display: block;
+          width: 100%;
+          padding: 0.25rem 0.4rem;
+          clear: both;
+          font-weight: 400;
+          color: #212529;
+          text-align: inherit;
+          white-space: nowrap;
+          background-color: transparent;
+          border: 0;
+      }
+      </style>
+        {% include '_alerts.html' %}
+        <div class="page-title-with-or-without-btn">
+            <span class="farm headingtop">Location list </span>
+            <!-- Create button for add-location-->
+            <div class="flex-header-btn">
+                <a href="{% url 'addlocation_processor3' %}" class="btn-close-cancel">Add Location</a>
+            </div>
+        </div>
+        <div class="card card-padding">
+            <div class="main-simple-table-with-search">
+                
+                {% if 'Processor2' in request.user.get_role and not request.user.is_superuser %}
+                {% else %}
+                <div class="form-inline justify-content-start">
+                    <form action="" method="get" class="">                                                
+
+                        <div class="col-8">
+                          <div class="inline-apply-filter">
+                              <div class="three-fields-with-label">
+                                  <select id="growerSelction" name="processor_id"  class="form-control selectpicker" data-live-search="true">
+                                      <option value='all' selected> Select All Processor </option>
+                                      {% for processor in processor %}
+                                      {% if processor.id == selectedprocessor %}
+                                      <option selected value="{{ processor.id }}">{{processor.entity_name}} - {{processor.id}}
+                                      </option>
+                                      {% else %}
+                                      <option value="{{ processor.id }}">{{processor.entity_name}} - {{processor.id}}</option>
+                                      {% endif %}
+                                      {% endfor %}
+                                  </select>
+                              </div>
+                              <input style="display : none;" id="submitBtn" type="submit"
+                                  class="apply-filter-btn primary-btn" value="Apply Filter" />
+                          </div>
+                  </div>
+               </form>                    
+                </div>
+                {% endif %}
+                <div class="both-data-in" style="display: inherit;">
+                    <div class="simple-responsive-table">
+                        <table id="processorList_tbl" class="table table-striped dt-responsive nowrap" style="width:100%">
+                            <thead>
+                                <tr style="border-bottom: 2px solid #e0e0e0;">
+                                    <th width="20%"> Processor Name </th>
+                                    <th width="20%"> Location Name </th>                                   
+                                    <th width="20%"> Coordinate </th>
+                                    <th width="20%" class="text-center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if location %}
+                                {% for location in location %}
+                                <tr>
+                                    <td>{{location.processor.entity_name}}</td>
+                                    <td>{{location.name}}</td>                                
+                                    <td>Lat: {{location.latitude}}, Lon: {{location.longitude}}</td>                                  
+                                    <td class="backk action-td" >
+                                        <!-- <li>
+                                        <a href="" class="map-icon-link"><span class="fas fa-draw-polygon"></span></a>
+                                        </li> -->
+                                        <li><a href="{% url 'location_edit_processor3' location.pk %}" class="update-btn-link" alt="edit location" title="edit location"> <span class="fas fa-edit"></span> </a>
+                                        </li>
+                                        <li>
+                                          <a type="button"
+                                      data-mdb-toggle="modal" data-mdb-target="#deleteModal{{location.id}}" alt="delete location" title="delete location">
+                                      <span class="fas fa-trash"></span></a>
+                                      </li>
+
+                                      <div class="modal fade" id="deleteModal{{location.id}}" aria-hidden="true" aria-labelledby="exampleModalToggleLabel22" tabindex="-1">
+                                          <div class="modal-dialog">
+                                            <div class="modal-content">
+                                        
+                                              <div class="modal-body">
+                                                <button type="button" class="btn-close cust-close-ds-btn" data-mdb-dismiss="modal" aria-label="Close"></button>
+                                                <div class="center-content-status">
+                                                  <img src="{% static 'img/trash.png' %}" alt="right" id="rightImg" class="warning-icon">
+                                                  <p id="message" class="modal-title titlepad">Are you sure you want to delete?</p>
+                                                </div>
+                                                <div class="modal-center-btn-footer">
+                                                  <button onclick="reloadwindow()" id="closeBtnpopup" type="button" class="btn-close-cancel btn-space"
+                                                    data-mdb-dismiss="modal">
+                                                    Close
+                                                  </button>                                                   
+                                                  
+                                                  <a href="{% url 'location_delete_processor3' location.id %}" id="storageDelete" class="btn-save-submit">Delete</a>                                                 
+                                                </div>
+                                              </div>                                        
+                                            </div>
+                                          </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                {% else %}
+                                <tr>
+                                    <td colspan="4" style="text-align:center;">No Result Found</td>
+                                </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                        <div class="col-md-12 col-sm-12 col-12 text-center mt-2" style="text-align:right">
+                          <span>Showing {{ location.start_index }} - {{ location.end_index }} of {{ location.paginator.count }} entries</span>
+                        </div>
+                        <!-- Pagination controls -->
+                        <div class="row d-flex justify-content-center align-items-center">
+                            <div class="col-sm-4"></div>
+                            <div class="col-sm-4">
+                                {% if location.has_other_pages %}
+                                <ul class="pagination" id="nav_1">
+                                    {% if location.has_previous %}
+                                    <li><a href="?processor_id={{ selectedprocessor }}&page={{ location.previous_page_number }}">&laquo;</a></li>
+                                    {% else %}
+                                    <li class="disabled"><span>&laquo;</span></li>
+                                    {% endif %}
+                                    {% for i in location.paginator.page_range %}
+                                    {% if location.number == i %}
+                                    <li class="active pagi" id="getactive"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+                                    {% else %}
+                                    <li><a href="?processor_id={{ selectedprocessor }}&page={{ i }}">{{ i }}</a></li>
+                                    {% endif %}
+                                    {% endfor %}
+                                    {% if location.has_next %}
+                                    <li><a href="?processor_id={{ selectedprocessor }}&page={{ location.next_page_number }}">&raquo;</a></li>
+                                    {% else %}
+                                    <li class="disabled"><span>&raquo;</span></li>
+                                    {% endif %}
+                                </ul>
+                                {% endif %}
+                            </div>
+                            <div class="col-sm-4"></div>
+                        </div>
+                      
+                        
+                    </div>
+                </div>
+            </div>
+
+    </main>
+    {% include 'footer.html' %}
+</div>
+{% endblock content %}
+
+{% block scripts %}
+<script src="https://cdn.datatables.net/1.11.0/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.0/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/responsive.bootstrap4.min.js"></script>
+
+<script src="{% static 'js/farm/farm_list.js' %}"></script>
+
+<script>
+    {% comment %} $(document).ready(function () {
+        $('#processorList_tbl').DataTable();
+    }); {% endcomment %}
+    $(document).ready(function () {
+      $('#processorList_tbl').DataTable({
+          "ordering": false  // Disable initial ordering
+      });
+  });
+    $(document).ready(function () {
+        $('#growerSelction').change(function () {
+            $('#submitBtn').click();
+        });
+    });
+
+</script>
+<script>
+    $('#Tier3-Processor-active').addClass('activeLink');
+  
+    $('#Tier3-Processor-down').addClass('down');
+    $('#Tier3-Processor-sub').show();
+  
+    $('#location-Management-Processor3').addClass('activeLink active-nav');
+
+</script>
+{% endblock scripts %}

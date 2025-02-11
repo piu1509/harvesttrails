@@ -1,0 +1,151 @@
+<div class="farm-fields-form">
+    <div class="row">
+        <div class="col-md-12">
+            <div id="div_question" class="form-group">
+                <label for="question_edit">
+                    Question
+                </label>
+                <div class="">
+                    <input type="hidden" name="question_id_edit" id="question_id_edit" value="{{Question_Survey_data.id}}">
+                    <textarea name="question_edit" id="question_edit" class="form-control" placeholder="Enter here" style="min-height: 88px;">{{Question_Survey_data.questionname}}</textarea>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div id="div_selction_type" class="form-group">
+                <label for="selction_type_edit">
+                    Selection Type
+                </label>
+                <div class="">
+                    <select name="selction_type_edit" class="select form-select" id="selction_type_edit">
+                        <option value="radio" 
+                        {% if Question_Survey_data.selection_type == 'radio' %}
+                        selected="selected"
+                        {% endif %}
+                        >Single Select</option>
+                        <option value="checkbox"
+                        {% if Question_Survey_data.selection_type == 'checkbox' %}
+                        selected="selected"
+                        {% endif %}
+                        >Multi Select</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div id="div_max_score" class="form-group">
+                <label for="max_score_edit">
+                    Max Score
+                </label>
+                <div class="">
+                    <input type="text" name="max_score_edit" id="max_score_edit" 
+                    value="{{Question_Survey_data.questiontotalscore}}" 
+                    class="textinput textInput form-control max_score_edit" 
+                    placeholder="Enter here" 
+                    onkeypress="return onlyNumberKey(event)" >
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="field_wrapper_edit">
+        {% for opt_data in Option_Survey_data %}
+        <div class="inner_elem_edit">
+            <div class="row">
+                <div class="col-md-8 col-6">
+                    <div id="div_id_option_name_1" class="form-group">
+                        <label for="option_name_1">
+                            Option
+                        </label>
+                        <div class="">
+                            <input type="text" name="option_name_edit" id="" value="{{opt_data.optionname}}" class="option_name_edit textinput textInput form-control" placeholder="Enter here">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-4">
+                    <div id="div_id_points_1" class="form-group">
+                        <label for="id_points_1">
+                            Points
+                        </label>
+                        <div class="">
+                            <input type="text" name="points_edit" id="" value="{{opt_data.optionscore}}" class="textinput textInput form-control points_edit" placeholder="Enter here" onkeypress="return onlyNumberKey(event)">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-1 col-2 inc-dec-icon-col">
+                    {% if forloop.first %}
+                    <a href="javascript:void(0);" class="add_button_edit"><img src="/static/img/plus.svg"></a>
+                    {% else %}
+                    <a href="javascript:void(0);" class="remove_button_edit"><img src="/static/img/minus.svg"></a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <div class="form-check">
+                <input type="checkbox" class="form-check-input" name="evidence_requird_edit" id="evidence_requird_edit"
+                {% if Question_Survey_data.evidence_requird %}
+                checked="checked"
+                {% endif %}
+                >
+                <label class="form-check-label" for="evidence_requird_edit">
+                    Evidence Required
+                </label>
+            </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div id="div_id_evidence_descr_edit" class="form-group" {% if Question_Survey_data.evidence_requird %}style="display: block;"{% else %}style="display: none;"{% endif %}>
+                <label for="evidence_descr_edit">
+                    Evidence Description
+                </label>
+                <div class="">
+                    <textarea name="evidence_descr_edit" id="evidence_descr_edit" class="form-control" placeholder="Enter here" style="min-height: 88px;">{{Question_Survey_data.evidence_descr}}</textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+    <script>
+    $("#evidence_requird_edit").on('click', function(e){
+        var is_evidence_requird = $(this).is(':checked');
+        if(is_evidence_requird)
+        {
+            $("#div_id_evidence_descr_edit").slideDown();
+        }
+        else
+        {
+            $("#div_id_evidence_descr_edit").slideUp();
+        }
+    });
+
+    $(document).ready(function(){
+        var maxField = 30; //Input fields increment limitation
+        var addButton = $('.add_button_edit'); //Add button selector
+        var wrapper = $('.field_wrapper_edit'); //Input field wrapper
+        var fieldHTML = '<div class="inner_elem_edit"> <div class="row"> <div class="col-md-8"> <div id="div_id_option_name_1" class="form-group"> <label for="option_name_1"> Option </label> <div class=""> <input type="text" name="option_name_edit" id="" value="" class="option_name_edit textinput textInput form-control" placeholder="Enter here"> </div></div></div><div class="col-md-3"> <div id="div_id_points_1" class="form-group"> <label for="id_points_1"> Points </label> <div class=""> <input type="text" name="points_edit" id="" value="" class="textinput textInput form-control points_edit" placeholder="Enter here" onkeypress="return onlyNumberKey(event)"> </div></div></div><div class="col-md-1 inc-dec-icon-col"> <a href="javascript:void(0);" class="remove_button_edit"><img src="/static/img/minus.svg"></a> </div></div></div>'; //New input field html 
+        var x = '{{Option_Survey_data_count}}'; //Initial field counter is 1
+        
+        //Once add button is clicked
+        $(addButton).click(function(){
+            //Check maximum number of input fields
+            if(x < maxField){ 
+                x++; //Increment field counter
+                $(wrapper).append(fieldHTML); //Add field html
+            }
+        });
+        
+        //Once remove button is clicked
+        $(wrapper).on('click', '.remove_button_edit', function(e){
+            e.preventDefault();
+            $(this).parent().parent().parent('.inner_elem_edit').remove(); //Remove field html
+            x--; //Decrement field counter
+        });
+    });
+    </script>

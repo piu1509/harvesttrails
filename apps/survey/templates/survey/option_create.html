@@ -1,0 +1,51 @@
+{% extends "base.html" %} {% load static %} {% block title %} Add Option {% endblock title %} {% block content %} {% include 'navbar.html' %}
+
+<div class="main-content">
+    {% include 'header.html' %} {% load crispy_forms_tags %}
+
+    <main>
+        <span class="farm headingtop">Add Option</span>
+        <div class="card add-options-card">
+
+
+            <div class="add-option-body">
+                <div class="container-fluid">
+                    <form method="post" class="farm-fields-form">
+                        {% csrf_token %}
+                        <div class="row mt-4">
+                            <div class="col-md-6">
+                                {{ form.question|as_crispy_field }}
+                            </div>
+
+                            <div class="col-md-6">
+                                {{ form.order|as_crispy_field }}
+                            </div>
+
+                            <div class="col-md-12">
+                                {{ form.text|as_crispy_field }}
+                            </div>
+
+                            <div class="col-md-6 custom-row-mg-points">
+                                {{ form.points|as_crispy_field }}
+                            </div>
+
+                            {% comment %} <div class="col-md-12 custom-row-mg-is-active mt-4">
+                                {{ form.is_active|as_crispy_field }}
+                            </div> {% endcomment %}
+                        </div>
+                        <div class="row">
+                            <div class="form-btn-row">
+                                <a href="{% url 'survey' %}" class="btn-close-cancel btn-space">Cancel</a>
+                                <input type="submit" class="btn-save-submit" value="Save">
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </main>
+    {% include 'footer.html' %}
+</div>
+
+{% endblock %}

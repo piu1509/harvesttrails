@@ -1,0 +1,288 @@
+{% extends "base.html" %} {% load static %}
+{% block title %} Shipment List {% endblock title %}
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+{% load crispy_forms_tags %}
+{% block content %}
+{% include 'navbar.html' %}
+
+<div class="main-content">
+    {% include 'header.html' %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.0/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.bootstrap4.min.css">
+
+    <main>
+        {% include '_alerts.html' %}
+        <div class="page-title-with-or-without-btn">
+            <span class="farm headingtop">Shipment List</span>
+            <!-- Create button for Add-->
+            <div class="flex-header-btn">
+                <a href="{% url 'grower_shipment' %}" class="btn-close-cancel">Add Shipment</a>
+            </div>
+        </div>
+
+        <div class="card card-padding">
+            <div class="main-simple-table-with-search col-12">
+                {% if 'Grower' in request.user.get_role and not request.user.is_superuser %}
+                {% else %}
+                <div class="row">
+                    <div class="col-8">
+                        <form action="" method="post" class="">
+                            {% csrf_token %}
+                            <div class="inline-apply-filter">
+                                <div class="three-fields-with-label">
+                                    <select id="growerSelction" name="selectgrower_id">
+                                        <option value='0' selected> Select All Growers </option>
+                                        {% for i in grower %}
+                                        {% if i == selectedGrower %}
+                                        <option value="{{ i.pk }}" selected>{{i.name}} - {{ i.pk }}
+                                        </option>
+                                        {% else %}
+                                        <option value="{{ i.pk }}">{{i.name}} - {{ i.pk }}</option>
+                                        {% endif %}
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <input style="display : none;" id="submitBtn" type="submit"
+                                    class="apply-filter-btn primary-btn" value="Apply Filter" />
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                {% endif %}
+                <div class="both-data-in" style="display: inherit;">
+                    <div class="simple-responsive-table">
+                        <table id="processorList_tbl" class="table table-striped dt-responsive nowrap"
+                            style="width:100%">
+                            <thead>
+                                <tr style="border-bottom: 2px solid #e0e0e0;">
+                                    <th width="10%">Shipment Id</th>
+                                    <th width="10%">Module Tag #</th>
+                                    <!-- <th width="15%">Storage</th> -->
+                                    <th width="10%">Field</th>
+                                    <th width="15%">Item , Variety</th>
+                                    <th width="10%">Weight</th>
+                                    <th width="10%">Status</th>
+                                    {% if 'Grower' in request.user.get_role and not request.user.is_superuser %}
+                                    {% else %}
+                                    <th width="10%">Grower</th>
+                                    {% endif %}
+                                    <th width="20%">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for grower_shipment in grower_shipment %}
+                                <tr>
+                                    <td>{{grower_shipment.shipment_id}}</td>
+                                    <td>{{grower_shipment.module_number}}</td>
+                                    <!-- <td>{{grower_shipment.storage.storage_name}}</td> -->
+                                    <td>{{grower_shipment.field.name}}</td>
+                                    <td>{{grower_shipment.crop}} , {{grower_shipment.variety}} </td>
+                                    <td>{{grower_shipment.amount}} {{grower_shipment.unit_type}} 
+                                        {% if grower_shipment.amount2|length > 0 %} 
+                                        + {{grower_shipment.amount2}} {{grower_shipment.unit_type2}} 
+                                        {% endif %}
+                                        
+                                    </td>
+                                    <td>{{grower_shipment.status}}</td>
+                                    {% if 'Grower' in request.user.get_role and not request.user.is_superuser %}
+                                    {% else %}
+                                    <td>{{grower_shipment.grower.name}}</td>
+                                    {% endif %}
+                                    <td class="backk action-td">
+                                        <li>
+                                            <a class="map-icon-link" onclick="showQR({{grower_shipment.pk}})" ><span
+                                                    class="fas fa-qrcode"></span></a>
+                                        </li>
+                                        <li>
+                                            <a href="{% url 'grower_shipment_view' grower_shipment.pk %}" class="update-btn-link"> <span class="fas fa-eye"></span> </a>
+                                        </li>
+                                        {% if 'Grower' in request.user.get_role %}
+                                        {% else %}
+                                        <li>
+                                            <a onclick="delStorage('{% url 'grower_shipment_delete' grower_shipment.id %}')" href="{% url 'grower_shipment_delete' grower_shipment.id %}" data-mdb-toggle="modal"
+                                                data-mdb-target="#deleteModal">
+                                                <span class="fas fa-trash"></span></a>
+                                        </li>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                <!-- Add Que Popup ##update -->
+                                <div class="modal fade" id="addqueModal" aria-hidden="true" aria-labelledby="exampleModalToggleLabel22" tabindex="-1">
+                                    <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header" style="text-align: center;">
+                                        <button type="button" class="btn-close cust-close-ds-btn close_modal_addqueModal" data-mdb-dismiss="modal"
+                                            aria-label="Close" onclick="closeAddModal()"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="modal-center-btn-footer">
+                                            <div class="row">
+                                                <div class="col-lg-12">
+                                                    <div>
+                                                    <h5 class="text-decoration-underline">QR CODE</h5>
+                                                    </div>
+                                                    <img id="qr_id" src="/media/{{grower_shipment.qr_code}}" alt="qr code" style="max-width: 100%;">
+                                            </div>
+                                            </div>  
+                                        </div>
+                                    </div>
+                                    </div>
+                                </div>
+                                <!-- end -->
+                                {% endfor %}
+                            </tbody>
+                           
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+</div>
+</main>
+{% include 'footer.html' %}
+</div>
+<!-- Delete Popup -->
+<div class="modal fade" id="deleteModal" aria-hidden="true" aria-labelledby="exampleModalToggleLabel22" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-body">
+                <button type="button" class="btn-close cust-close-ds-btn" data-mdb-dismiss="modal"
+                    aria-label="Close"></button>
+                <div class="center-content-status">
+                    <img src="{% static 'img/trash.png' %}" alt="right" id="rightImg" class="warning-icon">
+                    <p id="message" class="modal-title titlepad">Are you sure you want to delete?</p>
+                </div>
+                <div class="modal-center-btn-footer">
+                    <button onclick="reloadwindow()" id="closeBtnpopup" type="button" class="btn-close-cancel btn-space"
+                        data-mdb-dismiss="modal">
+                        Close
+                    </button>
+                    <!-- <button type="submit" class="btn-save-submit">Delete</button> -->
+
+                    <a onclick="storagedeleteNow()" href="" id="storageDelete"><button type=""
+                            class="btn-save-submit">Delete</button></a>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Add Que Popup -->
+<div class="modal fade" id="addqueModal" aria-hidden="true" aria-labelledby="exampleModalToggleLabel22" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header" style="text-align: center;">
+        <button type="button" class="btn-close cust-close-ds-btn close_modal_addqueModal" data-mdb-dismiss="modal"
+          aria-label="Close" onclick="closeAddModal()"></button>
+      </div>
+      <div class="modal-body">
+          <div class="modal-center-btn-footer">
+            <div class="row">
+              <div class="col-lg-12">
+                  <div>
+                    <h5 class="text-decoration-underline">QR CODE</h5>
+                  </div>
+                  <img id="qr_id" src="" alt="qr code" style="max-width: 100%;">
+            </div>
+          </div>  
+      </div>
+    </div>
+  </div>
+</div>
+<!-- end -->
+
+{% endblock content %}
+
+{% block scripts %}
+<script src="https://cdn.datatables.net/1.11.0/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.0/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/responsive.bootstrap4.min.js"></script>
+
+<script src="{% static 'js/farm/farm_list.js' %}"></script>
+
+<script>
+    {% comment %} $(document).ready(function () {
+        $('#processorList_tbl').DataTable();
+    }); {% endcomment %}
+    $(document).ready(function () {
+        $('#processorList_tbl').DataTable({
+            "ordering": false  // Disable initial ordering
+        });
+    });
+
+    $(document).ready(function () {
+        $('#growerSelction').change(function () {
+            $('#submitBtn').click();
+        });
+    });
+    // delete storage
+    function delStorage(url) {
+        $('#storageDelete').show();
+        $('#storageDelete').attr('url', url);
+    }
+
+    function storagedeleteNow() {
+        url = $('#storageDelete').attr('url');
+        console.log(url)
+        $.ajax({
+            url: url,
+            data: {},
+            success: function (data) {
+                if (data == 1) {
+                    location.reload();
+                }
+            }
+        });
+    }
+
+    function showQR(grower_shipment_pk){
+     console.log(grower_shipment_pk)
+     $.ajax({
+      type: "GET",
+      url: `/processor/qr_code_view/${grower_shipment_pk}`,
+      data: { },
+      contentType: false,
+      cache: false,
+      processData: false,
+      success: function (response) {
+        console.log('response1', response)
+        var qrimgsrc = document.getElementById("qr_id").src;
+        console.log(qrimgsrc)
+        $('#qr_id').attr("src", "/media/"+response);
+        
+
+      }
+    });
+     $('#addqueModal').modal('show');
+    }
+
+    function closeAddModal() {
+      $('#addqueModal').modal('hide');
+  }
+</script>
+{% comment %} <script>
+    $(document).ready(function() {
+        $('#processorList_tbl').DataTable({
+            "order": [[0, "desc"]]  // Sort by first column (ID) in descending order
+        });
+    });
+</script> {% endcomment %}
+{% endblock scripts %}

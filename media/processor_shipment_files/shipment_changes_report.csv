@@ -1,0 +1,12 @@
+Shipment ID,Description,Field,Old Value,New Value,Updated At,Updated By
+HTSH20240908350,The shipment has reached border.,Status,Released,At Border,2024-09-09 06:40:42,admin
+HTSH20240908350,The shipment has reached border.,Border Receive Date,None,2024-09-09,2024-09-09 06:40:42,admin
+HTSH20240909539,Status changed.,Status,Released,At Border,2024-09-09 12:33:58,admin
+HTSH20240909539,Status changed.,Border Receive Date,None,2024-09-10,2024-09-09 12:33:58,admin
+HTSH20240910522,Ship quantity updated.,Ship Quantity,52,50,2024-09-10 05:52:39,admin
+HTSH20240910522,Received.,Status,Released,Received,2024-09-10 05:53:28,admin
+HTSH20240910522,Received.,Warehouse/Customer Receive Date,None,2024-09-11,2024-09-10 05:53:28,admin
+HTSH20240910522,Gross weight updated.,Gross Weight,1245.0,1235,2024-09-10 05:54:34,admin
+HTSH20240910522,Gross weight updated.,Warehouse/Customer Receive Date,2024-09-11 04:00:00+00:00,2024-09-11,2024-09-10 05:54:34,admin
+HTSH20240910522,Receive Date changed,Warehouse/Customer Receive Date,2024-09-11,2024-09-10,2024-09-10 06:01:52,admin
+HTSH20240910522,Ship weight changed.,Ship Weight,5.0,5.5,2024-09-10 06:24:06,admin

@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grower Sign Up</title>
+    <!-- <link rel="stylesheet" href="css/style.css"> -->
+    <link rel="icon" type="image/x-icon" href="{% static 'img/icons/favicon.jpg' %}">
+    <link rel="stylesheet" href="{% static 'update-step-form/css/style.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/boxicons/2.1.0/css/boxicons.min.css">
+    <style>
+        #tab-body-bg1{
+            background-image: url("../static/update-step-form/images/loging-screen1.jpg");
+        }
+        #tab-body-bg2{
+            background-image: url("../static/update-step-form/images/loging-screen2.jpg");
+        }
+        #tab-body-bg3{
+            background-image: url("../static/update-step-form/images/loging-screen3.jpg");
+        }
+        .message-error{
+            color: #721c24;
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+        }
+        .message-sucess{
+            color: #155724;
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+        }
+        /* .shapclass{
+            padding-top: 7px;
+            padding-left: 40px;
+            padding-bottom: 7px;
+        } */
+        .placeholder-file{
+            height: 29px;
+            padding-left: 10px;
+            padding-right: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 13px;
+            color: #fff;
+            background-color: #4ba046;
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            border-radius: 30px;
+        }
+        [class*="message-"] {
+            position: relative;
+            padding: 0.375rem 1rem;
+            margin-bottom: 1rem;
+            font-size: 13px;
+            border: 1px solid transparent;
+            border-radius: 0.25rem;
+        }
+        .step-form-box {
+            padding-top: 8px;
+        }
+    </style>
+    <style>
+        input:focus ~ .floating-label,
+        input:not(:focus):valid ~ .floating-label{
+        top: -8px;
+        /* bottom: 10px; */
+        left: 20px;
+        font-size: 11px;
+        opacity: 1;
+        background-color: #fff;
+        padding: 3px 5px;
+        border-radius: 20px;
+        border: 1px solid #ddd;
+        }
+        .inputTextt {
+        font-size: 14px;
+        width: 200px;
+        height: 35px;
+        }
+
+        .floating-label {
+            font-size: 14px;
+        position: absolute;
+        pointer-events: none;
+        left: 20px;
+        top: 9px;
+        transition: 0.2s ease all;
+        
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-wrapper">
+        <form action="" method="post" class="main-form" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="step-form">
+                <div class="step-header">
+                    <!-- <img src="images/logo.png" alt=""> -->
+                    <img src="{% static 'update-step-form/images/logo.png' %}" alt="">
+                    <h2 class="title" id="fm_title">Grower’s Signup Process</h2>
+                    <div class="progress-bar">
+                        <div class="step completed">
+                            <span class="step-number">1</span>
+                            <span class="step-title">Personal</span>
+                        </div>
+                        <div class="step">
+                            <span class="step-number">2</span>
+                            <span class="step-title">Farm</span>
+                        </div>
+                        <div class="step">
+                            <span class="step-number">3</span>
+                            <span class="step-title">Field</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tab-content">
+                    <div class="tab">
+                        <div class="tab-body" id="tab-body-bg1">
+                            <div class="main-container">
+                                <div class="step-box">
+                                    <div class="step-form-box">
+                                        <div class="step-row">
+                                           
+                                            <div class="col-half">
+                                                <input type="text" id="first_name" name="first_name" required>
+                                                <span class="floating-label">First name*</span>
+                                            </div>
+                                            <div class="col-half">
+                                                <input type="text" id="last_name" name="last_name" required>
+                                                <span class="floating-label">Last Name*</span>
+                                            </div>
+                                            <div class="col-full">
+                                                <input type="email" id="username" name="username" required>
+                                                <span class="floating-label">Email / Username*</span>
+                                            </div>
+                                            <div class="col-half">
+                                                <input type="password" id="password1" name="password1" required>
+                                                <span class="floating-label">Password*</span>
+                                            </div>
+                                            <div class="col-half">
+                                                <input type="password" id="password2" name="password2" required>
+                                                <span class="floating-label">Confirm Password*</span>
+                                            </div>
+                                            <div class="col-full">
+                                                <input type="text" id="address" name="address" required>
+                                                <span class="floating-label">Address*</span>
+                                            </div>
+                                            <div class="col-half">
+                                                <input type="text" id="city" name="city" required>
+                                                <span class="floating-label">City*</span>
+                                            </div>
+                                            <div class="col-half">
+                                                <input type="number" min="0" id="phone" name="phone" required>
+                                                <span class="floating-label">Phone*</span>
+                                            </div>
+                                            <div class="col-half">
+                                                <!-- <input type="text" id="state" name="state" required> -->
+                                                <select name="state" id="state" required>
+                                                    <option value="">Select State</option>
+                                                    <option value="Alabama">Alabama</option>
+                                                    <option value="Alaska">Alaska</option>
+                                                    <option value="Arizona">Arizona</option>
+                                                    <option value="Arkansas">Arkansas</option>
+                                                    <option value="California">California</option>
+                                                    <option value="Colorado">Colorado</option>
+                                                    <option value="Connecticut">Connecticut</option>
+                                                    <option value="Delaware">Delaware</option>
+                                                    <option value="District Of Columbia">District Of Columbia</option>
+                                                    <option value="Florida">Florida</option>
+                                                    <option value="Georgia">Georgia</option>
+                                                    <option value="Hawaii">Hawaii</option>
+                                                    <option value="Idaho">Idaho</option>
+                                                    <option value="Illinois">Illinois</option>
+                                                    <option value="Indiana">Indiana</option>
+                                                    <option value="Iowa">Iowa</option>
+                                                    <option value="Kansas">Kansas</option>
+                                                    <option value="Kentucky">Kentucky</option>
+                                                    <option value="Louisiana">Louisiana</option>
+                                                    <option value="Maine">Maine</option>
+                                                    <option value="Maryland">Maryland</option>
+                                                    <option value="Massachusetts">Massachusetts</option>
+                                                    <option value="Michigan">Michigan</option>
+                                                    <option value="Minnesota">Minnesota</option>
+                                                    <option value="Mississippi">Mississippi</option>
+                                                    <option value="Missouri">Missouri</option>
+                                                    <option value="Montana">Montana</option>
+                                                    <option value="Nebraska">Nebraska</option>
+                                                    <option value="Nevada">Nevada</option>
+                                                    <option value="New Hampshire">New Hampshire</option>
+                                                    <option value="New Jersey">New Jersey</option>
+                                                    <option value="New Mexico">New Mexico</option>
+                                                    <option value="New York">New York</option>
+                                                    <option value="North Carolina">North Carolina</option>
+                                                    <option value="North Dakota">North Dakota</option>
+                                                    <option value="Ohio">Ohio</option>
+                                                    <option value="Oklahoma">Oklahoma</option>
+                                                    <option value="Oregon">Oregon</option>
+                                                    <option value="Pennsylvania">Pennsylvania</option>
+                                                    <option value="Rhode Island">Rhode Island</option>
+                                                    <option value="South Carolina">South Carolina</option>
+                                                    <option value="South Dakota">South Dakota</option>
+                                                    <option value="Tennessee">Tennessee</option>
+                                                    <option value="Texas">Texas</option>
+                                                    <option value="Utah">Utah</option>
+                                                    <option value="Vermont">Vermont</option>
+                                                    <option value="Virginia">Virginia</option>
+                                                    <option value="Washington">Washington</option>
+                                                    <option value="West Virginia">West Virginia</option>
+                                                    <option value="Wisconsin">Wisconsin</option>
+                                                    <option value="Wyoming">Wyoming</option>
+                                                </select>
+                                                <!-- <span class="floating-label">State / Province*</span> -->
+                                            </div>
+                                            <div class="col-half">
+                                                <input type="number" min="0" id="zip_code" name="zip_code" required>
+                                                <span class="floating-label">Postal / Zip Code*</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-full">
+                                        {% if error_msg %}
+                                        <div class="message-error">{{error_msg}}</div>
+                                        {% elif sus_msg %}
+                                        <div class="message-sucess">{{sus_msg}}</div>
+                                        {% else %}
+                                        <div class="" id="message"></div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab">
+                        <div class="tab-body" id="tab-body-bg2">
+                            <div class="main-container">
+                                <div class="step-box">
+                                    <div class="step-form-box" id="add-newrow-id">
+                                        <div class="step-row step-item open" id="remove-newrow-id_1">
+                                            <div class="col-full">
+                                                <input type="text" id="farm_name" name="farm_name" required>
+                                                <span class="floating-label">Farm Name*</span>
+                                            </div>
+                                            <div class="col-full">
+                                                <input type="text" id="farm_address" name="farm_address" required>
+                                                <span class="floating-label">Address*</span>
+                                            </div>
+                                            <div class="col-full">
+                                                <select name="farm_crop" id="farm_crop" required>
+                                                    <option value="">Crop *</option>
+                                                    <option value="COTTON">COTTON</option>
+                                                    <option value="RICE">RICE</option>
+                                                    <option value="WHEAT">WHEAT</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-half">
+                                                <input type="text" id="farm_city" name="farm_city" required>
+                                                <span class="floating-label">City*</span>
+                                                
+                                            </div>
+                                            <div class="col-half">
+                                                <select name="farm_state" id="farm_state" required>
+                                                    <option value="">Select State</option>
+                                                    <option value="Alabama">Alabama</option>
+                                                    <option value="Alaska">Alaska</option>
+                                                    <option value="Arizona">Arizona</option>
+                                                    <option value="Arkansas">Arkansas</option>
+                                                    <option value="California">California</option>
+                                                    <option value="Colorado">Colorado</option>
+                                                    <option value="Connecticut">Connecticut</option>
+                                                    <option value="Delaware">Delaware</option>
+                                                    <option value="District Of Columbia">District Of Columbia</option>
+                                                    <option value="Florida">Florida</option>
+                                                    <option value="Georgia">Georgia</option>
+                                                    <option value="Hawaii">Hawaii</option>
+                                                    <option value="Idaho">Idaho</option>
+                                                    <option value="Illinois">Illinois</option>
+                                                    <option value="Indiana">Indiana</option>
+                                                    <option value="Iowa">Iowa</option>
+                                                    <option value="Kansas">Kansas</option>
+                                                    <option value="Kentucky">Kentucky</option>
+                                                    <option value="Louisiana">Louisiana</option>
+                                                    <option value="Maine">Maine</option>
+                                                    <option value="Maryland">Maryland</option>
+                                                    <option value="Massachusetts">Massachusetts</option>
+                                                    <option value="Michigan">Michigan</option>
+                                                    <option value="Minnesota">Minnesota</option>
+                                                    <option value="Mississippi">Mississippi</option>
+                                                    <option value="Missouri">Missouri</option>
+                                                    <option value="Montana">Montana</option>
+                                                    <option value="Nebraska">Nebraska</option>
+                                                    <option value="Nevada">Nevada</option>
+                                                    <option value="New Hampshire">New Hampshire</option>
+                                                    <option value="New Jersey">New Jersey</option>
+                                                    <option value="New Mexico">New Mexico</option>
+                                                    <option value="New York">New York</option>
+                                                    <option value="North Carolina">North Carolina</option>
+                                                    <option value="North Dakota">North Dakota</option>
+                                                    <option value="Ohio">Ohio</option>
+                                                    <option value="Oklahoma">Oklahoma</option>
+                                                    <option value="Oregon">Oregon</option>
+                                                    <option value="Pennsylvania">Pennsylvania</option>
+                                                    <option value="Rhode Island">Rhode Island</option>
+                                                    <option value="South Carolina">South Carolina</option>
+                                                    <option value="South Dakota">South Dakota</option>
+                                                    <option value="Tennessee">Tennessee</option>
+                                                    <option value="Texas">Texas</option>
+                                                    <option value="Utah">Utah</option>
+                                                    <option value="Vermont">Vermont</option>
+                                                    <option value="Virginia">Virginia</option>
+                                                    <option value="Washington">Washington</option>
+                                                    <option value="West Virginia">West Virginia</option>
+                                                    <option value="Wisconsin">Wisconsin</option>
+                                                    <option value="Wyoming">Wyoming</option>
+                                                </select>
+                                                <!-- <input type="text" id="farm_state" name="farm_state" required>
+                                                <span class="floating-label">State / Province*</span> -->
+                                                
+                                            </div>
+                                            <div class="col-half">
+                                                <input type="number" min="0" id="farm_zip_code" name="farm_zip_code" required>
+                                                <span class="floating-label">Postal / Zip Code*</span>
+                                                
+                                            </div>
+                                            <div class="col-half">
+                                                <input type="text" id="farm_Nutrien Id" name="farm_Nutrien_id" required>
+                                                <span class="floating-label">Nutrien Id*</span>
+                                                
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="add-row">
+                                        <div id="root"></div>
+                                        <button id="add_more_split" class="btn-save-submit" type="button">+ Add Farms</button>
+                                        <input type="hidden" id="add-row-number" value="1" name="counter1">
+                                        <input type="hidden" id="topFcounter" value="1" name="topFcounter">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab">
+                        <div class="tab-body" id="tab-body-bg3">
+                            <div class="main-container">
+                                <div class="step-box">
+                                    <div class="step-form-box" id="add-newrow-id_2">
+                                        <div class="step-row step-item open" id="remove-newrow-id_2">
+                                            <div class="col-full">
+                                                <select name="select_farm_for_field" id="select_farm_for_field" required>
+                                                    <option value="">Select Farm*</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-full">
+                                                <input type="text" id="field_name" name="field_name" required>
+                                                <span class="floating-label">Field name*</span>
+                                                
+                                            </div>
+                                            <div class="col-half">
+                                                <input type="number" min="0" id="field_acreage" name="field_acreage" required>
+                                                <span class="floating-label">Acreage*</span>
+                                                
+                                            </div>
+                                            <div class="col-half">
+                                                <input type="number" min="0" id="field_cultivation_year" name="field_cultivation_year" required>
+                                                <span class="floating-label">Year of Cultivation*</span>
+                                                
+                                            </div>
+                                            <div class="col-half">
+                                                <input type="number" min="0" id="field_FSA_Farm_number" name="field_FSA_Farm_number" required>
+                                                <span class="floating-label">FSA Farm Number*</span>
+                                                
+                                            </div>
+                                            <div class="col-half">
+                                                <input type="number" min="0" id="field_FSA_Track_number" name="field_FSA_Track_number" required>
+                                                <span class="floating-label">FSA Track Number*</span>
+                                                
+                                            </div>
+                                            <div class="col-half">
+                                                <input type="number" min="0" id="field_FSA_Field_number" name="field_FSA_Field_number" required>
+                                                <span class="floating-label">FSA Field Number*</span>
+                                                
+                                            </div>
+                                            <div class="col-half">
+                                                <div class="group-file" style="position: relative;">
+                                                    <label class="placeholder-file" for="field_shape_file" >Shape File Upload</label>
+                                                    <input type="file" accept=".zip" id="field_shape_file" name="field_shape_file" style="padding-top: 7px;padding-left: 40px;padding-bottom: 7px;">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="add-row">
+                                        <div id="root2"></div>
+                                        <button id="add_more_split_2" class="btn-save-submit" type="button">+ Add Fields</button>
+                                        <input type="hidden" id="add-row-number_2" value="1" name="counter2">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="preview-buttons">
+                    <button type="button" class="button prev-btn" onclick="showPreviousTab()">Previous</button>
+                    <button type="button" class="button next-btn" onclick="showNextTab()">Next</button>
+                    <input type="submit" id="submit-btn" style="display: none;">
+                </div>
+            </div>
+        </form>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+        let currentTab = 0;
+        showTab(currentTab);
+
+        function showTab(tabIndex) {
+            const tabs = document.getElementsByClassName("tab");
+            const steps = document.getElementsByClassName("step");
+
+            // tabs[tabIndex].style.display = "block";
+            tabs[tabIndex].classList.add("active");
+            steps[tabIndex].classList.add("active");
+
+            if (tabIndex === 0) {
+                document.querySelector(".prev-btn").disabled = true;
+            } else {
+                document.querySelector(".prev-btn").disabled = false;
+            }
+
+            if (tabIndex === tabs.length - 1) {
+                document.querySelector(".next-btn").innerHTML = "Submit";
+            } else {
+                document.querySelector(".next-btn").innerHTML = "Next";
+            }
+        }
+
+        function IsEmail(email) {
+        var regex = /^([a-zA-Z0-9_\.\-\+])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+        if(!regex.test(email)) {
+            return false;
+        }else{
+            return true;
+        }
+        }
+
+        function showNextTab() {
+
+            const tabs = document.getElementsByClassName("tab");
+            var first_name = $('#first_name').val();
+            var username = $('#username').val();
+            var password1 = $('#password1').val();
+            var password2 = $('#password2').val();
+            var phone = $('#phone').val();
+            var zip_code = $('#zip_code').val();
+            var message = $('#message');
+
+            if (first_name != '' && username != '' && IsEmail(username)==true && password1 != '' && password2 != '' && password1 == password2 && phone != '' && phone.length == 10 && parseInt(phone) > 0 && zip_code !='' && zip_code.length == 5 && parseInt(zip_code) > 0){
+                message.html("");
+                message.removeClass("message-error");
+                if (currentTab < tabs.length - 1) {
+                    // tabs[currentTab].style.display = "none";
+                    tabs[currentTab].classList.add("active");
+                    currentTab++;
+                    showTab(currentTab);
+                    showFarm();
+                    var fm_title = document.getElementById('fm_title')
+                    if(fm_title.innerHTML == "Grower’s Signup Process"){
+                        fm_title.innerHTML = 'Farm Entry Process';
+                    }else if (fm_title.innerHTML == "Farm Entry Process"){
+                        fm_title.innerHTML = 'Field Entry Process';
+                    }
+                    
+                } else {
+                    // Handle form submission or completion
+                    alert("Form submitted!");
+                    document.getElementById('submit-btn').click();
+                }
+            }else{
+                if (first_name == ''){
+                    message.html("First Name must be filled out");
+                    message.addClass("message-error");
+
+                }
+                else if (username == '' ){
+                    message.html("Username must be filled out");
+                    message.addClass("message-error");
+                }
+                else if (IsEmail(username)==false ){
+                    message.html("Username must be email");
+                    message.addClass("message-error");
+                }
+                else if (password1 == ''){
+                    message.html("Password must be filled out");
+                    message.addClass("message-error");
+                }
+                else if (password2 == ''){
+                    message.html("Confirm Password must be filled out");
+                    message.addClass("message-error");
+                }
+                else if (password1 != '' && password2 != '' && password1 != password2){
+                    message.html("Confirm Password and Password must be same");
+                    message.addClass("message-error");
+                }
+                else if (phone == ''){
+                    message.html("Phone Number must be filled out");
+                    message.addClass("message-error");
+                }
+                else if (phone != '' && phone.length != 10 && parseInt(phone) > 0){
+                    message.html("Phone Number must be 10 digit");
+                    message.addClass("message-error");
+                }
+                else if (zip_code == '' ){
+                    message.html("Zip Code must be filled out");
+                    message.addClass("message-error");
+                }
+                else if (zip_code != '' && zip_code.length != 5 && parseInt(zip_code) > 0){
+                    message.html("Zip Code must be 5 digit");
+                    message.addClass("message-error");
+                }
+                else{
+                    message.html("");
+                    message.removeClass("message-error");
+                }
+                
+            }
+            
+        }
+
+        function showPreviousTab() {
+            const tabs = document.getElementsByClassName("tab");
+            const steps = document.getElementsByClassName("step");
+
+            if (currentTab > 0) {
+                tabs[currentTab].classList.remove("active");
+                steps[currentTab].classList.remove("active");
+                currentTab--;
+                showTab(currentTab);
+                var fm_title = document.getElementById('fm_title')
+                if(fm_title.innerHTML == "Field Entry Process"){
+                    fm_title.innerHTML = 'Farm Entry Process';
+                }else if (fm_title.innerHTML == "Farm Entry Process"){
+                    fm_title.innerHTML = "Grower’s Signup Process";
+                }
+            }
+        }
+    </script>
+    <script>
+        $("#add_more_split").click(function(e) {
+            var topFcounter = $("#topFcounter").val().trim();
+            $("#topFcounter").val(parseInt(topFcounter)+1);
+
+            var farm_name = document.getElementById('farm_name').value;
+            var counter_no = document.getElementById('add-row-number').value;
+            
+            try{
+                if (parseInt(counter_no) != 1){
+                    var farm_name2 = document.getElementById('farm_name_'+parseInt(counter_no)).value;
+                }
+                
+            }
+            catch{var farm_name2 = undefined}
+
+            if (farm_name != undefined && farm_name.length > 0 && farm_name2 == undefined){
+                var number_1 = $("#add-row-number").val().trim();
+                var number_2 = parseInt(number_1) + parseInt(1);
+                $("#add-row-number").val(number_2);
+                var serialNumber = $("#add-row-number").val().trim();
+                $("#add-newrow-id").append('<div class="step-row step-item open" id="remove-newrow-id_' + serialNumber + '"><button id="add_more_split-xyz" class="btn-delete" type="button" onclick="removeDiv(' + serialNumber + ')"> - </button><div class="col-full"><input type="text" id="farm_name_' + serialNumber + '" name="farm_name_' + serialNumber + '" required><span class="floating-label">Farm Name*</span></div><div class="col-full"><input type="text" id="farm_address_' + serialNumber + '" name="farm_address_' + serialNumber + '" required><span class="floating-label">Address*</span></div><div class="col-full"><select name="farm_crop_' + serialNumber + '" id="farm_crop_' + serialNumber + '" required><option value="">Crop *</option><option value="COTTON">COTTON</option><option value="RICE">RICE</option><option value="WHEAT">WHEAT</option></select></div><div class="col-half"><input type="text" id="farm_city_' + serialNumber + '" name="farm_city_' + serialNumber + '" required><span class="floating-label">City*</span></div><div class="col-half"><select name="farm_state_' + serialNumber + '" id="farm_state_' + serialNumber + '" required><option value="">Select State</option><option value="Alabama">Alabama</option><option value="Alaska">Alaska</option><option value="Arizona">Arizona</option><option value="Arkansas">Arkansas</option><option value="California">California</option><option value="Colorado">Colorado</option><option value="Connecticut">Connecticut</option><option value="Delaware">Delaware</option><option value="District Of Columbia">District Of Columbia</option><option value="Florida">Florida</option><option value="Georgia">Georgia</option><option value="Hawaii">Hawaii</option><option value="Idaho">Idaho</option><option value="Illinois">Illinois</option><option value="Indiana">Indiana</option><option value="Iowa">Iowa</option><option value="Kansas">Kansas</option><option value="Kentucky">Kentucky</option><option value="Louisiana">Louisiana</option><option value="Maine">Maine</option><option value="Maryland">Maryland</option><option value="Massachusetts">Massachusetts</option><option value="Michigan">Michigan</option><option value="Minnesota">Minnesota</option><option value="Mississippi">Mississippi</option><option value="Missouri">Missouri</option><option value="Montana">Montana</option><option value="Nebraska">Nebraska</option><option value="Nevada">Nevada</option><option value="New Hampshire">New Hampshire</option><option value="New Jersey">New Jersey</option><option value="New Mexico">New Mexico</option><option value="New York">New York</option><option value="North Carolina">North Carolina</option><option value="North Dakota">North Dakota</option><option value="Ohio">Ohio</option><option value="Oklahoma">Oklahoma</option><option value="Oregon">Oregon</option><option value="Pennsylvania">Pennsylvania</option><option value="Rhode Island">Rhode Island</option><option value="South Carolina">South Carolina</option><option value="South Dakota">South Dakota</option><option value="Tennessee">Tennessee</option><option value="Texas">Texas</option><option value="Utah">Utah</option><option value="Vermont">Vermont</option><option value="Virginia">Virginia</option><option value="Washington">Washington</option><option value="West Virginia">West Virginia</option><option value="Wisconsin">Wisconsin</option><option value="Wyoming">Wyoming</option></select></div><div class="col-half"><input type="number" min="0" id="farm_zip_code_' + serialNumber + '" name="farm_zip_code_' + serialNumber + '" required><span class="floating-label">Postal / Zip Code*</span></div><div class="col-half"><input type="text" id="farm_Nutrien_Id_' + serialNumber + '" name="farm_Nutrien_Id_' + serialNumber + '" required><span class="floating-label">Nutrien Id*</span></div></div>');
+            
+            }
+            else if(farm_name2 != undefined && farm_name2.length > 0){
+                var number_1 = $("#add-row-number").val().trim();
+                var number_2 = parseInt(number_1) + parseInt(1);
+                $("#add-row-number").val(number_2);
+                var serialNumber = $("#add-row-number").val().trim();
+
+                $("#add-newrow-id").append('<div class="step-row step-item open" id="remove-newrow-id_' + serialNumber + '"><button id="add_more_split-xyz" class="btn-delete" type="button" onclick="removeDiv(' + serialNumber + ')"> - </button><div class="col-full"><input type="text" id="farm_name_' + serialNumber + '" name="farm_name_' + serialNumber + '" required><span class="floating-label">Farm Name*</span></div><div class="col-full"><input type="text" id="farm_address_' + serialNumber + '" name="farm_address_' + serialNumber + '" required><span class="floating-label">Address*</span></div><div class="col-full"><select name="farm_crop_' + serialNumber + '" id="farm_crop_' + serialNumber + '" required><option value="">Crop *</option><option value="COTTON">COTTON</option><option value="RICE">RICE</option><option value="WHEAT">WHEAT</option></select></div><div class="col-half"><input type="text" id="farm_city_' + serialNumber + '" name="farm_city_' + serialNumber + '" required><span class="floating-label">City*</span></div><div class="col-half"><select name="farm_state_' + serialNumber + '" id="farm_state_' + serialNumber + '" required><option value="">Select State</option><option value="Alabama">Alabama</option><option value="Alaska">Alaska</option><option value="Arizona">Arizona</option><option value="Arkansas">Arkansas</option><option value="California">California</option><option value="Colorado">Colorado</option><option value="Connecticut">Connecticut</option><option value="Delaware">Delaware</option><option value="District Of Columbia">District Of Columbia</option><option value="Florida">Florida</option><option value="Georgia">Georgia</option><option value="Hawaii">Hawaii</option><option value="Idaho">Idaho</option><option value="Illinois">Illinois</option><option value="Indiana">Indiana</option><option value="Iowa">Iowa</option><option value="Kansas">Kansas</option><option value="Kentucky">Kentucky</option><option value="Louisiana">Louisiana</option><option value="Maine">Maine</option><option value="Maryland">Maryland</option><option value="Massachusetts">Massachusetts</option><option value="Michigan">Michigan</option><option value="Minnesota">Minnesota</option><option value="Mississippi">Mississippi</option><option value="Missouri">Missouri</option><option value="Montana">Montana</option><option value="Nebraska">Nebraska</option><option value="Nevada">Nevada</option><option value="New Hampshire">New Hampshire</option><option value="New Jersey">New Jersey</option><option value="New Mexico">New Mexico</option><option value="New York">New York</option><option value="North Carolina">North Carolina</option><option value="North Dakota">North Dakota</option><option value="Ohio">Ohio</option><option value="Oklahoma">Oklahoma</option><option value="Oregon">Oregon</option><option value="Pennsylvania">Pennsylvania</option><option value="Rhode Island">Rhode Island</option><option value="South Carolina">South Carolina</option><option value="South Dakota">South Dakota</option><option value="Tennessee">Tennessee</option><option value="Texas">Texas</option><option value="Utah">Utah</option><option value="Vermont">Vermont</option><option value="Virginia">Virginia</option><option value="Washington">Washington</option><option value="West Virginia">West Virginia</option><option value="Wisconsin">Wisconsin</option><option value="Wyoming">Wyoming</option></select></div><div class="col-half"><input type="number" min="0" id="farm_zip_code_' + serialNumber + '" name="farm_zip_code_' + serialNumber + '" required><span class="floating-label">Postal / Zip Code*</span></div><div class="col-half"><input type="text" id="farm_Nutrien_Id_' + serialNumber + '" name="farm_Nutrien_Id_' + serialNumber + '" required><span class="floating-label">Nutrien Id*</span></div></div>');
+            
+            }
+            else{};            
+            
+        });
+
+        $("#add_more_split_2").click(function(e) {
+            var number_1 = $("#add-row-number_2").val().trim();
+            var number_2 = parseInt(number_1) + parseInt(1);
+            $("#add-row-number_2").val(number_2);
+            var serialNumber = $("#add-row-number_2").val().trim();
+
+            $("#add-newrow-id_2").append('<div class="step-row step-item open" id="remove-newrow-id_2_' + serialNumber + '"><button id="add_more_split-abc" class="btn-delete" type="button" onclick="removeDiv2(' + serialNumber + ')"> - </button><div class="col-full"><select name="select_farm_for_field_' + serialNumber + '" id="select_farm_for_field_' + serialNumber + '" required><option value="">Select Farm</option></select></div><div class="col-full"><input type="text" id="field_name_' + serialNumber + '" name="field_name_' + serialNumber + '" required><span class="floating-label">Field name*</span></div><div class="col-half"><input type="number" min="0" id="field_acreage_' + serialNumber + '" name="field_acreage_' + serialNumber + '" required><span class="floating-label">Acreage*</span></div><div class="col-half"><input type="number" min="0" id="field_cultivation_year_' + serialNumber + '" name="field_cultivation_year_' + serialNumber + '" required><span class="floating-label">Year of Cultivation*</span></div><div class="col-half"><input type="number" min="0" id="field_FSA_Farm_number_' + serialNumber + '" name="field_FSA_Farm_number_' + serialNumber + '" required><span class="floating-label">FSA Farm Number*</span></div><div class="col-half"><input type="number" min="0" id="field_FSA_Track_number_' + serialNumber + '" name="field_FSA_Track_number_' + serialNumber + '" required><span class="floating-label">FSA Track Number*</span></div><div class="col-half"><input type="number" min="0" id="field_FSA_Field_number_' + serialNumber + '" name="field_FSA_Field_number_' + serialNumber + '" required><span class="floating-label">FSA Field Number*</span></div><div class="col-half"><div class="group-file"><label class="placeholder-file" for="field_shape_file_' + serialNumber + '">Shape File Upload</label><input type="file" accept=".zip" id="field_shape_file_' + serialNumber + '" name="field_shape_file_' + serialNumber + '"></div></div></div>');
+            showFarm3(serialNumber);
+        });
+    </script>
+    
+    <script>
+        function showfile(serialNumber) {
+            let fileInput = document.getElementById('field_shape_file_' + serialNumber + '');
+            let fileName = fileInput.files[0].name;
+            document.getElementById('show-shape_file_' + serialNumber + '').innerHTML = fileName;
+
+        }
+    </script>
+    <script>
+        function showFarm() {
+            var farm_name_list = document.getElementById("farm_name").value;
+            var total_loop = document.getElementById('topFcounter').value;
+            var itidist_nm_html='<option value="">Select Farm</option>';
+            
+            if (farm_name_list != undefined ){
+                console.log('111 farm_name',1,farm_name_list);
+                itidist_nm_html+='<option value="'+farm_name_list+'">'+farm_name_list+'</option>';
+                
+            try {
+                for (let i = 2; i <  parseInt(total_loop) + 1; i++){
+                    console.log('only farm_name',i,farm_name);
+                    if (!$('#farm_name_'+i).length){
+                        console.log('continue farm_name',i,farm_name);
+                        continue;
+                    }else{
+                        var farm_name = document.getElementById('farm_name_'+i+'').value;
+                        console.log('farm_name',i,farm_name);
+                    }
+                    itidist_nm_html+='<option value="'+farm_name+'">'+farm_name+'</option>';
+                }
+            } catch {}
+            $('#select_farm_for_field').html(itidist_nm_html);
+                
+            }else{}
+            
+        }
+
+        function showFarm3(serialNumber) {
+            var itidist_nm_html='<option value="">Select Farm</option>';
+            var total_loop = document.getElementById('topFcounter').value;
+            try {
+                var farm_name_list = document.getElementById("farm_name").value;
+                if (farm_name_list != undefined) {
+                    itidist_nm_html+='<option value="'+farm_name_list+'">'+farm_name_list+'</option>';
+                }
+                for (let i = 2; i <  parseInt(total_loop) + 1; i++){
+                    
+                    if (!$('#farm_name_'+i).length) {
+                        continue;
+                    }
+                    else{
+                        var farm_name = document.getElementById('farm_name_'+i+'').value;
+                    }
+                    itidist_nm_html+='<option value="'+farm_name+'">'+farm_name+'</option>';
+                }
+            } catch {}
+            $('#select_farm_for_field_'+serialNumber).html(itidist_nm_html);
+        }
+    </script>
+    <script>
+        // remove all .open classes when clicked anywhere
+        hide = true;
+        $('body').on("click", function() {
+            if (hide) $('.step-item').removeClass('open');
+            hide = true;
+        });
+
+        // add and remove .open
+        $('body').on('click', '.step-item', function() {
+
+            var self = $(this);
+
+            // if (self.hasClass('open')) {
+            //     $('.step-item').removeClass('open');
+            //     return false;
+            // }
+
+            $('.step-item').removeClass('open');
+
+            self.toggleClass('open');
+            hide = false;
+        });
+    </script>
+    <script>
+        function removeDiv(serialNumber){
+            
+            document.getElementById('remove-newrow-id_' + serialNumber + '').remove();
+            var counter_no = parseInt(document.getElementById('add-row-number').value) - 1;
+            document.getElementById('add-row-number').value = counter_no;
+        }
+        function removeDiv2(serialNumber){
+            
+            document.getElementById('remove-newrow-id_2_' + serialNumber + '').remove();
+            var counter_no = parseInt(document.getElementById('add-row-number_2').value) - 1;
+            document.getElementById('add-row-number_2').value = counter_no;
+            
+        }
+    </script>
+</body>
+
+</html>

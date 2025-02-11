@@ -1,0 +1,259 @@
+{% extends "base.html" %} {% load static %}
+{% block title %} Grower Payee List {% endblock title %}
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+{% load crispy_forms_tags %}
+{% block content %}
+{% include 'navbar.html' %}
+
+<div class="main-content">
+    {% include 'header.html' %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.0/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.bootstrap4.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/fixedcolumns/4.2.1/css/fixedColumns.dataTables.min.css">
+  <style>
+    .dataTables_scrollHead,
+        .dataTables_scrollBody,
+        .dataTables_scrollFoot {
+            width: 100% !important;
+        }
+    </style>
+
+    <main>
+        {% include '_alerts.html' %}
+        <div class="page-title-with-or-without-btn">
+            <span class="farm headingtop">Grower Payee List</span>
+            <!-- Create button for Account-->
+            <div class="flex-header-btn">
+                <a href="{% url 'grower_split_payee_list' %}" class="btn-close-cancel">GROWER Payment Statement</a>
+                &nbsp;
+                <a href="{% url 'grower_split_payee_add' %}" class="btn-close-cancel">ADD GROWER SPLIT PAYEE</a>
+            </div>
+
+        </div>
+
+        <div class="card card-padding">
+            <div class="main-simple-table-with-search col-12">                
+
+                <div class="both-data-in" style="display: inherit;">
+                    <div class="simple-responsive-table">
+                        <table id="processorList_tbl" class="table table-striped dt-responsive nowrap"
+                            style="width:100%">
+                            <thead>
+                                <tr style="border-bottom: 2px solid #e0e0e0;">
+                                    <th width="20%">Grower</th>
+                                    <th width="20%">Field</th>
+                                    <th width="20%">Lien Name</th>
+                                    <th width="20%"># of Splits</th>
+                                    <th width="20%">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for grower_payee in grower_payee_lst %}
+                                <tr>
+                                    <td>{{grower_payee.grower_namee}}</td>
+                                    <td>{{grower_payee.field_namee}}</td>
+                                    <td>{{grower_payee.lien_name}}</td>
+                                    <td>{{grower_payee.split_conut}}</td>
+                                    <td class="backk action-td rmv-bd">
+                                        <ul>                                                                              
+                                            <li>
+                                                <a href="{% url 'grower_split_payee_edit' grower_payee.id %}" class="update-btn-link" alt="edit" title="edit"> <span class="fas fa-edit"></span></a>
+                                            </li>
+                                            <li>
+                                                <a onclick="delShipment('{% url 'grower_split_payee_delete' grower_payee.id %}')"
+                                                    href="{% url 'grower_split_payee_delete' grower_payee.id %}"
+                                                    data-mdb-toggle="modal" data-mdb-target="#deleteModal" alt="delete" title="delete">
+                                                    <span class="fas fa-trash"></span></a>
+                                            </li>
+                                        </ul>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        <div class="row d-flex justify-content-center ">
+                            <div class="col-md-12 col-sm-12 col-12 text-center mt-2">                                
+                                <span>Showing {{ page_obj.start_index }} - {{ page_obj.end_index }} of {{ page_obj.paginator.count }} entries</span>                                                       
+                            </div>
+                        </div>
+                        <div class="row d-flex justify-content-center align-items-center">
+                            {% if page_obj.has_other_pages %}
+                            <nav aria-label="Page navigation">
+                                <ul class="pagination justify-content-center">
+                                    <!-- Previous Page -->
+                                    {% if page_obj.has_previous %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
+                                            <span aria-hidden="true">&laquo;</span>
+                                        </a>
+                                    </li>
+                                    {% else %}
+                                    <li class="page-item disabled">
+                                        <span class="page-link" aria-hidden="true">&laquo;</span>
+                                    </li>
+                                    {% endif %}
+                        
+                                    <!-- Page Numbers -->
+                                    {% for i in page_obj.paginator.page_range %}
+                                    {% if page_obj.number == i %}
+                                    <li class="page-item active">
+                                        <span class="page-link">{{ i }}</span>
+                                    </li>
+                                    {% else %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+                                    </li>
+                                    {% endif %}
+                                    {% endfor %}
+                        
+                                    <!-- Next Page -->
+                                    {% if page_obj.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
+                                            <span aria-hidden="true">&raquo;</span>
+                                        </a>
+                                    </li>
+                                    {% else %}
+                                    <li class="page-item disabled">
+                                        <span class="page-link" aria-hidden="true">&raquo;</span>
+                                    </li>
+                                    {% endif %}
+                                </ul>
+                            </nav>
+                            {% endif %}
+                        </div>  
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+    </main>
+{% include 'footer.html' %}
+</div>
+
+
+<!-- end -->
+<!-- Delete Popup -->
+<div class="modal fade" id="deleteModal" aria-hidden="true" aria-labelledby="exampleModalToggleLabel22"
+    tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-body">
+                <button type="button" class="btn-close cust-close-ds-btn" data-mdb-dismiss="modal"
+                    aria-label="Close"></button>
+                <div class="center-content-status">
+                    <img src="{% static 'img/trash.png' %}" alt="right" id="rightImg" class="warning-icon">
+                    <p id="message" class="modal-title titlepad">Are you sure you want to delete?</p>
+                </div>
+                <div class="modal-center-btn-footer">
+                    <button onclick="reloadwindow()" id="closeBtnpopup" type="button"
+                        class="btn-close-cancel btn-space" data-mdb-dismiss="modal">
+                        Close
+                    </button>
+
+                    <a onclick="shipmentdeleteNow()" href="" id="shipmentDelete"><button type=""
+                            class="btn-save-submit">Delete</button></a>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<!-- end -->
+    {% endblock content %}
+
+    {% block scripts %}
+    <script src="https://cdn.datatables.net/1.11.0/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.0/js/dataTables.bootstrap4.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.2.9/js/responsive.bootstrap4.min.js"></script>
+    <script src="{% static 'js/farm/farm_list.js' %}"></script>
+    <script src="https://cdn.datatables.net/fixedcolumns/4.2.1/js/dataTables.fixedColumns.min.js"></script>
+
+    <script>
+        // delete storage
+        function delShipment(url) {
+            $('#shipmentDelete').show();
+            $('#shipmentDelete').attr('url', url);
+        }
+
+        function shipmentdeleteNow() {
+            url = $('#shipmentDelete').attr('url');
+            console.log(url)
+            $.ajax({
+                url: url,
+                data: {},
+                success: function (data) {
+                    if (data == 1) {
+                        location.reload();
+                    }
+                }
+            });
+        }
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            $('#processorList_tbl').DataTable({
+                responsive: false,
+            "paging": true,
+            "pageLength": 100,
+			"autoWidth": true,
+            scrollY: "600px",
+            scrollX: true,
+            scrollCollapse: true,
+            fixedColumns: {
+                left: 1,
+                right: 1
+            },
+            });
+        });
+
+        function showQR(grower_shipment_pk) {
+            console.log(grower_shipment_pk)
+            $.ajax({
+                type: "GET",
+                url: `/processor/qr_code_view/${grower_shipment_pk}`,
+                data: {},
+                contentType: false,
+                cache: false,
+                processData: false,
+                success: function (response) {
+                    console.log('response1', response)
+                    var qrimgsrc = document.getElementById("qr_id").src;
+                    console.log(qrimgsrc)
+                    $('#qr_id').attr("src", "/media/" + response);
+
+                }
+            });
+            $('#addqueModal').modal('show');
+        }
+
+        function closeAddModal() {
+            $('#addqueModal').modal('hide');
+        }
+    </script>
+    <script>
+        $('#Growers-Payments-active').addClass('activeLink');
+                      
+        $('#Growers-Payments-down').addClass('down');
+        $('#Growers-Payments-sub').show();
+        
+        $('#Grower-Payee-List').addClass('activeLink active-nav');
+    </script>
+    {% endblock scripts %}

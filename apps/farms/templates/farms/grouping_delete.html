@@ -1,0 +1,43 @@
+{% extends "base.html" %} 
+{% load static %} 
+{% block title %} Delete Grouping Criteria {% endblock title %} 
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+{% block content %} 
+{% include 'navbar.html' %}
+
+<div class="main-content">
+    {% include 'header.html' %}
+    <div class="modal-dialog">
+        <div class="modal-content deletepopup">
+            <div class="modal-body">
+                <div class="container">
+                    <form method="post" action="{% url 'grouping-delete' object.pk %}">
+                        {% csrf_token %}
+                        <p class="delete-msg">Are you sure you want to delete "{{object}}"?</p>
+                        <div class="modal-footer delete-footer-btn">
+                            <button class="btn-inffo">Delete</button>
+                            <a href="{% url 'grouping' %}" class="btn-inffo2" data-mdb-dismiss="modal" aria-label="Close">Cancel</a>
+                        </div> </form>
+                     
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer"> </div>
+</div>
+</div>
+
+{% endblock content %} 
+

@@ -1,0 +1,672 @@
+{% extends "base.html" %} {% load static %}
+{% block title %} Grower Weather Section Outline {% endblock title %}
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+{% load crispy_forms_tags %}
+{% block content %}
+{% include 'navbar.html' %}
+
+<!-- datepicker styles -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker3.min.css">
+
+<style>
+    .canvasjs-chart-credit{
+        display: none;
+    }
+    .designbox{
+        border-radius:20px;
+        border:1px solid #ccc;
+        background: #f8f8f8;
+        font-size:20px;
+        box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
+        padding: 20px;
+        text-align: left !important;
+        margin: 0px 0px 20px 0;
+    }
+    .designbox .topmainClass{
+        overflow-y: auto;
+    }
+    .designbox.newdesignbox .topmainClass{
+        height: 12vh;
+    }
+
+    @media(min-width: 768px) {
+        .designbox .topmainClass{
+        height: 36vh;
+        }
+    }
+    .designbox .topmainClass::-webkit-scrollbar{width:6px;max-height:20px;padding-right: 10px;}
+
+    .designbox .topmainClass::-webkit-scrollbar-track{background:#ccc}
+    .designbox .topmainClass::-webkit-scrollbar-thumb{background-color:#000;border-radius:20px;min-height:20px}
+
+
+    
+    .designbox h4{ text-align: left !important; font-size: 27px; font-weight: bold; color: #1a416d;}
+    .designbox p{ text-align: left; font-size: 16px; color:rgb(39, 39, 39); list-style: disc; padding: 5px 10px; margin: 0px;}
+
+    .designbox .mainClass{
+        padding: 5px 10px;
+    }
+    .designbox .mainClass h6{
+        font-size: 16px;
+        font-weight: 700;
+        margin-bottom: 2px;
+        color: rgb(39, 39, 39);
+    }
+    .designbox .mainClass p{
+        font-size: 16px;
+        padding: 0;
+    }
+
+    .h-100 {height: 100%;}
+    .relative{
+        position: relative;
+    }
+
+    .bootstrap-select>select {
+        top: 0;
+        left: 0;
+    }
+
+    .dropdown.bootstrap-select.form-control .btn {
+        line-height: 2.5;
+    }
+
+    .selected {
+        margin-top: 0;
+        padding: 5px 7px;
+        margin-left: 0;
+    }
+    .form-select {
+        padding-top: 12px !important;
+        padding-bottom: 12px !important;
+        height: auto !important;
+    }
+
+    .dropdown-toggle:after {
+        background-image: url(data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%234f4f4f' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3E%3C/svg%3E);
+    }
+
+    .card-padding {
+        box-shadow: none;
+    }
+
+    @media(max-width:767px) {
+        .mob-canvas-scroll {
+            overflow-x: auto;
+        }
+
+        .mob-width-768px {
+            width: 768px;
+        }
+    }
+
+
+    .accordion-button:not(.collapsed) {
+        color: #0b6c39;
+    }
+</style>
+
+<div class="main-content">
+    {% include 'header.html' %}
+
+    <main>
+        <div class="page-title-with-or-without-btn d-flex">
+            <div class="farm headingtop ">Grower Weather Section Outline</div> 
+            <div class="mst-auto">
+                {% comment %} <button onclick="downloadimage()" class="btn-close-cancel">Click To Download Image</button> {% endcomment %}
+            </div>
+        </div>
+
+        <div id="htmltoimage">
+            <div>
+                <form action="" method="post" >
+                    {% csrf_token %}
+                    <div class="inline-option p-3 rounded shadow bg-white">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label for=""><strong>Grower</strong></label>
+                                <select name="growerSelction" id="growerSelction" class="form-control selectpicker border border-solid border-black rounded-pill" data-live-search="true">
+                                    <option value="">Select Grower</option>
+                                    {% for i in growers %}
+                                    {% if i == selectedGrower %}
+                                    <option value="{{i.pk}}" selected>{{i.name}}</option>
+                                    {% else %}
+                                    <option value="{{i.pk}}">{{i.name}}</option>
+                                    {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label for=""><strong>Field</strong></label>
+                                <select name="fieldSelction" id="fieldSelction" class="form-control selectpicker border border-solid border-black rounded-pill" data-live-search="true">
+                                    <option value="">Select Field</option>
+                                    {% for i in fields %}
+                                    {% if i == selectedField %}
+                                    <option value="{{i.pk}}" selected>{{i.name}}</option>
+                                    {% else %}
+                                    <option value="{{i.pk}}">{{i.name}}</option>
+                                    {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <input type="submit" id="submitBtn" style="display: none;">
+                </form>
+                {% if selectedField %}
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <div class="accordion accordion-flush" id="accordionFlushExample">
+                            <div class="accordion-item">
+                              <h2 class="accordion-header" id="flush-headingOne">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
+                                    <i class="fas fa-map-marker-alt me-1"></i> {% if f_county %}{{f_county}}, {% endif %}{% if f_state %}{{f_state}}{% else %}{{f_loc.state}}{% endif %}
+                                </button>
+                              </h2>
+                              <div id="flush-collapseOne" class="accordion-collapse collapse p-3" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
+                                {% if f_county %}<p><strong>County </strong>{{f_county}}</p>{% endif %}
+                                {% if f_state %}<p><strong>State </strong>{{f_state}}</p>{% endif %}
+                                {% if f_postcode %}<p><strong>Postcode </strong>{{f_postcode}} </p>{% endif %}
+                                {% if latitude %}<p><strong>Latitude </strong>{{latitude}} </p>{% endif %}
+                                {% if longitude %}<p><strong>Longitude </strong>{{longitude}} </p>{% endif %}
+                              </div>
+                            </div>
+                            <div class="accordion-item mt-3">
+                              <h2 class="accordion-header" id="flush-headingTwo">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseTwo" aria-expanded="false" aria-controls="flush-collapseTwo">
+                                    <i class="fas fa-exclamation-triangle me-1"></i> {{alerts_data_title}}  
+                                </button>
+                              </h2>
+                              <div id="flush-collapseTwo" class="accordion-collapse collapse p-3" aria-labelledby="flush-headingTwo" data-bs-parent="#accordionFlushExample">
+                                {% if alerts_data %}
+                                {% for i in alerts_data %}
+                                <strong>{{i.headline}}</strong>
+                                <p>{{i.description}}</p>
+                                <p>{{i.areaDesc}}</p>
+                                <hr>
+                                {% endfor %}
+                                {% else %}
+                                <strong>No alerts for this region</strong>
+                                {% endif %}
+                              </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 mt-4">
+                        <div class="row">
+                            <div class="col-sm-6 col-12">
+                                <h4 class="mb-3">Current Weather</h4>
+                                <div class="p-4 bg-white shadow">
+                                    <div class="row" style="padding-bottom: 45px;">
+                                        <div class="col-sm-3">
+                                            {% if f_climate_current.f_get_currentForecast == 'sunny' %}
+                                            <img src="{% static 'img/images/bigsunny.png' %}" alt="sunny">
+                                            {% elif f_climate_current.f_get_currentForecast == 'cloudy' %}
+                                            <img src="{% static 'img/images/bigcloudy.png' %}" alt="cloudy">
+                                            {% elif f_climate_current.f_get_currentForecast == 'rainy' %}
+                                            <img src="{% static 'img/images/bigrainy.png' %}" alt="rainy">
+                                            {% elif f_climate_current.f_get_currentForecast == 'snow' %}
+                                            <img src="{% static 'img/images/bigsnow.png' %}" alt="snow">
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-sm-9">
+                                            <h2>Now</h2>
+                                            <p style="margin: 0px;padding: 0px;font-size: 36px;color: #1a416d;font-weight: bold;">{{f_climate_current.f_temperature}} °F </p>
+                                            <p style="margin: 0px;padding: 0px;font-size: 24px;margin-bottom: 20px;font-weight: bold;text-transform: uppercase;">{{f_climate_current.f_get_currentForecast}}</p>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            &nbsp;
+                                        </div>
+                                        <div class="col-sm-9">
+                                            <p style="margin: 0px;padding: 0px;font-size: 24px;"><strong>Forecast : </strong> {{f_climate_current.f_description}} </p>
+                                            <p style="margin: 0px;padding: 0px;font-size: 24px;"><strong>Humidity : </strong>{{f_climate_current.f_humidity}} %</p>
+                                            <p style="margin: 0px;padding: 0px;font-size: 24px;"><strong>Wind Speed : </strong>{{f_climate_current.f_wind}} mph</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-12">
+                                <h4 class="mb-3">Forecast Weather</h4>
+                                <div class="p-4 bg-white shadow">
+                                    <ul class="m-0 p-0">
+                                        {% for i in result_forecast_data %}
+                                        <li class="mb-1">
+                                            <button type="button" class="btn w-100 text-start" data-bs-container="body" data-bs-toggle="popover" data-bs-placement="bottom" data-bs-content="{{i.shortForecast}}, Relative Humidity : {{i.relativeHumidity}} %, WindSpeed : {{i.windSpeed_value}} mph">
+                                                {% if i.get_shortForecast == 'sunny' %}
+                                                <img src="{% static 'img/images/sunny.png' %}" alt="sunny" height="24px">
+                                                {% elif i.get_shortForecast == 'cloudy' %}
+                                                <img src="{% static 'img/images/cloudy.png' %}" alt="cloudy" height="24px">
+                                                {% elif i.get_shortForecast == 'rainy' %}
+                                                <img src="{% static 'img/images/rain.png' %}" alt="rainy" height="24px">
+                                                {% elif i.get_shortForecast == 'snow' %}
+                                                <img src="{% static 'img/images/snow.png' %}" alt="snow" height="24px">
+                                                {% endif %}
+                                                <strong>{{i.day}}</strong> - {{i.get_shortForecast}} <strong>{{i.max_temp}}/{{i.min_temp}}</strong>°F
+                                            </button>
+                                        </li>
+
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                          </div>
+                    </div>
+                    <!-- temperature graph -->
+                    <div class="col-12 mt-3">
+                        <div class="d-flex">
+                            <div style="margin-top: 5px;">
+                                <h4 class="mb-3">Temperature for Region</h4>
+                            </div>
+                            <div style="margin-left: 210px; margin-bottom: 10px;">
+                                <select name="daySelction" id="daySelction" class="form-control selectpicker border border-solid border-black" data-live-search="true" onchange="getSelectedValue()">
+                                    <option value="all">All Days</option>
+                                    {% for i in result_forecast_data %}
+                                    <option value="{{i.day}}">{{i.day}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="p-4 bg-white shadow h-100">
+                                    <div id="chartContainer" style="height: 424px; width: 100%; position: relative;"></div>
+                                    {% for k in result_url3 %}
+                                    <div id="chartContainer-{{k.day}}" style="height: 424px; width: 100%; position: relative; display: none;"></div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="p-4 bg-white shadow h-100">
+                                    <img src="https://graphical.weather.gov/images/conus/T1_conus.png" alt="" class="w-100">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 mt-4">
+                        <div class="row">
+                            <div class="col-sm-12 col-12">
+                                <h4 class="mb-3">Radar</h4>
+                                <div class="p-4 bg-white shadow">
+                                    <iframe src="{{rader_url_format}}" width="100%" height="600" class="border" frameborder="0" allowfullscreen="" aria-hidden="false" tabindex="0"></iframe>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% elif error_msg %}
+                <div>{{error_msg}}</div>
+                {% endif %}
+            </div>
+        </div>    
+    </div>
+                    
+    </main>
+    {% include 'footer.html' %}
+</div>
+{% endblock content %}
+
+{% block scripts %}
+
+<script src="https://cdn.canvasjs.com/canvasjs.min.js"></script>
+<script src="{% static 'js/farm/farm_list.js' %}"></script>
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.js"></script>
+{% comment %} <script>
+    function downloadimage() {
+                /*var container = document.getElementById("image-wrap");*/ /*specific element on page*/
+                var container = document.getElementById("htmltoimage"); /* full page */
+                html2canvas(container, { allowTaint: true }).then(function (canvas) {
+
+                    var link = document.createElement("a");
+                    document.body.appendChild(link);
+                    link.download = "{{select_get_grower_name}}.jpg";
+                    link.href = canvas.toDataURL();
+                    link.target = '_blank';
+                    link.click();
+                });
+            }
+    
+</script> {% endcomment %}
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.js">
+</script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.js">
+</script>
+
+<link href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/ui-lightness/jquery-ui.css" rel="stylesheet"
+    type="text/css" />
+
+<script>
+    const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]')
+    const popoverList = [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl))
+    $(document).ready(function() {
+    $('#growerSelction').change( function () {
+    $('#submitBtn').click();
+    });
+    });
+    $(document).ready(function() {
+    $('#fieldSelction').change( function () {
+    $('#submitBtn').click();
+    });
+    });
+</script>
+<!-- Temperatuer graph Days-->
+<script>
+    // Temperatuer graph Days
+        function getSelectedValue() {
+            var selectedValue = document.getElementById("daySelction").selectedOptions[0].value;
+            if (selectedValue != "all"){
+                document.getElementById("chartContainer").style.display = "none";
+
+                {% for zz in result_url3 %}
+                document.getElementById("chartContainer-"+ "{{zz.day}}").style.display = "none";
+                {% endfor %}
+
+                document.getElementById("chartContainer-"+ selectedValue).style.display = "block";
+                
+                
+                {% for zz in result_url3 %}
+                if ('{{zz.day}}' == selectedValue){
+                    document.getElementById("chartContainer-"+ selectedValue).style.display = "block";
+                    // Temperatuer graph Days
+                    charts_.render();
+                }
+                // else{
+                // //     console.log("else selectedValue",selectedValue, '{{zz}}');
+                //     document.getElementById("chartContainer-"+ selectedValue).style.display = "none";
+                // }
+                {% endfor %}
+                
+                
+            }else{
+                document.getElementById("chartContainer").style.display = "block";
+                {% for zz in result_url3 %}
+                document.getElementById("chartContainer-"+ "{{zz.day}}").style.display = "none";
+                {% endfor %}
+                // document.getElementById("chartContainer"+ selectedValue).style.display = "none";
+            }
+                   
+    
+        }
+</script>
+<script>
+    window.onload = function () {
+    var chart = new CanvasJS.Chart("chartContainer", {
+        animationEnabled: true,
+        title:{
+            text: ""
+        },
+        // axisX: {
+        //     valueFormatString: "DD MMM,YY"
+        // },
+        axisY: {
+            maximum: 120,
+            title: "",
+            suffix: ""
+        },
+        legend:{
+            cursor: "pointer",
+            fontSize: 16,
+            itemclick: toggleDataSeries
+        },
+        toolTip:{
+            shared: true,
+        },
+        data: [{
+            name: "Temperature (°F)",
+            type: "spline",
+            toolTipContent: "<strong>Day :</strong> {day}</br><strong>Temperature (°F):</strong> {y} °F",
+            showInLegend: true,
+            color: "#05cdfa",
+            dataPoints: [
+                {% for i in result_forecast_data %}
+                { label: "{{i.day}}", y: {{i.max_temp}}, name: '{{i.get_shortForecast}}',day: '{{i.day}}', h:'{{i.relativeHumidity}}'},
+                {% endfor %}
+            ]
+        },
+        {
+            name: "Humidity (%)",
+            type: "spline",
+            color: "#0b6c39",
+            toolTipContent: "<strong>Humidity (%):</strong> {y} %",
+            showInLegend: true,
+            
+            dataPoints: [
+                {% for i in result_forecast_data %}
+                { label: "{{i.day}}", y: {{i.relativeHumidity}}, name: '{{i.get_shortForecast}}' },
+                {% endfor %}
+            ]
+        },
+        {
+            name: "Wind speed (kph)",
+            type: "spline",
+            lineDashType: "dash",
+            toolTipContent: "<strong>Wind speed (mph):</strong> {y} mph</br><strong>Short forecast :</strong> {name} ",
+            showInLegend: true,
+            color: "#9805fa",
+            dataPoints: [
+                {% for i in result_forecast_data %}
+                { label: "{{i.day}}", y: {{i.windSpeed_value}}, name: '{{i.get_shortForecast}}' },
+                {% endfor %}
+            ]
+        }]
+    });
+    chart.render();
+    //
+    var images = [];  
+    
+    addImagesFahrenheit(chart);
+    function addImagesFahrenheit(chart) {
+        for(var i = 0; i < chart.data[0].dataPoints.length; i++){
+            var dpsName = chart.data[0].dataPoints[i].name;
+            if(dpsName == "cloudy"){
+                images.push($("<img>").attr("src", "{% static 'img/images/cloudy.png' %}"));
+            } else if(dpsName == "rainy"){
+            images.push($("<img>").attr("src", "{% static 'img/images/rain.png' %}"));
+            } else if(dpsName == "sunny"){
+                images.push($("<img>").attr("src", "{% static 'img/images/sunny.png' %}"));
+            }
+            else if(dpsName == "snow"){
+                images.push($("<img>").attr("src", "{% static 'img/images/snow.png' %}"));
+            }
+    
+        images[i].attr("class", dpsName).appendTo($("#chartContainer>.canvasjs-chart-container"));
+        
+        positionImage(images[i], i);
+        }
+    };
+    function positionImage(image, index) {
+	var imageCenter = chart.axisX[0].convertValueToPixel(chart.data[0].dataPoints[index].x);
+	var imageTop =  chart.axisY[0].convertValueToPixel(chart.axisY[0].maximum);
+	image.width("40px")
+	.css({ "left": imageCenter - 20 + "px",
+	"position": "absolute","top":imageTop+ "px",
+	"position": "absolute"});
+    }
+
+    $( window ).resize(function() {
+        var cloudyCounter = 0, rainyCounter = 0, sunnyCounter = 0;    
+        var imageCenter = 0;
+        for(var i=0;i<chart.data[0].dataPoints.length;i++) {
+            imageCenter = chart.axisX[0].convertValueToPixel(chart.data[0].dataPoints[i].x) - 20;
+            if(chart.data[0].dataPoints[i].name == "cloudy") {					
+                $(".cloudy").eq(cloudyCounter++).css({ "left": imageCenter});
+            } else if(chart.data[0].dataPoints[i].name == "rainy") {
+                $(".rainy").eq(rainyCounter++).css({ "left": imageCenter});  
+            } else if(chart.data[0].dataPoints[i].name == "sunny") {
+                $(".sunny").eq(sunnyCounter++).css({ "left": imageCenter});  
+            }                
+        }
+    });
+
+    function formatter(e) { 
+        if(e.index === 0 && e.dataPoint.x === 0) {
+            return " Min " + e.dataPoint.y[e.index] + "°";
+        } else if(e.index == 1 && e.dataPoint.x === 0) {
+            return " Max " + e.dataPoint.y[e.index] + "°";
+        } else{
+            return e.dataPoint.y[e.index] + "°";
+        }
+    }
+    //
+    function toggleDataSeries(e){
+        if (typeof(e.dataSeries.visible) === "undefined" || e.dataSeries.visible) {
+            e.dataSeries.visible = false;
+        }
+        else{
+            e.dataSeries.visible = true;
+        }
+        chart.render();
+    }};
+    // 
+    // 
+    // 
+    // Temperatuer graph //
+    {% for k in combined_data %}
+    var charts_ = new CanvasJS.Chart("chartContainer-{{k.day}}", {
+        animationEnabled: true,
+        title:{
+            text: "{{k.day}}"
+        },
+        axisX: {
+            // valueFormatString: "DD MMM,YY"
+        },
+        axisY: {
+            maximum: 120,
+            title: "",
+            suffix: ""
+        },
+        legend:{
+            cursor: "pointer",
+            fontSize: 16,
+            itemclick: toggleDataSeries_
+        },
+        toolTip:{
+            shared: true,
+        },
+        data: [{
+            name: "Temperature (°F)",
+            type: "spline",
+            toolTipContent: "<strong>Datetime :</strong> {day}</br><strong>Temperature (°F):</strong> {y} °F",
+            showInLegend: true,
+            color: "#05cdfa",
+            dataPoints: [
+                {% for ii in k.data_points %}
+                { label: '{{ii.formatted_date}}', y: {{ii.temperature}}, name: '{{ii.get_shortForecast}}',day: '{{ii.formatted_date}}', h:'{{ii}}'},
+                {% endfor %}
+            ]
+        },
+        {
+            name: "Humidity (%)",
+            type: "spline",
+            color: "#0b6c39",
+            toolTipContent: "<strong>Humidity (%):</strong> {y} %",
+            showInLegend: true,
+            
+            dataPoints: [
+                {% for hh in k.data_points %}
+                { label: '{{hh.formatted_date}}', y: {{hh.relativeHumidity}}, name: '{{hh.get_shortForecast}}' },
+                {% endfor %}
+            ]
+        },
+        {
+            name: "Wind speed (kph)",
+            type: "spline",
+            lineDashType: "dash",
+            toolTipContent: "<strong>Wind speed (mph):</strong> {y} mph</br><strong>Short forecast :</strong> {name} ",
+            showInLegend: true,
+            color: "#9805fa",
+            dataPoints: [
+                {% for ww in k.data_points %}
+                { label: '{{ww.formatted_date}}', y: {{ww.windSpeed}}, name: '{{ww.get_shortForecast}}' },
+                {% endfor %}
+            ]
+        }
+    ]
+    });
+    charts_.render();
+    //
+    // var images_ = [];  
+    
+    // addImagesFahrenheit_(charts_);
+    // function addImagesFahrenheit_(charts_) {
+    //     for(var i = 0; i < charts_.data[0].dataPoints.length; i++){
+    //         var dpsName = charts_.data[0].dataPoints[i].name;
+    //         if(dpsName == "cloudy"){
+    //             images_.push($("<img>").attr("src", "{% static 'img/images/cloudy.png' %}"));
+    //         } else if(dpsName == "rainy"){
+    //             images_.push($("<img>").attr("src", "{% static 'img/images/rain.png' %}"));
+    //         } else if(dpsName == "sunny"){
+    //             images_.push($("<img>").attr("src", "{% static 'img/images/sunny.png' %}"));
+    //         }
+    //         else if(dpsName == "snow"){
+    //             images_.push($("<img>").attr("src", "{% static 'img/images/snow.png' %}"));
+    //         }
+    
+    //         images_[i].attr("class", dpsName).appendTo($("#chartContainer-{{k.day}}>.canvasjs-chart-container"));
+        
+    //     positionImage_(images_[i], i);
+    //     }
+    // };
+    // function positionImage_(images_, index) {
+	// var imageCenter = charts_.axisX[0].convertValueToPixel(charts_.data[0].dataPoints[index].x);
+	// var imageTop =  charts_.axisY[0].convertValueToPixel(charts_.axisY[0].maximum);
+	// images_.width("40px")
+	// .css({ "left": imageCenter - 20 + "px",
+	// "position": "absolute","top":imageTop+ "px",
+	// "position": "absolute"});
+    // }
+
+    // $( window ).resize(function() {
+    //     var cloudyCounter = 0, rainyCounter = 0, sunnyCounter = 0;    
+    //     var imageCenter = 0;
+    //     for(var i=0;i<charts_.data[0].dataPoints.length;i++) {
+    //         imageCenter = charts_.axisX[0].convertValueToPixel(charts_.data[0].dataPoints[i].x) - 20;
+    //         if(charts_.data[0].dataPoints[i].name == "cloudy") {					
+    //             $(".cloudy").eq(cloudyCounter++).css({ "left": imageCenter});
+    //         } else if(charts_.data[0].dataPoints[i].name == "rainy") {
+    //             $(".rainy").eq(rainyCounter++).css({ "left": imageCenter});  
+    //         } else if(charts_.data[0].dataPoints[i].name == "sunny") {
+    //             $(".sunny").eq(sunnyCounter++).css({ "left": imageCenter});  
+    //         }                
+    //     }
+    // });
+
+    // function formatter(e) { 
+    //     if(e.index === 0 && e.dataPoint.x === 0) {
+    //         return " Min " + e.dataPoint.y[e.index] + "°";
+    //     } else if(e.index == 1 && e.dataPoint.x === 0) {
+    //         return " Max " + e.dataPoint.y[e.index] + "°";
+    //     } else{
+    //         return e.dataPoint.y[e.index] + "°";
+    //     }
+    // }
+    //
+    // 
+    function toggleDataSeries_(e){
+        if (typeof(e.dataSeries.visible) === "undefined" || e.dataSeries.visible) {
+            e.dataSeries.visible = false;
+        }
+        else{
+            e.dataSeries.visible = true;
+        }
+        charts_.render();
+    }
+{% endfor %}
+</script>
+
+{% endblock scripts %}

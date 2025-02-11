@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %} Field Management
+{% endblock title %}
+{% load crispy_forms_tags %}
+{% block content %}
+{% include 'navbar.html' %}
+
+<div class="main-content">
+  {% include 'header.html' %}
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css">
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.11.0/css/dataTables.bootstrap4.min.css">
+  <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.bootstrap4.min.css">
+  <main>
+    {% include '_alerts.html' %}
+    <div class="page-title-with-or-without-btn">
+      <span class="farm headingtop">CONTRACT DETAILS</span>
+      <!-- Create button for Account-->
+      <div class="flex-header-btn">
+        {% if 'Field Edit' in request.user.get_role_perm or request.user.is_superuser %}
+<!--        <a title="Upload CSV file with all the required coloumns" href="{% url 'csv-field-create' %}"-->
+<!--          class="btn-close-cancel btn-space">Create Field via CSV</a>-->
+<!--        <a href="{% url 'field-create' %}" class="btn-close-cancel">Create Field</a>-->
+        {% endif %}
+      </div>
+    </div>
+
+
+
+    <div class="card">
+      <div class="signdocument-block">
+        <div class="signdocument-content p-4">
+            <span class="farm headingtop mt-2">{{ object.name }}</span>
+            <br><br>
+            {{object.contract | safe}}
+        </div>
+      </div>
+    </div>
+
+    <div class="card card-padding mt-3">
+      <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book</p>
+      <div class="row">
+        <div class="col-md-5">
+          <div id="div_id_name" class="form-group">
+<!--              <label for="id_name">-->
+<!--                  Contract Name-->
+<!--              </label>-->
+<!--              <div class="dashed-textarea">-->
+<!--                  <textarea type="text" name="" class="form-control" placeholder="Enter here"> </textarea>-->
+<!--              </div>-->
+
+
+
+
+
+
+
+              {% if is_signed %}
+                {% if signatures %}
+                    <div class="container-fluid">
+                        <div class="row">
+                            {% for signature in signatures %}
+                                <div class="col-md-4">
+                                    <img src="{{ signature.signature }}" height="150" />
+                                    <label for="id_name">
+                                        {{ signature.grower__name }}
+                                    </label>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% else %}
+                    <label for="id_name">
+                        Signature
+                    </label>
+                    <img src="{{ signature }}" height="150" width="500" style="border: 2px dashed #ddd;" />
+                {% endif %}
+              {% else %}
+
+                <label for="id_name">
+                    Signature
+                </label>
+                  <canvas id="colors_sketch" width="500" height="150" style="border: 2px dashed #ddd;">
+                  </canvas>
+
+                {% if not request.user.is_superuser or not 'SubAdmin' in request.user.get_role or not 'SuperUser' in request.user.get_role %}
+                    <div class="row">
+                        <div class="form-btn-row">
+                            <a href="{% url 'contract-list' %}" class="btn-close-cancel btn-space">Cancel</a>
+                            <input id="btnSave" type="button" class="btn-save-submit" value="Save">
+                        </div>
+                    </div>
+                {% endif %}
+              {% endif %}
+          </div>
+
+            <form action="/contracts/sign-contracts/" id="contractSignForm" method="post" class="farm-fields-form">
+                {% csrf_token %}
+                <input type="hidden" name="signature" value="" id="contract_signature">
+                <input type="hidden" name="contract_id" value="{{ object.id }}" id="contract_signature">
+                <input type="hidden" name="grower_id" value="{{ request.user.grower.id }}" id="contract_signature">
+            </form>
+
+
+      </div>
+      </div>
+    </div>
+
+
+  </main>
+  {% include 'footer.html' %}
+</div>
+
+<!-- end -->
+{% comment %} <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+<script src="https://cdn.datatables.net/1.11.0/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.0/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/responsive.bootstrap4.min.js"></script>
+
+{% endcomment %}
+<script type="text/javascript" src="{% static 'js/field/field_list.js' %}"></script>
+{% endblock content %}
+
+{% block scripts %}
+
+<script src="https://cdn.datatables.net/1.11.0/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.0/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/responsive.bootstrap4.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
+
+<script src="{% static 'js/farm/farm_list.js' %}"></script>
+{% endblock scripts %}
+{% block jquery %}
+<script>
+    $(document).ready(function() {
+        $('#fieldListtbl').DataTable({
+          columnDefs: [
+            {
+                orderable: false,
+                targets: [2]
+            }
+        ]
+        });
+
+    });
+</script>
+
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+<script src="https://cdn.rawgit.com/mobomo/sketch.js/master/lib/sketch.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+    $(function () {
+        $('#colors_sketch').sketch();
+        $(".tools a").eq(0).attr("style", "color:#000");
+        $(".tools a").click(function () {
+            $(".tools a").removeAttr("style");
+            $(this).attr("style", "color:#000");
+        });
+        $("#btnSave").bind("click", function () {
+            var base64 = $('#colors_sketch')[0].toDataURL();
+            //$("#imgCapture").attr("src", base64);
+            //$("#imgCapture").show();
+            $("#contract_signature").val(base64)
+            $("#contractSignForm").submit();
+        });
+    });
+</script>
+
+<script type="text/javascript">
+    jQuery(document).ready(function($){
+
+    var canvas = document.getElementById("signature");
+    var signaturePad = new SignaturePad(canvas);
+
+    $('#clear-signature').on('click', function(){
+        signaturePad.clear();
+    });
+
+});
+</script>
+<script>
+  $('#Contracts-active').addClass('activeLink');
+
+  $('#Contracts-down').addClass('down');
+  $('#Contracts-sub').show();
+
+  $('#Contracts-List').addClass('activeLink active-nav');
+
+</script>
+{% endblock jquery %}

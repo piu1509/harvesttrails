@@ -1,0 +1,193 @@
+{% extends "base.html" %} {% load static %}
+{% block title %} QuickBooks Vendor Management {% endblock title %}
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+
+{% load crispy_forms_tags %}
+{% block content %}
+{% include 'navbar.html' %}
+<style>
+  .table>:not(caption)>*>*{
+    border-bottom-width:0px
+  }
+</style>
+<div class="main-content">
+    {% include 'header.html' %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.0/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.bootstrap4.min.css">
+
+    <main>
+        {% include '_alerts.html' %}
+        <div class="page-title-with-or-without-btn">
+            <span class="farm headingtop">QuickBooks Vendor List</span>
+            <!-- Create button for add-processor-->
+            
+        </div>
+        <div class="card card-padding">
+          <div class="main-simple-table-with-search">
+            <div class="both-data-in" style="display: inherit;">
+                <div class="simple-responsive-table">
+                    <form method="POST" action="{% url 'import_vendor' %}">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" class="btn-close-cancel mb-3">Import</button>
+                        </div>
+                        
+                        <table id="distributorList_tbl" class="table table-striped dt-responsive nowrap" style="width:100%">
+                            <thead>
+                                <tr style="border-bottom: 2px solid #e0e0e0;">
+                                    <th>
+                                        <input type="checkbox" id="select_all" onclick="toggleSelectAll(this)">
+                                    </th>
+                                    <th width="">QuickBooks ID</th> 
+                                    <th width="">Vendor name</th> 
+                                    <th width="">Email</th>                           
+                                    <th width="">Phone</th>
+                                    <th width="">Type</th>
+                                    <th width="">Website</th>                                      
+                                    <th width="">Billing Address</th>                                                            
+                                                                
+                                </tr>
+                            </thead>
+                        
+                            <tbody>
+                                {% for vendor in vendors %}                                                  
+                                <tr> 
+                                    <td>
+                                        <input type="checkbox" class="vendor_checkbox" name="vendor_ids" value="{{ vendor.id }}">
+                                    </td>                             
+                                    <td>{{vendor.id}}</td>
+                                    <td>{{vendor.name}}</td>    
+                                    <td>{{vendor.email}}</td> 
+                                    <td><a href="tel:{{vendor.phone}}" title="{{vendor.phone}}"><span class="fas fa-phone"></span></a></td>   
+                                    <td>{{vendor.type}}</td> 
+                                    <td>{{vendor.website}}</td>                                                  
+                                    <td>{{vendor.bill_address}}</td>
+                                    
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>                    
+                    </form>
+                    <div class="col-md-12 col-sm-12 col-12 text-center mt-2" style="text-align:right">
+                      <span>Showing {{ vendors.start_index }} - {{ vendors.end_index }} of {{ vendors.paginator.count }} entries</span>
+                    </div>
+                    <!-- Pagination controls -->
+                    <div class="row d-flex justify-content-center align-items-center"> 
+                        <div class="col-sm-4 text-center"> 
+                            {% if vendors.has_other_pages %}
+                            <ul class="pagination justify-content-center" id="nav_1"> 
+                                {% if vendors.has_previous %}
+                                <li><a href="?search_name={{ search_name }}&page={{ vendors.previous_page_number }}">&laquo;</a></li>
+                                {% else %}
+                                <li class="disabled"><span>&laquo;</span></li>
+                                {% endif %}
+                                {% for i in vendors.paginator.page_range %}
+                                {% if vendors.number == i %}
+                                <li class="active pagi" id="getactive"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+                                {% else %}
+                                <li><a href="?search_name={{ search_name }}&page={{ i }}">{{ i }}</a></li>
+                                {% endif %}
+                                {% endfor %}
+                                {% if vendors.has_next %}
+                                <li><a href="?search_name={{ search_name }}&page={{ vendors.next_page_number }}">&raquo;</a></li>
+                                {% else %}
+                                <li class="disabled"><span>&raquo;</span></li>
+                                {% endif %}
+                            </ul>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    {% include 'footer.html' %}
+</div>
+
+{% endblock content %}
+
+{% block scripts %}
+
+<script>
+  document.getElementById('searchInput').addEventListener('keyup', function() {
+      let filter = this.value.toUpperCase();
+      let rows = document.querySelector("#processorList_tbl tbody").rows;
+      
+      for (let i = 0; i < rows.length; i++) {
+          let cells = rows[i].cells;
+          let match = false;
+          for (let j = 0; j < cells.length; j++) {
+              if (cells[j].innerText.toUpperCase().indexOf(filter) > -1) {
+                  match = true;
+                  break;
+              }
+          }
+          if (match) {
+              rows[i].style.display = "";
+          } else {
+              rows[i].style.display = "none";
+          }
+      }
+  });
+</script>
+<script>
+    // Function to toggle all checkboxes
+    function toggleSelectAll(selectAllCheckbox) {
+        const checkboxes = document.querySelectorAll('.vendor_checkbox');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = selectAllCheckbox.checked;
+        });
+    }
+
+    // Optional: Update the "Select All" checkbox based on individual checkbox state
+    document.querySelectorAll('.vendor_checkbox').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const selectAllCheckbox = document.getElementById('select_all');
+            const allChecked = document.querySelectorAll('.vendor_checkbox:checked').length === document.querySelectorAll('.vendor_checkbox').length;
+            selectAllCheckbox.checked = allChecked;
+        });
+    });
+</script>
+
+<script src="https://cdn.datatables.net/1.11.0/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.0/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/responsive.bootstrap4.min.js"></script>
+
+<script src="{% static 'js/farm/farm_list.js' %}"></script>
+
+<script>
+    $(document).ready(function () {
+        $('#distributorList_tbl').DataTable();
+    });
+    
+    $(document).ready(function () {
+        $('#growerSelction').change(function () {
+            $('#submitBtn').click();
+        });
+    });
+
+</script>
+<script>
+    $('#Quickbooks-active').addClass('activeLink');
+  
+    $('#Quickbooks-down').addClass('down');
+    $('#Quickbooks-sub').show();
+
+    $('#Vendor-List').addClass('activeLink active-nav');
+
+</script>
+{% endblock scripts %}

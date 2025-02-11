@@ -1,0 +1,99 @@
+{% extends "base.html" %} {% load static %}
+{% block title %} Tier 3 Processor list {% endblock title %}
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+
+{% load crispy_forms_tags %}
+{% block content %}
+{% include 'navbar.html' %}
+<div class="main-content">
+    {% include 'header.html' %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.0/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.bootstrap4.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/fixedcolumns/4.2.1/css/fixedColumns.dataTables.min.css">
+    <style>
+      .table>:not(caption)>*>*{
+        border-bottom-width:0px
+      }
+    </style>
+    <style>
+      .dataTables_scrollHead,
+      .dataTables_scrollBody,
+      .dataTables_scrollFoot {
+          width: 100% !important;
+      }
+  </style>
+    <main>
+        {% include '_alerts.html' %}
+        <div class="page-title-with-or-without-btn">
+            <span class="farm headingtop">Hi Rijuuuuuuuuuuuu</span>
+            <!-- Create button for add-processor-->
+            <div class="flex-header-btn">
+                <!--<a href="{% url 'add_processor3' %}" class="btn-close-cancel">Create Tier 3 Processor</a>-->
+            </div>
+        </div>
+    </main>
+    {% include 'footer.html' %}
+</div>
+
+<!-- Delete Popup 
+<div class="modal fade" id="deleteModal" aria-hidden="true" aria-labelledby="exampleModalToggleLabel22" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+  
+        <div class="modal-body">
+          <button type="button" class="btn-close cust-close-ds-btn" data-mdb-dismiss="modal" aria-label="Close"></button>
+          <div class="center-content-status">
+            <img src="{% static 'img/trash.png' %}" alt="right" id="rightImg" class="warning-icon">
+            <p id="message" class="modal-title titlepad">Are you sure you want to delete?</p>
+          </div>
+          <div class="modal-center-btn-footer">
+            <button onclick="reloadwindow()" id="closeBtnpopup" type="button" class="btn-close-cancel btn-space"
+              data-mdb-dismiss="modal">
+              Close
+            </button>
+            <!-- <button type="submit" class="btn-save-submit">Delete</button> -->
+            
+            <a onclick="processor3deleteNow()" href="" id="processor3Delete" ><button type=""
+                class="btn-save-submit">Delete</button></a>
+           
+          </div>
+        </div>
+  
+      </div>
+    </div>
+  </div>
+ end -->
+{% endblock content %}
+
+{% block scripts %}
+
+
+
+
+{% endblock scripts %}
+
+{% block jquery %}
+
+<script>
+    $('#Processor3-Configuration-active').addClass('activeLink');
+    $('#Processor3-Configuration-down').addClass('down');
+    $('#Processor3-Configuration-sub').show();
+    $('#Processor3-riju').addClass('activeLink active-nav');
+  </script>
+
+ 
+{% endblock jquery %}
+

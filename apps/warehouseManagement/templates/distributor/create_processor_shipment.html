@@ -1,0 +1,680 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %} Send Shipment {% endblock title %}
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+{% block content %}
+{% include 'navbar.html' %}
+
+<style>
+    .shipment-custom-btn {
+        height: 100%;
+        display: flex;
+        align-items: flex-end;
+    }
+
+    .shipment-custom-btn .btn-save-submit {
+        padding-top: 11px;
+        padding-bottom: 11px;
+        border-radius: 4px;
+    }
+    .extra_border_select{
+        border: 1px solid #ccc
+    }
+
+.ui-menu{height: 20vh;overflow-y: auto;padding: 0px 10px;margin: 0px 15px;}
+.ui-menu::-webkit-scrollbar{width:6px;max-height:20px;padding-right: 10px;}
+.ui-menu::-webkit-scrollbar-track{background:#ccc}
+.ui-menu:-webkit-scrollbar-thumb{background-color:#000;border-radius:20px;min-height:20px}
+.bootstrap-select .dropdown-menu li.disabled.selected{display: none;}
+.dropdown.bootstrap-select.form-control .btn{border: 1px solid; padding: 16px 10px; border-radius: 0;}
+.bootstrap-select .dropdown-menu{max-width: 280px;}
+.bootstrap-select .dropdown-menu li.selected.active .dropdown-item.active.selected{margin-left: 0;padding: 0;}
+
+
+</style>
+<div class="main-content">
+    {% include 'header.html' %} {% load crispy_forms_tags %}
+    <main>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+        <span class="farm headingtop">Send Shipment</span>
+        <div class="card farm-fields-container">
+            {% include '_alerts.html' %}
+            <nav aria-label="breadcrumb m-5">
+                {% if error_messages %}
+                <div id="alertMessage" class="alert alert-warning alert-dismissible fade show" role="alert">
+                    <strong>{{error_messages}}</strong>  
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>                         
+                  </div> 
+                  <script>                            
+                    setTimeout(function() {
+                        document.getElementById('alertMessage').style.display = 'none';
+                    }, 5000);
+                </script>                          
+                {% endif %}
+            </nav>
+            <div class="container-fluid">
+                <form method="post" class="farm-fields-form" enctype="multipart/form-data">
+                    {% csrf_token %}                   
+                    <div class="row mb-2">
+                        <h2 style="background-color: #d7d5d5;color: #0b6c39;font-size: 22px;font-weight: 600;margin: 20px 0;padding: 12px 0;text-align: center">Contract Details</h2>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="selected_contract">Select Contract<span class="asteriskField">*</span></label>
+                                <select name="selected_contract" id="selected_contract" class="form-control"  required>
+                                    <option value="All" selected disabled>Select Contract</option>
+                                    {% for contract in contracts %}
+                                    <option value="{{ contract.id }}"{% if selected_contract.id == contract.id %} selected {% endif %}>{{ contract.secret_key }} - {{ contract.processor_entity_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="processor">Processor<span class="asteriskField">*</span></label>
+                                <input type="text" id="processor" name="processor" class="textinput textInput form-control" 
+                                    style="width: 100%; padding-left: 10px;" value="" readonly>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">  
+                        <h2 style="background-color: #d7d5d5;color: #0b6c39;font-size: 22px;font-weight: 600;margin: 20px 0;padding: 12px 0;text-align: center">Delivery details</h2>
+                        
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="outbound_type">Outbound Type<span class="asteriskField">*</span></label>
+                                <select name="outbound_type" id="outbound_type" class="form-control" required>                                 
+                                    <option value="Domestic">Domestic</option>
+                                    <option value="International">International</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="carrier_type">Carrier type<span class="asteriskField">*</span></label>
+                                <select name="carrier_type" id="carrier_type" class="form-control" required >                                 
+                                    <option value="Rail Car">Rail Car</option>
+                                    <option value="Truck/Trailer">Truck/Trailer</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="carrier_id">Carrier ID<span class="asteriskField">*</span></label>
+                                <input type="text" name="carrier_id" id="carrier_id" class="textinput textInput form-control" style="width: 100%;padding-left:10px ;" value="{{carrier_id}}">
+                            </div>
+                        </div>                      
+                        
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="purchase_order_name">Purchase Order Name<span class="asteriskField">*</span></label>
+                                <input type="text" name="purchase_order_name" id="purchase_order_name" class="textinput textInput form-control" style="width: 100%;padding-left:10px ;" value="{{purchase_order_name}}">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="purchase_order_number">Purchase Order Number<span class="asteriskField">*</span> </label>
+                                <input type="number" name="purchase_order_number" id="purchase_order_number" class="textinput textInput form-control" style="width: 100%;padding-left:10px ;" value="{{purchase_order_number}}">
+                            </div>
+                        </div>
+                        
+                    </div>                   
+                    
+                    <div class="row">
+                        <h2 style="background-color: #d7d5d5;color: #0b6c39;font-size: 22px;font-weight: 600;margin: 20px 0;padding: 12px 0;text-align: center">Crop Details</h2>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="shipment_type">Shipment Type<span class="asteriskField">*</span></label>
+                                <select name="shipment_type" id="shipment_type" class="form-control" required>
+                                    <option value="Single Crop">Single Crop Shipment</option>
+                                    <option value="Multiple Crop">Multiple Crop Shipment</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div id="add-crop-btn-container" class="text-end" style="display: none;">
+                            <button type="button" id="add-crop-btn" class="btn btn-primary" style="width: 41px; height: 24px; padding: 0; display: inline-flex; justify-content: center; align-items: center; font-size: 19px;">+</button>
+                        </div> 
+                        <div id="crop-fields-container">                           
+                            <div class="crop-fields-row">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="crop">Crop<span class="asteriskField">*</span></label>
+                                            <select name="crop_id[]" class="form-control crops" required >
+                                                <option value="All" selected disabled>Select </option>  
+                                                
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="lot_number">Lot Number<span class="asteriskField">*</span> </label>
+                                            <input type="text" name="lot_number[]" class="textinput textInput form-control" style="width: 100%;padding-left:10px ;" >
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 rail">
+                                        <div class="form-group">
+                                            <label for="weight">Weight<span class="asteriskField">*</span></label>
+                                            <div class="d-flex">
+                                            <input type="number" step="0.01" name="weight[]" class="textinput textInput form-control" style="margin-top:0; border-top-right-radius:0 !important; border-bottom-right-radius:0 !important" value="{{weight}}">
+                                            <select name="amount_unit" class="form-select" style="border-top-left-radius:0 !important; border-bottom-left-radius:0 !important; border-left:0; width:90px;" required>                                   
+                                                <option value="LBS">LBS</option>
+                                                <option value="MT">MT</option>
+                                            </select>
+                                        </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 truck">
+                                        <div class="form-group">
+                                            <label for="gross_weight">Gross Weight<span class="asteriskField">*</span></label>
+                                            <div class="d-flex">
+                                            <input type="number" step="0.01" name="gross_weight[]" class="textinput textInput form-control" style="margin-top:0; border-top-right-radius:0 !important; border-bottom-right-radius:0 !important">
+                                            <select name="amount_unit"  class="form-select" style="border-top-left-radius:0 !important; border-bottom-left-radius:0 !important; border-left:0; width:90px;" required>                                   
+                                                <option value="LBS">LBS</option>
+                                                <option value="MT">MT</option>
+                                            </select>
+                                        </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 truck">
+                                        <div class="form-group">
+                                            <label for="ship_weight">Ship Weight<span class="asteriskField">*</span></label>
+                                            <div class="d-flex">
+                                            <input type="number" step="0.01" name="ship_weight[]" class="textinput textInput form-control" style="margin-top:0; border-top-right-radius:0 !important; border-bottom-right-radius:0 !important">
+                                            <select name="amount_unit"  class="form-select" style="border-top-left-radius:0 !important; border-bottom-left-radius:0 !important; border-left:0; width:90px;" required>                                   
+                                                <option value="LBS">LBS</option>
+                                                <option value="MT">MT</option>
+                                            </select>
+                                        </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 truck">
+                                        <div class="form-group">
+                                            <label for="ship_quantity">Ship Quantity<span class="asteriskField">*</span></label>
+                                            <input type="number" name="ship_quantity[]" class="textinput textInput form-control" style="width: 100%;padding-left:10px ;">
+                                        </div>
+                                    </div>                                    
+                                </div>
+                            </div>
+                        </div>                        
+                    </div>
+                    <div class="row">
+                        <h2 style="background-color: #d7d5d5;color: #0b6c39;font-size: 22px;font-weight: 600;margin: 20px 0;padding: 12px 0;text-align: center">Destination</h2>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="selected_destination">Destination Type<span class="asteriskField">*</span></label>
+                                <select name="selected_destination" id="selected_destination" class="form-control" required>                                 
+                                    <option value="warehouse">Warehouse</option>
+                                    <option value="customer">Customer</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="destination_id">Destination<span class="asteriskField">*</span></label>
+                                <select name="destination_id" id="destination_id" class="form-control" required>  
+                                    <option value="All" selected disabled>Select </option>                               
+                                    
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4 customer_contract_select" style="display: none;">
+                            <div class="form-group">
+                                <label for="customer_contract">Customer Contract<span class="asteriskField">*</span></label>
+                                <select name="customer_contract" id="customer_contract" class="form-control" >
+                                    <option value="" selected disabled>Select Customer Contract</option>
+                                    
+                                </select>
+                            </div>
+                        </div>
+                    
+                        <div class="col-md-4 customer_contract_select" style="display:none;">
+                            <div class="form-group">
+                                <label for="final_payment_date">Final Payment Date</label>
+                                <input type="date" name="final_payment_date" class="textinput textInput form-control" style="width: 100%;padding-left:10px ;" value="{{final_payment_date|date:'Y-m-d'}}">
+                            </div>
+                        </div>                       
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="status">Status<span class="asteriskField">*</span></label>                                
+                                <select name="status" id="status" class="form-select" style="width: 100%;padding-left:10px ;" required>                                   
+                                    <option value="Released">Released</option>
+                                    <option value="At Border">At Border</option>
+                                    <option value="Crossed Border">Crossed Border</option>
+                                    <option value="Received">Received</option>
+                                    <option value="Released/Received">Released/Received</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <div class="form-group">
+                                <label for="multi_file">Upload File </label>
+                                <input type="file" name="files" multiple accept=".jpg,.png,.xlsx,.csv,.pdf" id="multi_file" class="textinput textInput form-control" >
+                                <p id="file_name_show" style="color:gray"></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-btn-row">
+                            <a href="{% url 'list-processor-shipment' %}" class="btn-close-cancel btn-space">Cancel</a>
+                            <input style="display: none;" id="hide_btn1" type="submit" class="btn-save-submit"
+                                value="Save" name="save">
+                          
+                            <input type="submit" name="save" class="btn-save-submit" value="Save" onclick="activityButton1()">
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+    {% include 'footer.html' %}
+</div>
+{% block script %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+   
+    $(document).ready(function () {
+        $('#selected_contract').on('change', function () {
+            const selectedContract = $(this).val();
+
+            if (selectedContract) {
+                $.ajax({
+                    url: '{% url "get_selected_processor" %}', 
+                    method: 'GET',
+                    data: { selected_contract: selectedContract },
+                    success: function (response) {
+                        if (response.selected_processor) {
+                            $('#processor').val(response.selected_processor);
+                        } else {
+                            $('#processor').val(''); 
+                        }
+                    },
+                    error: function () {
+                        alert('Error retrieving processor information.');
+                    }
+                });
+            } else {
+                $('#processor').val(''); 
+            }
+        });
+    });
+</script>
+
+<script>   
+    $(document).ready(function () {
+        function fetchDestinations(selectedDestination) {
+            if (selectedDestination) {
+                $.ajax({
+                    url: '{% url "get_destination_list" %}', 
+                    method: 'GET',
+                    data: { selected_destination: selectedDestination },
+                    success: function (response) {
+                        if (response.destination_list) {
+                            
+                            $('#destination_id').empty();
+                            $('#destination_id').append('<option value="All" selected disabled>Select</option>');
+
+                            response.destination_list.forEach(function (destination) {
+                                $('#destination_id').append(
+                                    `<option value="${destination.id}">${destination.name}</option>`
+                                );
+                            });
+                        } else {
+                           
+                            $('#destination_id').empty();
+                            $('#destination_id').append('<option value="All" selected disabled>No destinations available</option>');
+                        }
+                    },
+                    error: function () {
+                        alert('Error retrieving destination information.');
+                    }
+                });
+            } else {
+               
+                $('#destination_id').empty();
+                $('#destination_id').append('<option value="All" selected disabled>Select</option>');
+            }
+        }
+
+        $('#selected_destination').on('change', function () {
+            const selectedDestination = $(this).val();
+            fetchDestinations(selectedDestination);
+        });
+
+        const initialDestination = $('#selected_destination').val();
+        fetchDestinations(initialDestination);
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var statusSelect = document.getElementById('outbound_type');
+        var approvedFields = document.querySelectorAll('.domestic');
+        var disapprovedFields = document.querySelectorAll('.international');
+    
+        function toggleFields() {
+            var status = statusSelect.value;
+            if (status === 'Domestic') {
+                approvedFields.forEach(function(field) {
+                    field.style.display = 'block';
+                });
+                disapprovedFields.forEach(function(field) {
+                    field.style.display = 'none';
+                });
+            } else if (status === 'International') {
+                approvedFields.forEach(function(field) {
+                    field.style.display = 'none';
+                });
+                disapprovedFields.forEach(function(field) {
+                    field.style.display = 'block';
+                });
+            } else {
+                approvedFields.forEach(function(field) {
+                    field.style.display = 'none';
+                });
+                disapprovedFields.forEach(function(field) {
+                    field.style.display = 'none';
+                });
+            }
+        }
+    
+        statusSelect.addEventListener('change', toggleFields);
+    
+        toggleFields();
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var statusSelect = document.getElementById('carrier_type');
+        var approvedFields = document.querySelectorAll('.rail');
+        var disapprovedFields = document.querySelectorAll('.truck');
+    
+        function toggleFields() {
+            var status = statusSelect.value;
+            if (status === 'Rail Car') {
+                approvedFields.forEach(function(field) {
+                    field.style.display = 'block';
+                });
+                disapprovedFields.forEach(function(field) {
+                    field.style.display = 'none';
+                });
+            } else if (status === 'Truck/Trailer') {
+                approvedFields.forEach(function(field) {
+                    field.style.display = 'none';
+                });
+                disapprovedFields.forEach(function(field) {
+                    field.style.display = 'block';
+                });
+            } else {
+                approvedFields.forEach(function(field) {
+                    field.style.display = 'none';
+                });
+                disapprovedFields.forEach(function(field) {
+                    field.style.display = 'none';
+                });
+            }
+        }
+    
+        statusSelect.addEventListener('change', toggleFields);
+    
+        toggleFields();
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const shipmentType = document.getElementById('shipment_type');
+        const carrierType = document.getElementById('carrier_type');
+        const addCropBtn = document.getElementById('add-crop-btn');
+        const cropFieldsContainer = document.getElementById('crop-fields-container');
+
+        shipmentType.addEventListener('change', function () {
+            if (shipmentType.value === 'Multiple Crop') {
+                document.getElementById('add-crop-btn-container').style.display = 'block';
+            } else {
+                document.getElementById('add-crop-btn-container').style.display = 'none';
+            }
+        });
+
+        addCropBtn.addEventListener('click', function () {
+            const carrier = carrierType.value; 
+            const cropOptions = document.querySelector('.crops').innerHTML;
+
+            const newRow = document.createElement('div');
+            newRow.className = 'crop-fields-row';
+            newRow.innerHTML = `
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="crop">Crop<span class="asteriskField">*</span></label>
+                            <select name="crop_id[]" class="form-control crops" required>
+                                ${cropOptions} 
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="lot_number">Lot Number<span class="asteriskField">*</span> </label>
+                            <input type="text" name="lot_number[]" class="textinput textInput form-control" style="width: 100%;padding-left:10px ;" >
+                        </div>
+                    </div>
+                    ${carrier === 'Rail Car' ? `
+                    <div class="col-md-4 rail">
+                        <div class="form-group">
+                            <label for="weight">Weight<span class="asteriskField">*</span></label>
+                            <div class="d-flex">
+                                <input type="number" step="0.01" name="weight[]" class="form-control">
+                                <select name="amount_unit" class="form-select" style="width:90px;" required>
+                                    <option value="LBS">LBS</option>
+                                    <option value="MT">MT</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>` : `
+                    <div class="col-md-4 truck">
+                        <div class="form-group">
+                            <label for="gross_weight">Gross Weight<span class="asteriskField">*</span></label>
+                            <div class="d-flex">
+                                <input type="number" step="0.01" name="gross_weight[]" class="textinput textInput form-control">
+                                <select name="amount_unit" class="form-select" style="width:90px;" required>
+                                    <option value="LBS">LBS</option>
+                                    <option value="MT">MT</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 truck">
+                        <div class="form-group">
+                            <label for="ship_weight">Ship Weight<span class="asteriskField">*</span></label>
+                            <div class="d-flex">
+                                <input type="number" step="0.01" name="ship_weight[]" class="textinput textInput form-control">
+                                <select name="amount_unit" class="form-select" style="width:90px;" required>
+                                    <option value="LBS">LBS</option>
+                                    <option value="MT">MT</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 truck">
+                        <div class="form-group">
+                            <label for="ship_quantity">Ship Quantity<span class="asteriskField">*</span></label>
+                            <input type="number" name="ship_quantity[]" class="textinput textInput form-control">
+                        </div>
+                    </div>
+                    `}
+                    <div class="col-md-2">
+                        <button type="button" class="btn btn-danger btn-sm remove-crop-btn" style="margin-top: 30px;">-</button>
+                    </div>
+                </div>
+            `;
+            cropFieldsContainer.appendChild(newRow);
+        });
+
+        cropFieldsContainer.addEventListener('click', function (event) {
+            if (event.target.classList.contains('remove-crop-btn')) {
+                event.target.closest('.crop-fields-row').remove();
+            }
+        });
+
+        if (shipmentType.value === 'Multiple Crop') {
+            document.getElementById('add-crop-btn-container').style.display = 'block';
+        } else {
+            document.getElementById('add-crop-btn-container').style.display = 'none';
+        }
+    });
+</script>
+
+<script>   
+    $(document).ready(function () {
+        $('#selected_contract').on('change', function () {
+            const selectedContract = $(this).val();
+
+            if (selectedContract) {
+                $.ajax({
+                    url: '{% url "get_crops" %}', 
+                    method: 'GET',
+                    data: { selected_contract: selectedContract },
+                    success: function (response) {
+                        if (response.crops) {
+                            console.log(response.crops)
+                           
+                            $('.crops').empty();
+                            $('.crops').append('<option value="All" selected disabled>Select</option>');
+
+                           
+                            response.crops.forEach(function (crop) {
+                                $('.crops').append(
+                                    `<option value="${crop.id}">${crop.crop}- ${crop.crop_type}</option>`
+                                );
+                            });
+                        } else {
+                            $('.crops').empty();
+                            $('.crops').append('<option value="All" selected disabled>No Crops available</option>');
+                        }
+                    },
+                    error: function () {
+                        alert('Error retrieving Crops.');
+                    }
+                });
+            } else {
+                $('.crops').empty();
+                $('.crops').append('<option value="All" selected disabled>Select</option>');
+            }
+        });
+    });
+</script>
+
+<script>
+    $(document).ready(function () {
+
+        $('#selected_destination').on('change', function () {
+            const destinationType = $(this).val();
+
+            if (destinationType === 'customer') {
+                $('.customer_contract_select').show();
+            } else {
+                $('.customer_contract_select').hide();
+                $('#customer_contract').empty().append('<option value="" selected disabled>Select Customer Contract</option>');
+            }
+        });
+
+        $('#destination_id').on('change', function () {
+            const customerId = $(this).val();
+
+            const cropIds = $('select[name="crop_id[]"]').map(function () {
+                return $(this).val();
+            }).get().join(',');
+
+            if (!customerId) {
+                alert('Please select a customer.');
+                return;
+            }
+
+            if (!cropIds) {  
+                alert('Please select at least one crop.');
+                return;
+            }
+
+            const destinationType = $('#selected_destination').val();
+            if (destinationType === 'customer') {
+                $.ajax({
+                    url: '{% url "get_customer_contracts" %}',
+                    method: 'GET',
+                    data: {
+                        destination_id: customerId,
+                        crop_ids: cropIds  
+                    },
+                    success: function (response) {
+                        if (response.customer_contracts) {
+                            $('#customer_contract').empty();
+                            $('#customer_contract').append('<option value="" selected disabled>Select Customer Contract</option>');
+                            response.customer_contracts.forEach(function (contract) {
+                                $('#customer_contract').append(
+                                    `<option value="${contract.id}">${contract.secret_key} - ${contract.customer_name}</option>`
+                                );
+                            });
+                        } else {
+                            $('#customer_contract').empty();
+                            $('#customer_contract').append('<option value="" selected disabled>No Customer Contracts Found</option>');
+                        }
+                    },
+                    error: function () {
+                        alert('No customer contract found for the selected crops.');
+                    }
+                });
+            } else {
+
+                $('#customer_contract').empty().append('<option value="" selected disabled>Select Customer Contract</option>');
+            }
+        });
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const destinationSelect = document.getElementById('selected_destination');
+        const customerContractSelect = document.querySelectorAll('.customer_contract_select');
+
+        function toggleCustomerContract() {
+            customerContractSelect.forEach(function(contractSelect) {
+                if (destinationSelect.value === 'customer') {
+                    contractSelect.style.display = 'block';
+                } else {
+                    contractSelect.style.display = 'none';
+                }
+            });
+        }
+
+        toggleCustomerContract();
+
+        destinationSelect.addEventListener('change', toggleCustomerContract);
+    });
+</script>
+
+<script>
+    $('#Warehouse-active').addClass('activeLink');
+    $('#Warehouse-down').addClass('down');
+    $('#Warehouse-sub_unic').show();
+    $('#Processor-Shipment').addClass('activeLink active-nav');
+</script>
+{% endblock script %}
+{% endblock content %}

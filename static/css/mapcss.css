@@ -1,0 +1,125 @@
+.maplisting {
+    position: relative;
+    z-index: 4;
+}
+.maplisting svg {
+    width: 100%;
+    height: auto;
+    filter: drop-shadow(0px 0px 2px rgb(0 0 0/50%));
+    margin-top: 0;
+}
+
+.land {
+    fill: #a5f2fc
+}
+.maplisting .land {
+    fill: #00a1ad;
+    stroke: rgb(255 255 255/33%);
+    fill-opacity: 1;
+    stroke-opacity: 1;
+    stroke-width: 2;
+}
+.maplisting .land:hover {
+    fill: #f9cb4d;
+    filter: url(#hover-outer-shadow);
+    stroke: none
+}
+
+
+.maplisting a.current .land {
+    fill: url(#gradyellow);
+    filter: url(#path-shadow-filter);
+    stroke: none;
+    top: -6px;
+    position: relative;
+    cursor: pointer;
+}
+
+.maplisting .shade-effect {
+    fill: #c29a22;
+    filter: url(#outer-shadow);
+    stroke: none;
+    opacity: 0
+}
+
+.maplisting a.current .shade-effect {
+    opacity: 1;
+    z-index: 99999;
+    position: relative
+}
+
+.heyo:hover {
+    -moz-transition: .3s;
+    -o-transition: .3s;
+    -webkit-transition: .3s;
+    transition: .3s
+}
+
+.map-section {
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: 72em auto;
+    margin-top: -8em;
+    padding-top: 8em;
+    position: relative;
+    padding-bottom: 2em
+}
+
+.maplisting {
+    position: relative;
+    z-index: 4;
+
+}
+
+.j-tab-con .tab-con-item {
+    display: none;
+}
+ul.list-of-data-types li span{
+    width: 15px;
+    height: 15px;
+    display: block;
+    margin-right: 10px;
+}
+ul.list-of-data-types li span.rice-symbol {
+    background: #91d152;
+}
+ul.list-of-data-types li span.landuse-symbol {
+    background: #de9f2c;
+}
+ul.list-of-data-types li span.temp-symbol {
+    background: #52b8d1;
+}
+ul.list-of-data-types li span.moist-symbol {
+    background: #d16952;
+}
+ul.list-of-data-types li span.usewater-symbol {
+    background: #07e8ff;
+}
+ul.list-of-data-types li {
+    display: flex;
+    align-items: center;
+    margin: 0px;
+    padding: 0px;
+    line-height: initial;
+    margin-bottom: 5px;
+    font-size: 16px;
+}
+.svg-map-bg {
+    position: relative;
+}
+/* .data-type-indicators {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+} */
+/* .maplisting .row {
+    align-items: center;
+} */
+.temperature-data-tab table {
+    width: 100%;
+    margin: auto;
+}
+.main-tab {
+    margin-top: 25px;
+    margin-bottom: 20px;
+}

@@ -1,0 +1,3 @@
+Shipment ID,Description,Field,Old Value,New Value,Updated At,Updated By
+HTSH20240908350,The shipment has reached border.,Status,Released,At Border,2024-09-09 06:40:42,admin
+HTSH20240908350,The shipment has reached border.,Border Receive Date,None,2024-09-09,2024-09-09 06:40:42,admin

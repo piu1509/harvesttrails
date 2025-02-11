@@ -1,0 +1,318 @@
+{% extends "base.html" %} {% load static %}
+{% block title %} Nasdaq ZR Historical Data {% endblock title %}
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+{% load crispy_forms_tags %}
+{% block content %}
+{% include 'navbar.html' %}
+
+
+
+<!-- datepicker styles -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker3.min.css">
+
+<style>
+    tfoot input {
+        width: 100%;
+        padding: 3px;
+        box-sizing: border-box;
+    }
+
+    @media(max-width:575px) {
+        .inline-apply-filter.ewr-report {
+            display: block;
+        }
+    }
+</style>
+<style>
+    table.classing tbody tr td {
+        vertical-align: top;
+    }
+
+    ul.pagination {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+    }
+
+    ul.pagination li {
+        list-style: none;
+        line-height: 45px;
+        text-align: center;
+        font-size: 18px;
+        font-weight: 500;
+        cursor: pointer;
+        user-select: none;
+        transition: all 0.3s ease;
+    }
+
+    ul.pagination li {
+        display: none;
+        position: relative;
+    }
+
+
+    ul.pagination li:first-of-type,
+    ul.pagination li:nth-of-type(2),
+    ul.pagination li:last-of-type,
+    ul.pagination li:has( + li:last-of-type),
+    ul.pagination li.active,
+    ul.pagination li.active + li,
+    ul.pagination li.active + li + li,
+    ul.pagination li:has(+ li.active),
+    ul.pagination li:has(+ li + li.active){
+        display: block;
+    }
+
+    ul.pagination li:has(+ li + li.active){
+        padding-left: 35px;
+    }
+
+    ul.pagination li.active + li + li {
+        padding-right: 35px;
+    }
+
+    ul.pagination li:has( + li + li.active) a:before,
+    ul.pagination li.active + li + li a:after {
+        content: "...";
+        font-size: 16px;
+        display: inline-block;
+        width: 35px;
+        height: 40px;
+        position: absolute;
+        top: -1px;
+        background-color: #fff;
+        border: 1px solid #ddd;
+    }
+
+    ul.pagination li:has( + li + li.active) a:before {
+        left: -35px;
+    }
+
+    ul.pagination li.active + li + li a:after {
+        right: -35px;
+    }
+
+    ul.pagination li:nth-of-type(1) a:before,
+    ul.pagination li:nth-of-type(2) a:before,
+    ul.pagination li:nth-of-type(3) a:before {
+        display: none !important;
+    }
+
+    ul.pagination li:nth-of-type(1),
+    ul.pagination li:nth-of-type(2),
+    ul.pagination li:nth-of-type(3) {
+        padding-left: 0 !important;
+    }
+
+    ul.pagination li:nth-of-type(1) a:after,
+    ul.pagination li:nth-of-type(2) a:after,
+    ul.pagination li:nth-of-type(3) a:after {
+        display: none !important;
+    }
+
+    ul.pagination li:nth-of-type(1),
+    ul.pagination li:nth-of-type(2),
+    ul.pagination li:nth-of-type(3) {
+        padding-left: 0 !important;
+    }
+
+
+
+</style>
+<style>
+    .canvasjs-chart-credit{
+        display: none;
+    }
+</style>
+<div class="main-content">
+    {% include 'header.html' %}
+    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css"> -->
+    <!-- <link rel="stylesheet" href="https://cdn.datatables.net/1.11.0/css/dataTables.bootstrap4.min.css"> -->
+    <!-- <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.bootstrap4.min.css"> -->
+
+    <main>
+        {% include '_alerts.html' %}
+        <div class="page-title-with-or-without-btn">
+            <span class="farm headingtop">Nasdaq ZR Historical Data</span>
+            <div class="inline-apply-filter justify-content-center justify-content-md-end ewr-report">
+                <div></div>
+            </div>
+        </div>
+        <div class="card card-padding">
+            <div id="chartContainer" style="height: 300px; width: 100%;"></div>
+
+            <div class="three-fields-with-label" style="margin-top: 15px;">
+                <form action="" method="post" class="row align-items-center">
+                    {% csrf_token %}
+                    <div class="col-lg-5 col-md-6 mb-2 d-flex">
+                        
+                        <input name="get_date" value="{{show_date}}" class="datepicker form-control" type="text" id="dateInput" placeholder="Select date" autocomplete="off"/>
+                        <div class="" style="height: auto;">
+                            <!-- <a href="{% url 'nasdaq_list_data' %}" class="btn-close-cancel" style="border-radius: 0px;padding: 13px 25px;">Reset</a> -->
+                            <!-- <button  onclick="funcReset()" class="btn-close-cancel" style="border-radius: 0px;padding: 13px 25px;">Reset</button> -->
+                          </div>
+                    </div>
+                    <div class="col-lg-7 col-md-6">
+                        <input  id="" type="submit" class="apply-filter-btn primary-btn" value="Apply Filter" />
+                        <button  onclick="funcReset()" class="btn-close-cancel" style="padding: 7px 25px; background: #333;">Reset</button>
+                    </div>
+                    
+                </form>
+            </div>
+          
+            <div class="main-simple-table-with-search">                
+                <div class="both-data-in" style="display: inherit;">
+                    <div class="simple-responsive-table">
+                        <table id="" class="table table-striped dt-responsive nowrap text-center" style="width:100%">
+                            <thead>
+                                <tr style="border-bottom: 2px solid #e0e0e0;">
+                                    <th width="50%">Date</th>
+                                    <th width="50%">Close/Last</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for i in report %}
+                                <tr>
+                                    <td>{{i.date_api}}</td>
+                                    <td>{{i.close_value_api}}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="row align-items-center">
+                        <div class="col-md-12 col-sm-12 col-12 text-center">
+                            {% if report.has_other_pages %}
+                                <ul class="pagination" id="nav_1">
+                                {% if report.has_previous %}
+                                    <li><a href="?page={{ report.previous_page_number }}">&laquo;</a></li>
+                                    {% else %}
+                                    <li class="disabled"><span>&laquo;</span></li>
+                                    {% endif %}
+                                    {% for i in report.paginator.page_range %}
+                                    {% if report.number == i %}
+                                    <li class="active pagi" id="getactive"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+                                    {% else %}
+                                    <li><a href="?page={{ i }}">{{ i }}</a></li>
+                                    {% endif %}
+                                    {% endfor %}
+                                    {% if report.has_next %}
+                                    <li><a href="?page={{ report.next_page_number }}">&raquo;</a></li>
+                                    {% else %}
+                                    <li class="disabled"><span>&raquo;</span></li>
+                                {% endif %}
+                                </ul>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-12 col-sm-12 col-12 text-center mt-2" style="text-align:right">
+                            <span>Showing  {{ report.start_index }} - {{ report.end_index }} of {{ report.paginator.count }} entries
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </main>
+    {% include 'footer.html' %}
+</div>
+{% endblock content %}
+
+{% block scripts %}
+<!-- <script src="https://cdn.datatables.net/1.11.0/js/jquery.dataTables.min.js"></script> -->
+<!-- <script src="https://cdn.datatables.net/1.11.0/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/responsive.bootstrap4.min.js"></script> -->
+
+
+<script src="https://cdn.canvasjs.com/canvasjs.min.js"></script>
+<script>
+    window.onload = function () {
+        var date_calc = "";
+    var chart = new CanvasJS.Chart("chartContainer", {
+        animationEnabled: true,
+        zoomEnabled: true,
+        theme: "light2",
+        title:{
+            text: "ZR (Rough Rice) Historical Data"
+        },
+        axisX:{
+            title: "DATE",
+            valueFormatString: "DD MMM,YY",
+            crosshair: {
+                enabled: true,
+                snapToDataPoint: true
+		    }
+        },
+        axisY:{
+            title: "CLOSE / LAST",
+        },
+        data: [{        
+            type: "line",
+              indexLabelFontSize: 16,
+              toolTipContent: "<b>Date : </b>{x}<br/><b>Close/Last : </b>{y}<br/>",
+            dataPoints: [
+            {% for i in all_report %}
+            { x: new Date('{{i.date_api}}'), y: {{i.close_value_api}} },
+            {% endfor %}
+                           
+            ]
+        }]
+    });
+    chart.render();
+    
+    }
+    </script>
+
+
+<script src="{% static 'js/farm/farm_list.js' %}"></script>
+
+
+
+<!-- Datepicker -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+
+<!-- Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        $('#dateInput').datepicker({
+        language: "es",
+        autoclose: true,
+        format: "mm-dd-yyyy"
+    });
+    });
+    
+</script>
+<script>
+    function funcReset(){
+        $('#dateInput').val("");
+        var path = `${window.location.protocol + "//" + window.location.host}/growerpayments/nasdaq_list_data/`
+        path.click();
+    } 
+</script>
+<script>
+    $('#Growers-Payments-active').addClass('activeLink');
+                  
+    $('#Growers-Payments-down').addClass('down');
+    $('#Growers-Payments-sub').show();
+    
+    $('#Nasdaq-Historical-Data').addClass('activeLink active-nav');
+  </script>
+{% endblock scripts %}

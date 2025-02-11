@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+
+	Upload File
+
+{% endblock title %}
+{% load crispy_forms_tags %}
+{% block content %}
+	{% include 'navbar.html' %}
+    <div class="main-content">
+      {% include 'header.html' %}
+	
+
+	<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+					<div class="modal-dialog">
+						<div class="modal-content m-content">
+							<div class="modal-header">
+								<h5 class="modal-title foraddd" id="exampleModalLabel">choose FIELD</h5>
+								<button type="button" class="btn-close custumclose" data-mdb-dismiss="modal"
+									aria-label="Close"></button>
+							</div>
+							<div class="modal-body">
+								<div class="container-fluid">
+								<form action="{% url 'gallery-create' %}", method='POST'> 
+									{% comment %} <div class="row">
+										<div class="col-md-4">
+											<select class="addselect">
+												<option>Select Grower</option>
+												<option>Document</option>
+												<option>Photos</option>
+											</select>
+										</div>
+										<div class="col-md-4"></div>
+										<div class="col-md-4"></div>
+									</div> {% endcomment %}
+									{% comment %} <div class="row mt-4">
+										<div class="col-md-4">
+											{{ form.farm|as_crispy_field }}
+										</div>
+										
+										<div class="col-md-4">
+											{{ form.plot|as_crispy_field }}
+										</div>
+										<div class="col-md-4">
+											{{ form.survey_type|as_crispy_field }}
+										</div>
+									</div> {% endcomment %}
+									<div class="row mt-4">
+										<div class="col-md-4">
+											{{ form.sub_type|as_crispy_field }}
+										</div>
+										<div class="col-md-4">
+											{{ form.image|as_crispy_field }}
+										</div>
+										<div class="col-md-4">
+											{{ form.files|as_crispy_field }}
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="modal-footer">
+								<button class="btn-inffo">Upload</button><span><button class="btn-inffo2">Cancel</button></span>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+{% endblock content %}

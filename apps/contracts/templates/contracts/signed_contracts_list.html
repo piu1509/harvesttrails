@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %} Field Management
+{% endblock title %}
+{% load crispy_forms_tags %}
+{% block content %}
+{% include 'navbar.html' %}
+
+<div class="main-content">
+  {% include 'header.html' %}
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css">
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.11.0/css/dataTables.bootstrap4.min.css">
+  <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.bootstrap4.min.css">
+  <main>
+    {% include '_alerts.html' %}
+    <div class="page-title-with-or-without-btn">
+      <span class="farm headingtop">CONTRACTS SIGNED</span>
+      <!-- Create button for Account-->
+      <div class="flex-header-btn">
+        {% if 'Field Edit' in request.user.get_role_perm or request.user.is_superuser %}
+<!--        <a title="Upload CSV file with all the required coloumns" href="{% url 'csv-field-create' %}"-->
+<!--          class="btn-close-cancel btn-space">Create Field via CSV</a>-->
+<!--        <a href="{% url 'field-create' %}" class="btn-close-cancel">Create Field</a>-->
+        {% endif %}
+      </div>
+    </div>
+    <div class="card card-padding">
+
+      <div class="main-simple-table-with-search">
+
+
+
+        <div class="simple-responsive-table">
+          <table id="signedContractTable" class="table table-striped table-bordered dt-responsive nowrap" style="width:100%">
+            <thead>
+              <tr style="border-bottom: 2px solid #e0e0e0;">
+                {% if request.user.is_superuser %}
+                  <th  width="30%"><div style="padding-right: 20px">GROWER NAME</div></th>
+                {% endif %}
+                <th width="50%"><div style="padding-right: 20px">CONTRACT</div> </th>
+                <th width="20%">SIGNED</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for contract in object_list %}
+              <tr>
+                {% if request.user.is_superuser %}
+                  <td>{{contract.grower.name}}</td>
+                {% endif %}
+                <td>{{contract.contract.name}}</td>
+                <td class="backk action-td">
+                  <li> <a href="{% url 'contract-pdf' contract.id %}" target="_blank"><span class="fas fa-download"> </span></a>
+                  </li>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+
+        </div>
+      </div>
+    </div>
+  </main>
+  {% include 'footer.html' %}
+</div>
+
+<!-- end -->
+{% comment %} <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+<script src="https://cdn.datatables.net/1.11.0/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.0/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/responsive.bootstrap4.min.js"></script>
+
+{% endcomment %}
+<script type="text/javascript" src="{% static 'js/field/field_list.js' %}"></script>
+{% endblock content %}
+
+{% block scripts %}
+
+<script src="https://cdn.datatables.net/1.11.0/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.0/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/responsive.bootstrap4.min.js"></script>
+
+<script src="{% static 'js/farm/farm_list.js' %}"></script>
+{% endblock scripts %}
+{% block jquery %}
+<script>
+    $(document).ready(function() {
+
+
+
+        var myTable = $("#signedContractTable").DataTable({
+          paging: true,
+          searching: true,
+          info: false,
+          orderable: false,
+		});
+
+		// 2d array is converted to 1D array
+		// structure the actions are
+		// implemented on EACH column
+		myTable
+		.columns()
+		.flatten()
+		.each(function (colID) {
+            if (colID == 0 || colID == 1) {
+			// Create the select list in the
+			// header column header
+			// On change of the list values,
+			// perform search operation
+			var mySelectList = $("<select />")
+			.appendTo(myTable.column(colID).header())
+			.on("change", function () {
+				myTable.column(colID).search($(this).val());
+
+				// update the changes using draw() method
+				myTable.column(colID).draw();
+			});
+
+			// Get the search cached data for the
+			// first column add to the select list
+			// using append() method
+			// sort the data to display to user
+			// all steps are done for EACH column
+			myTable
+			.column(colID)
+			.cache("search")
+			.sort()
+			.each(function (param) {
+				mySelectList.append(
+				$('<option value="' + param + '">'
+					+ param + "</option>")
+				);
+			});
+		  }
+		});
+
+
+
+    });
+</script>
+<script>
+  $('#Documents-and-Photos-active').addClass('activeLink');
+
+  $('#Documents-and-Photos-down').addClass('down');
+  $('#Documents-and-Photos-sub').show();
+  {% comment %} $('#Contracts-active').addClass('activeLink');
+
+  $('#Contracts-down').addClass('down');
+  $('#Contracts-sub').show(); {% endcomment %}
+
+  $('#Signed-Contracts').addClass('activeLink active-nav');
+
+</script>
+{% endblock jquery %}

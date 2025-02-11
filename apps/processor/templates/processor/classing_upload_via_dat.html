@@ -1,0 +1,174 @@
+{% extends "base.html" %} {% load static %}
+{% block title %} Classing Report Upload Via .dat File{% endblock title %}
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+{% load crispy_forms_tags %}
+{% block content %}
+{% include 'navbar.html' %}
+
+<div class="main-content">
+    {% include 'header.html' %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.0/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.bootstrap4.min.css">
+
+    <main>
+        {% include '_alerts.html' %}
+        <div class="page-title-with-or-without-btn">
+            <span class="farm headingtop">Classing Report Upload Via .dat File</span>
+            <!-- Create button for add-location-->
+            
+        </div>
+        <div class="card card-padding">
+            <div class="main-simple-table-with-search">                
+                <div class="both-data-in" style="display: inherit;">
+                    <form action="" method="post" class="farm-fields-form"
+                    enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row">
+                        {% if request.user.is_processor %}
+                        {% else %}
+                        <div class="col-md-3">
+                            <lable for="">Select Processor<span class="asteriskField">*</span></lable>
+                            <select id="processor_id" name="processor_id" class="textinput textInput form-control" style="margin-top: 9px;height:49px;">
+                                <option value=0 selected disabled> Select All Processor </option>
+                                {% for processor in get_processor %}
+                                {% if processor == p %}
+                                <option value="{{ processor.pk }}" selected>{{processor.entity_name}} - {{processor.pk }}</option>
+                                {% else %}
+                                <option value="{{ processor.pk }}">{{processor.entity_name}} - {{processor.pk }}</option>
+                                {% endif %}
+                                {% endfor %}
+                            </select>
+                            <p id="disp0" style="color: red;"></p>
+                        </div>
+                        <!-- <input style="display : none;" id="grower_select" type="submit"
+                                    class="apply-filter-btn primary-btn" value="Apply Filter" /> -->
+                        {% endif %}
+                        <div class="col-md-3">
+                            <lable for="">Select Growers<span class="asteriskField">*</span></lable>
+                            <select id="grower_id" name="grower_id" class="textinput textInput form-control" style="margin-top: 9px;height:49px;">
+                                <option value=0 selected disabled> Select All Growers </option>
+                                {% for grower in get_grower %}
+                                {% if grower == selectedgrower %}
+                                <option value="{{ grower.pk }}" selected>{{grower.name}} - {{ grower.pk }}</option>
+                                {% else %}
+                                <option value="{{ grower.pk }}">{{grower.name}} - {{ grower.pk }}</option>
+                                {% endif %}
+                                {% endfor %}
+                            </select>
+                            <p id="disp1" style="color: red;"></p>
+                        </div>
+                        <div class="col-md-3">
+                            <lable for="">Select Field<span class="asteriskField">*</span></lable>
+                            <select id="field_id" name="field_id" class="textinput textInput form-control" style="margin-top: 9px;height:49px;">
+                                <option value=""> Select All Fields </option>
+                                {% for field in get_field %}
+                                <option value="{{ field.pk }}">{{field.name}} - {{ field.pk }}</option>
+                                {% endfor %}
+                            </select>
+                            <p id="disp3" style="color: red;"></p>
+                        </div>
+                        <div class="col-md-3" id="div1">
+                            <div class="">
+                                <label for="">Upload File<span class="asteriskField">*</span></label>
+                                <div class="file-upload-wrapper" data-text="classingreport.dat">
+                                    <input type="file" name="dat_file" accept=".dat"
+                                        class="clearablefileinput file-upload-field" id="id_csv_file">
+                                </div>
+                                <p id="disp2" style="color: red;"></p>
+                            </div>
+                        </div>
+                        <input style="display : none;" id="grower_select" type="submit"
+                                    class="apply-filter-btn primary-btn" value="Apply Filter" />
+                        <div class="row">
+                            <div class="form-btn-row">
+                                <a href="{% url 'classing_list' %}" class="btn-close-cancel btn-space">Cancel</a>
+                                <input style="display: none;" id="hide_btn1" type="submit" class="btn-save-submit" value="Save">
+                                <input type="button" class="btn-save-submit" value="Save" onclick="activityButton1()">
+                            </div>
+                        </div>
+                </form>
+                </div>
+            </div>
+    </main>
+    {% include 'footer.html' %}
+</div>
+
+{% endblock content %}
+
+{% block scripts %}
+<script src="https://cdn.datatables.net/1.11.0/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.0/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/responsive.bootstrap4.min.js"></script>
+
+<script src="{% static 'js/farm/farm_list.js' %}"></script>
+
+
+{% endblock scripts %}
+
+{% block jquery %}
+<script>
+    $('#processor_id').on('change', function (e) {
+        var value = $(this).val();
+        $('#grower_select').click();
+    })
+
+    $('#grower_id').on('change', function (e) {
+        var value = $(this).val();
+        $('#grower_select').click();
+        
+    })
+
+    function activityButton1(){
+        var id_csv_file = $('#id_csv_file').val();
+        var grower_id = $('#grower_id').val();
+        var field_id = $('#field_id').val();
+
+        if (id_csv_file != '' && grower_id != null && field_id != '') {
+            $('#hide_btn1').click();
+        }else{
+            if (grower_id == null) {
+                document.getElementById("disp1").innerHTML = "*Please Select a Grower";
+            }
+            if (grower_id != null) {
+                document.getElementById("disp1").innerHTML = "";
+            }
+            if (id_csv_file == '') {
+                document.getElementById("disp2").innerHTML = "*Please Upload CSV";
+            }
+            if (id_csv_file != '') {
+                document.getElementById("disp2").innerHTML = "";
+            }
+            if (field_id == '') {
+                document.getElementById("disp3").innerHTML = "*Please Select Field";
+            }
+            if (field_id != '') {
+                document.getElementById("disp3").innerHTML = "";
+            }
+
+        }
+    }
+</script>
+<script>
+    $('#Processor-active').addClass('activeLink');
+  
+    $('#Processor-down').addClass('down');
+    $('#Processor-sub').show();
+  
+    $('#Classing-All-Reports').addClass('activeLink active-nav');
+  
+  </script>
+{% endblock jquery %}

@@ -1,0 +1,168 @@
+{% extends "base.html" %} 
+{% load static %} 
+
+{% block title %} 
+    Link Tier 1 Processor to Processor 
+{% endblock title %} 
+
+{% block extrahead %}
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-Y3EWVPF7PQ');
+    </script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+{% endblock extrahead %}
+
+{% block content %} 
+    {% include 'navbar.html' %}
+
+    <style>
+        .newselect {
+            padding: 12px 15px;
+            display: block;
+            width: 352px;
+            background: #fff !important;
+            outline: none !important;
+            margin-top: 5px !important;
+            height: auto !important;
+        }
+
+        .multi-select + .select2 .select2-search__field {
+            padding: 6px 15px;
+            background: #fff !important;
+            outline: none !important;
+            margin-top: 0px !important;
+            height: 47px !important;
+            width: 100%;
+        }
+
+        .multi-select + .select2-container--default {
+            width: auto !important;
+        }
+
+        .multi-select + .select2-container--default .select2-selection--multiple {
+            padding-bottom: 0 !important;
+        }
+
+        .multi-select + .select2-container .select2-selection--multiple .select2-selection__rendered {
+            display: block;
+            margin: 0;
+        }
+
+        .select2-container--default .select2-results__option--highlighted.select2-results__option--selectable {
+            background-color: #0b6c39 !important;
+        }
+    </style>
+
+    <div class="main-content">
+        {% include 'header.html' %}
+        {% load crispy_forms_tags %}
+        <main>
+            <span class="farm headingtop">Tier 2 Processor Link Management</span>
+            <div class="card farm-fields-container">
+                <div class="container-fluid">
+                    <form action="" method="post" class="">
+                        {% csrf_token %}
+                        <div class="inline-apply-filter">
+                            <div class="three-fields-with-label">
+                                <label for="processorSelction">Select Processor</label>
+                                <select id="processorSelction" name="processor_id" class="mb-0" style="border-radius:0px !important; width: 50%;" onchange="this.form.submit()">
+                                    <option value="" > Select Processor </option>
+                                    {% for processor in processor2 %}
+                                        {% if processor.pk == selectedprocessor %}
+                                            <option  value="{{ processor.pk }}" selected>{{processor.entity_name}} - {{processor.id}}{{selectedprocessor}}</option>
+                                        {% else %}
+                                            <option value="{{ processor.pk }}">{{processor.entity_name}} - {{processor.id}} ({{processor.pk}}) {{selectedprocessor}}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="mb-3 d-flex flex-column" style="width: 468px;">
+                            <label for="growerSelction">Select Processor</label>
+                            <select id="mySelect" multiple="multiple" name="select_processor2" class="multi-select">
+                                
+                                {% if processor3|length != 0 %}
+                                    <optgroup label="T3 Processor">
+                                        {% for pro3 in processor3 %}
+                                            <option value="{{ pro3.id }} T3">{{ pro3.entity_name }}</option>
+                                        {% endfor %}
+                                    </optgroup>
+                                {% else %}
+                                {% endif %}
+                                {% if processor4|length != 0 %}
+                                    <optgroup label="T4 Processor">
+                                        {% for pro4 in processor4 %}
+                                            <option value="{{ pro4.id }} T4"> {{ pro4.entity_name }}</option>
+                                        {% endfor %}
+                                    </optgroup>
+                                {% else %}
+                                {% endif %}
+                            </select>
+                        </div>
+                        <div class="row">
+                          <div class="form-btn-row">
+                              <a href="{% url "processor3_processor_management" %}" class="btn-close-cancel btn-space">Cancel</a>
+                              <input type="submit" class="btn-save-submit" value="Save" name="save">
+                          </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+        {% include 'footer.html' %}
+    </div>
+{% endblock %}
+
+{% block jquery %}
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Initialize Select2 on the select element
+            $('#mySelect').select2({
+                placeholder: 'Select Processor',
+                allowClear: true
+            });
+        });
+    </script>
+    <script>
+        function save(){
+            let temp_arr = []
+            let temp = document.getElementsByTagName('select')
+            temp.forEach(element => {
+                temp_arr.push(element.value)
+                if (element.value == ''){
+                    $('#'+element.id).css('border-color', 'red');
+                    document.getElementById("disp0").innerHTML = "*All the box should be selected";
+                } else {
+                    $('#'+element.id).css('border-color', '#bdbdbd');
+                    document.getElementById("disp0").innerHTML = "";
+                }
+            })
+
+            let res = temp_arr.every((item)=>{
+                return item !== '';
+            })
+
+            if(res){
+                $('#btn_submit').click();
+            }
+        }
+    </script>
+    <script>
+        $('#Tier3-Processor-active').addClass('activeLink');
+  
+    $('#Tier3-Processor-down').addClass('down');
+    $('#Tier3-Processor-sub').show();
+  
+    $('#Processor3-Processor-Management').addClass('activeLink active-nav');
+  
+      </script>
+{% endblock jquery %}

@@ -1,0 +1,62 @@
+@media(max-width:1200px){
+	.modal-dialog{
+		width: 100% !important;
+	}
+	.for-card-use1 h1{
+
+    margin-bottom: 10px;
+	}
+
+	#onnee {
+      margin: 0px -30px;
+  }
+  #nav-toggle:checked .sidebar .sidebar-brand,
+  #nav-toggle:checked + .sidebar li 
+  {
+    padding-left: 0rem;
+  }
+
+  #nav-toggle:checked + .sidebar .forn-none {
+    display: block;
+}
+}
+
+@media(max-width: 1200px){
+  .m-content{
+  width:96% !important;
+border-radius: 12px !important;
+box-shadow: 0 10px 20px 0 rgb(0 0 0 / 5%) !important;
+padding-bottom: 30px !important;
+margin-top: 15%;
+
+}
+.addselect{
+width: 50% !important;
+}
+
+  .bs-example.mt-4 {
+    margin-left: 0% !important;
+
+}
+
+.farm{
+  margin-left: 0% !important;
+}
+.selected{
+  width: 30%;
+    margin-left: 0% !important; 
+}
+
+.btn-inffo{
+    width:36% !important;
+}
+
+
+.cards{
+  margin-left: 00px !important;
+}
+
+
+
+
+}

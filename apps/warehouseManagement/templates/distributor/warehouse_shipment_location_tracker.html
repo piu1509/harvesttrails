@@ -1,0 +1,291 @@
+{% extends "base.html" %}
+{% load static %}
+{% load custom_tags %}
+{% block title %} Warehouse Shipment Current location {% endblock title %}
+
+{% block extrahead %}
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAQ_OGAb4yuL8g55IMufP3Dwd4yjrWxrdI&libraries=places"></script>
+
+{% endblock extrahead %}
+
+{% block content %}
+{% include 'navbar.html' %}
+<div class="main-content">
+    {% include 'header.html' %}
+    <main>
+        
+        <div class="page-title-with-or-without-btn">
+            <span class="farm headingtop">Warehouse Shipment Location Tracker</span>
+            <div class="flex-header-btn d-flex">
+                <a href="{% url 'view_trace' shipment_id from_date to_date %}" class="btn-close-cancel me-2">View Traceabilty</a>
+                <a href="{% url 'list-warehouse-shipment' %}" class="btn-close-cancel">Back</a>
+            </div>
+        </div>
+        <div class="card farm-fields-container">
+            {% include '_alerts.html' %}
+            <nav aria-label="breadcrumb m-5">
+                {% if error_messages %}
+                <div id="alertMessage" class="alert alert-warning alert-dismissible fade show" role="alert">
+                    <strong>{{error_messages}}</strong>  
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>                         
+                  </div> 
+                  <script>                            
+                    setTimeout(function() {
+                        document.getElementById('alertMessage').style.display = 'none';
+                    }, 5000);
+                </script>                          
+                  {% endif %}
+                  
+            </nav>
+            <div class="container-fluid mt-5">
+                <form>
+                    <div class="row mt-4 mb-4">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label for="shipment_id">Shipment ID</label>
+                                <input name="shipment_id" value="{{ shipment_id }}" type="text" class="form-control text-center" readonly>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="source">Source</label>
+                                <input name="source" value="{{ source }}" type="text" class="form-control text-center" readonly>
+                            </div>  
+                            <div class="col-md-4">
+                                <label for="destination">Destination</label>
+                                <input name="destination" value="{{ destination_name }}" type="text" class="form-control text-center" readonly>
+                            </div> 
+                        </div> 
+                        <div class="row">      
+                            <div class="col-md-4">
+                                <label for="contract_id">Contract ID</label>
+                                <input name="contact_id" value="{{ contract_id }}" type="text" class="form-control text-center" readonly>
+                            </div>                                 
+                            <div class="col-md-4">
+                                <label for="status">Status</label>
+                                <input name="status" value="{{ shipment_status }}" type="text" class="form-control text-center" readonly>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <div id="map" style="width: 100%; height: 500px;" class="mt-5"></div>
+                
+            </div>
+        </div>
+    </main>
+    {% include 'footer.html' %}
+</div>
+{%endblock content%}
+{% block jquery %}
+
+{% comment %} <script>
+    function initMap() {
+        const origin = { lat: {{ origin.lat }}, lng: {{ origin.lng }} };
+        const destination = { lat: {{ destination.lat }}, lng: {{ destination.lng }} };
+        const currentLocation = { lat: {{ current_location.lat }}, lng: {{ current_location.lng }} };
+
+        const waypoints = [
+            {% for waypoint in waypoints %}
+            { lat: {{ waypoint.lat }}, lng: {{ waypoint.lng }} },
+            {% endfor %}
+        ];
+
+        const map = new google.maps.Map(document.getElementById("map"), {
+            zoom: 6,
+            center: currentLocation,
+        });
+
+        const directionsService = new google.maps.DirectionsService();
+
+        // Function to add markers with titles and info windows
+        function addMarkerWithInfo(map, position, title, infoContent, label = null) {
+            const marker = new google.maps.Marker({
+                position: position,
+                map: map,
+                title: title,
+                label: label, // Optional label
+            });
+
+            const infoWindow = new google.maps.InfoWindow({
+                content: infoContent,
+            });
+
+            marker.addListener("click", () => {
+                infoWindow.open(map, marker);
+            });
+
+            return marker;
+        }
+
+        // Add markers for origin, destination, and current location
+        addMarkerWithInfo(map, origin, "Origin", "<strong>Origin</strong><br>Latitude: " + origin.lat + "<br>Longitude: " + origin.lng);
+        addMarkerWithInfo(map, currentLocation, "Current Location", "<strong>Current Location</strong><br>Latitude: " + currentLocation.lat + "<br>Longitude: " + currentLocation.lng, "C");
+        addMarkerWithInfo(map, destination, "Destination", "<strong>Destination</strong><br>Latitude: " + destination.lat + "<br>Longitude: " + destination.lng);
+
+        // Draw the route from origin to current location
+        directionsService.route({
+            origin: origin,
+            destination: currentLocation,
+            travelMode: google.maps.TravelMode.DRIVING,
+        }, function (result, status) {
+            if (status === google.maps.DirectionsStatus.OK) {
+                const routePolyline = new google.maps.Polyline({
+                    path: result.routes[0].overview_path,
+                    geodesic: true,
+                    strokeColor: "#0000FF", // Blue for covered path
+                    strokeOpacity: 1.0,
+                    strokeWeight: 4,
+                });
+                routePolyline.setMap(map);
+            } else {
+                console.error("Error in origin-to-currentLocation route: ", status);
+            }
+        });
+
+        // Draw the route from current location to destination
+        directionsService.route({
+            origin: currentLocation,
+            destination: destination,
+            travelMode: google.maps.TravelMode.DRIVING,
+        }, function (result, status) {
+            if (status === google.maps.DirectionsStatus.OK) {
+                const routePolyline = new google.maps.Polyline({
+                    path: result.routes[0].overview_path,
+                    geodesic: true,
+                    strokeColor: "#FF0000", // Red for remaining path
+                    strokeOpacity: 1.0,
+                    strokeWeight: 4,
+                });
+                routePolyline.setMap(map);
+            } else {
+                console.error("Error in currentLocation-to-destination route: ", status);
+            }
+        });
+
+        // Add markers for waypoints (without info windows)
+        waypoints.forEach((waypoint) => {
+            const waypointPosition = { lat: waypoint.lat, lng: waypoint.lng };
+            new google.maps.Marker({
+                position: waypointPosition,
+                map: map,
+                title: "Waypoint",
+            });
+        });
+    }
+
+    window.onload = initMap;
+</script> {% endcomment %}
+<script>
+    function initMap() {
+        const origin = { lat: {{ origin.lat }}, lng: {{ origin.lng }} };
+        const destination = { lat: {{ destination.lat }}, lng: {{ destination.lng }} };
+        const currentLocation = { lat: {{ current_location.lat }}, lng: {{ current_location.lng }} };
+
+        const waypoints = [
+            {% for waypoint in waypoints %}
+            { location: { lat: {{ waypoint.lat }}, lng: {{ waypoint.lng }} }, stopover: true },
+            {% endfor %}
+        ];
+
+        const map = new google.maps.Map(document.getElementById("map"), {
+            zoom: 6,
+            center: currentLocation,
+        });
+
+        const directionsService = new google.maps.DirectionsService();
+        const directionsRenderer = new google.maps.DirectionsRenderer({
+            suppressMarkers: true, // Suppress default markers
+            map: map,
+        });
+
+        // Add custom markers for Origin (O), Current Location (C), and Destination (D)
+        const customMarkers = [
+            { position: origin, label: "O", title: "Origin" },
+            { position: currentLocation, label: "C", title: "Current Location" },
+            { position: destination, label: "D", title: "Destination" },
+        ];
+
+        customMarkers.forEach(markerInfo => {
+            new google.maps.Marker({
+                position: markerInfo.position,
+                map: map,
+                label: markerInfo.label,
+                title: markerInfo.title,
+            });
+        });
+
+        // Add small markers for waypoints
+        function addWaypointMarkers(waypoints) {
+            waypoints.forEach(waypoint => {
+                const waypointMarker = new google.maps.Circle({
+                    strokeColor: "#FFA500", 
+                    strokeOpacity: 0.8,
+                    strokeWeight: 2,
+                    fillColor: "#FFA500", 
+                    fillOpacity: 0.6,
+                    map: map,
+                    center: waypoint.location,
+                    radius: 2000, 
+                    title: "Waypoint" 
+                });
+            });
+        }
+
+        // Draw the route from origin to current location with waypoints
+        directionsService.route({
+            origin: origin,
+            destination: currentLocation,
+            waypoints: waypoints,
+            travelMode: google.maps.TravelMode.DRIVING,
+            optimizeWaypoints: true, // Optional: Optimize waypoint order
+        }, function (result, status) {
+            if (status === google.maps.DirectionsStatus.OK) {
+                directionsRenderer.setDirections(result);
+                addWaypointMarkers(waypoints); // Add waypoint markers on map
+            } else {
+                console.error("Error in origin-to-currentLocation route: ", status);
+            }
+        });
+
+        // Draw the route from current location to destination
+        directionsService.route({
+            origin: currentLocation,
+            destination: destination,
+            travelMode: google.maps.TravelMode.DRIVING,
+        }, function (result, status) {
+            if (status === google.maps.DirectionsStatus.OK) {
+                const remainingRoutePolyline = new google.maps.Polyline({
+                    path: result.routes[0].overview_path,
+                    geodesic: true,
+                    strokeColor: "#FF0000", // Red for the remaining route
+                    strokeOpacity: 1.0,
+                    strokeWeight: 4,
+                });
+                remainingRoutePolyline.setMap(map);
+            } else {
+                console.error("Error in currentLocation-to-destination route: ", status);
+            }
+        });
+    }
+
+    window.onload = initMap;
+</script>
+<script>
+    $('#Warehouse-active').addClass('activeLink');
+  
+    $('#Warehouse-down').addClass('down');
+    $('#Warehouse-sub_unic').show();
+  
+    $('#Warehouse-Shipment').addClass('activeLink active-nav');
+  
+</script>
+
+{% endblock jquery %}

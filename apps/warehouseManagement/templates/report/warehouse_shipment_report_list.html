@@ -1,0 +1,211 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %} Shipment Report{% endblock title %}
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+
+<!-- Custom CSS for Styling -->
+<style>
+    body {
+        font-family: Arial, sans-serif;
+    }
+    .main-content {
+        margin: 20px;
+    }
+    .farm.headingtop {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 20px;
+    }
+    .card.farm-fields-container {
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        background-color: #f9f9f9;
+    }
+    form {
+        margin-bottom: 20px;
+    }
+    .form-control {
+        margin-right: 10px;
+        border-radius: 4px;
+    }
+    .btn-primary {
+        border-radius: 4px;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+    }
+    table, th, td {
+        border: 1px solid #ddd;
+    }
+    th, td {
+        padding: 12px;
+        text-align: left;
+    }
+    th {
+        background-color: #f4f4f4;
+    }
+    pre {
+        background: #f4f4f4;
+        padding: 10px;
+        border-radius: 4px;
+        overflow-x: auto;
+    }
+    .container {
+        margin-top: 20px;
+    }
+    @media (max-width: 768px) {
+        .form-control, .btn-primary {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+    }
+</style>
+{% endblock extrahead %}
+
+{% block content %}
+{% include 'navbar.html' %}
+
+<div class="main-content">
+    {% include 'header.html' %}
+    {% load crispy_forms_tags %}
+    <main>
+        {% include '_alerts.html' %}
+        <div class="page-title-with-or-without-btn">
+        <span class="farm headingtop">Warehouse Shipment Report</span>
+        {% if changes_dict %}
+            <div class="flex-header-btn">
+                <a href="{% url 'warehouse_shipment_export_csv' %}" class="btn-close-cancel">Download CSV</a>
+            </div>
+        {% endif %}
+        </div>
+        <div class="card farm-fields-container">           
+            
+            <!-- Search Bar and Button -->
+            <form class="d-flex flex-column flex-sm-row my-3" method="POST">
+                {% csrf_token %}
+                <select id="date_choice" name="date_choice" class="form-control mb-3 mb-sm-0 me-sm-2">
+                    <option value="all" {% if date_choice == 'all' %}selected{% endif %}>Select Date Type</option>
+                    <option value="single_date" {% if date_choice == 'single_date' %}selected{% endif %}>Single Date</option>
+                    <option value="date_range" {% if date_choice == 'date_range' %}selected{% endif %}>Date Range</option>
+                </select>
+            
+                <!-- Single Date Input -->
+                <input type="date" id="single_date" name="single_date" class="form-control mb-3 mb-sm-0" 
+                       value="{{ single_date }}" 
+                       style="display: {% if date_choice == 'single_date' %}block{% else %}none{% endif %};">
+            
+                <!-- Start and End Date Inputs for Date Range -->
+                <input type="date" id="start_date" name="start_date" class="form-control mb-3 mb-sm-0" 
+                       value="{{ start_date }}" 
+                       style="display: {% if date_choice == 'date_range' %}block{% else %}none{% endif %};">
+                <input type="date" id="end_date" name="end_date" class="form-control mb-3 mb-sm-0" 
+                       value="{{ end_date }}" 
+                       style="display: {% if date_choice == 'date_range' %}block{% else %}none{% endif %};">
+            
+                <button class="btn text-white" type="submit" style="background-color:#549874;">Generate Report</button>
+            </form>
+           
+            <!-- Conditionally render table if any date filter is applied -->
+            {% if date_choice %}
+            <div class="container">
+                {% if changes_dict %}
+                    {% for shipment_id, descriptions in changes_dict.items %}
+                    <div class="d-flex justify-content-between align-items-center p-3" style="background-color: #d7d5d5;color: #0b6c39;font-size: 22px;font-weight: 600;margin: 20px 0;padding: 12px 0;">
+                        <span class="font-weight-bold">Shipment ID: {{ shipment_id }}</span>
+                        <span><a href="{% url 'export_csv_for_single_shipment_warehouse' shipment_id %}" class="btn text-white font-weight-bold" style="background-color:#549874;">CSV Download</a></span>
+                    </div>
+                        
+                        {% for description, changes in descriptions.items %}
+                            <h6 class="font-weight-bold">Description: {{ description }}</h6>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th width="20%">Field</th>
+                                        <th width="20%">Old Value</th>
+                                        <th width="20%">New Value</th>
+                                        <th width="20%">Updated At</th>
+                                        <th width="20%">Updated By</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for change in changes %}
+                                        <tr>
+                                            <td>{{ change.field }}</td>
+                                            <td>{{ change.old }}</td>
+                                            <td>{{ change.new }}</td>
+                                            <td>{{ change.updated_at }}</td>
+                                            <td>{{ change.updated_by }}</td>
+                                        </tr>
+                                    {% empty %}
+                                        <tr>
+                                            <td colspan="5">No changes found</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        {% endfor %}
+                    {% endfor %}
+                {% else %}
+                    <p>No shipment logs available for the selected dates.</p>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </main>
+    {% include 'footer.html' %}
+</div>
+{% endblock %}
+
+{% block jquery %}
+<script>
+    document.getElementById('date_choice').addEventListener('change', function() {
+        const single_date = document.getElementById('single_date');
+        const start_date = document.getElementById('start_date');
+        const end_date = document.getElementById('end_date');
+
+        // When Single Date is selected
+        if (this.value === 'single_date') {
+            single_date.style.display = 'block';  // Show single date input
+            start_date.style.display = 'none';    // Hide range inputs
+            end_date.style.display = 'none';
+        }
+        // When Date Range is selected
+        else if (this.value === 'date_range') {
+            single_date.style.display = 'none';   // Hide single date input
+            start_date.style.display = 'block';   // Show range inputs
+            end_date.style.display = 'block';
+        }
+        // When neither is selected
+        else {
+            single_date.style.display = 'none';   // Hide both types of inputs
+            start_date.style.display = 'none';
+            end_date.style.display = 'none';
+        }
+    });
+
+    // Trigger change event to display the correct inputs based on pre-selected value
+    document.getElementById('date_choice').dispatchEvent(new Event('change'));
+</script>
+<script>
+    $('#Warehouse-active').addClass('activeLink');
+  
+    $('#Warehouse-down').addClass('down');
+    $('#Warehouse-sub_unic').show();
+  
+    $('#Warehouse-Shipment-Report').addClass('activeLink active-nav');
+  
+</script>
+{% endblock jquery %}

@@ -1,0 +1,134 @@
+{% extends "base.html" %} {% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}Shipment Items{% endblock title %}
+
+{% block content %}
+{% include 'navbar.html' %}
+<div class="main-content">
+    {% include 'header.html' %}
+    <main>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+        <!-- Include Select2 CSS -->
+        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+        <!-- Include Select2 JS -->
+        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+        {% include '_alerts.html' %}
+        <div class="page-title-with-or-without-btn row">
+        <span class="farm headingtop">Shipment Items</span>
+       
+        <div class="card farm-fields-container">
+            <nav aria-label="breadcrumb m-5">
+                {% if error_messages %}
+                <div id="alertMessage" class="alert alert-warning alert-dismissible fade show" role="alert">
+                    <strong>{{error_messages}}</strong>  
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>                         
+                  </div> 
+                  <script>                            
+                    setTimeout(function() {
+                        document.getElementById('alertMessage').style.display = 'none';
+                    }, 5000);
+                </script>                          
+                  {% endif %}
+            </nav>            
+            <div class="">
+                <div class="main-simple-table-with-search col-12">                        
+
+                    <div class="both-data-in" style="display: inherit;">
+                        <div class="table-responsive">
+                            <table id="" class="table table-striped dt-responsive nowrap"
+                                style="width:100%">
+                                <thead>
+                                    <tr style="border-bottom: 2px solid #e0e0e0;"> 
+                                        <th width="10%">Quickbooks ID</th>                                           
+                                        <th width="5%">Item Name</th>
+                                        <th width="10%">Category</th>                                           
+                                        <th width="25%">Per Unit Price</th>                                         
+                                        <th width="10%">Type</th>                                            
+                                        <th width="10%">Status</th>                                           
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    
+                                    {% if items %}
+                                        {% for item in items %}                                            
+                                        <tr>
+                                            <td>{{item.quickbooks_id}}</td>
+                                            <td>{{item.item_name}}</td>
+                                            <td>{{item.item_type}}</td>                                                
+                                            <td>$ {{item.per_unit_price}}</td>
+                                            
+                                            <td>{{item.type}}</td>
+                                            <td>{% if item.is_active %} Active {% else %} Not Active {% endif %}</td>                                                
+                                            
+                                        </tr>
+                                        {% endfor %}
+                                    {% else %}
+                                        <tr>
+                                            <td colspan="12" style="text-align:center;">No Result Found</td>
+                                        </tr>
+                                    {% endif %} 
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="row align-items-center">
+                                <div class="col-md-12 col-sm-12 col-12 text-center">
+                                    {% if items.has_other_pages %}
+                                        <ul class="pagination" id="nav_1">
+                                            {% if items.has_previous %}
+                                                <li><a href="?page={{ items.previous_page_number }}">&laquo;</a></li>
+                                            {% else %}
+                                                <li class="disabled"><span>&laquo;</span></li>
+                                            {% endif %}
+                                            {% for i in items.paginator.page_range %}
+                                                {% if items.number == i %}
+                                                    <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+                                                {% else %}
+                                                    <li><a href="?page={{ i }}">{{ i }}</a></li>
+                                                {% endif %}
+                                            {% endfor %}
+                                            {% if items.has_next %}
+                                                <li><a href="?page={{ items.next_page_number }}">&raquo;</a></li>
+                                            {% else %}
+                                                <li class="disabled"><span>&raquo;</span></li>
+                                            {% endif %}
+                                        </ul>
+                                    {% endif %}
+                                </div>
+                            <div class="col-md-12 col-sm-12 col-12 text-center mt-2" style="text-align:right">
+                                <span>Showing  {{ items.start_index }} - {{ items.end_index }} of {{ items.paginator.count }} entries
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>           
+        </div>
+    </main>
+    {% include 'footer.html' %}
+</div>
+{% endblock %}
+{% block jquery %}
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('#processor_id').select2({
+            placeholder: "Select a Processor",
+            allowClear: true
+        });
+    });
+</script>
+<script>
+    $('#Contracts-active').addClass('activeLink');
+  
+    $('#Contracts-down').addClass('down');
+    $('#Contracts-sub').show();
+  
+    $('#Shipment-Item-List').addClass('activeLink active-nav');
+  
+</script>
+{% endblock jquery %}

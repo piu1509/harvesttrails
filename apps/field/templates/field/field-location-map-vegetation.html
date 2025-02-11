@@ -1,0 +1,486 @@
+{% extends "base.html" %}
+{% load static %} {% block title %} Field map view vegetation {% endblock title %} 
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+{% block content %}
+{% include 'navbar.html' %}
+<div class="main-content">
+    {% include 'header.html' %}
+    <style>
+        #map-canvas{
+        height: calc(100vh - 260px);
+        width: 100%;
+    }
+    </style>
+<main>
+    <div class="page-title-with-or-without-btn">
+        <span class="farm headingtop">{{field_obj.name}}</span>
+        <!-- Create button for Account-->
+        <div class="flex-header-btn">
+          <div class="flex-header-btn-col">
+            <a href="javascript:void(0);" onclick="history.back()" class="btn btn-black btn-rounded btn-small">Back</a>
+          </div>
+        </div>
+      </div>
+      
+        <!-- Tab panes -->
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card card-padding">
+                    <ul class="nav field-historic-tab">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="{% url 'field-location-map-vegetation' field_obj.pk %}">Vegetation</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'field-location-map-moisture' field_obj.pk %}">Moisture</a>
+                        </li>
+                    </ul>
+                <div class="table-filter-row mb-3">
+                    <input type="hidden" name="field_id" id="field_id" value="{{field_obj.pk}}">
+                    <div class="table-filter-col">
+                        <div class="row">
+                            <div class="col-sm-4 mb-2"> 
+                                <select class="select200 mt-0" name="index_name"" id="index_name">
+                                    <option value="">Index</option>
+                                    <option value="NDVI">NDVI</option>
+                                    <option value="MSAVI">MSAVI</option>
+                                    <option value="NDRE">NDRE</option>
+                                    <option value="RECI">RECI</option>
+                                    <option value="NDMI">NDMI</option>
+                                </select>
+                            </div>
+                            <div class="col-sm-4 mb-2">
+                                <select class="select200 mt-0" name="date_list" id="date_list">
+                                    <option value="">Date</option>
+                                    <option value="2022-11-23">Nov 23, 2022 cloud: 0.0%</option>
+                                    <option value="2022-11-20">Nov 20, 2022 cloud: 0.0%</option>
+                                    <option value="2022-11-18">Nov 18, 2022 cloud: 0.0%</option>
+                                    <option value="2022-11-15">Nov 15, 2022 cloud: 0.0%</option>
+                                    <option value="2022-11-13">Nov 13, 2022 cloud: 0.0%</option>
+                                    <option value="2022-11-10">Nov 10, 2022 cloud: 0.0%</option>
+                                    <option value="2022-11-03">Nov 3, 2022 cloud: 0.0%</option>
+                                    <option value="2022-10-31">Oct 31, 2022 cloud: 0.0%</option>
+                                    <option value="2022-10-26">Oct 26, 2022 cloud: 0.0%</option>
+                                    <option value="2022-10-19">Oct 19, 2022 cloud: 0.0%</option>
+                                    <option value="2022-10-16">Oct 16, 2022 cloud: 0.0%</option>
+                                    <option value="2022-10-14">Oct 14, 2022 cloud: 0.0%</option>
+                                    <option value="2022-10-11">Oct 11, 2022 cloud: 0.0%</option>
+                                    <option value="2022-10-06">Oct 6, 2022 cloud: 0.0%</option>
+                                    <option value="2022-10-04">Oct 4, 2022 cloud: 0.0%</option>
+                                    <option value="2022-10-01">Oct 1, 2022 cloud: 0.0%</option>
+                                    <option value="2022-09-29">Sep 29, 2022 cloud: 0.0%</option>
+                                    <option value="2022-09-26">Sep 26, 2022 cloud: 0.0%</option>
+                                    <option value="2022-09-24">Sep 24, 2022 cloud: 0.0%</option>
+                                    <option value="2022-09-21">Sep 21, 2022 cloud: 0.0%</option>
+                                    <option value="2022-09-16">Sep 16, 2022 cloud: 0.0%</option>
+                                    <option value="2022-09-14">Sep 14, 2022 cloud: 0.0%</option>
+                                    <option value="2022-09-09">Sep 9, 2022 cloud: 0.0%</option>
+                                    <option value="2022-09-06">Sep 6, 2022 cloud: 0.0%</option>
+                                    <option value="2022-09-04">Sep 4, 2022 cloud: 0.0%</option>
+                                    <option value="2022-09-01">Sep 1, 2022 cloud: 0.0%</option>
+                                    <option value="2022-08-30">Aug 30, 2022 cloud: 0.0%</option>
+                                    <option value="2022-08-27">Aug 27, 2022 cloud: 0.0%</option>
+                                    <option value="2022-08-25">Aug 25, 2022 cloud: 0.0%</option>
+                                    <option value="2022-08-22">Aug 22, 2022 cloud: 0.0%</option>
+                                    <option value="2022-08-20">Aug 20, 2022 cloud: 0.0%</option>
+                                    <option value="2022-08-15">Aug 15, 2022 cloud: 0.0%</option>
+                                    <option value="2022-08-12">Aug 12, 2022 cloud: 0.0%</option>
+                                    <option value="2022-08-10">Aug 10, 2022 cloud: 0.0%</option>
+                                    <option value="2022-08-07">Aug 7, 2022 cloud: 0.0%</option>
+                                    <option value="2022-08-05">Aug 5, 2022 cloud: 0.0%</option>
+                                    <option value="2022-08-02">Aug 2, 2022 cloud: 0.0%</option>
+                                    <option value="2022-07-28">July 28, 2022 cloud: 0.0%</option>
+                                    <option value="2022-07-26">July 26, 2022 cloud: 0.0%</option>
+                                    <option value="2022-07-23">July 23, 2022 cloud: 0.0%</option>
+                                    <option value="2022-07-21">July 21, 2022 cloud: 0.0%</option>
+                                    <option value="2022-07-18">July 18, 2022 cloud: 0.0%</option>
+                                    <option value="2022-07-16">July 16, 2022 cloud: 0.0%</option>
+                                    <option value="2022-07-13">July 13, 2022 cloud: 0.0%</option>
+                                    <option value="2022-07-11">July 11, 2022 cloud: 0.0%</option>
+                                    <option value="2022-07-07">July 07, 2022 cloud: 0.0%</option>
+                                    <option value="2022-06-29">June 29, 2022 cloud: 0.0%</option>
+                                    <option value="2022-06-24">June 24, 2022 cloud: 0.0%</option>
+                                    <option value="2022-06-19">June 19, 2022 cloud: 0.0%</option>
+                                    <option value="2022-06-14">June 14, 2022 cloud: 0.0%</option>
+                                    <option value="2022-06-09">June 9, 2022 cloud: 0.0%</option>
+                                    <option value="2022-06-04">June 4, 2022 cloud: 0.0%</option>
+                                    <option value="2022-05-30">May 30, 2022 cloud: 0.0%</option>
+                                    <option value="2022-05-20">May 20, 2022 cloud: 0.0%</option>
+                                    <option value="2022-05-15">May 15, 2022 cloud: 0.0%</option>
+                                    <option value="2022-05-10">May 10, 2022 cloud: 0.0%</option>
+                                    <option value="2022-04-10">April 10, 2022 cloud: 0.0%</option>
+                                    <option value="2022-03-11">March 11, 2022 cloud: 0.0%</option>
+                                    <option value="2022-03-01">March 1, 2022 cloud: 0.0%</option>
+                                    <option value="2022-02-19">Feb. 19, 2022 cloud: 0.0%</option>
+                                    <option value="2022-02-14">Feb. 14, 2022 cloud: 0.0%</option>
+                                    <option value="2022-02-09">Feb. 9, 2022 cloud: 0.0%</option>
+                                    <option value="2022-01-30">Jan. 30, 2022 cloud: 0.0%</option>
+                                    <option value="2022-01-25">Jan. 25, 2022 cloud: 0.0%</option>
+                                    <option value="2022-01-10">Jan. 10, 2022 cloud: 0.0%</option>
+                                    <option value="2022-01-05">Jan. 5, 2022 cloud: 0.0%</option>
+                                    <option value="2021-12-21">Dec. 21, 2021 cloud: 0.0%</option>
+                                    <option value="2021-12-06">Dec. 6, 2021 cloud: 0.0%</option>
+                                    <option value="2021-11-26">Nov. 26, 2021 cloud: 0.0%</option>
+                                    <!-- <option value="2021-11-06">Nov. 6, 2021 cloud: 0.0%</option>
+                                    <option value="2021-10-22">Oct. 22, 2021 cloud: 0.0%</option>
+                                    <option value="2021-10-17">Oct. 17, 2021 cloud: 0.0%</option>
+                                    <option value="2021-10-12">Oct. 12, 2021 cloud: 0.0%</option>
+                                    <option value="2021-09-27">Sept. 27, 2021 cloud: 0.0%</option>
+                                    <option value="2021-09-12">Sept. 12, 2021 cloud: 0.0%</option>
+                                    <option value="2021-09-07">Sept. 7, 2021 cloud: 0.0%</option>
+                                    <option value="2021-09-02">Sept. 2, 2021 cloud: 0.0%</option>
+                                    <option value="2021-08-28">Aug. 28, 2021 cloud: 0.0%</option>
+                                    <option value="2021-08-23">Aug. 23, 2021 cloud: 0.0%</option>
+                                    <option value="2021-08-08">Aug. 8, 2021 cloud: 0.0%</option>
+                                    <option value="2021-08-03">Aug. 3, 2021 cloud: 0.0%</option>
+                                    <option value="2021-07-24">July 24, 2021 cloud: 0.0%</option>
+                                    <option value="2021-07-14">July 14, 2021 cloud: 0.0%</option> -->
+                                </select>
+<!--                            <div class="col-sm-4"> -->
+<!--                                <select class="select200 mt-0" name="date_list" style="border-radius:5px;" id="date_list">-->
+<!--                                    <option value="">Date</option>-->
+<!--                                </select>-->
+<!--                            </div>-->
+                            </div>
+                            <div class="col-sm-4 text-center text-sm-start">
+                                <input class="btn-save-submit h-47" id="submitparams" type="button" value="submit" onclick="submitparams();" />
+<!--                                <select class="select200 mt-0" name="zone_list" style="border-radius:5px;" id="zone_list">-->
+<!--                                    <option value="">Apply</option>-->
+<!--                                </select>-->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% if field_img %}
+                {% if index_selected %}
+                    <b>the field image is for {{index_selected}} of the date {{date_selected}}</b><br>
+                {% endif %}
+                <div id="map-image">
+                    <img src="{{field_img}}" class="img-fluid">
+                </div>
+            {% else %}
+                <div id="map-canvas"></div>
+            {% endif %}
+        </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card card-padding field-info-map">
+            <h5>Field Info</h5>
+            <div class="d-flex justify-content-between">
+                <div>Grower Name:</div>
+                <div>{{field_obj.grower.name}}</div>
+            </div>
+            <div class="d-flex justify-content-between">
+                <div>Crop Year:</div>
+                <div>-</div>
+            </div>
+            <div class="d-flex justify-content-between">
+                <div>Farm:</div>
+                <div>{{field_obj.farm.name}}</div>
+            </div>
+            <div class="d-flex justify-content-between">
+                <div>Field:</div>
+                <div>{{field_obj.name}}</div>
+            </div>
+            <div class="d-flex justify-content-between">
+                <div>Acreage:</div>
+                <div>{{field_obj.acreage}}</div>
+            </div>
+            <div class="d-flex justify-content-between">
+                <div>Variety:</div>
+                <div>{{field_obj.variety}}</div>
+            </div>
+            <div class="d-flex justify-content-between">
+                <div>Yield:</div>
+                <div>{{field_obj.total_yield}}</div>
+            </div>
+            <div class="d-flex justify-content-between">
+                <div>Gal water saved:</div>
+                <div>{{field_obj.gal_water_saved}}</div>
+            </div>
+            <div class="d-flex justify-content-between">
+                <div>Water/LB saved:</div>
+                <div>{{field_obj.water_lbs_saved}}</div>
+            </div>
+            <div class="d-flex justify-content-between">
+                <div>C02-eq reduced:</div>
+                <div>{{field_obj.co2_eq_reduced}}</div>
+            </div>
+            <div class="d-flex justify-content-between">
+                <div>Increase Nitrogen:</div>
+                <div>{{field_obj.increase_nitrogen}}</div>
+            </div>
+            <div class="d-flex justify-content-between">
+                <div>GHG Reduction:</div>
+                <div>{{field_obj.ghg_reduction}}</div>
+            </div>
+            <div class="d-flex justify-content-between">
+                <div>Land Use Efficiency:</div>
+                <div>{{field_obj.land_use_efficiency}}</div>
+            </div>
+            <div class="d-flex justify-content-between">
+                <div>Grower Premium %:</div>
+                <div>{{field_obj.grower_premium_percentage}}</div>
+            </div>
+            <div class="d-flex justify-content-between">
+                <div>Grower Dollar Premium:</div>
+                <div>{{field_obj.grower_dollar_premium}}</div>
+            </div>
+            <div class="d-flex justify-content-between">
+                <div>Field coordinates:</div>
+                <div>{{field_coordinates|join:" "}}</div>
+            </div>
+<!--            <div class="d-flex justify-content-between">-->
+<!--                <div>Q1:</div>-->
+<!--                <div>{{result_obj.q1}}</div>-->
+<!--            </div>-->
+<!--            <div class="d-flex justify-content-between">-->
+<!--                <div>Q3:</div>-->
+<!--                <div>{{result_obj.q3}}</div>-->
+<!--            </div>-->
+<!--            <div class="d-flex justify-content-between">-->
+<!--                <div>MAX:</div>-->
+<!--                <div>{{result_obj.max}}</div>-->
+<!--            </div>-->
+<!--            <div class="d-flex justify-content-between">-->
+<!--                <div>MIN:</div>-->
+<!--                <div>{{result_obj.min}}</div>-->
+<!--            </div>-->
+<!--            <div class="d-flex justify-content-between">-->
+<!--                <div>P10:</div>-->
+<!--                <div>{{result_obj.p10}}</div>-->
+<!--            </div>-->
+<!--            <div class="d-flex justify-content-between">-->
+<!--                <div>P90:</div>-->
+<!--                <div>{{result_obj.p90}}</div>-->
+<!--            </div>-->
+<!--            <div class="d-flex justify-content-between">-->
+<!--                <div>STD:</div>-->
+<!--                <div>{{result_obj.std}}</div>-->
+<!--            </div>-->
+<!--            <div class="d-flex justify-content-between">-->
+<!--                <div>MEDIAN:</div>-->
+<!--                <div>{{result_obj.median}}</div>-->
+<!--            </div>-->
+<!--            <div class="d-flex justify-content-between">-->
+<!--                <div>AVERAGE:</div>-->
+<!--                <div>{{result_obj.average}}</div>-->
+<!--            </div>-->
+<!--            <div class="d-flex justify-content-between">-->
+<!--                <div>VARIANCE:</div>-->
+<!--                <div>{{result_obj.variance}}</div>-->
+<!--            </div>-->
+        </div>
+        </div>
+        </div>
+    
+    </main>
+    </div>
+    {% include 'footer.html' %}
+    </div>
+    {% endblock %}
+    {% block scripts %}
+    <script src="https://maps.google.com/maps/api/js?key=AIzaSyBA6EZ3fYAqY3DEG1Z4MFvayhIxIRCacx8"></script>
+    {% endblock scripts %}
+    {% block jquery %}
+     <script>
+        function setIndexValue(){
+            var selId = document.getElementById("index_name");
+            var items = selId.options;
+            for (var i = 0; i < items.length; i++) {
+              if (items[i].value == "{{index_selected}}") {
+                     items[i].selected = true;
+              }
+            }
+        }
+        function setDateValue(){
+            var selId = document.getElementById("date_list");
+            var items = selId.options;
+            console.log('the items are ',items);
+            for (var i = 0; i < items.length; i++) {
+              if (items[i].value == "{{date_selected}}") {
+                     items[i].selected = true;
+              }
+            }
+        }
+        window.onload = function() {
+            setIndexValue();
+            setDateValue();
+        };
+    </script>
+    <script>
+        function submitparams(){
+            var index_name_val = document.getElementById("index_name").value;
+            console.log("index value is ", index_name_val);
+            var date_id_val = document.getElementById("date_list").value;
+            console.log("date value is ", date_id_val);
+            var link = document.createElement('a');
+            link.href = "{% url 'field-location-map-vegetation' field_obj.id %}?index_name="+index_name_val+"&date="+date_id_val;
+            document.body.appendChild(link);
+            $('#map-image').addClass('loading');
+            link.click();
+        };
+    </script>
+    <script>
+      function initialize() {
+      var mapOptions = {
+          zoom: 5,
+          center: new google.maps.LatLng(40,-117),
+          mapTypeId: google.maps.MapTypeId.SATELLITE,
+          disableDefaultUI: true
+      };
+  
+      var map = new google.maps.Map(document.getElementById('map-canvas'),  mapOptions);
+      var arr = new Array();
+      var polygons = [];
+      var bounds = new google.maps.LatLngBounds();
+      var infoWindow = google.maps.InfoWindow;
+  
+      // downloadUrl("subdivision-coordinates.php", function(data) {
+      //var xmlString = '<subdivisions><subdivision name="Auburn Hills"><coord lat="39.00748" lng="-92.323222"/><coord lat="39.000843" lng="-92.323523"/><coord lat="39.000509" lng="-92.311592"/><coord lat="39.007513" lng="-92.311378"/><coord lat="39.00748" lng="-92.323222"/></subdivision><subdivision name="Vanderveen"><coord lat="38.994206" lng="-92.350645"/><coord lat="38.985033" lng="-92.351074"/><coord lat="38.984699" lng="-92.343092"/><coord lat="38.981163" lng="-92.342234"/><coord lat="38.984663" lng="-92.3335"/><coord lat="38.993472" lng="-92.333179"/><coord lat="38.994206" lng="-92.350645"/></subdivision><subdivisions>';
+          var xmlString = '{{polydata_n | safe}}';
+          var xml = xmlParse(xmlString);
+          var subdivision = xml.getElementsByTagName("subdivision");
+          // alert(subdivision.length);
+          for (var i = 0; i < subdivision.length; i++) {
+              var poly_name = subdivision[i].getAttribute("name");
+              var field_id = subdivision[i].getAttribute("fieldId");
+              arr = [];
+              var coordinates = xml.documentElement.getElementsByTagName("subdivision")[i].getElementsByTagName("coord");
+              for (var j=0; j < coordinates.length; j++) {
+                arr.push( new google.maps.LatLng(
+                      parseFloat(coordinates[j].getAttribute("lat")),
+                      parseFloat(coordinates[j].getAttribute("lng"))
+                ));
+                  
+                bounds.extend(arr[arr.length-1])
+              }
+              polygons.push(new google.maps.Polygon({
+                  paths: arr,
+                  strokeColor: getRandomColor(),
+                  strokeOpacity: 0.8,
+                  strokeWeight: 1,
+                  fillColor: getRandomColor(),
+                  fillOpacity: 0.50,
+                  name: poly_name,
+                  field_id: field_id
+              }));
+              
+              polygons[polygons.length-1].setMap(map);
+              infoWindow = new google.maps.InfoWindow();
+              google.maps.event.addListener(polygons[polygons.length-1], 'mouseover', function(e) {
+                    //console.log(e.latLng.lat());
+                    
+                    let contentString = '<b>' + this.name + '</b>';
+                    
+                    infoWindow.setContent(contentString);
+                    infoWindow.setPosition(e.latLng);
+                    //infoWindow.open(map);
+              });
+
+              google.maps.event.addListener(polygons[polygons.length-1], 'click', function(e) {
+                      //console.log(e.latLng.lat()); field_location_map
+                      //window.open("/field/field_location_map/vegetation/" + this.field_id, "_blank");
+                });
+  
+              
+          }
+    // });
+    map.fitBounds(bounds);
+  }
+
+  function getRandomColor() {
+    var letters = '0123456789ABCDEF';
+    var color = '#';
+    for (var i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+  }
+  
+  
+  
+  /**
+   * Parses the given XML string and returns the parsed document in a
+   * DOM data structure. This function will return an empty DOM node if
+   * XML parsing is not supported in this browser.
+   * @param {string} str XML string.
+   * @return {Element|Document} DOM.
+   */
+  function xmlParse(str) {
+    if (typeof ActiveXObject != 'undefined' && typeof GetObject != 'undefined') {
+      var doc = new ActiveXObject('Microsoft.XMLDOM');
+      doc.loadXML(str);
+     return doc;
+    }
+  
+    if (typeof DOMParser != 'undefined') {
+      return (new DOMParser()).parseFromString(str, 'text/xml');
+    }
+  
+    return document.createElement('div', null);
+  }
+  
+  google.maps.event.addDomListener(window, 'load', initialize);
+  </script>
+
+  <script>
+    $('#index_nameee').on('change', function(e){
+        var index_name_val = $(this).val();
+        var field_id_val = $('#field_id').val();
+        $('#date_list').addClass('loading');
+
+        if(index_name_val != "" )
+        {
+            $.ajax({ // create an AJAX call...
+                data: {index_name_val:index_name_val, field_id_val:field_id_val}, // get the form data
+                type: 'POST', // GET or POST
+                url: "{% url 'eos-create-task-for-date-list' %}", // the file to call
+                dataType: "JSON",
+                beforeSend: function(xhr, settings){
+                    xhr.setRequestHeader("X-CSRFToken", '{{csrf_token}}');
+                }, 
+                success: function(response) { // on success..
+                    console.log(response);
+                    var date_arr = ['<option value="">Date</option>'];
+                    for(var i = 0; i < response.data.length; i++)
+                    {
+                        date_arr.push('<option value="'+ response.data[i].date_val +'">'+ response.data[i].date_text +'</option>');
+                    }
+
+                    date_list = date_arr.join("");
+                    $('#date_list').html(date_list);
+                    $('#date_list').removeClass('loading');
+                    
+                }
+            });
+        }
+        else
+        {
+            $('#date_list').html('<option value="">Date</option>');
+            $('#date_list').removeClass('loading');
+        }
+        
+    });
+
+  </script>
+    <script>
+    $('#Farm-Configuration-active').addClass('activeLink');
+                    
+    $('#Farm-Configuration-down').addClass('down');
+    $('#Farm-Configuration-sub').show();
+    
+    $('#Field-Management').addClass('activeLink active-nav');
+    </script>
+    {% endblock jquery %}

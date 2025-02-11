@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %} Upload {% endblock title %}
+{% block content %}
+{% include 'navbar.html' %}
+
+<div class="main-content">
+	{% include 'header.html' %} {% load crispy_forms_tags %}
+	<main>
+		<span class="farm headingtop">Upload Files </span>
+		{% if not user.is_superuser %}
+		<br> Grower Name : <label for="">{{user.grower.name}}</label>
+		<label hidden id="defGrower" for="">{{user.grower.id}}</label> {% endif %}
+		<div class="modal-body card mt-4">
+			<div class="container-fluid">
+				<form method="post" enctype="multipart/form-data">
+					{% csrf_token %}
+					<div class="row mt-4">
+						<!-- <div class="col-md-4">
+							<div id="div_id_grower" class="form-group">
+								<label for="id_grower" class=" requiredField">
+									Grower<span class="asteriskField">*</span>
+								</label>
+								<div class="">
+									<select name="grower" class="select form-control" required="" id="id_grower">
+										<option value="" selected="">---------</option>
+									</select>
+								</div>
+							</div>
+						</div> -->
+						{% if user.is_superuser %}
+						<div class="col-md-4">
+							{{ form.grower|as_crispy_field }}
+						</div>
+						{% endif %}
+						<div class="col-md-4">
+							{{ form.farm|as_crispy_field }}
+						</div>
+						<div class="col-md-4">
+							{{ form.field|as_crispy_field }}
+						</div>
+					</div>
+					<div class="row mt-4">
+						<div class="col-md-4">
+							{{ form.survey_type|as_crispy_field }}
+						</div>
+						<div class="col-md-4">
+						{{ form.year|as_crispy_field }}
+						</div>
+						<div class="col-md-4">
+						{{file_form.file|as_crispy_field}}
+						</div>
+					</div>
+					<div class="modal-footer">
+						<a href="{% url 'gallery' %}" class="btn-close-cancel btn-space">Cancel </a>
+						<button class="btn-save-submit" type='submit'>Save</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</main>
+	{% include 'footer.html' %}
+	{% endblock %}
+	{% block jquery %}
+
+<script src="{% static 'js/jquery-file-upload/vendor/jquery.ui.widget.js' %}"></script>
+<script src="{% static 'js/jquery-file-upload/jquery.iframe-transport.js' %}"></script>
+	{% endblock jquery %}
+	{% block scripts %}
+<script type="text/javascript" src="{% static 'js/multiselect.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/gallery/uploadJquery.js' %}"></script>
+
+	{% endblock scripts %}

@@ -1,0 +1,15 @@
+{% extends "base.html" %} 
+{% load static %}
+{% block content %}
+
+<div class="bg">
+    
+    <div class="box pt-5">
+        <!-- <h3 class="text-center1">You have been logged out</h3><br> -->
+		<p class="sent-msg-p inc-size">You have been logged out</p>
+		<a class="back-to-login" href="{% url 'login' %}">Log in again</a>
+    </div>
+</div>
+
+{% endblock content %}
+

@@ -1,0 +1,76 @@
+{% extends "base.html" %} {% load static %} {% block title %} Add New Account {% endblock title %} 
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+{% load crispy_forms_tags %} {% block content %} {% include 'navbar.html' %}
+<div class="main-content">
+    {% include 'header.html' %}
+    <main>
+        <span class="farm headingtop">User Registration Form</span>
+        <div class="card farm-fields-container">
+            <div class="container-fluid">
+                <form method="post" class="farm-fields-form">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-4">
+                            {{ form.name|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.phone|as_crispy_field }}
+                            
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.email|as_crispy_field }}
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4">
+                            {{ form.role|as_crispy_field }}
+                        </div>
+                        
+                    </div>
+                    
+                    <div class="row">
+                        <div class="form-btn-row">
+                            <a href="{% url 'user-list' %}" class="btn-close-cancel btn-space">Cancel</a>
+                            {% comment %}
+                                super-account-list
+                            {% endcomment %}
+                            <input type="submit" class="btn-save-submit" value="Save">
+                        </div>
+                    </div>
+                </form>
+            </div>
+    </main>
+    {% include 'footer.html' %}
+    </div>
+    {% endblock %}
+    {% block jquery %}
+    <script>
+    $(document).ready(function(){
+        $("#id_role option[value='2']").remove();
+        $("#id_role option[value='4']").remove();
+        $("#id_role option[value='9']").remove();
+    });
+    </script>
+    <script>
+        $('#User-Management-active').addClass('activeLink');
+
+        $('#User-Management-down').addClass('down');
+        $('#User-Management-sub').show();
+
+        $('#user-list').addClass('activeLink active-nav');
+
+      </script>
+    {% endblock jquery %}

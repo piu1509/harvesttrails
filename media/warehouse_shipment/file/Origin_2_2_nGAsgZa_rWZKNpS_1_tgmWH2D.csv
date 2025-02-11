@@ -1,0 +1,18 @@
+CROP,VARIETY,FIELD,GROWER,FARM,HARVEST DATE,PROJECTED YIELD,ACTUAL YIELD,YIELD  DELTA,Pass / Fail Sustainability,Water Savings %,Land Use Efficiency %,Less GHG % ,Premiums to Growers %,CO2 EQ Footprint #,Pounds of Water Per Pound Savings %
+RICE,DG-263L,test rice f,App Test Grower,Test 123,,,65.0,,Fail,0,0,nan,0,0
+RICE,DG-263L,test rice f,App Test Grower,Test 123,,,52.0,,Fail,0,0,nan,0,0
+RICE,DG-263L,test rice f,App Test Grower,Test 123,,,65.0,,Fail,0,0,nan,0,0
+RICE,DG-263L,test rice f,App Test Grower,Test 123,,,33.0,,Fail,0,0,nan,0,0
+RICE,DG-263L,test rice f,App Test Grower,Test 123,,,50.0,,Fail,0,0,nan,0,0
+RICE,DG-263L,test rice f,App Test Grower,Test 123,,,,,Fail,0,0,nan,0,0
+RICE,DG-263L,test rice f,App Test Grower,Test 123,,,25.0,,Fail,0,0,nan,0,0
+RICE,DG-263L,test rice f,App Test Grower,Test 123,,,25.0,,Fail,0,0,nan,0,0
+RICE,DG-263L,test rice f,App Test Grower,Test 123,,,,,Fail,0,0,nan,0,0
+RICE,DG-263L,test rice f,App Test Grower,Test 123,,,30.0,,Fail,0,0,nan,0,0
+RICE,DG-263L,test rice f,App Test Grower,Test 123,,,,,Fail,0,0,nan,0,0
+RICE,DG-263L,test rice f,App Test Grower,Test 123,,,,,Fail,0,0,nan,0,0
+RICE,DG-263L,test rice f,App Test Grower,Test 123,,,,,Fail,0,0,nan,0,0
+RICE,DG-263L,test rice f,App Test Grower,Test 123,,,34.0,,Fail,0,0,nan,0,0
+RICE,DG-263L,test rice f,App Test Grower,Test 123,,,,,Fail,0,0,nan,0,0
+RICE,DG-263L,test rice f,App Test Grower,Test 123,,,25.0,,Fail,0,0,nan,0,0
+RICE,DG-263L,test debashis,Debashis,new dev farm,2022-12-30,22.0,13.0,-9.0,Fail,0,0,nan,0,0

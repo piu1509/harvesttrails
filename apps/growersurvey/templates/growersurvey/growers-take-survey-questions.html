@@ -1,0 +1,339 @@
+{% extends "base.html" %}
+{% load static %} {% block title %} Take Survey {% endblock title %} {% block content %}
+{% include 'navbar.html' %}
+<div class="main-content">
+    {% include 'header.html' %}
+    <style>
+      .butclass{border:1px solid #333; padding: 6px 15px;}
+      .nextclass{background: rgb(7, 97, 7); color:rgb(255, 255, 255);}
+      .nextclass:hover{background: rgb(0, 2, 0); color:rgb(255, 255, 255);}
+      .backclass{background: rgb(117, 64, 3); color:rgb(255, 255, 255);}
+      .backclass:hover{background: rgb(61, 18, 2); color:rgb(255, 255, 255);}
+  </style>
+<!-- MID CONTENT -->
+
+<main> 
+    <div class="page-title-with-or-without-btn">
+      <div>
+        <span class="farm headingtop">{{surveytypename}} - {{surveyyear}}</span>
+        <br>
+        <span>{{ growersurvey_farm_name.0.name }} - {{ growersurvey_field_name.0.name }}</span> <span style="margin-left: 100px;"> {{question_names.questionorder}}/{{total_questions}} Question</span>
+      </div>
+      <!-- Create button for Account-->
+      <div class="flex-header-btn" id="survay_form_2">
+        <a href="javascript:void(0);" onclick="saveExitSurvey()" class="farm headingtop">Save & Exit</a>      
+      </div>
+    </div>
+    <div class="card farm-fields-container">
+        <div class="container-fluid">
+          <div id="survay_form">
+          <form method="post" name="takeSurvey" id="takeSurvey" class="farm-fields-form" style="padding:5px 15px;" enctype="multipart/form-data">
+            {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-12">
+                        <div id="div_id_name" class="form-group">
+                          <label for="id_name">
+                              Q.{{question_names.questionorder}} {{question_names.questionname}}
+                          </label>
+                          
+                          {% for op in option %}
+                          <div class="form-check mt-3">
+                            <input type="{{question_names.selection_type}}" class="form-check-input option_select" name="option" data-value="{{op.id}}" value="{{op.optionscore}}" id="opt_{{op.id}}" />
+                            <label class="form-check-label" for="opt_{{op.id}}">
+                                {{op.optionname}}
+                            </label>
+                          </div>
+                          {% endfor %}
+                        </div>
+                        <p id="disp_option" style="color: red;"></p>
+                    </div>
+                    <input type="hidden" name="evidence_requird" value="{{question_names.evidence_requird}}" id="evidence_requird">
+                    {% if question_names.evidence_requird %}
+                    <div class="col-md-6">
+                      <div id="div_id_name" class="form-group mt-4">
+                          <label for="id_name">
+                              {{question_names.evidence_descr}}
+                          </label>
+                          <div class="upload-btn">
+                  
+                              <input type="file" name="evidence_requird_files" id="upload_file" class=" form-control" placeholder="dsdsdsd" multiple>
+                              Upload 
+                              <img src="/static/img/upload.svg" class="upload-icon">
+                          </div>
+                          <p id="uploaded_files"></p>
+                      </div>
+                      <p id="disp_upload_file" style="color: red;"></p>
+                   </div>
+                   {% endif %}
+
+
+                </div>
+                <div class="row">
+                  <div class="col-md-12">
+                    <div class="form-group">
+                      <div class="row mt-4">
+                        <div class="col-lg-6">
+                          <div class="form-btn-row" style="text-align: left;">
+                            <!-- <button class="btn-back-btn">Back</button> -->
+                            <a href="javascript:void(0);" class="btn-back-btn" onclick="history.back()">Back</a>
+                          </div>
+                        </div>
+                        <div class="col-lg-6">
+                          <div class="form-btn-row">
+                            <a href="javascript:void(0);" onclick="closeSurvey()" class="btn-close-btn-green">Close Survey</a>
+                            <input type="hidden" name="question_id" value="{{question_names.id}}" id="question_id">
+                            <input type="hidden" name="optionvalue" value="" id="optionvalue">
+                            <input type="hidden" name="option_id" value="" id="option_id">
+                            <input type="hidden" name="questionspkvalue" value="{{total_questions}}" id="questionspkvalue">
+
+                            <input type="hidden" name="nextquestionid" value="{{nextquestion}}" id="nextquestionid">
+                            <input type="hidden" name="growerid" value="{{logged_grower_id}}" id="growerid">
+                            <input type="hidden" name="namesurvey_id" value="{{namesurvey_id}}" id="namesurvey_id">
+                            <input type="hidden" name="growersurvey_farm_id" value="{{growersurvey_farm_id}}" id="growersurvey_farm_id">
+                            <input type="hidden" name="growersurvey_feild_id" value="{{growersurvey_feild_id}}" id="growersurvey_feild_id">
+                            <input type="hidden" name="status" value="ongoing" id="status">
+                            <input type="hidden" name="save_status" value="0" id="save_status">
+                            <!-- <button class="btn-next-btn-green"><a href="{{nextquestion}}" onclick="insertopt_value(this)">Next</a></button> -->
+                            <a href="javascript:void(0);" onclick="insertopt_value();" class="btn-next-btn-green" id="nxt_btn">Next</a>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+            </form> 
+          </div>  
+            
+            <div id="replacethis" style="display: none;">
+              <div class="container-fluid">
+                  <div class="sustain" style="display: flex; flex-wrap: nowrap; width: 100%; gap: 12%; justify-content: center;">
+                      
+                          <div class="block" style="text-align: center; ">
+                            <label for="grower-name" >
+                              <strong> Grower </strong> : 
+                          </label>
+                          <div id="grower_name"></div>
+                          </div>
+                          
+                          <div class="block" style="text-align: center;">
+                            <label for="grower-name">
+                                <strong> Survey </strong> : 
+                            </label>
+                            <div id="survey_type"></div>
+                          </div>
+                          <div class="block" style="text-align: center;">
+                          <label for="grower-name">
+                              <strong> Year </strong> : 
+                          </label>
+                          <div id="survey_year"></div>
+                          </div>
+                          <div class="block" style="text-align: center;">
+                            <label for="grower-name" >
+                                <strong> Farm </strong> : 
+                            </label>
+                            <div id="">{{ growersurvey_farm_name.0.name }}</div>
+                        </div>
+                        <div class="block" style="text-align: center;">
+                          <label for="grower-name" >
+                              <strong> Field </strong> : 
+                          </label>
+                          <div id="">{{ growersurvey_field_name.0.name }}</div>
+                      </div>
+                      
+                  </div>
+                  <div class="col-lg-12" style="padding-top: 60px; text-align: center; margin: 0 auto;">
+                    <label for="grower-name">
+                      <strong style="font-size: 30px;"> Sustainability Score </strong> : 
+                    </label>
+                    <div style="padding-top: 40px; text-align: center; width: 100%; margin: 0 auto;">
+                        <div style="border: 12px solid rgb(7, 93, 173) ; border-radius:50%; width: 400px; height: 400px; margin: 0 auto;">
+                          <p style="font-size: 160px; color:rgb(7, 93, 173); vertical-align: middle; text-align: center; align-items: center; justify-content: center; display: flex; height: 100%;" id="percent_score"></p>
+                        
+                        </div>
+                    </div>
+                  </div>
+              </div>
+            </div>
+        </div>
+    </div>
+</main>
+<!-- MID CONTENT END-->
+{% include 'footer.html' %}
+</div>
+{% endblock %}
+{% block jquery %}
+<script>
+var total = 0;
+function setvalueoption(optionid,optionvalue)
+{
+  $('#optionid').val(optionid);
+  $('#optionvalue').val(optionvalue);
+}
+
+$('#upload_file').on('change', function(e){
+  var file_names = new Array();
+  $.each($(this)[0].files, function(i, file) {
+      file_names.push(file.name);
+  });
+
+  var file_name_com = file_names.join(", ");
+  console.log(file_name_com);
+  $('#uploaded_files').text(file_name_com);
+});
+
+
+
+$('.option_select').on('click', function(e){
+  var option_select_chk = new Array();
+  var option_select_chk_id = new Array();
+	var option_select_chk_n = $(".option_select:checked").length;
+
+	if (option_select_chk_n > 0){
+		$(".option_select:checked").each(function(){
+			option_select_chk.push(parseInt($(this).val()));
+      option_select_chk_id.push(parseInt($(this).data('value')));
+
+		});
+	}
+  console.log(option_select_chk_id);
+  //var get_score = option_select_chk.reduce((a, b) => a + b, 0);
+  
+  for (var i in option_select_chk) {
+    total += option_select_chk[i];
+  }
+
+  var option_select_chk_id_comm = option_select_chk_id.join(',');
+
+  $('#optionvalue').val(total);
+  $('#option_id').val(option_select_chk_id_comm);
+
+});
+
+$('#takeSurvey').on('submit', function(e){
+  e.preventDefault();
+  var nextquestionid = '{{nextquestion}}';
+  
+
+  var next_question_url =  '/growersurvey/questions/{{nextquestion}}/{{growersurvey_farm_id}}/{{growersurvey_feild_id}}/{{namesurvey_id}}';
+  var growerid = "{{logged_grower_id}}";
+  var question_id = $('#question_id').val().trim();
+  var optionvalue = $('#optionvalue').val().trim();
+  var namesurvey_id = '{{namesurvey_id}}';
+  var growersurvey_farm_id = '{{growersurvey_farm_id}}';
+  var growersurvey_feild_id = '{{growersurvey_feild_id}}';
+  var questionspkvalue = $('#questionspkvalue').val().trim();
+
+
+  $('#replacethis').hide();
+  $('#grower_name').text("");
+  $('#survey_type').text("");
+  $('#survey_year').text("");
+  $('#percent_score').text("");
+
+  //alert(next_question_url);
+  var formData = new FormData(this);
+
+  var evidence_requird = $('#evidence_requird').val().trim();
+
+  var file_uploaded = true;
+  if(evidence_requird == 'True')
+  {
+    file_uploaded = false;
+    $.each($("#upload_file")[0].files, function(i, file) {
+      formData.append("file", file);
+      file_uploaded = true;
+      //console.log(file.name);
+    });
+  }
+
+  if(!file_uploaded)
+  {
+    $('#disp_upload_file').text("Uploade evidence file.");
+  }
+  else
+  {
+    $('#disp_upload_file').text("");
+  }
+
+  if(optionvalue == "")
+  {
+    $('#disp_option').text("Need to select option.");
+  }
+  else
+  {
+    $('#disp_option').text("");
+  }
+  
+
+  if(growerid > 0 && question_id!="" && optionvalue!="" && file_uploaded == true)
+  {
+    $.ajax({
+      type: "POST",
+      url: "{% url 'insertopt-value' %}",
+      data: formData,
+      dataType: 'json',
+			contentType: false,
+			cache: false,
+			processData:false,
+      success: function (data) {
+
+        if(data.status && nextquestionid > 0 && data.exit_status==0) 
+        {
+          window.location.href = next_question_url;
+        }
+        else
+        {
+          console.log(data);
+          
+          $('#survay_form').hide();
+          $('#survay_form_2').hide();
+          $('#replacethis').show();
+          $('#grower_name').text(data.grower_name);
+          $('#survey_type').text(data.survey_type_name);
+          $('#survey_year').text(data.survey_year);
+          $('#percent_score').text(data.suspercentage + '%');
+         
+        }
+
+      }
+    });
+
+  }
+
+});
+
+function insertopt_value()
+{
+  var nextquestionid = '{{nextquestion}}';
+  $('#save_status').val(0);
+  $('#status').val('ongoing');
+  setTimeout(function(){
+    if(nextquestionid == "")
+    {
+      $('#save_status').val(1);
+    }
+
+    $('#takeSurvey').submit();
+  }, 500);
+}
+
+function closeSurvey()
+{
+  $('#optionvalue').val(total);
+  $('#save_status').val(1);
+  $('#status').val('completed');
+  setTimeout(function(){
+    $('#takeSurvey').submit();
+  }, 500);
+}
+
+function saveExitSurvey()
+{
+  $('#status').val('ongoing');
+  $('#save_status').val(1);
+  setTimeout(function(){
+    $('#takeSurvey').submit();
+  }, 500);
+}
+</script>
+{% endblock jquery %}

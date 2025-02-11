@@ -1,0 +1,50 @@
+{% extends "base.html" %} {% load static %} {% block title %} Edit Option {% endblock title %} {% block content %} {% include 'navbar.html' %}
+
+<div class="main-content">
+    {% include 'header.html' %} {% load crispy_forms_tags %}
+
+    <main>
+        <span class="farm headingtop">Edit Question</span>
+        <div class="card add-options-card">
+
+
+            <div class="add-option-body">
+                <div class="container-fluid">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="row mt-4">
+                            <div class="col-md-6">
+                                {{ form.survey_type|as_crispy_field }}
+                            </div>
+
+                            <div class="col-md-6">
+                                {{ form.question_type|as_crispy_field }}
+                            </div>
+
+                            <div class="col-md-12">
+                                {{ form.order|as_crispy_field }}
+                            </div>
+
+                            <div class="col-md-6 custom-row-mg-points">
+                                {{ form.text|as_crispy_field }}
+                            </div>
+
+                            <div class="col-md-12 custom-row-mg-is-active">
+                                {{ form.option_type|as_crispy_field }}
+                            </div>
+                        </div>
+                        <div class="add-option-footer">
+                        <button class="save-btn-addOptions">Save</button>
+                        <a href="{% url 'survey' %}" class="cancel-btn-addOptions">Cancel</a>
+                            
+
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+{% endblock %}

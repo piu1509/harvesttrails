@@ -1,0 +1,122 @@
+{% extends "base.html" %} {% load static %} {% block title %} Create Farm {% endblock title %} 
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+{% block content %} {% include 'navbar.html' %}
+
+<div class="main-content">
+    {% include 'header.html' %} {% load crispy_forms_tags %}
+  <main>
+      <style>
+    .separate-top-msg{
+      display: none;
+    }
+    </style>
+    <div class="page-title-with-or-without-btn">
+      <span class="farm headingtop">Create Farms via CSV file</span>
+  <!-- Create button for Account-->
+  <div class="flex-header-btn">
+
+  </div>
+  </div>
+  <div class="remark-point">
+    <div class="alert alert-warning" role="alert">
+      <p class="note-point">
+        <span class="fw-600">Note: </span>Please map CSV fields using dropdown options</p>
+      </div>
+    </div>
+<div class="card card-padding">
+  <form action="" method="POST"> {% csrf_token %}
+    <div class="container-fluid">
+      <div class="row flex-aligned">
+        <div class="col-md-2">
+          <div class="three-fields-with-label">
+          {% if user.is_superuser %}
+      <label for="">Grower Name : </label>
+      <select required class="" name="grower_name" id="growerSelect">
+          <option selected disabled>Select</option>
+          {% for grower_name in grower_names %}
+          <option value="{{grower_name.pk}}">{{grower_name.name}}</option>
+          {% endfor %}
+      </select>
+      {% else %}
+      <select class="" name="grower_name" id="growerSelect" style="display : none;">
+          <option value="{{user.grower.pk}}">{{user.grower.name}}</option>
+      </select>
+
+  {% endif %}
+</div>
+        </div>
+        <div class="col-md-10">
+          <div class="shift-right-mandate-fields">
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" id="mandetory">
+              <label id="mandetoryLabel" class="form-check-label" for="mandetory"><b>Exclude non-mandatory fields</b></label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+<table class="table-striped farm-mapping-table">
+  <thead>
+    <tr>
+      <th scope="col">Required fields</th>
+      <th scope="col">Fields in CSV</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for mf in model_fields %}
+    <tr>
+      <td>{{mf}}</td>
+      <td>
+        <div class="three-fields-with-label map-fields">
+        <select class="map" name="{{mf}}" id="{{mf}}_id">
+            <option selected disabled>Select</option>
+            {% for item in map_col %}
+            <option value="{{item}}">{{item}}</option>
+            {% endfor %}
+        </select>
+      </div>
+      </td>
+    </tr>
+    {% endfor %}
+
+  </tbody>
+</table>
+<div class="buttonHolder">
+  <input type="reset" id="farmcancelbtn" class="btn-close-cancel btn-space" value="Cancel">
+<input type="submit" id="uploadbtn" class="btn-save-submit" value="Submit">
+</div>
+
+</form>
+<label for="" id='msg' class="create-farm-err-msg"></label>
+
+</div>
+  </main>
+</div>
+{% endblock %}
+
+{% block scripts %}
+
+<script type="text/javascript" src={% static 'js/farm/csv_farm_mapping.js' %}></script>
+<script>
+  $('#Farm-Configuration-active').addClass('activeLink');
+        
+  $('#Farm-Configuration-down').addClass('down');
+  $('#Farm-Configuration-sub').show();
+  
+  $('#Farm-Management').addClass('activeLink active-nav');
+</script>
+{% endblock scripts %}

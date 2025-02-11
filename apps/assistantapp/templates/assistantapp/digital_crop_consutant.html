@@ -1,0 +1,1311 @@
+{% extends "base.html" %} {% load static %}
+{% block title %} Digital Crop Consultant {% endblock title %}
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+{% load crispy_forms_tags %}
+{% block content %}
+{% include 'navbar.html' %}
+
+<div class="main-content">
+    {% include 'header.html' %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.0/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.bootstrap4.min.css">
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+
+    <style>
+
+        .main-simple-table-with-search {
+            background-color: #4782c6;
+            padding: 20px;
+        }
+
+        .flex-btn-filter-search form,
+        .three-fields-with-label {
+            width: 100%;
+        }
+        .three-fields-with-label select{
+            padding-top: 7px;
+            padding-bottom: 7px;
+        }
+
+        .card-box {
+            border-radius: 10px;
+            border: 1px solid #ccc;
+            /* background: #f8f8f8; */
+            /* font-size: 20px; */
+            box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
+            padding: 20px;
+            text-align: left !important;
+            margin: 0px 0px 20px 0;
+            height: 100%;
+        }
+        {% if f_crop == 'COTTON' %}
+            .card-box-bg{background:url("../../static/img/c-field.jpg");}
+        {% elif f_crop == 'RICE' %}
+            .card-box-bg{background:url("../../static/img/r-field.jpg");}
+        {% else %}
+            .card-box-bg{background:none}
+        {% endif %}
+
+        /* .card-box-aibg{background-image: url("https://img.freepik.com/premium-psd/sunny-rainy-cloudy-day-weather-forecast-icon-illustration_47987-10695.jpg");} */
+        
+        .round2{
+            width: 170px;
+            height: 170px;
+            overflow:hidden;
+            border-radius: 50%;
+            border:2px solid #333;
+            box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+
+        }
+        .round2 img{width:100%; height:100%; object-fit: cover; }
+
+        @media(max-width:767px) {
+            .mob-canvas-scroll {
+                overflow-x: auto;
+            }
+
+            .mob-width-768px {
+                width: 768px;
+            }
+        }
+
+
+        @media(max-width:575px) {
+            .round2{
+                margin-bottom: 15px;
+                width: 100%;
+                border-radius: 6px;
+            }
+        }
+        
+        .swapTemp{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position:absolute;
+            top: 0;
+            right: 0;
+        }
+        .swapTemp button{
+            border: 1px solid #00b258;
+            color: #00b258;
+        }
+        .swapTemp button.active{
+            background-color: #00b258;
+            color: #fff;
+        }
+        ul.field-address {
+            margin: 0;
+            padding: 0;
+            position: relative;
+
+        }
+
+        ul.field-address li {
+            list-style: none;
+        }
+
+        ul.field-address li:not(:last-of-type) {
+            margin-bottom: 10px;
+        }
+        .weather-bg {
+            display: inline-block;
+            width: 20px;
+            height: 14px;
+            margin-right: 0.5rem;
+            background-color: transparent;
+        }
+
+        .bg-Tem {
+            background-color: #84a7d1;
+        }
+        .bg-Hum{background-color:#71d88b;}
+        .bg-Wind{background-color:#1b4de4;}
+    </style>
+    <style>
+        .message-header {
+            padding: 0.5rem 1rem;
+            border-bottom: 1px solid #ddd;
+            background-color: #f5fdf9;
+        }
+        .message-header h4 {
+            font-size: 1rem;
+        }
+        .to_messageboard {
+                    display: flex;
+                    flex-wrap: wrap;
+                }
+        
+                .messageboard_left_panel,
+                .messageboard_right_panel {
+                    position: relative;
+                    width: 100%;
+                }
+        
+                .messageboard_right_panel {
+                }
+        
+                .messageboard_searchbar,
+                .messageboard_main_user {
+                    padding: 8px 15px;
+                    height: 75px;
+                }
+        
+                .messageboard_searchbar .message_serach {
+                    padding: 6px 16px;
+                    display: block;
+                    width: 100%;
+                    border: 1px solid #ddd;
+                }
+        
+                .messageboard_list {
+                    height: calc(40vh - 70px);
+                    overflow-y: auto;
+                }
+        
+                .messageboard_list ul {
+                    margin: 0;
+                    padding: 0;
+                }
+        
+                .messageboard_list ul li {
+                    list-style: none;
+                    padding: 8px 15px;
+                    border-top: 1px solid #ddd;
+                    transition: all ease-in-out 0.3s;
+                    position: relative;
+                }
+        
+                .messageboard_list ul li.active,
+                .messageboard_list ul li:hover {
+                    background-color: #f1f1f1;
+                    cursor: pointer;
+                }
+        
+                .messageboard_list ul li h6,
+                .messageboard_main_user h6 {
+                    margin-top: 0;
+                    margin-bottom: 0;
+                    font-size: 16px;
+                }
+        
+                .messageboard_list ul li span,
+                .messageboard_main_user span,
+                .messageboard_chat ul li .message_status {
+                    font-size: 12px;
+                    color: #aaa;
+                }
+                
+                .messageboard_list ul li a {
+                    color: inherit;
+                }
+                
+                .messageboard_main_user {
+                    border-bottom: 1px solid #ddd;
+                }
+        
+                .messageboard_chat {
+                    padding: 8px 15px;
+                    display: flex;
+                    flex-wrap: wrap;
+                    align-items: flex-end;
+                    height: calc(60vh - 130px);
+                    overflow-y: auto;
+                    flex-direction: column-reverse;
+                }
+        
+                .messageboard_chat ul {
+                    margin: 0;
+                    padding: 0;
+                    /* flex: 0 0 100%; */
+                    width: 100%;
+                }
+        
+                .messageboard_chat ul li {
+                    list-style: none;
+                    display: flex;
+                }
+        
+                .messageboard_chat ul li:not(:last-of-type) {
+                    margin-bottom: 15px;
+                }
+        
+                .messageboard_chat ul li.my_message {
+                    justify-content: flex-end;
+                }
+        
+                .messageboard_chat ul li .messageboard_box {
+                    width: 70%;
+                }
+        
+                .messageboard_chat ul li p {
+                    margin: 0;
+                }
+        
+                .messageboard_chat ul li p span {
+                    display: inline-block;
+                    margin-top: 0;
+                    margin-bottom: 4px;
+                    padding: 6px 12px;
+                }
+        
+                .messageboard_chat ul li.client_message p span {
+                    border-radius: 2px;
+                    background-color: #FFC195;
+                }
+        
+                .messageboard_chat ul li.my_message p span {
+                    border-radius: 2px;
+                    background-color: #7cd3db;
+                }
+        
+                .messageboard_chat ul li.my_message .message_text {
+                    display: flex;
+                    flex-wrap: wrap;
+                    flex-direction: column;
+                    align-items: flex-end;
+                }
+        
+                .messageboard_chat ul li.my_message .message_status {
+                    text-align: right;
+                }
+        
+                .messageboard_send {
+                    padding: 8px 15px;
+                    border-top: 1px solid #ddd;
+                }
+        
+                .message_input-group {
+                    position: relative;
+                    display: flex;
+                    flex-wrap: wrap;
+                    align-items: stretch;
+                    width: 100%;
+                }
+        
+                .message_input-group>.message_form-control {
+                    position: relative;
+                    flex: 1 1 auto;
+                    width: 1%;
+                    min-width: 0;
+                    border-radius: 6px 0 0 6px;
+                }
+        
+                .message_form-control {
+                    display: block;
+                    width: 100%;
+                    padding: 0.375rem 0.75rem;
+                    font-size: 1rem;
+                    font-weight: 400;
+                    line-height: 1.5;
+                    color: #212529;
+                    background-color: #fff;
+                    background-clip: padding-box;
+                    border: 1px solid #ced4da;
+                    -webkit-appearance: none;
+                    -moz-appearance: none;
+                    appearance: none;
+                    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+                }
+        
+                .message_input-group>:not(:first-child):not(.dropdown-menu):not(.valid-tooltip):not(.valid-feedback):not(.invalid-tooltip):not(.invalid-feedback) {
+                    margin-left: -1px;
+                }
+        
+                .message_input-group-text {
+                    display: flex;
+                    align-items: center;
+                    padding: 0.375rem 0.75rem;
+                    font-size: 1rem;
+                    font-weight: 400;
+                    line-height: 1.5;
+                    color: #fff;
+                    text-align: center;
+                    white-space: nowrap;
+                    border-radius: 0 6px 6px 0;
+                    background-color: #00b258;
+                    border: 1px solid #00b258;
+                }
+        
+                .unread_msg {
+                position: absolute;
+                top: 50%;
+                right: 15px;
+                width: 16px;
+                height: 16px;
+                color: #fff !important;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                border-radius: 50%;
+                background-color: #f00;
+                transform: translateY(-50%);
+            }
+        
+            textarea.message_form-control {
+                height: 40px;
+                resize: none;
+            }
+        
+            .message_form-control:focus-visible {
+                outline: 0;
+            }
+        
+                .messageboard_right_panel.grower-chat-box {
+                    flex: 0 0 100%;
+                }
+        
+                @media(min-width: 768px) {
+                    .messageboard_left_panel {
+                        flex: 0 0 30%;
+                    }
+                    .messageboard_right_panel {
+                        flex: 0 0 70%;
+                    }
+                    .messageboard_left_panel:before {
+                        content: "";
+                        position: absolute;
+                        top: 0;
+                        bottom: 0;
+                        right: 0;
+                        border-right: 1px solid #ddd;
+                    }
+        
+                    .messageboard_list {
+                        height: calc(100vh - 256px);
+                    }
+                    .messageboard_chat {
+                        height: calc(100vh - 330px);
+                    }
+                }
+        
+                @media(max-width: 767px) {
+                    .messageboard_main_user {
+                        border-top: 1px solid #ddd;
+                        background-color: #f1f1f1;
+                    }
+        
+                    .messageboard_chat ul li .messageboard_box {
+                        width: 90%;
+                    }
+                }
+        
+        </style>
+        <style>
+        .canvasjs-chart-credit{
+            display: none;
+        }
+        </style>
+        <style>
+
+            .chat-close {
+                width: 24px;
+                height: 24px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                color: #fff;
+                border: 0;
+                border-radius: 100%;
+                background-color: #b64545;
+                cursor: pointer;
+                position: absolute;
+                top: 1rem;
+                right: 1rem;
+            }
+
+            @media(min-width:768px) {
+                .mob-chat-box,
+                .chat-btn {
+                    display: none;
+                }                
+            }
+            /* Chat Bot Mobile View Pop Up */
+            @media(max-width:767px) {
+                .desktop-chat {
+                    display: none;
+                }
+        
+                .chat-btn {
+                    width: 36px;
+                    height: 36px;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    color: #fff;
+                    border: 0;
+                    border-radius: 100%;
+                    background-color: #4CC552;
+                    cursor: pointer;
+                    position: fixed;
+                    bottom: 2rem;
+                    right: 1rem;
+                    z-index: 11;
+                }
+        
+                .mob-chat-box {
+                    display: none;
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    bottom: 0;
+                    right: 0;
+                    z-index: 111;
+                }
+
+                .messageboard_chat {
+                    /* height: calc(100vh - 150px); */
+                    height: 100%;
+                }
+
+                .messageboard_right_panel {
+                    height: calc(100% - 140px);
+                }
+            }
+    
+        </style>
+    <main>
+        {% include '_alerts.html' %}
+        <div class="page-title-with-or-without-btn">
+            <span class="farm headingtop">Digital Crop Consultant</span>
+            <!-- Create button for Account-->
+            <div class="flex-header-btn">
+                
+            </div>
+        </div>
+        <div class="card card-padding">
+            <div class="main-simple-table-with-search">
+                <div class="table-filter-row">
+                    <div class="table-filter-col">
+                        <div class="flex-btn-filter-search">
+                            <form action="" method="post">
+                                {% csrf_token %}
+                                <div class="inline-apply-filter">
+                                    <div class="three-fields-with-label">
+                                        <select id="fieldid" name="fieldid" class="form-select rounded-pill">
+                                            <option value='all' selected> Select Your Field </option>
+                                            {% for i in fields %}
+                                            {% if i == selectedField %}
+                                            <option value="{{ i.pk }}" selected>{{i.name}} - {{ i.pk }}
+                                            </option>
+                                            {% else %}
+                                            <option value="{{ i.pk }}">{{i.name}} - {{ i.pk }}</option>
+                                            {% endif %}
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <input type="hidden" name="" id="full_name" value="{{request.user.first_name}} {{request.user.last_name}}">
+                                    <input id="submitBtn" type="submit" class="apply-filter-btn primary-btn" value="Apply Filter" />
+                                </div>
+                            </form>                        
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            {% if f_loc %}
+            <div class="row mt-3">
+                <div class="col-lg-6 col-md-6 col-sm-12 col-12">
+                    <div >
+                        <h4>Field Address</h4> 
+                        {% if f_county %}{{f_county}}, {% endif %}{% if f_state %}{{f_state}}, {% endif %}
+                            {% if f_country %}{{f_country}}, {% endif %}{% if f_postcode %}{{f_postcode}} {% endif %}
+                    </div>
+                </div>
+                
+                <div class="col-lg-6 col-md-6 col-sm-12 col-12 ">
+                    <div >
+                        
+                        <h4>Crop Details</h4>
+                       
+                            {% if f_crop %}<strong>Crop : </strong>{{f_crop}}, {% endif %}
+                            {% if f_acreage %}<strong>Acreage : </strong>{{f_acreage}}, {% endif %}
+                            {% if f_variety %}<strong>Variety : </strong>{{f_variety}}, {% endif %}
+                            {% if f_previous_crop %}<strong>Previous Crop : </strong>{{f_previous_crop}} {% endif %}
+                        
+                        
+                    </div>
+
+                </div>
+                <div class="col-lg-6 col-md-6 col-sm-12 col-12 mt-3">
+                    <div class="card-box card-box-bg">
+                        <h4>Field Id</h4>
+                        <ul class="field-address">
+                            {% if f_fsa_farm_number %}<li><strong>FSA Farm Number : </strong>{{f_fsa_farm_number}}</li>{% endif %}
+                            {% if f_fsa_tract_number %}<li><strong>FSA Tract Number : </strong>{{f_fsa_tract_number}}</li>{% endif %}
+                            {% if f_fsa_field_number  %}<li><strong>FSA Field Number : </strong>{{f_fsa_field_number}}</li>{% endif %}
+                            {% if f_eschlon_id  %}<li><strong>Echelon Id : </strong>{{f_eschlon_id}}</li>{% endif %}
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-md-6 col-sm-12 col-12 mt-3 ">
+                    <div class="card-box ">
+                        <h4>Current Weather</h4>
+                        <div class="row">
+                            <div class="col-sm-7 col-12">
+                                <ul class="field-address order-last order-sm-first">
+                                    {% for i in f_climate_current %}
+                                    {% if i.f_temperature %}<li id="swpTemp"><strong>Temperature : </strong>{{i.f_temperature}} &deg;F</li><li class="swapTemp"><button class="active" id="temF" onclick="changeFtoC()">&deg;F</button><button id="temC" class="" onclick="changeCtoF()">&deg;C</button></li>{% endif %}
+                                    {% if i.f_humidity %}<li><strong>Humidity : </strong>{{i.f_humidity}} %</li>{% endif %}
+                                    {% if i.f_wind %}<li><strong>Wind Speed : </strong>{{i.f_wind}} Km/h</li>{% endif %}
+                                    {% if i.f_description %}<li><strong>Description : </strong>{{i.f_description}}</li>{% endif %}
+                                    {% endfor %}
+                                    {% if current_time %}<li><strong>{{current_time}}</strong></li>{% endif %}
+                                </ul>                           
+                            </div>
+                            <div class="col-sm-5 col-12 order-first order-sm-last">
+                                <!-- <div class="round2"><img src="../../media/chatgpt_img/{{climate_img}}"></div> -->
+                                <div class="round2"><img src="{{climate_img}}"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Chat Start -->
+                {% if forecast_lst|length > 0 %}
+                
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-12 mt-3">
+                        <div class="card-box">
+                            <h4 id="tempHead">Temperature (°F) Forecast 7 days</h4>
+                            <div class="mob-canvas-scroll">
+                                <div class="mob-width-768px">
+                                    <div id="chartContainer" style="height: 300px;margin: 10px;"></div>
+                                    <div id="chartContainerCelsius" style="height: 300px;margin: 10px;display: none;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-12 mt-3">
+                        <div class="card-box">
+                            <h4>Humidity (%) Forecast 7 days</h4>
+                            <div class="mob-canvas-scroll">
+                                <div class="mob-width-768px">
+                                    <div id="chartContainer2" style="height: 300px;margin: 10px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-12 mt-3">
+                        <div class="card-box">
+                            <h4>Wind Speed (mph) Forecast 7 days</h4>
+                            <div class="mob-canvas-scroll">
+                                <div class="mob-width-768px">
+                                    <div id="chartContainer3" style="height: 300px;margin: 10px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                
+                {% endif %}
+                <!-- Chat End -->
+
+                <div class="col-lg-12 col-md-12 col-sm-12 col-12 mt-3 card-box desktop-chat" style="background-image: url(../../static/img/digital-crop-AI.jpg);background-size: cover;">
+                    <!-- <div class="mb-3">
+                        <select name="" id="" class="form-select dropdown-toggle">
+                            <option class="dropdown-item" value="">Select the parameter</option>
+                            <option class="dropdown-item" value="">About Fertilizer</option>
+                            <option class="dropdown-item" value="">About Fungicide</option>
+                            <option class="dropdown-item" value="">Plant growth regulators (PGRs)</option>
+                        </select>
+                    </div> -->
+                    <!-- <img src="{% static 'img/digital-crop-AI.jpg' %}" alt=""> -->
+                    <div class="row" style="margin: 20px;">
+                        <div class="col-lg-6 col-md-6 col-sm-12 col-12">
+                            <div class="card-box" style="background:white; padding-bottom: 0;">
+                                <h4>Your Digital Assistant</h4>
+                                <hr>
+                                <div class="messageboard_right_panel grower-chat-box">
+                                    <div id="msgboard_chat" class="messageboard_chat">
+                                        <ul id="show-chat">
+                                            {% for i in get_chat %}
+                                            <li class="my_message">
+                                                <div class="messageboard_box">
+                                                    <div class="message_text"><p><span>{{i.question}}</span></p></div>
+                                                    <div class="message_status"><span class="date" style="text-transform: capitalize;">{{i.user_name}}</span></div>
+                                                </div>
+                                            </li>
+                                            <li class="client_message">
+                                                <div class="messageboard_box">
+                                                    <div class="message_text"><p><span>{{i.answer}}</span></p></div>
+                                                    <div class="message_status"><span class="date" style="text-transform: capitalize;">Digital Assistant</span></div>
+                                                </div>
+                                            </li>
+                                            {% endfor %}
+                                            
+                                        </ul>
+                                    </div>
+                                    
+                                    <div class="messageboard_send">
+                                        <form action="" method="get" id="gptapi">
+                                            <div class="message_input-group">
+                                                <textarea id="chat-message-input" name="questionText" class="message_form-control" placeholder="Type your message here..."></textarea>
+                                                <button type="button" class="message_input-group-text" id="btn-chat" onclick="getAns()">Send</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat pop up for mobile -->
+            <div class="mob-chat-box" id="id-mob-chat-box">
+                <button class="chat-close" onclick="closeMobileChat()"><i class="fas fa-times"></i></button>
+                <div class="card-box" style="background:white; padding-bottom: 0;">
+                    <h4>Your Digital Assistant</h4>
+                    <hr>
+                    <div class="messageboard_right_panel grower-chat-box">
+                        <div id="msgboard_chat" class="messageboard_chat">
+                            <ul id="show-chat-mobile">
+                                {% for i in get_chat %}
+                                <li class="my_message">
+                                    <div class="messageboard_box">
+                                        <div class="message_text"><p><span>{{i.question}}</span></p></div>
+                                        <div class="message_status"><span class="date" style="text-transform: capitalize;">{{i.user_name}}</span></div>
+                                    </div>
+                                </li>
+                                <li class="client_message">
+                                    <div class="messageboard_box">
+                                        <div class="message_text"><p><span>{{i.answer}}</span></p></div>
+                                        <div class="message_status"><span class="date" style="text-transform: capitalize;">Digital Assistant</span></div>
+                                    </div>
+                                </li>
+                                {% endfor %}
+
+                            </ul>
+                        </div>
+                        
+                        <div class="messageboard_send">
+                            <form action="" method="get" id="gptapi-mobile">
+                                <div class="message_input-group">
+                                    <textarea id="chat-message-input-mobile" name="questionText" class="message_form-control" placeholder="Type your message here..."></textarea>
+                                    <button type="button" class="message_input-group-text" id="btn-chat-mobile" onclick="getAnsMobile()">Send</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button class="chat-btn"><i class="fa fa-comments"></i></button>
+                
+           
+            {% else %}
+            <div id="loader" class="loader" style="display: none;text-align: center;">
+                <img src="{% static 'img/loader.gif' %}" alt="loader">
+            </div>
+            {% endif %}
+        </div>
+        
+    </main>
+    {% include 'footer.html' %}
+</div>
+
+{% endblock content %}
+
+{% block scripts %}
+
+
+
+
+<script src="https://cdn.datatables.net/1.11.0/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.0/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/responsive.bootstrap4.min.js"></script>
+
+<script src="https://cdn.canvasjs.com/canvasjs.min.js"></script>
+<script>
+    $( document ).ready(function() {
+        $(".chat-btn").click(function(){
+          $(".mob-chat-box").toggle();
+        });
+    });
+    function closeMobileChat(){
+        document.getElementById('id-mob-chat-box').style.display='none';
+    }
+</script>
+<script>
+    
+function changeFtoC(){
+        var swpTemp = document.getElementById('swpTemp');
+        var f_tem = {% for i in f_climate_current %}{% if i.f_temperature %}{{i.f_temperature}}{% endif %}{% endfor %}
+        swpTemp.innerHTML = `<strong>Temperature : </strong>`+f_tem+` &deg;F`;
+        var temC = document.getElementById('temC');
+        var temF = document.getElementById('temF');
+        temF.classList.add('active');
+        temC.classList.remove('active');
+        document.getElementById('tempHead').innerHTML = 'Temperature (°F) Forecast 7 days';
+        document.getElementById('chartContainerCelsius').style.display = 'none';
+        document.getElementById('chartContainer').style.display = 'block';
+        
+        // 
+        // 
+        // This for temperatur graph
+        var chart = new CanvasJS.Chart("chartContainer", {
+        animationEnabled: true,
+        
+        title:{
+            // text: "7-Day Weather Forecast"
+        },
+        axisX:{
+            valueFormatString: "DD MMM,YY hh:mm TT",
+            crosshair: {
+                enabled: true,
+                snapToDataPoint: true
+            }
+        },
+        axisY: {
+            valueFormatString: "## °F",
+            maximum: 120,
+            crosshair: {
+                enabled: true,
+                snapToDataPoint: true,
+                labelFormatter: function(e) {
+                    return CanvasJS.formatNumber(e.value, "## ") + " °F";
+                }
+            }
+        },
+        toolTip:{
+            shared: true,
+            content: "<strong>Date: </strong> {x} </br> <strong>Temperature: </strong> {y}</br><strong>Forecast: </strong> {shortForecast}"
+        },
+        data: [{
+            type: "splineArea",
+            xValueFormatString: "DD MMM,YY hh:mm TT",
+            yValueFormatString: "## °F",
+            dataPoints: [
+            {% for i in forecast_lst %}
+                // { x: new Date({{i.yyyy}}, {{i.mm}}, {{i.dd}}, {{i.t1}}, {{i.t2}}), y: {{i.temperature}}, name: '{{i.get_shortForecast}}', a: new Date({{i.yyyy}}, {{i.mm}}, {{i.dd}}, {{i.t1}}, {{i.t2}}).toLocaleString('en-US', options) },
+                { x: new Date('{{i.startTime}}') , y: {{i.temperature}}, name: '{{i.get_shortForecast}}', shortForecast: '{{i.shortForecast}}' },
+            {% endfor %}
+            ]
+        }]
+    });
+
+    chart.render();
+    
+    var images = [];    
+    addImagesFahrenheit(chart);
+    
+    function addImagesFahrenheit(chart) {
+        for(var i = 0; i < chart.data[0].dataPoints.length; i++){
+            var dpsName = chart.data[0].dataPoints[i].name;
+            if(dpsName == "cloudy"){
+                images.push($("<img>").attr("src", "https://canvasjs.com/wp-content/uploads/images/gallery/gallery-overview/cloudy.png"));
+            } else if(dpsName == "rainy"){
+            images.push($("<img>").attr("src", "https://canvasjs.com/wp-content/uploads/images/gallery/gallery-overview/rainy.png"));
+            } else if(dpsName == "sunny"){
+                images.push($("<img>").attr("src", "https://canvasjs.com/wp-content/uploads/images/gallery/gallery-overview/sunny.png"));
+            }
+    
+        images[i].attr("class", dpsName).appendTo($("#chartContainer>.canvasjs-chart-container"));
+        positionImage(images[i], i);
+        }
+    }
+    
+    function positionImage(image, index) {
+        var imageCenter = chart.axisX[0].convertValueToPixel(chart.data[0].dataPoints[index].x);
+        var imageTop =  chart.axisY[0].convertValueToPixel(chart.axisY[0].maximum);
+    
+        image.width("40px")
+        .css({ "left": imageCenter - 20 + "px",
+        "position": "absolute","top":imageTop + "px",
+        "position": "absolute"});
+    }
+    
+    $( window ).resize(function() {
+        var cloudyCounter = 0, rainyCounter = 0, sunnyCounter = 0;    
+        var imageCenter = 0;
+        for(var i=0;i<chart.data[0].dataPoints.length;i++) {
+            imageCenter = chart.axisX[0].convertValueToPixel(chart.data[0].dataPoints[i].x) - 20;
+            if(chart.data[0].dataPoints[i].name == "cloudy") {					
+                $(".cloudy").eq(cloudyCounter++).css({ "left": imageCenter});
+            } else if(chart.data[0].dataPoints[i].name == "rainy") {
+                $(".rainy").eq(rainyCounter++).css({ "left": imageCenter});  
+            } else if(chart.data[0].dataPoints[i].name == "sunny") {
+                $(".sunny").eq(sunnyCounter++).css({ "left": imageCenter});  
+            }                
+        }
+    });
+    
+    function formatter(e) { 
+        if(e.index === 0 && e.dataPoint.x === 0) {
+            return " Min " + e.dataPoint.y[e.index] + "°";
+        } else if(e.index == 1 && e.dataPoint.x === 0) {
+            return " Max " + e.dataPoint.y[e.index] + "°";
+        } else{
+            return e.dataPoint.y[e.index] + "°";
+        }
+    } 
+    };
+
+    function changeCtoF(){
+        var swpTemp = document.getElementById('swpTemp');
+        var f_tem = {% for i in f_climate_current %}{% if i.f_temperature %}{{i.f_temperature}}{% endif %}{% endfor %}
+        var c_tem = Math.ceil((parseInt(f_tem) - 32) * 0.55);
+        swpTemp.innerHTML = `<strong>Temperature : </strong>`+c_tem+` &deg;C`;
+        var temF = document.getElementById('temF');
+        var temC = document.getElementById('temC');
+        temC.classList.add('active');
+        temF.classList.remove('active');
+        document.getElementById('tempHead').innerHTML = 'Temperature (°C) Forecast 7 days';
+        document.getElementById('chartContainer').style.display = 'none';
+        document.getElementById('chartContainerCelsius').style.display = 'block';
+        // 
+        // 
+        // This for temperatur graph
+        var chartCelsius = new CanvasJS.Chart("chartContainerCelsius", {
+        animationEnabled: true,
+        
+        title:{
+            // text: "7-Day Weather Forecast"
+        },
+        axisX:{
+            valueFormatString: "DD MMM,YY hh:mm TT",
+            crosshair: {
+                enabled: true,
+                snapToDataPoint: true
+            }
+        },
+        axisY: {
+            valueFormatString: "## °C",
+            maximum: 50,
+            crosshair: {
+                enabled: true,
+                snapToDataPoint: true,
+                labelFormatter: function(e) {
+                    return CanvasJS.formatNumber(e.value, "## ") + " °C";
+                }
+            }
+        },
+        toolTip:{
+            shared: true,
+            content: "<strong>Date: </strong> {x} </br> <strong>Temperature: </strong> {y}</br><strong>Forecast: </strong> {shortForecast}"
+        },
+        data: [{
+            type: "splineArea",
+            xValueFormatString: "DD MMM,YY hh:mm TT",
+            yValueFormatString: "## °C",
+            dataPoints: [
+            {% for i in forecast_lst %}
+                // { x: new Date({{i.yyyy}}, {{i.mm}}, {{i.dd}}, {{i.t1}}, {{i.t2}}), y: {{i.temperature}}, name: '{{i.get_shortForecast}}', a: new Date({{i.yyyy}}, {{i.mm}}, {{i.dd}}, {{i.t1}}, {{i.t2}}).toLocaleString('en-US', options) },
+                { x: new Date('{{i.startTime}}') , y: {{i.temperature_Celsius}}, name: '{{i.get_shortForecast}}', shortForecast: '{{i.shortForecast}}' },
+            {% endfor %}
+            ]
+        }]
+    });
+
+    chartCelsius.render();
+    
+    var images = [];    
+    addImagesCelsius(chartCelsius);
+    
+    function addImagesCelsius(chartCelsius) {
+        for(var i = 0; i < chartCelsius.data[0].dataPoints.length; i++){
+            var dpsName = chartCelsius.data[0].dataPoints[i].name;
+            if(dpsName == "cloudy"){
+                images.push($("<img>").attr("src", "https://canvasjs.com/wp-content/uploads/images/gallery/gallery-overview/cloudy.png"));
+            } else if(dpsName == "rainy"){
+            images.push($("<img>").attr("src", "https://canvasjs.com/wp-content/uploads/images/gallery/gallery-overview/rainy.png"));
+            } else if(dpsName == "sunny"){
+                images.push($("<img>").attr("src", "https://canvasjs.com/wp-content/uploads/images/gallery/gallery-overview/sunny.png"));
+            }
+    
+        images[i].attr("class", dpsName).appendTo($("#chartContainerCelsius>.canvasjs-chart-container"));
+        positionImage(images[i], i);
+        }
+    }
+    
+    function positionImage(image, index) {
+        var imageCenter = chartCelsius.axisX[0].convertValueToPixel(chartCelsius.data[0].dataPoints[index].x);
+        var imageTop =  chartCelsius.axisY[0].convertValueToPixel(chartCelsius.axisY[0].maximum);
+    
+        image.width("40px")
+        .css({ "left": imageCenter - 20 + "px",
+        "position": "absolute","top":imageTop + "px",
+        "position": "absolute"});
+    }
+    
+    $( window ).resize(function() {
+        var cloudyCounter = 0, rainyCounter = 0, sunnyCounter = 0;    
+        var imageCenter = 0;
+        for(var i=0;i<chartCelsius.data[0].dataPoints.length;i++) {
+            imageCenter = chartCelsius.axisX[0].convertValueToPixel(chartCelsius.data[0].dataPoints[i].x) - 20;
+            if(chartCelsius.data[0].dataPoints[i].name == "cloudy") {					
+                $(".cloudy").eq(cloudyCounter++).css({ "left": imageCenter});
+            } else if(chartCelsius.data[0].dataPoints[i].name == "rainy") {
+                $(".rainy").eq(rainyCounter++).css({ "left": imageCenter});  
+            } else if(chartCelsius.data[0].dataPoints[i].name == "sunny") {
+                $(".sunny").eq(sunnyCounter++).css({ "left": imageCenter});  
+            }                
+        }
+    });
+    
+    function formatter(e) { 
+        if(e.index === 0 && e.dataPoint.x === 0) {
+            return " Min " + e.dataPoint.y[e.index] + "°";
+        } else if(e.index == 1 && e.dataPoint.x === 0) {
+            return " Max " + e.dataPoint.y[e.index] + "°";
+        } else{
+            return e.dataPoint.y[e.index] + "°";
+        }
+    } 
+
+    
+    };
+ 
+</script>
+
+
+<script>
+try {
+    window.onload = function () {
+        const options = {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: 'numeric',
+        hour12: true
+        };
+        // This for temperatur graph
+        var chart = new CanvasJS.Chart("chartContainer", {
+	animationEnabled: true,
+    
+	title:{
+		// text: "7-Day Weather Forecast"
+	},
+	axisX:{
+		valueFormatString: "DD MMM,YY hh:mm TT",
+		crosshair: {
+			enabled: true,
+			snapToDataPoint: true
+		}
+	},
+	axisY: {
+		valueFormatString: "## °F",
+        maximum: 120,
+		crosshair: {
+			enabled: true,
+			snapToDataPoint: true,
+			labelFormatter: function(e) {
+				return CanvasJS.formatNumber(e.value, "## ") + " °F";
+			}
+		}
+	},
+    toolTip:{
+        shared: true,
+        content: "<strong>Date: </strong> {x} </br> <strong>Temperature: </strong> {y}</br><strong>Forecast: </strong> {shortForecast}"
+    },
+	data: [{
+		type: "splineArea",
+		xValueFormatString: "DD MMM,YY hh:mm TT",
+		yValueFormatString: "## °F",
+		dataPoints: [
+        {% for i in forecast_lst %}
+			// { x: new Date({{i.yyyy}}, {{i.mm}}, {{i.dd}}, {{i.t1}}, {{i.t2}}), y: {{i.temperature}}, name: '{{i.get_shortForecast}}', a: new Date({{i.yyyy}}, {{i.mm}}, {{i.dd}}, {{i.t1}}, {{i.t2}}).toLocaleString('en-US', options) },
+			{ x: new Date('{{i.startTime}}') , y: {{i.temperature}}, name: '{{i.get_shortForecast}}', shortForecast: '{{i.shortForecast}}' },
+        {% endfor %}
+		]
+	}]
+});
+
+chart.render();
+    // ==========================
+    // ==========================
+        var humidity_chart = new CanvasJS.Chart("chartContainer2", {
+        animationEnabled: true,  
+        title:{
+            // text: "Humidity chart"
+        },
+        axisX:{
+		valueFormatString: "DD MMM,YY hh:mm TT",
+	    },
+        axisY: {
+            maximum: 100,
+            suffix: " %",
+            gridThickness: 0
+        },
+        toolTip:{
+            shared: true,
+            content: "<strong>Date: </strong> {x} </br> <strong>Humidity: </strong> {y}%"
+        },
+        data: [{
+            xValueFormatString: "DD MMM,YY hh:mm TT",
+            type: "splineArea",
+            color: "#34c759",
+            dataPoints: [
+            {% for i in forecast_lst %}
+                {x: new Date('{{i.startTime}}'), y: {{i.relativeHumidity}}},
+            {% endfor %}
+            ]
+        }]
+    });
+    humidity_chart.render();
+    // ==========================
+    // ==========================
+    // ==========================
+    var wind_Speed  = new CanvasJS.Chart("chartContainer3", {
+        animationEnabled: true,  
+        title:{
+            // text: "Humidity chart"
+        },
+        axisX:{
+		valueFormatString: "DD MMM,YY hh:mm TT",
+	    },
+        axisY: {
+            valueFormatString: "##0 mph",
+            maximum: 70,
+            // suffix: " Km/h",
+            gridThickness: 0
+        },
+        toolTip:{
+            shared: true,
+            content: "<strong>Date: </strong> {x} </br> <strong>Wind Speed: </strong> {y} mph"
+        },
+        data: [{
+            xValueFormatString: "DD MMM,YY hh:mm TT",
+            type: "splineArea",
+            color: "#1b4de4",
+            dataPoints: [
+            {% for i in forecast_lst %}
+                {x: new Date('{{i.startTime}}'), y: {{i.windSpeed}} },
+            {% endfor %}
+            ]
+        }]
+    });
+    wind_Speed.render();
+    // ==========================
+    // ==========================
+    // ==========================
+    
+    var images = [];    
+    
+    addImages(chart);
+    
+    function addImages(chart) {
+        for(var i = 0; i < chart.data[0].dataPoints.length; i++){
+            var dpsName = chart.data[0].dataPoints[i].name;
+            if(dpsName == "cloudy"){
+                images.push($("<img>").attr("src", "https://canvasjs.com/wp-content/uploads/images/gallery/gallery-overview/cloudy.png"));
+            } else if(dpsName == "rainy"){
+            images.push($("<img>").attr("src", "https://canvasjs.com/wp-content/uploads/images/gallery/gallery-overview/rainy.png"));
+            } else if(dpsName == "sunny"){
+                images.push($("<img>").attr("src", "https://canvasjs.com/wp-content/uploads/images/gallery/gallery-overview/sunny.png"));
+            }
+    
+        images[i].attr("class", dpsName).appendTo($("#chartContainer>.canvasjs-chart-container"));
+        positionImage(images[i], i);
+        }
+    }
+    
+    function positionImage(image, index) {
+        var imageCenter = chart.axisX[0].convertValueToPixel(chart.data[0].dataPoints[index].x);
+        var imageTop =  chart.axisY[0].convertValueToPixel(chart.axisY[0].maximum);
+    
+        image.width("40px")
+        .css({ "left": imageCenter - 20 + "px",
+        "position": "absolute","top":imageTop + "px",
+        "position": "absolute"});
+    }
+    
+    $( window ).resize(function() {
+        var cloudyCounter = 0, rainyCounter = 0, sunnyCounter = 0;    
+        var imageCenter = 0;
+        for(var i=0;i<chart.data[0].dataPoints.length;i++) {
+            imageCenter = chart.axisX[0].convertValueToPixel(chart.data[0].dataPoints[i].x) - 20;
+            if(chart.data[0].dataPoints[i].name == "cloudy") {					
+                $(".cloudy").eq(cloudyCounter++).css({ "left": imageCenter});
+            } else if(chart.data[0].dataPoints[i].name == "rainy") {
+                $(".rainy").eq(rainyCounter++).css({ "left": imageCenter});  
+            } else if(chart.data[0].dataPoints[i].name == "sunny") {
+                $(".sunny").eq(sunnyCounter++).css({ "left": imageCenter});  
+            }                
+        }
+    });
+    
+    function formatter(e) { 
+        if(e.index === 0 && e.dataPoint.x === 0) {
+            return " Min " + e.dataPoint.y[e.index] + "°";
+        } else if(e.index == 1 && e.dataPoint.x === 0) {
+            return " Max " + e.dataPoint.y[e.index] + "°";
+        } else{
+            return e.dataPoint.y[e.index] + "°";
+        }
+    } 
+    
+    }
+}
+catch(err) {
+
+}
+    </script>
+<script>
+    const button = document.getElementById('submitBtn');
+    const loader = document.getElementById('loader');
+    try{
+        button.addEventListener('click', () => {
+        loader.style.display = 'block';  // Show the loader
+        });
+    }catch{};    
+</script>
+
+<script>
+    // Mobile Chat section
+    try{
+        var input = document.getElementById("chat-message-input-mobile");
+        input.addEventListener("keypress", function(event) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            getAnsMobile();
+        }
+        });
+    }catch{}
+    try{
+        function getAnsMobile(){
+            var frm = $('#gptapi-mobile');
+            var chatbox = document.getElementById('show-chat-mobile');
+            var get_question = $('#chat-message-input-mobile').val();
+            const full_name = $('#full_name').val();
+            let date = new Date();
+            timestamp = date.getTime(); 
+            var qusid = 'q_'+timestamp;
+            var ansid = 'a_'+timestamp;
+            if (get_question == ''){
+                pass
+            }else{
+                chatbox.innerHTML +=`<li class="my_message">
+                                        <div class="messageboard_box">
+                                            <div class="message_text"><p id=`+qusid+`><span>`+ get_question +`</span></p></div>
+                                            <div class="message_status"><span class="date" style="text-transform: capitalize;">`+ full_name +`</span></div>
+                                        </div>
+                                    </li>`
+                var q_container = $('#'+qusid+''); 
+                $.ajax({
+                type: 'GET',
+                url: '../digital_crop_consultant_chatgpt/',
+                data: frm.serialize(),
+                dataType: 'text',
+                contentType: 'application/x-www-form-urlencoded',
+                success: function (response){
+                    // console.log('response',response);
+                    document.getElementById('chat-message-input-mobile').value = '';
+                    var characters = response.split('');
+                    chatbox.innerHTML +=`<li class="client_message">
+                                        <div class="messageboard_box">
+                                            <div class="message_text"><p><span id=`+ansid+`></span></p></div>
+                                            <div class="message_status"><span class="date" style="text-transform: capitalize;">`+ 'Digital Assistant' +`</span></div>
+                                        </div>
+                                    </li>`
+                    
+                    var delay = 50;
+                    function displayCharacter(index) {
+                        if (index < characters.length) {                   
+                            var container = $('#'+ansid+'');
+                            container.append(characters[index]);
+                            setTimeout(function() {
+                                displayCharacter(index + 1);
+                            }, delay);
+                        }
+                    }
+                    displayCharacter(0);
+                            
+                }
+            
+            });
+        }}
+    }catch{}
+    
+</script>
+<script>
+    // Desktop Chat section
+    try{
+        var input = document.getElementById("chat-message-input");
+        input.addEventListener("keypress", function(event) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            getAns();
+        }
+        });
+    }catch{}
+    try{
+    function getAns(){
+      var frm = $('#gptapi');
+      var chatbox = document.getElementById('show-chat');
+      var get_question = $('#chat-message-input').val();
+      const full_name = $('#full_name').val();
+      let date = new Date();
+      timestamp = date.getTime(); 
+      var qusid = 'q_'+timestamp;
+      var ansid = 'a_'+timestamp;
+
+      if (get_question == ''){
+        pass
+      }else{
+        chatbox.innerHTML +=`<li class="my_message">
+                                <div class="messageboard_box">
+                                    <div class="message_text"><p id=`+qusid+`><span>`+ get_question +`</span></p></div>
+                                    <div class="message_status"><span class="date" style="text-transform: capitalize;">`+ full_name +`</span></div>
+                                </div>
+                            </li>`
+        var q_container = $('#'+qusid+''); 
+        
+
+        $.ajax({
+          type: 'GET',
+          url: '../digital_crop_consultant_chatgpt/',
+          data: frm.serialize(),
+          dataType: 'text',
+          contentType: 'application/x-www-form-urlencoded',
+          success: function (response){
+            // console.log('response',response);
+            document.getElementById('chat-message-input').value = '';
+            var characters = response.split('');
+            chatbox.innerHTML +=`<li class="client_message">
+                                <div class="messageboard_box">
+                                    <div class="message_text"><p><span id=`+ansid+`></span></p></div>
+                                    <div class="message_status"><span class="date" style="text-transform: capitalize;">`+ 'Digital Assistant' +`</span></div>
+                                </div>
+                            </li>`
+            
+            var delay = 50;
+            function displayCharacter(index) {
+                if (index < characters.length) {                   
+                    var container = $('#'+ansid+'');
+                    container.append(characters[index]);
+                    setTimeout(function() {
+                        displayCharacter(index + 1);
+                    }, delay);
+                }
+            }
+            displayCharacter(0);
+                    
+          }
+          
+        });
+        
+        }
+      }
+    }catch{}
+  </script>
+  
+{% endblock scripts %}

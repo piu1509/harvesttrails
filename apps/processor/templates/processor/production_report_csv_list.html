@@ -1,0 +1,150 @@
+{% extends "base.html" %} {% load static %}
+{% block title %} Production CSV Report {% endblock title %}
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+{% load crispy_forms_tags %}
+{% block content %}
+{% include 'navbar.html' %}
+
+<div class="main-content">
+    {% include 'header.html' %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.0/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.bootstrap4.min.css">
+
+    <main>
+        {% include '_alerts.html' %}
+        <div class="page-title-with-or-without-btn">
+            <span class="farm headingtop">Production CSV Report</span>
+            <!-- Create button for add-location-->
+            <div class="flex-header-btn">
+                <a href="{% url 'bale_report_list' %}" class="btn-close-cancel">View Bale List</a>
+                &nbsp;
+                <a href="{% url 'production_report_upload' %}" class="btn-close-cancel">Upload CSV by Date</a>
+            </div>
+        </div>
+        <div class="card card-padding">
+            <div class="main-simple-table-with-search">                
+                <div class="both-data-in" style="display: inherit;">
+                    <div class="simple-responsive-table">
+                        <table id="processorList_tbl" class="table table-striped dt-responsive nowrap" style="width:100%">
+                            <thead>
+                                <tr style="border-bottom: 2px solid #e0e0e0;">
+                                    <th width="10%">Prod ID</th>
+                                    <th width="10%">Load ID</th>
+                                    <th width="10%">Farm ID</th>
+                                    <th width="10%">Field</th>
+                                    <th width="10%">PK NUM</th>
+                                    <th width="10%">Variety</th>
+                                    <th width="10%">Tm</th>
+                                    <th width="10%">Module</th>
+                                    <th width="10%">Truck Id</th>
+                                    <th width="10%">Made Date</th>
+                                    <th width="10%">Del. Date</th>
+                                    <th width="10%">Gin Date</th>
+                                    <th width="10%">Bc</th>
+                                    <th width="10%">Cot. Seed</th>
+                                    <th width="10%">Lint</th>
+                                    <th width="10%">Seed</th>
+                                    <th width="10%">Turnout</th>
+                                    <!-- <th width="10%">Bale Tot</th> -->
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for i in report %}
+                                <tr>
+                                    <td>{{i.prod_id}}</td>
+                                    <td>{{i.load_id}}</td>
+                                    <td>{{i.farm_id}}</td>
+                                    <td>{{i.field_name}}</td>
+                                    <td>{{i.pk_num}}</td>
+                                    <td>{{i.variety}}</td>
+                                    <td>{{i.tm}}</td>
+                                    <td>{{i.module_amount}}</td>
+                                    <td>{{i.truck_id}}</td>
+                                    <td>{{i.made_date}}</td>
+                                    <td>{{i.delivery_date}}</td>
+                                    <td>{{i.gin_date}}</td>
+                                    <td>{{i.bc}}</td>
+                                    <td>{{i.cotton_seed}}</td>
+                                    <td>{{i.lint}}</td>
+                                    <td>{{i.seed}}</td>
+                                    <td>{{i.turnout}}</td>
+                                    <!-- <td>{{i.bale_tot}}</td> -->
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+    </main>
+    {% include 'footer.html' %}
+</div>
+
+<!-- Delete Popup -->
+<div class="modal fade" id="deleteModal" aria-hidden="true" aria-labelledby="exampleModalToggleLabel22" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+  
+        <div class="modal-body">
+          <button type="button" class="btn-close cust-close-ds-btn" data-mdb-dismiss="modal" aria-label="Close"></button>
+          <div class="center-content-status">
+            <img src="{% static 'img/trash.png' %}" alt="right" id="rightImg" class="warning-icon">
+            <p id="message" class="modal-title titlepad">Are you sure you want to delete?</p>
+          </div>
+          <div class="modal-center-btn-footer">
+            <button onclick="reloadwindow()" id="closeBtnpopup" type="button" class="btn-close-cancel btn-space"
+              data-mdb-dismiss="modal">
+              Close
+            </button>
+            <!-- <button type="submit" class="btn-save-submit">Delete</button> -->
+            
+            <a onclick="storagedeleteNow()" href="" id="storageDelete" ><button type=""
+                class="btn-save-submit">Delete</button></a>
+           
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+<!-- end -->
+{% endblock content %}
+
+{% block scripts %}
+<script src="https://cdn.datatables.net/1.11.0/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.0/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/responsive.bootstrap4.min.js"></script>
+
+<script src="{% static 'js/farm/farm_list.js' %}"></script>
+
+<script>
+    $(document).ready(function () {
+        $('#processorList_tbl').DataTable();
+    });
+    $('#processorList_tbl').dataTable( {
+    "pageLength": 50
+    } );
+</script>
+<script>
+  $('#Processor-active').addClass('activeLink');
+
+  $('#Processor-down').addClass('down');
+  $('#Processor-sub').show();
+
+  $('#Production-Report').addClass('activeLink active-nav');
+
+</script>
+{% endblock scripts %}

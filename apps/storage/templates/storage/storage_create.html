@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %} Storage Create {% endblock title %}
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+{% block content %}
+{% include 'navbar.html' %}
+
+<style>
+    .mystyle {
+        display: none;
+    }
+
+    .upload-file-main label {
+        font-size: 16px
+    }
+
+    .file-upload-wrapper {
+        border-radius: 0px;
+        border: 1px solid #ccc;
+    }
+
+    .file-upload-wrapper:before {
+        border-bottom-right-radius: 0px;
+        border-top-right-radius: 0px
+    }
+
+    .file-upload-wrapper:after {
+        background: none;
+    }
+
+    .gro_dd {
+        border-color: #ccc;
+        margin-top: 0px;
+        height: 50px;
+    }
+    .bootstrap-select .dropdown-menu li.disabled.selected{display: none;}
+    .dropdown.bootstrap-select.form-control .btn{border: 1px solid #B2BEB5; padding: 13px 8px; border-radius:0;}
+    .bootstrap-select .dropdown-menu{max-width: 280px;}
+    .bootstrap-select .dropdown-menu li.selected.active .dropdown-item.active.selected{margin-left: 0;padding: 0;}
+</style>
+
+<div class="main-content">
+    {% include 'header.html' %}
+    {% load crispy_forms_tags %}
+    {% include '_alerts.html' %}
+    <main>
+        <span class="farm headingtop">Storage Create</span>
+        <div class="card farm-fields-container">
+            <div class="container-fluid">
+                {% if messages %}
+                {% for messages in messages %}
+                <div class="alert alert-danger" role="alert">
+                    {{messages}}
+                  </div>
+                {% endfor %}
+                {% endif %}
+                <form action="{% url 'storage-create' %}" method="post" class="farm-fields-form"
+                    enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-4">
+                            {{form.storage_name|as_crispy_field}}
+                        </div>
+                        <div class="col-md-4">
+                            {{form.storage_uniqueid|as_crispy_field}}
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <lable>Select Growers</lable>
+                                <select id="growerSelction" name="grower_id" class="gro_dd form-control selectpicker" data-live-search="true">
+                                    <option value=0 selected disabled> Select All Growers </option>
+                                    {% for grower in grower %}
+                                    <option value="{{ grower.pk }}">{{grower.name}} - {{ grower.pk }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+             
+                        <div class="col-md-4 mb-3">
+                            <div>
+                                <label for="grower_crop">Crop<span class="asteriskField">*</span></label>
+                                <select onchange="checkcotton()" id="grower_crop" name="grower_crop" class="textinput textInput form-control">
+                                    <option value= 0 selected disabled> Select Crop </option>
+                                    {% for crop in crop %}
+                                    <option value={{crop}} > {{crop}} </option>
+                                    {% endfor %}
+                                </select>
+                                <p id="p2" style="color: red;"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-4" onchange="myFunction()">
+                            {{form.upload_type|as_crispy_field}}
+                        </div>
+                        <div class="col-md-4" id="div1">
+                            <div class="form-group">
+                                <div class="upload-file-main">
+                                    <label for="">Upload File</label>
+                                    <div class="file-upload-wrapper" data-text="shapefilename.zip">
+                                        <input type="file" name="zip_file" accept=".zip"
+                                            class="clearablefileinput file-upload-field" id="id_csv_file">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4" id="div2">
+                            <div class="form-group">
+                                {{form.latitude|as_crispy_field}}
+                            </div>
+                        </div>
+                        <div class="col-md-4" id="div3">
+                            <div class="form-group">
+                                {{form.longitude|as_crispy_field}}
+                            </div>
+                        </div>
+                        
+                        <div class="form-btn-row text-center text-md-end">
+                            <a href="{% url 'storage-list' %}" class="btn-close-cancel btn-space">Cancel</a>
+                            <input type="submit" class="btn-save-submit" value="Save">
+                        </div>
+                        
+                </form>
+            </div>
+        </div>
+</div>
+</main>
+{% include 'footer.html' %}
+</div>
+{% endblock content %}
+{% block scripts %}
+<script>
+    var upload_type = document.getElementById("id_upload_type").value
+    if (upload_type === "") {
+        document.getElementById("div1").classList.add("mystyle");
+        document.getElementById("div2").classList.add("mystyle");
+        document.getElementById("div3").classList.add("mystyle");
+    }
+    function myFunction() {
+
+        var upload_type = document.getElementById("id_upload_type").value
+        if (upload_type === "shapefile") {
+            document.getElementById("div1").classList.remove("mystyle");
+            document.getElementById("div2").classList.add("mystyle");
+            document.getElementById("div3").classList.add("mystyle");
+        }
+        else if (upload_type === "coordinates") {
+            document.getElementById("div1").classList.add("mystyle");
+            document.getElementById("div2").classList.remove("mystyle");
+            document.getElementById("div3").classList.remove("mystyle");
+        }
+        else if (upload_type === "") {
+            document.getElementById("div1").classList.add("mystyle");
+            document.getElementById("div2").classList.add("mystyle");
+            document.getElementById("div3").classList.add("mystyle");
+        }
+    }
+
+</script>
+{% endblock scripts %}
+{% block jquery %}
+<script>
+$('#Storage-Management-active').addClass('activeLink');
+                
+$('#Storage-Management-down').addClass('down');
+$('#Storage-Management-sub').show();
+
+$('#Storage-Add').addClass('activeLink active-nav');
+</script>
+{% endblock jquery %}

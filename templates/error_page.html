@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %} 404 Error - Page Not Found {% endblock title %}
+
+{% block extrahead %}
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f3f3f3;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        overflow: hidden; /* Hide overflow to prevent scrolling */
+    }
+
+    .container {
+        text-align: center;
+        position: relative;
+        z-index: 1; /* Ensure content is on top of the background */
+    }
+
+    .background-image {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: url('https://marvel-b1-cdn.bc0a.com/f00000000283318/home.dartmouth.edu/sites/home/files/styles/max_width_720px/public/2022-12/Rice%20plants%202%20horiz%20by%20Jiajing%20Wang_0.jpg?itok=PIjqbt1P');
+        background-size: cover;
+        background-position: center;
+        filter: brightness(50%); /* Optional: Adjust brightness of the image */
+        z-index: -1; /* Send the background image to the back */
+    }
+
+    h1 {
+        font-size: 15rem; /* Increase font size */
+        color: #fff; /* Change text color to be visible against the background */
+        margin-bottom: 20px;
+        margin-top: 10px;
+    }
+    h2 {
+        font-size: 4rem; /* Increase font size */
+        color: #fff; /* Change text color to be visible against the background */
+        margin-bottom: 10px;
+    }
+
+    p {
+        font-size: 1.5em;
+        color: #fff; /* Change text color to be visible against the background */
+        margin-bottom: 20px;
+    }
+
+    .btn {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #0A6C38;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        text-decoration: none;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn:hover {
+        background-color:  #6C0A3E;
+    }
+    a,
+    .btn-save-submit:hover {
+        color: #fff;
+    }
+
+    
+</style>
+{% endblock extrahead %}
+
+{% block content %} 
+{% include 'navbar.html' %}
+<div class="main-content">
+    {% include 'header.html' %} 
+        <body>
+            <div class="background-image"></div>
+            <div class="container">
+                <h1 style ="font-size: 15rem;">404 Error</h1>
+                <h2 style="font-size: 4rem;">Page Not Found</h2>
+                <p>Oops! The page you are looking for could not be found.</p>
+                <a href="{% url 'dashboard' %}" class="btn btn-close-cancel mt-2 mt-sm-0 text-white">Go Home</a>
+            </div>
+        </body>
+{% comment %} {% include 'footer.html' %} {% endcomment %}
+</div>
+{% endblock content%}

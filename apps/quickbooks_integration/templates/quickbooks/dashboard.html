@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Home{% endblock %}
+
+{% block extrahead %}
+  <!-- Google Tag Manager -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+    gtag('js', new Date());
+    gtag('config', 'G-Y3EWVPF7PQ');
+  </script>
+{% endblock extrahead %}
+
+{% block content %}
+  {% include 'navbar.html' %}
+
+  <style>
+    /* Ensure full-width layout */
+    .content-wrapper {
+      max-width: 1200px; 
+      margin: 0 auto;
+      padding: 20px;
+      font-family: Arial, sans-serif;
+    }
+  
+    .company-info {
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      text-align: left;
+      margin-top: 20px;
+    }
+  
+    /* Center the company header */
+    .company-header {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      margin-bottom: 20px;
+    }
+  
+    /* Make the company logo responsive */
+    .company-logo {
+      width: 300px;
+      height: auto;
+      margin-bottom: 20px;
+    }
+  
+    h2 {
+      font-size: 2.5em;
+      color: #333;
+    }
+  
+    /* Make text size responsive */
+    .company-details h6 {
+      font-size: 1.1em;
+      line-height: 1.6em;
+      color: #555;
+    }
+  
+    h3 {
+      font-size: 1.6em;
+      color: #444;
+      margin-top: 20px;
+    }
+  
+    /* Add space between additional info items */
+    ul {
+      padding-left: 20px;
+    }
+  
+    ul li {
+      padding: 8px 0;
+      font-size: 1.1em;
+      color: #666;
+    }
+  </style>  
+  <div class="main-content">
+    {% include 'header.html' %}
+    
+    <main class="content-wrapper">
+      <section class="company-info m-5 text-center">
+        <div class="company-header row">
+          <img src="{% static '/images/warehouse-logo.avif' %}" alt="Company Logo" class="company-logo">
+          <h2>{{ company_info.CompanyInfo.CompanyName }}</h2>
+        </div>
+        
+        <div class="company-details">
+          <h6><strong>Legal Name:</strong> {{ company_info.CompanyInfo.LegalName }}</h6>
+          <h6><strong>Start Date:</strong> {{ company_info.CompanyInfo.CompanyStartDate }}</h6>
+          <h6><strong>Fiscal Year Start Month:</strong> {{ company_info.CompanyInfo.FiscalYearStartMonth }}</h6>
+          <h6><strong>Country:</strong> {{ company_info.CompanyInfo.Country }}</h6>
+        </div>
+    
+        <h3>Address</h3>
+        <h6>
+          <strong>Line 1:</strong> {{ company_info.CompanyInfo.CompanyAddr.Line1 }}<br>
+          <strong>City:</strong> {{ company_info.CompanyInfo.CompanyAddr.City }}<br>
+          <strong>State:</strong> {{ company_info.CompanyInfo.CompanyAddr.CountrySubDivisionCode }}<br>
+          <strong>Postal Code:</strong> {{ company_info.CompanyInfo.CompanyAddr.PostalCode }}
+        </h6>
+    
+        <h3>Contact Information</h3>
+        <h6><strong>Email:</strong> {{ company_info.CompanyInfo.Email.Address }}</h6>
+        <h6><strong>Customer Communication Email:</strong> {{ company_info.CompanyInfo.CustomerCommunicationEmailAddr.Address }}</h6>
+    
+        <h3>Meta Data</h3>
+        <h6><strong>Created At:</strong> {{ company_info.CompanyInfo.MetaData.CreateTime }}</h6>
+        <h6><strong>Last Updated:</strong> {{ company_info.CompanyInfo.MetaData.LastUpdatedTime }}</h6>
+    
+        <h3>Additional Info</h3>
+        <ul>
+          {% for item in company_info.CompanyInfo.NameValue %}
+            <li><strong>{{ item.Name }}:</strong> {{ item.Value }}</li>
+          {% endfor %}
+        </ul>
+      </section>
+    </main>  
+    
+    {% include 'footer.html' %}
+  </div>
+{% endblock content %}
+
+

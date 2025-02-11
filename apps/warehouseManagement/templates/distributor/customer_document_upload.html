@@ -1,0 +1,132 @@
+{% extends "base.html" %} {% load static %} {% block title %} Add Customer {% endblock title %} 
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+
+{% block content %} {% include 'navbar.html' %}
+<div class="main-content">
+    {% include 'header.html' %} {% load crispy_forms_tags %}
+  <main>
+    {% include '_alerts.html' %}
+        <span class="farm headingtop">Upload Documents</span>
+        <div class="card farm-fields-container">
+            <div class="container-fluid">
+                <form method="post" class="farm-fields-form" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group d-flex align-items-center justify-content-center">
+                                <label for="required_documents" class="mb-0">Required Documents:</label>
+                                <!-- Admin can add document names -->
+                                {% if request.user.is_superuser or 'SubAdmin' in request.user.get_role or 'SuperUser' in request.user.get_role or request.user.is_distributor or request.user.is_warehouse_manager %}
+                                    <button type="button" class="btn btn-primary font-weight-bold btn-lg ms-2" id="add-document" style="width: 41px;height: 24px;padding: 0;display: inline-flex;justify-content: center;align-items: center;font-size: 19px;">+</button>
+                                {% endif %}
+                                <div class="flex-grow-1"></div>
+                            </div>
+
+                            <div id="document-container">
+                                {% for document in documents %}
+                                <div class="document-row d-flex align-items-center mb-3">
+                                    <input type="text" name="document_name[]" class="form-control me-3" value="{{ document.document_name }}" {% if request.user.is_customer %}readonly{% endif %}>
+                                    {% if document.file %}
+                                        <a href="{{ document.document.url }}" class="elements_for_object_docs me-3" target="_blank" download><span class="doc_name">{{ document.document_name }}</span></a>
+                                    {% else %}
+                                        <span class='me-3'>Not uploaded.</span>
+                                    {% endif %}
+                                    <input type="text" name="document_status_{{ document.id }}" class="form-control me-3 " value="{% if document.document_status %}{{ document.document_status }}{% endif %}" placeholder="Document status" {% if request.user.is_customer %}readonly{% endif %}>
+                                    <input type="hidden" name="document_ids" value="{{ document.id }}">
+                                    {% if request.user.is_customer %}
+                                        <input type="file" name="document_file_{{ document.id }}" class="form-control me-3" value="{{document.file.name}}">
+                                    {% endif %}
+                                    {% if request.user.is_superuser or 'SubAdmin' in request.user.get_role or 'SuperUser' in request.user.get_role or request.user.is_distributor or request.user.is_warehouse_manager %}
+                                        <!-- Delete button for admins -->
+                                        <button type="button" class="btn btn-danger btn-remove-document" data-document-id="{{ document.id }}" style="width: 41px;height: 24px;padding: 0;display: inline-flex;justify-content: center;align-items: center;font-size: 10px;">x</button>
+                                    {% endif %}
+                                    
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <div id="delete-document-container">
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-btn-row">
+                            <a href="{% url 'list-customer' %}" class="btn-close-cancel btn-space">Cancel</a>
+                            <input type="submit" class="btn-save-submit" value="Save">
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+    {% include 'footer.html' %}
+</div>
+
+{% endblock %}
+{% block jquery %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Event delegation for dynamically added delete buttons
+        document.getElementById('document-container').addEventListener('click', function (event) {
+            if (event.target.classList.contains('btn-remove-document')) {
+                var documentId = event.target.getAttribute('data-document-id');
+                
+                // Create the hidden input
+                var deleteInput = document.createElement('input');
+                deleteInput.type = 'hidden';
+                deleteInput.name = 'delete_document_ids[]';
+                deleteInput.value = documentId;
+                console.log(deleteInput);
+                
+                // Append it directly to the form
+                document.querySelector('#delete-document-container').appendChild(deleteInput);
+                
+                // Remove the document row from the DOM
+                var documentRow = event.target.closest('.document-row');
+                documentRow.remove();
+            }
+        });
+    
+        // Event listener for adding new documents
+        document.getElementById('add-document').addEventListener('click', function () {
+            var documentContainer = document.getElementById('document-container');
+            var documentRow = document.createElement('div');
+            documentRow.className = 'document-row d-flex align-items-center mb-3';
+            documentRow.innerHTML = `
+                <input type="text" name="document_name[]" class="form-control me-3" placeholder="Enter document name">
+                <button type="button" class="btn btn-danger btn-remove-unic">-</button>
+            `;
+            documentContainer.appendChild(documentRow);
+        });
+    
+        // Event delegation for removing dynamically added document rows
+        document.getElementById('document-container').addEventListener('click', function (event) {
+            if (event.target.classList.contains('btn-remove-unic')) {
+                event.target.closest('.document-row').remove();
+            }
+        });
+    });
+    
+</script>
+<script>
+    $('#Warehouse-active').addClass('activeLink');
+  
+    $('#Warehouse-down').addClass('down');
+    $('#Warehouse-sub_unic').show();
+
+    $('#customer-management').addClass('activeLink active-nav');
+
+</script>
+{% endblock %}

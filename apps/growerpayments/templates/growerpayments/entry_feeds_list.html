@@ -1,0 +1,318 @@
+{% extends "base.html" %} {% load static %}
+{% block title %} Entry Feeds List {% endblock title %}
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+{% load crispy_forms_tags %}
+{% block content %}
+{% include 'navbar.html' %}
+
+<div class="main-content">
+    {% include 'header.html' %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.0/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.bootstrap4.min.css">
+
+    <main>
+        {% include '_alerts.html' %}
+        <div class="page-title-with-or-without-btn">
+            <span class="farm headingtop">Entry Feeds List </span>
+            <!-- Create button for Add-->
+            <div class="flex-header-btn">
+                <a href="{% url 'entry_feeds_add' %}" class="btn-close-cancel">Add Entry feeds</a>
+                &nbsp;
+                <a href="{% url 'nasdaq_get_data' %}" class="btn-close-cancel">Upload Nasdaq Data</a>
+            </div>
+        </div>
+        <div class="card card-padding">
+            <div class="main-simple-table-with-search col-12">                
+                <div class="both-data-in" style="display: inherit;">
+                    <div class="simple-responsive-table">
+                        <table id="processorList_tbl" class="table table-striped dt-responsive nowrap"
+                            style="width:100%">
+                            <thead>
+                                <tr style="border-bottom: 2px solid #e0e0e0;">
+                                    <th width="10%" style="text-align:center">Grower</th>
+                                    <th width="10%" style="text-align:center">Crop</th>
+                                    <th width="10%" style="text-align:center">From Date</th>
+                                    <th width="10%" style="text-align:center">To Date</th>
+                                    <th width="10%" style="text-align:center">Payment Option</th>
+                                    <th width="20%" style="text-align:center">Contract Base Price /LBS</th>
+                                    <th width="20%" style="text-align:center">Sustainability Premium /LBS</th>
+                                    <th width="10%" style="text-align:center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for entry in entries %}
+                                <tr>
+                                    <td align="center" style="vertical-align: middle;">{{ entry.grower.name }}</td>
+                                    <td align="center" style="vertical-align: middle;">{{ entry.crop }}</td>
+                                    <td align="center" style="vertical-align: middle;">{% if entry.from_date %}{{ entry.from_date }}{% else %}{% endif %}</td>
+                                    <td align="center" style="vertical-align: middle;">{% if entry.to_date %}{{ entry.to_date }}{% else %}{% endif %}</td>
+                                    <td align="center" style="vertical-align: middle;">{{ entry.contracted_payment_option }}</td>
+                                    <td align="center" style="vertical-align: middle;">{{ entry.contract_base_price }}</td>
+                                    <td align="center" style="vertical-align: middle;">
+                                        {% if entry.contracted_payment_option == 'Delivered Market Price' %}
+                                        0.04
+                                        {% else %}
+                                        {{ entry.sustainability_premium }}
+                                        {% endif %}
+                                    </td>
+                                    <td class="backk action-td" align="center">
+                                        <ul>
+                                            <li>
+                                                <a href="{% url 'entry_feeds_edit' entry.pk %}" class="update-btn-link" alt="edit entry feeds" title="edit entry feeds"> <span class="fas fa-edit"></span></a>
+                                            </li>
+                                            <li>
+                                                <a onclick="delreport('{% url 'entry_feeds_delete' entry.pk %}')" href="{% url 'entry_feeds_delete' entry.pk %}"
+                                                data-mdb-toggle="modal" data-mdb-target="#deleteModal" alt="delete entry feeds" title="delete entry feeds">
+                                                <span class="fas fa-trash"></span></a>
+                                            </li>
+                                        </ul>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>                           
+                        </table>
+                        <!-- Pagination -->
+                        <div class="row d-flex justify-content-center ">
+                            <div class="col-md-12 col-sm-12 col-12 text-center mt-2">                                
+                                <span>Showing {{ entries.start_index }} - {{ entries.end_index }} of {{ entries.paginator.count }} entries</span>                                                           
+                            </div>
+                        </div>
+                        <div class="row d-flex justify-content-center align-items-center">
+                            {% if entries.has_other_pages %}
+                            <nav aria-label="Page navigation">
+                                <ul class="pagination justify-content-center">
+                                    <!-- Previous Page -->
+                                    {% if entries.has_previous %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ entries.previous_page_number }}" aria-label="Previous">
+                                            <span aria-hidden="true">&laquo;</span>
+                                        </a>
+                                    </li>
+                                    {% else %}
+                                    <li class="page-item disabled">
+                                        <span class="page-link" aria-hidden="true">&laquo;</span>
+                                    </li>
+                                    {% endif %}
+                        
+                                    <!-- Page Numbers -->
+                                    {% for i in entries.paginator.page_range %}
+                                    {% if entries.number == i %}
+                                    <li class="page-item active">
+                                        <span class="page-link">{{ i }}</span>
+                                    </li>
+                                    {% else %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+                                    </li>
+                                    {% endif %}
+                                    {% endfor %}
+                        
+                                    <!-- Next Page -->
+                                    {% if entries.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ entries.next_page_number }}" aria-label="Next">
+                                            <span aria-hidden="true">&raquo;</span>
+                                        </a>
+                                    </li>
+                                    {% else %}
+                                    <li class="page-item disabled">
+                                        <span class="page-link" aria-hidden="true">&raquo;</span>
+                                    </li>
+                                    {% endif %}
+                                </ul>
+                            </nav>
+                            {% endif %}
+                        </div>  
+                    </div>
+                </div>
+            </div>
+        </div>    
+    </main>
+{% include 'footer.html' %}
+</div>
+<!-- Delete Popup -->
+<div class="modal fade" id="deleteModal" aria-hidden="true" aria-labelledby="exampleModalToggleLabel22" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+  
+        <div class="modal-body">
+          <button type="button" class="btn-close cust-close-ds-btn" data-mdb-dismiss="modal" aria-label="Close"></button>
+          <div class="center-content-status">
+            <img src="{% static 'img/trash.png' %}" alt="right" id="rightImg" class="warning-icon">
+            <p id="message" class="modal-title titlepad">Are you sure you want to delete?</p>
+          </div>
+          <div class="modal-center-btn-footer">
+            <button onclick="reloadwindow()" id="closeBtnpopup" type="button" class="btn-close-cancel btn-space"
+              data-mdb-dismiss="modal">
+              Close
+            </button>
+            <!-- <button type="submit" class="btn-save-submit">Delete</button> -->
+            
+            <a onclick="reportdeleteNow()" href="" id="reportdelete" ><button type=""
+                class="btn-save-submit">Delete</button></a>
+           
+          </div>
+        </div>
+  
+      </div>
+    </div>
+  </div>
+<!-- end -->
+
+{% endblock content %}
+
+{% block scripts %}
+<!-- <script src="https://cdn.datatables.net/1.11.0/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.0/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/responsive.bootstrap4.min.js"></script>
+
+<script src="{% static 'js/farm/farm_list.js' %}"></script> -->
+
+
+<script src="https://cdn.datatables.net/1.11.0/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.0/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/responsive.bootstrap4.min.js"></script>
+<script src="{% static 'js/dataTables.buttons.min.js' %}"></script>
+<script src="{% static 'js/buttons.html5.min.js' %}"></script>
+
+<script>
+    $(document).ready(function () {
+        $('#processorList_tbl').DataTable();
+    });
+
+    function delreport(url){
+    $('#reportdelete').show();
+    $('#reportdelete').attr('url',url);
+}
+
+function reportdeleteNow(){
+  url = $('#reportdelete').attr('url');
+  console.log(url)
+  $.ajax({
+  url: url,
+  data: { },
+  success: function (data) {
+    if (data==1){
+      location.reload();
+    }
+  }
+});
+}
+    // $('#processorList_tbl').dataTable( {
+    // "pageLength": 100
+    // } );
+//     let getselectedGrower = document.getElementById("getselectedGrower").value
+    
+//     $(document).ready(function () {
+//     let data_table_odj = $('#processorList_tbl').DataTable({
+//         columnDefs: [ 
+//             { 
+                
+//             }
+//         ],
+//         buttons: [ 
+//             { 
+//                 extend: 'csv', 
+//                 text: 'CSV EXPORT',
+//                 title: `${getselectedGrower ? `${getselectedGrower} PAYMENTS DETAILS`: `All GROWER PAYMENTS DETAILS` } - {% now "jS F Y" %}`, 
+//                 className: "btn-export", 
+//                 exportOptions: { 
+//                     columns: 'th:not(:last-child)' 
+//                 },
+//                 customize: function (csv) {
+//                 var csvRows = csv.split('\n');
+//                 csvRows[0] = csvRows[0].replace('"CBP / LBS"', '"Contract Base Price / LBS"')
+//                 csvRows[0] = csvRows[0].replace('"SP / LBS"', '"Sustainability Premium / LBS"')
+//                 csvRows[0] = csvRows[0].replace('"QP / LBS"', '"Quality Premium / LBS"')
+//                 return csvRows.join('\n');
+//                 } 
+//             }
+//         ],
+//         "iDisplayLength": 100,
+        
+//     });
+//     data_table_odj.buttons().container().appendTo('#Export_CSV');
+    
+
+// });
+
+//     $(document).ready(function() {
+//     $('#growerSelction').change( function () {
+//     $('#submitBtn2').click();
+//     });
+//     });
+
+//     $(document).ready(function () {
+//         $('#growerSelction').change(function () {
+//             $('#submitBtn').click();
+//         });
+//     });
+//     // delete storage
+//     function delStorage(url) {
+//         $('#storageDelete').show();
+//         $('#storageDelete').attr('url', url);
+//     }
+
+//     function storagedeleteNow() {
+//         url = $('#storageDelete').attr('url');
+//         console.log(url)
+//         $.ajax({
+//             url: url,
+//             data: {},
+//             success: function (data) {
+//                 if (data == 1) {
+//                     location.reload();
+//                 }
+//             }
+//         });
+//     }
+
+//     function showQR(grower_shipment_pk){
+//      console.log(grower_shipment_pk)
+//      $.ajax({
+//       type: "GET",
+//       url: `/processor/qr_code_view/${grower_shipment_pk}`,
+//       data: { },
+//       contentType: false,
+//       cache: false,
+//       processData: false,
+//       success: function (response) {
+//         console.log('response1', response)
+//         var qrimgsrc = document.getElementById("qr_id").src;
+//         console.log(qrimgsrc)
+//         $('#qr_id').attr("src", "/media/"+response);
+        
+
+//       }
+//     });
+//      $('#addqueModal').modal('show');
+//     }
+
+//     function closeAddModal() {
+//       $('#addqueModal').modal('hide');
+//   }
+</script>
+<script>
+    $('#Growers-Payments-active').addClass('activeLink');
+                  
+    $('#Growers-Payments-down').addClass('down');
+    $('#Growers-Payments-sub').show();
+    
+    $('#Grower-Entry-Feeds').addClass('activeLink active-nav');
+</script>
+{% endblock scripts %}

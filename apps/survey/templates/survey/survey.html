@@ -1,0 +1,112 @@
+{% extends "base.html" %} {% load static %} {% block title %} Survey {% endblock title %} {% block content %} {% include "navbar.html" %} 
+
+<div class="main-content">
+    {% include "header.html" %}
+    <main>
+    {% include '_alerts.html' %}
+        <div class="page-title-with-or-without-btn">
+            <span class="farm headingtop">Survey Configuration</span>
+        </div>
+
+        <div class="card card-padding">
+            <div class="accordion-container">
+                <h2>Questions</h2>
+
+                <form action="{% url 'survey' %}" method="get" class="">
+                    <!-- <label for="grower_id"></label> -->
+                    <div class="inline-apply-filter">
+                        <div class="three-fields-with-label">
+                            <select id="queType" name="questionType_id">
+
+                                <option disabled="true" selected> Select Question Type </option>
+                                {% for ques_type in ques_categories %}
+                                <option value="{{ ques_type }}">{{ques_type}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <input style="display : none;" id="applyFilter" type="submit" class="apply-filter-btn primary-btn" value="Apply Filter" />
+                    </div>
+                </form>
+
+                <!-- <h3 style="margin-top: 15px;">Whole Farm Questions</h3> -->
+                <br>
+
+                <div class="set custom-set-accordion">
+
+                    {% for question in questions %}
+                    <a href="javascript:void(0);" class="hoverquestion" onclick="customAccordion(this);">
+
+                        {{question.order}}: {{question.text}}
+                        {% comment %} <button src="{% url 'question-update' question.pk %}" type="button"
+                            class="onQuestions-edit">
+                            <span class="fas fa-edit"></span> Edit
+                        </button> {% endcomment %}
+                        {% comment %} <i class="fa fa-plus"></i> {% endcomment %}
+                    </a>
+                    <div class="content-pera" id="separateBox">
+                        <div class="boxaling">
+                            <div class="container-fluid padingg">
+                                <div class="row flex-algin-center">
+                                    <div class="col-md-8">
+                                        <p class="default-content-survey">Options :</p>
+                                    </div>
+                                    <div class="col-md-4 righttext">
+                                        <a href="{% url 'option-create' %}" class="add-btn-option-survey"><i
+                                                class="fa fa-plus"></i></a>
+                                        <div class="foriconright"> </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="boxaling">
+                            <div class="container-fluid padingg">
+                                {% for option in question.get_options %}
+                                <div class="row">
+                                    <div class="col-md-8">({{option.order}}) : {{option.text}} </div>
+                                    <div class="col-md-4 righttext"> <span>
+                                            <label class="cont">
+                                                <li>
+                                                    <a href="{% url 'option-update' option.pk %}"
+                                                        class="update-options-survey"><span class="fas fa-edit"
+                                                            data-mdb-toggle="modal"
+                                                            data-mdb-target="#exampleModal"></span>
+                                        </a>
+                                        </li>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                    </div>
+                    {% endfor %}
+
+
+                </div>
+            </div>
+        </div>
+
+    </main>
+    {% include 'footer.html' %}
+</div>
+
+<!-- Custom scripts -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js">
+</script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+{% endblock content %} {% block scripts %}
+<script>
+    $(document).ready(function() {
+
+        $('#queType').change(function() {
+            //var id = $('#growerSelection').val();
+            //document.location.href = '/farms/farms_list/?grower_id=' + id;
+
+            $("#applyFilter").click();
+        });
+
+    });
+</script>
+{% endblock scripts %}

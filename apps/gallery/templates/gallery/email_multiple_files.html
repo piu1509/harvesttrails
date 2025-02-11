@@ -1,0 +1,270 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Mail Template</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,500;0,700;1,300;1,400&display=swap" rel="stylesheet">
+    <style>
+        body{
+            font-family: 'Roboto', sans-serif;
+        }
+        h2.mail-title {
+            font-weight: 700;
+            text-align: center;
+            font-size: 35px;
+            color: #fff;
+        }
+
+        img.main-logo {
+        width: 180px;
+        }
+
+        .top-logo {
+            text-align: center;
+        }
+
+        p.mail-subtitle {
+    text-align: center;
+    color: #fff;
+    font-size: 16px;
+    margin-top: 25px;
+    line-height: 22px;
+}
+
+        .top-logo {
+            padding: 20px;
+        }
+        .content-bg::after {
+    background: #00000082;
+    position: absolute;
+    content: '';
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}
+.content-bg {
+    padding: 50px 30px;
+    background: url({% static 'img/background.jpg' %}) no-repeat;
+    background-size: cover;
+    position: relative;
+    z-index: 1;
+}
+        .mail-body {
+    padding: 40px;
+    background: #fff;
+}
+section.mail-template {
+    width: 75%;
+    margin: 0px auto;
+    padding: 20px 70px;
+}
+p.sub-title {
+    text-align: center;
+    color: #15a64e;
+    font-size: 22px;
+    margin: 0px;
+    font-weight: 600;
+}
+p.address-mail {
+    text-align: center;
+    line-height: 10px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #fff;
+}
+.mail-header {
+    padding: 20px 0px;
+}
+.mail-body p {
+    font-weight: 500;
+}
+ul.mail-list-info li {
+    margin-bottom: 15px;
+    font-weight: 500;
+}
+.mail-body-list {
+    padding: 15px 0px;
+    border-bottom: 1px solid #b1b1b1;
+    border-top: 1px solid #b1b1b1;
+    margin-bottom: 20px;
+    margin-top: 20px;
+}
+ul.mail-list-info {
+    list-style: none;
+    padding: 0px;
+    margin: 0px;
+}
+span.cancel-call {
+    text-decoration: underline;
+}
+p.cancel-title {
+    color: #15a64e;
+    font-weight: 700;
+    font-size: 18px;
+}
+ul.social-icons li a {
+    color: #070807;
+    text-decoration: none;
+}
+ul.social-icons {
+    list-style: none;
+    margin: 0px;
+    padding: 0px;
+    text-align: center;
+}
+ul.social-icons li {
+    display: inline-block;
+    margin: 0px 7px;
+}
+span.blue-brand {
+    color: #15a64e;
+}
+p.footer-brand {
+    color: #aaabaa;
+    text-align: center;
+    margin: 0px;
+}
+p.likes-p {
+    color: #aaabaa;
+    text-align: center;
+    margin: 5px 0px 8px;
+    font-size: 10px;
+}
+p.unsubscribe a {
+    color: #aaabaa;
+}
+p.unsubscribe {
+    color: #aaabaa;
+    text-align: center;
+    margin: 5px 0px 5px;
+    font-size: 10px;
+}
+p.copyright {
+    color: #aaabaa;
+    text-align: center;
+    margin: 0px;
+    font-size: 10px;
+}
+img.footer-icon-brand {
+    width: 40px;
+}
+.center-icon {
+    text-align: center;
+}
+.mail-footer-social {
+    padding: 50px 0px;
+}
+.card.custom-table {
+    padding: 15px;
+    box-shadow: 0px 0px 5px #ddd;
+    margin-bottom: 30px;
+}
+.card.custom-table.mail-footer p {
+    margin: 0px;
+}
+img.attachment-img {
+    width: 100%;
+    height: 100%;
+}
+    </style>
+</head>
+
+<body>
+    <section class="mail-template">
+        <div class="container">
+<div class="mail-header">
+    <div class="top-logo">
+        <img src="{% static 'img/logo.png' %}"  alt="logo" class="main-logo">
+    </div>
+   <div class="content-bg">
+    <h2 class="mail-title">Greetings for the day</h2>
+    <p class="mail-subtitle">Please find the attachment and get the file details in below tables.</p>
+
+    <p class="sub-title">River Terrace Inn</p>
+    <p class="address-mail">1600 Soscol Ave, Napa, CA 94559</p>
+
+   </div>
+</div>
+            <div class="mail-body">
+                <div class="mail-body-header">
+                    <p>Grower Name - {{grower_name}}</p>
+                    <div class="card custom-table">
+                        {% for obj in list_objects %}
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th colspan="2" style="text-align: center;">Attachment 1</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            
+                                <tr>
+                                    <th>File Name</th>
+                                    {% if obj.image %}
+                                    <td>{{ obj.image|stringformat:"s"|slice:"14:" }}</td>
+                                    {% else %}
+                                    <td>{{ obj.files|stringformat:"s"|slice:"13:" }}</td>
+                                    {% endif %}
+                                  </tr>
+                                  <tr>
+                                    <th>Farm</th>
+                                    <td>{{ obj.farm }}</td>
+                                  </tr>
+                                  <tr>
+                                    <th>Field</th>
+                                    <td>{{ obj.field }}</td>
+                                  </tr>
+                                  <tr>
+                                    <th>Survey Type </th>
+                                    <td>{{ obj.survey_type }}</td>
+                                  </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                        {% endfor %}
+                    
+                     
+                <div class="card custom-table mail-footer">
+                    <p>Remark : {{remark}} </p>
+                </div>
+               <div class="card custom-table">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <p>All Attachments</p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-3 col-12">
+                            <img src="screenshots/1.jpg" alt="" class="attachment-img">
+                        </div>
+                        <div class="col-lg-3 col-12">
+                         <img src="screenshots/2.jpeg" alt="" class="attachment-img">
+                     </div>
+                     <div class="col-lg-3 col-12">
+                         <img src="screenshots/3.jpg" alt="" class="attachment-img">
+                     </div>
+                    </div>
+                </div>
+               </div>
+            </div>
+            <div class="mail-footer-social">
+                <p class="footer-brand">Agreeta <span class="blue-brand">Solutions</span></p>
+                <p class="copyright">&copy; 2021 Agreeta Solutions</p>
+                <div class="center-icon">
+                    <img src="{% static 'img/logo.png' %}" alt="footer icon" class="footer-icon-brand">
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+
+</html>

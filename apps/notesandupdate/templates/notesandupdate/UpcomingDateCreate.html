@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% load static %} {% block title %} Create Comment {% endblock title %} {% block content %}
+{% include 'navbar.html' %}
+<div class="main-content">
+    {% include 'header.html' %}
+
+<!-- MID CONTENT -->
+
+<main> 
+    <span class="farm headingtop">Create Comment</span>
+    <div class="card farm-fields-container">
+        <div class="container-fluid">
+            <form method="post" action="{% url 'upcoming-date-create-save' %}" class="farm-fields-form" name="createComment" id="createComment" style="padding:5px 15px;">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-12">
+                        <div id="div_id_note" class="form-group">
+                            <label for="note">
+                                Comment
+                            </label>
+                            <div class="">
+                                <textarea name="note" id="note" class="form-control" placeholder="Enter here" style="min-height: 88px;" required></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div id="div_id_showdate" class="form-group">
+                            <label for="showdate">
+                                Date
+                            </label>
+                            <div class="">
+                                <input type="date" name="showdate" id="showdate" value="" class="form-control" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div id="div_id_status" class="form-group">
+                            <label for="status">
+                                Status
+                            </label>
+                            <div class="">
+                                <select name="status" class="select form-control" id="status" required>
+                                    <option value="1">Active</option>
+                                    <option value="0">Inactive</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-12">
+                        <div class="form-btn-row">
+                            <input type="submit" name="create_note" id="create_note" class="btn-save-submit" value="Save Comment">
+                        </div>
+                    </div>
+                </div>
+            </form>   
+        </div>
+    </div>
+</main>
+<!-- MID CONTENT END-->
+  <!-- end -->
+  <!-- Add Que Popup -->
+{% include 'footer.html' %}
+</div>
+{% endblock %}
+{% block jquery %}
+<script>
+    $('#Setting-Configuration-active').addClass('activeLink');
+  
+    $('#Setting-Configuration-down').addClass('down');
+    $('#Setting-Configuration-sub').show();
+  
+    $('#Upcoming-Dates').addClass('activeLink active-nav');
+  
+  </script>
+{% endblock jquery %}

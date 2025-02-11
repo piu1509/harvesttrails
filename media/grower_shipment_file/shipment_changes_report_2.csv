@@ -1,0 +1,7 @@
+Shipment ID,Description,Field,Old Value,New Value,Updated At,Updated By
+HTSH20240905524,Left border,Ship Weight,2.0,2.0,2024-09-09 07:07:31,admin
+HTSH20240905524,Left border,Border Receive Date,2024-09-05 00:00:00+00:00,2024-09-04,2024-09-09 07:07:31,admin
+HTSH20240905524,Left border,Border Leaving Date,None,2024-09-09,2024-09-09 07:07:31,admin
+HTSH20240905601,changed,Ship Weight,0,0,2024-09-09 07:11:39,admin
+HTSH20240905601,changed,Customer Receive Date,None,2024-09-10,2024-09-09 07:11:39,admin
+HTSH20240905601,Customer Receive Date changed,Customer Receive Date,2024-09-10 04:00:00+00:00,2024-09-09,2024-09-09 07:19:24,admin

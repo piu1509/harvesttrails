@@ -1,0 +1,192 @@
+{% extends "base.html" %} {% load static %}
+{% block title %} QuickBooks Item Management {% endblock title %}
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+
+{% load crispy_forms_tags %}
+{% block content %}
+{% include 'navbar.html' %}
+<style>
+  .table>:not(caption)>*>*{
+    border-bottom-width:0px
+  }
+</style>
+<div class="main-content">
+    {% include 'header.html' %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.0/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.bootstrap4.min.css">
+
+    <main>
+        {% include '_alerts.html' %}
+        <div class="page-title-with-or-without-btn">
+            <span class="farm headingtop">QuickBooks Item List</span>
+            <!-- Create button for add-processor-->
+            
+        </div>
+        <div class="card card-padding">
+          <div class="main-simple-table-with-search">
+            <div class="both-data-in" style="display: inherit;">
+                <div class="simple-responsive-table">
+                    <form method="POST" action="{% url 'import_item' %}">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" class="btn-close-cancel mb-3">Import</button>
+                        </div>
+                        
+                        <table id="distributorList_tbl" class="table table-striped dt-responsive nowrap" style="width:100%">
+                            <thead>
+                                <tr style="border-bottom: 2px solid #e0e0e0;">
+                                    <th>
+                                        <input type="checkbox" id="select_all" onclick="toggleSelectAll(this)">
+                                    </th>
+                                    <th width="">QuickBooks ID</th> 
+                                    <th width="">Item name</th> 
+                                    <th width="">Type</th>                           
+                                    <th width="">Per Unit Price</th>
+                                    <th width="">Class Name</th>
+                                    <th width="">Active Status</th>                                                                            
+                                </tr>
+                            </thead>
+                        
+                            <tbody>
+                                {% for item in items %}                                                  
+                                <tr> 
+                                    <td>
+                                        <input type="checkbox" class="item_checkbox" name="item_ids" value="{{ item.id }}">
+                                    </td>                             
+                                    <td>{{item.id}}</td>
+                                    <td>{{item.item_name}}</td>    
+                                    <td>{{item.type}}</td>
+                                    
+                                    <td>{{item.per_unit_price}}</td>                                                  
+                                    <td>{{item.class_name}}</td>
+                                    <td>{{item.is_active}}</td>                               
+                                    
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>                    
+                    </form>
+                    <div class="col-md-12 col-sm-12 col-12 text-center mt-2" style="text-align:right">
+                      <span>Showing {{ items.start_index }} - {{ items.end_index }} of {{ items.paginator.count }} entries</span>
+                    </div>
+                    <!-- Pagination controls -->
+                    <div class="row d-flex justify-content-center align-items-center">
+                        
+                        <div class="col-sm-4">
+                            {% if items.has_other_pages %}
+                            <ul class="pagination" id="nav_1">
+                                {% if items.has_previous %}
+                                <li><a href="?search_name={{ search_name }}&page={{ items.previous_page_number }}">&laquo;</a></li>
+                                {% else %}
+                                <li class="disabled"><span>&laquo;</span></li>
+                                {% endif %}
+                                {% for i in items.paginator.page_range %}
+                                {% if items.number == i %}
+                                <li class="active pagi" id="getactive"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+                                {% else %}
+                                <li><a href="?search_name={{ search_name }}&page={{ i }}">{{ i }}</a></li>
+                                {% endif %}
+                                {% endfor %}
+                                {% if items.has_next %}
+                                <li><a href="?search_name={{ search_name }}&page={{ items.next_page_number }}">&raquo;</a></li>
+                                {% else %}
+                                <li class="disabled"><span>&raquo;</span></li>
+                                {% endif %}
+                            </ul>
+                            {% endif %}
+                        </div>                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    {% include 'footer.html' %}
+</div>
+
+{% endblock content %}
+
+{% block scripts %}
+
+<script>
+  document.getElementById('searchInput').addEventListener('keyup', function() {
+      let filter = this.value.toUpperCase();
+      let rows = document.querySelector("#processorList_tbl tbody").rows;
+      
+      for (let i = 0; i < rows.length; i++) {
+          let cells = rows[i].cells;
+          let match = false;
+          for (let j = 0; j < cells.length; j++) {
+              if (cells[j].innerText.toUpperCase().indexOf(filter) > -1) {
+                  match = true;
+                  break;
+              }
+          }
+          if (match) {
+              rows[i].style.display = "";
+          } else {
+              rows[i].style.display = "none";
+          }
+      }
+  });
+</script>
+<script>
+    // Function to toggle all checkboxes
+    function toggleSelectAll(selectAllCheckbox) {
+        const checkboxes = document.querySelectorAll('.item_checkbox');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = selectAllCheckbox.checked;
+        });
+    }
+
+    // Optional: Update the "Select All" checkbox based on individual checkbox state
+    document.querySelectorAll('.item_checkbox').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const selectAllCheckbox = document.getElementById('select_all');
+            const allChecked = document.querySelectorAll('.item_checkbox:checked').length === document.querySelectorAll('.item_checkbox').length;
+            selectAllCheckbox.checked = allChecked;
+        });
+    });
+</script>
+
+<script src="https://cdn.datatables.net/1.11.0/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.0/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/responsive.bootstrap4.min.js"></script>
+
+<script src="{% static 'js/farm/farm_list.js' %}"></script>
+
+<script>
+    $(document).ready(function () {
+        $('#distributorList_tbl').DataTable();
+    });
+    
+    $(document).ready(function () {
+        $('#growerSelction').change(function () {
+            $('#submitBtn').click();
+        });
+    });
+
+</script>
+<script>
+    $('#Quickbooks-active').addClass('activeLink');
+  
+    $('#Quickbooks-down').addClass('down');
+    $('#Quickbooks-sub').show();
+
+    $('#Item-List').addClass('activeLink active-nav');
+
+</script>
+{% endblock scripts %}

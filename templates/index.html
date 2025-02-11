@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HARVEST</title>
+    <link rel="icon" href="{% static 'img/icons/favicon.png' %}" type="image/x-icon" />
+    <link rel="stylesheet" href="{% static 'landing_page/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'landing_page/css/boxicons.min.css' %}">
+    <link rel="stylesheet" href="{% static 'landing_page/css/fonts.css' %}">
+    <link rel="stylesheet" href="{% static 'landing_page/css/slick.css' %}">
+    <link rel="stylesheet" href="{% static 'landing_page/css/slick-theme.css' %}">
+    <link rel="stylesheet" href="{% static 'landing_page/css/style.css' %}">
+</head>
+
+<body>
+    <header id="header" class="position-absolute top-0 start-0 end-0">
+        <div class="container-xl container-2xl">
+            <nav class="nav-header py-3">
+                <div class="container-3xl relative">
+                    <div class="nav-row d-flex flex-wrap justify-content-center align-items-center">
+                        <div class="nav-logo">
+                            <a href="{% url 'main_page' %}" class="custom-logo-link">
+                                <img src="{% static 'landing_page/images/logo.png' %}" alt="Logo">
+                            </a>
+                        </div>
+                        <div class="login ms-sm-auto text-uppercase text-center">
+                            <!-- <a href="#" class="text-decoration-none d-flex align-items-center"><i class="bx bx-user-circle bx-md me-2"></i> login to our portal</a> -->
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+    <div class="intro py-5 bg-cover bg-no-repeat bg-center text-white d-flex align-items-center">
+        <div class="container-xl container-2xl">
+            <div class="slider intro-slider">
+                <section class="items relative">
+                    <div class="row justify-content-lg-end justify-content-center align-items-center gy-3 text-lg-start text-center">
+                        <div class="col-lg-6 col-md-12 col-sm-12 col-12 order-md-first">
+                            <div class="max-w-600 d-flex flex-column align-items-lg-start align-items-center row-gap-4 mx-lg-0 mx-auto">
+                                <h1 class="h1 font-normal text-uppercase" style="text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);">We are proud to offer an <strong>end-to-end rice supply chain</strong></h1>
+                                <h3 class="h4 font-normal" style="text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);">Each grain is traced and monitored for sustainability</h3>
+                                <a href="{% url 'login' %}" class="btn btn-lg btn-theme px-5 text-uppercase">login to our portal</a>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <main>
+        <section class="py-lg-6 py-5 bg-green-900 text-white">
+            <div class="container-xl container-2xl">
+                <div class="row justify-content-center text-center">
+                    <div class="col-xxl-10 col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                        <h2 class="h4 font-normal text-uppercase mb-4">All of our rice is USA grown and packaged</h2>
+                        <h3 class="h2 font-medium text-uppercase mb-4">click here to download app</h3>
+                        <div class="app-btn-list d-flex flex-sm-row flex-column justify-content-center gap-3">
+                            <a href="#" class="inline-block"><img src="{% static 'landing_page/images/ios-btn.png' %}" alt=""></a>
+                            <a href="#" class="inline-block"><img src="{% static 'landing_page/images/android-btn.png' %}" alt=""></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="py-lg-6 py-5">
+            <div class="container-xl container-2xl">
+                <div class="row justify-content-center text-center pb-6">
+                    <div class="col-xxl-6 col-xl-7 col-lg-8 col-md-10 col-sm-12 col-12 cms-content">
+                        <h2 class="h4 font-normal mb-4">We support our farmers in their communities as they grow rice to support the growing demand for <strong>USA rice in domestics and export markets</strong></h2>
+                    </div>
+                </div>
+                <div class="row justify-content-center gx-xxl-6 pb-6 gy-5 text-lg-start text-center">
+                    <div class="col-xxl-5 col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 cms-content">
+                        <img src="{% static 'landing_page/images/grain-rice.png' %}" alt="">
+                    </div>
+                    <div class="col-xxl-5 col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 cms-content">
+                        <h3 class="h2 mb-4 text-green-900">Long Grain Rice</h3>
+                        <div class="custom-tab max-w-400 mb-4 mx-lg-0 mx-auto">
+                            <ul class="nav nav-tabs" id="longgrainRice" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active" id="grainWhite-tab" data-bs-toggle="tab" data-bs-target="#grainWhite-tab-pane" type="button" role="tab" aria-controls="grainWhite-tab-pane" aria-selected="true">Long Grain White</button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="grainBrown-tab" data-bs-toggle="tab" data-bs-target="#grainBrown-tab-pane" type="button" role="tab" aria-controls="grainBrown-tab-pane" aria-selected="false">Long Grain Brown</button>
+                                </li>
+                            </ul>
+                            <div class="tab-content border-start border-bottom border-end border-green-900 rounded-bottom-4" id="longgrainRiceContent">
+                                <div class="tab-pane p-4 fade show active" id="grainWhite-tab-pane" role="tabpanel" aria-labelledby="grainWhite-tab" tabindex="0">
+                                    <ul role="list" class="list-unstyled check-list text-start">
+                                        <li>Non-GMO Certified</li>
+                                        <li>Sustainably Certified</li>
+                                        <li>Gluten free</li>
+                                        <li>USA Grown and Packaged</li>
+                                        <li>Kosher Certified</li>
+                                    </ul>
+                                </div>
+                                <div class="tab-pane p-4 fade" id="grainBrown-tab-pane" role="tabpanel" aria-labelledby="grainBrown-tab" tabindex="0">
+                                    <ul role="list" class="list-unstyled check-list text-start">
+                                        <li>Non-GMO Certified</li>
+                                        <li>Sustainably Certified</li>
+                                        <li>Gluten free</li>
+                                        <li>USA Grown and Packaged</li>
+                                        <li>Kosher Certified</li>
+                                        <li>100% Whole Wheat Certified</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <p><span class="text-red">*</span> Varieties available and certifications</p>
+                        <p><span class="text-red">**</span> Various sizes available from 1-lb up to 50-lbs, plus bulk totes.</p>
+                        <p><span class="text-red">***</span> Gusseted resealable standup pouch, Pillow pouch, Paperboard box</p>
+                    </div>
+                </div>
+                <div class="row justify-content-center gx-xxl-6 pb-6 gy-5 text-lg-start text-center">
+                    <div class="col-xxl-5 col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 cms-content order-lg-last">
+                        <img src="{% static 'landing_page/images/instant-rice.png' %}" alt="">
+                    </div>
+                    <div class="col-xxl-5 col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 cms-content order-lg-first">
+                        <h3 class="h2 mb-4 text-green-900">Instant Rice</h3>
+                        <div class="custom-tab max-w-400 mb-4 mx-lg-0 mx-auto">
+                            <ul class="nav nav-tabs" id="instantRice" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active" id="instantWhite" data-bs-toggle="tab" data-bs-target="#instantWhite-pane" type="button" role="tab" aria-controls="instantWhite-pane" aria-selected="true">Instant White</button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="instantBrown-tab" data-bs-toggle="tab" data-bs-target="#instantBrown-tab-pane" type="button" role="tab" aria-controls="instantBrown-tab-pane" aria-selected="false">Instant Brown</button>
+                                </li>
+                            </ul>
+                            <div class="tab-content border-start border-bottom border-end border-green-900 rounded-bottom-4" id="instantRiceContent">
+                                <div class="tab-pane p-4 fade show active" id="instantWhite-pane" role="tabpanel" aria-labelledby="instantWhite" tabindex="0">
+                                    <ul role="list" class="list-unstyled check-list text-start">
+                                        <li>Non-GMO Certified</li>
+                                        <li>Sustainably Certified</li>
+                                        <li>Gluten free</li>
+                                        <li>USA Grown and Packaged</li>
+                                        <li>Kosher Certified</li>
+                                    </ul>
+                                </div>
+                                <div class="tab-pane p-4 fade" id="instantBrown-tab-pane" role="tabpanel" aria-labelledby="instantBrown-tab" tabindex="0">
+                                    <ul role="list" class="list-unstyled check-list text-start">
+                                        <li>Non-GMO Certified</li>
+                                        <li>Sustainably Certified</li>
+                                        <li>Gluten free</li>
+                                        <li>USA Grown and Packaged</li>
+                                        <li>Kosher Certified</li>
+                                        <li>100% Whole Wheat Certified</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <p><span class="text-red">*</span> Varieties available and certifications</p>
+                        <p><span class="text-red">**</span> Various sizes available from 1-lb up to 50-lbs, plus bulk totes.</p>
+                        <p><span class="text-red">***</span> Gusseted resealable standup pouch, Pillow pouch, Paperboard box</p>
+                    </div>
+                </div>
+                <div class="row justify-content-center gx-xxl-6 gy-5 text-lg-start text-center">
+                    <div class="col-xxl-5 col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 cms-content">
+                        <img src="{% static 'landing_page/images/jasmine-rice.png' %}" alt="">
+                    </div>
+                    <div class="col-xxl-5 col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 cms-content">
+                        <h3 class="h2 mb-4 text-green-900">Jasmine Rice</h3>
+                        <div class="custom-tab max-w-400 mb-4 mx-lg-0 mx-auto">
+                            <ul class="nav nav-tabs" id="Jasmine" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active" id="Jasmine-tab" data-bs-toggle="tab" data-bs-target="#Jasmine-tab-pane" type="button" role="tab" aria-controls="Jasmine-tab-pane" aria-selected="true">Jasmine</button>
+                                </li>
+                                <!-- <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="grainBrown-tab" data-bs-toggle="tab" data-bs-target="#grainBrown-tab-pane" type="button" role="tab" aria-controls="grainBrown-tab-pane" aria-selected="false">Long Grain Brown</button>
+                                </li> -->
+                            </ul>
+                            <div class="tab-content border-start border-bottom border-end border-green-900 rounded-bottom-4" id="JasmineContent">
+                                <div class="tab-pane p-4 fade show active" id="Jasmine-tab-pane" role="tabpanel" aria-labelledby="Jasmine-tab" tabindex="0">
+                                    <ul role="list" class="list-unstyled check-list text-start">
+                                        <li>Non-GMO Certified</li>
+                                        <li>Sustainably Certified</li>
+                                        <li>Gluten free</li>
+                                        <li>USA Grown and Packaged</li>
+                                        <li>Kosher Certified</li>
+                                    </ul>
+                                </div>
+                                <!-- <div class="tab-pane p-4 fade" id="grainBrown-tab-pane" role="tabpanel" aria-labelledby="grainBrown-tab" tabindex="0">
+                                    <ul role="list" class="list-unstyled check-list">
+                                        <li>Non-GMO Certified</li>
+                                        <li>Sustainably Certified</li>
+                                        <li>Gluten free</li>
+                                        <li>USA Grown and Packaged</li>
+                                        <li>Kosher Certified</li>
+                                        <li>100% Whole Wheat Certified</li>
+                                    </ul>
+                                </div> -->
+                            </div>
+                        </div>
+                        <p><span class="text-red">*</span> Varieties available and certifications</p>
+                        <p><span class="text-red">**</span> Various sizes available from 1-lb up to 50-lbs, plus bulk totes.</p>
+                        <p><span class="text-red">***</span> Gusseted resealable standup pouch, Pillow pouch, Paperboard box</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="min-h-500 py-lg-6 py-5 bg-green-900 text-white bg-cover bg-no-repeat bg-center d-flex justify-content-center align-items-center" style="background-image: url(static/landing_page/images/app-banner.jpg);">
+            <div class="container-xl container-2xl">
+                <div class="row justify-content-center text-center">
+                    <div class="col-xxl-10 col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                        <h2 class="h4 font-normal text-uppercase mb-4">Our grading standards ensure the highest quality</h2>
+                        <h3 class="h2 font-medium text-uppercase mb-4">click here to download app</h3>
+                        <div class="app-btn-list d-flex flex-sm-row flex-column justify-content-center gap-3">
+                            <a href="#" class="inline-block"><img src="{% static 'landing_page/images/ios-btn.png' %}" alt=""></a>
+                            <a href="#" class="inline-block"><img src="{% static 'landing_page/images/android-btn.png' %}" alt=""></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="py-lg-6 pt-5 pb-3">
+            <div class="container-xl container-2xl pb-5">
+                <div class="row justify-content-center text-center">
+                    <div class="col-xxl-12 col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                        <h2 class="font-bold text-uppercase mb-lg-5 mb-4 text-green-900">Recipes</h2>
+                        <div class="slider four-col-slider slider-gap-3 relative pb-4">
+                            <div class="items px-3 relative text-center">
+                                <figure>
+                                    <img src="{% static 'landing_page/images/1.jpg' %}" alt="Trulli" class="rounded block mb-4 w-100">
+                                    <figcaption class="h5 text-uppercase">Fajita Rice<br/>Salad</figcaption>
+                                </figure>
+                            </div>
+                            <div class="items px-3 relative text-center">
+                                <figure>
+                                    <img src="{% static 'landing_page/images/2.jpg' %}" alt="Trulli" class="rounded block mb-4 w-100">
+                                    <figcaption class="h5 text-uppercase">Dairy-free <br/>Horchata</figcaption>
+                                </figure>
+                            </div>
+                            <div class="items px-3 relative text-center">
+                                <figure>
+                                    <img src="{% static 'landing_page/images/3.jpg' %}" alt="Trulli" class="rounded block mb-4 w-100">
+                                    <figcaption class="h5 text-uppercase">Lemon Blueberry Bliss Rice Pudding</figcaption>
+                                </figure>
+                            </div>
+                            <div class="items px-3 relative text-center">
+                                <figure>
+                                    <img src="{% static 'landing_page/images/4.jpg' %}" alt="Trulli" class="rounded block mb-4 w-100">
+                                    <figcaption class="h5 text-uppercase">Creamy Cheesy Chicken Rice Casserole</figcaption>
+                                </figure>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    <footer class="footer pt-lg-6 py-5 bg-black text-white">
+        <div class="container-xl container-2xl">
+            <div class="footer-logo text-center">
+                <img src="{% static 'landing_page/images/logo.png' %}" alt="">
+            </div>
+            <div class="row justify-content-center text-center">
+                <div class="col-xxl-5 col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                    <h2 class="h3 font-normal mb-5">We are proud to offer an <br/><strong>End-To-End Rice Supply Chain</strong></h2>
+                    <div class="app-btn-list d-flex flex-sm-row flex-column justify-content-center gap-3">
+                        <a href="#" class="inline-block"><img src="{% static 'landing_page/images/ios-btn.png' %}" alt=""></a>
+                        <a href="#" class="inline-block"><img src="{% static 'landing_page/images/android-btn.png' %}" alt=""></a>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center pt-5">
+                <ul class="list-unstyled footer-link">
+                    <!-- <li><a href="https://harvesttrails.app">Home</a></li> -->
+                    <li><a href="{% url 'main_page' %}">Home</a></li>
+                    <li><a href="{% url 'login' %}">Login</a></li>
+                    <li><a href="{% url 'terms_and_conditions' %}">Terms & Conditions</a></li>
+                    <li><a href="{% url 'privacy' %}">Privacy Policy</a></li>
+                </ul>
+            </div>
+            <p class="mb-0 copy text-center">&copy; 2024 harvesttrails. All Rights Reserved.</p>
+        </div>
+    </footer>
+    <script src="{% static 'landing_page/js/jquery-3.7.0.min.js' %}"></script>
+    <script src="{% static 'landing_page/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'landing_page/js/slick.js' %}"></script>
+    <script src="{% static 'landing_page/js/custom.js' %}"></script>
+</body>
+
+</html>

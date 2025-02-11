@@ -1,0 +1,3 @@
+Grower Name,Grower ID,Crop,Storage Name,Storage ID,Field Name,Field ID,Status,Qnt,Unit,Shp Id
+ALGRIFF,568,RICE,shop bin,48,AL 14,1468,Add,58.36,LBS,
+ALGRIFF,56,RICE,fisher bin 5,411,AL 14,1468,Remove,10,LBS,abc10

@@ -1,0 +1,44 @@
+{% load static %}
+<div class="card card-padding">
+	<div class="container-fluid">
+		<div class="row">
+		 <div class="col-md-4">
+				<h4 class="Wholepera">Questions</h4>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-12">
+	<div class="questions-list-container">
+<table class="table table-striped question-table">
+    <thead>
+        <tr>
+            <th>Order</th>
+            <th>Questions</th>
+            <th>Attachments</th>
+            <th>Farmer point</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for survey in questions  %}
+        <tr>
+        <td><div class="sr-number"> <span>{{survey.question.order}}</span> </div></td>
+        <td><div class="questions-title">{{survey.question.text}}</div></td>
+        {% if survey.doc_count != 0 %}
+            {% if survey.document.url|lower|slice:"-4:" == ".jpg" or survey.document.url|lower|slice:"-4:" == ".png" %}
+                <td><a onclick="loadPopup('{{survey.document.url}}','{{survey.document.url}}','{{survey.farm.name}}','{{survey.field.name}}','{{survey.survey_type.name}}','{{survey.year}}','{{survey.pk}}', '{% url 'load-popup' %}')" href="javascript:void({{survey.document.url}});" data-mdb-toggle="modal" data-mdb-target="#exampleModalfile" class="attachment-icons"><i class="far fa-file-alt"></i><span class="total-files">{{survey.doc_count}}</span></a></td>
+            {% else %}
+                <td><a onclick="loadPopup('{{survey.document.url}}','{% static 'img/doc_icon.png' %}','{{survey.farm.name}}','{{survey.field.name}}','{{survey.survey_type.name}}','{{survey.year}}','{{survey.pk}}','{% url 'load-popup' %}')" href="javascript:void({{survey.document.url}});" data-mdb-toggle="modal" data-mdb-target="#exampleModalfile" class="attachment-icons"><i class="far fa-file-alt"></i><span class="total-files">{{survey.doc_count}}</span></a></td>
+            {% endif %}
+        {% else %}
+        <td></td>
+        {% endif %}
+        <td><div class="score-display">{{survey.farmer_points}}</div></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+    </table>
+	            </div>
+		    </div>
+	    </div>
+    </div>
+</div> 

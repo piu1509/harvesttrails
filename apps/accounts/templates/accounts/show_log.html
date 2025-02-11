@@ -1,0 +1,751 @@
+{% extends "base.html" %} {% load static %} {% block title %} Log Details {% endblock title %} 
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+{% block content %} {% include 'navbar.html' %}
+<div class="main-content">
+    {% include 'header.html' %} {% load crispy_forms_tags %}
+<!-- <style>
+    /* For From Date */
+    #from_date {
+        position: relative;
+        min-height:51px
+    }
+    #from_date:before {
+        position: absolute;
+        top: 10px; left: 10px;
+        content: attr(data-date);
+        display: inline-block;
+        color: black;
+    }
+
+    #from_date::-webkit-datetime-edit, input::-webkit-inner-spin-button, input::-webkit-clear-button {
+        display: none;
+    }
+
+    #from_date::-webkit-calendar-picker-indicator {
+        position: absolute;
+        top: 15px;
+        right: 0;
+        color: black;
+        opacity: 1;
+    }
+
+    /* For To Date */
+    #to_date {
+        position: relative;
+         min-height:51px
+    }
+    #to_date:before {
+        position: absolute;
+        top: 10px; left: 10px;
+        content: attr(data-date);
+        display: inline-block;
+        color: black;
+    }
+    #to_date::-webkit-datetime-edit, input::-webkit-inner-spin-button, input::-webkit-clear-button {
+        display: none;
+    }
+
+    #to_date::-webkit-calendar-picker-indicator {
+        position: absolute;
+        top: 15px;
+        right: 0;
+        color: black;
+        opacity: 1;
+    }
+</style> -->
+<style>
+    
+    ul.pagination {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+    }
+
+    ul.pagination li {
+        /*        color: #55c176;*/
+        list-style: none;
+        line-height: 45px;
+        text-align: center;
+        font-size: 18px;
+        font-weight: 500;
+        cursor: pointer;
+        user-select: none;
+        transition: all 0.3s ease;
+    }
+
+    ul.pagination li {
+        list-style: none;
+        height: 45px;
+        width: 45px;
+        margin: 0 1px;
+        line-height: 45px;
+        border-radius: 6px;
+    }
+
+    ul.pagination li:first-of-type {
+        margin: 0px -5px 0 0;
+    }
+
+    ul.pagination li:first-of-type:before,
+    ul.pagination li:last-of-type:before {
+        content: "";
+        border: solid black;
+        border-width: 0 3px 3px 0;
+        display: inline-block;
+        padding: 3px;
+    }
+
+    ul.pagination li:first-of-type:before {
+        transform: rotate(135deg);
+        -webkit-transform: rotate(135deg);
+    }
+
+    ul.pagination li:last-of-type:before {
+        transform: rotate(-45deg);
+        -webkit-transform: rotate(-45deg);
+    }
+
+    ul.pagination li:last-of-type {
+        margin: 0 0 0 -5px;
+    }
+
+    ul.pagination li.dots {
+        font-size: 22px;
+        cursor: default;
+    }
+
+    ul.pagination li.btn {
+        padding: 0 20px;
+        border-radius: 6px;
+    }
+
+    ul.pagination li.active,
+    ul.pagination li.active:hover {
+        color: #fff;
+        background: #55c176;
+    }
+
+    ul.pagination li:hover,
+    ul.pagination li:first-child:hover,
+    ul.pagination li:last-child:hover {
+        background: #ddd;
+    }
+
+
+    ul.pagination li {
+        display: none;
+        position: relative;
+    }
+
+
+    ul.pagination li:first-of-type,
+    ul.pagination li:nth-of-type(2),
+    ul.pagination li:last-of-type,
+    ul.pagination li:has( + li:last-of-type),
+    ul.pagination li.active,
+    ul.pagination li.active + li,
+    ul.pagination li.active + li + li,
+    ul.pagination li:has(+ li.active),
+    ul.pagination li:has(+ li + li.active){
+        display: block;
+    }
+
+    /*ul.pagination li:has(+ li + li + li.active) {
+        font-size: 0;
+    }*/
+
+    ul.pagination li:has( + li + li.active):before,
+    ul.pagination li.active + li + li:after {
+            content: "...";
+            font-size: 16px;
+            position: absolute;
+            top: -4px;
+
+    }
+
+    ul.pagination li:has( + li + li.active):before {
+        left: -5px;
+    }
+
+    ul.pagination li.active + li + li:after {
+        right: -5px;
+    }
+
+    ul.pagination li:nth-last-child(-n+2):after,
+    ul.pagination li:nth-last-child(-n+2) ~ li:after {
+        display: none;
+    }
+
+
+    ul.pagination li:has( + li + li.active):before, ul.pagination li.active + li + li:after {
+        position: static;
+        width: 34px;
+        height: 38px;
+        display: inline-block;
+        border: 1px solid #ddd;
+    }
+
+    ul.pagination li {
+        font-size: 16px;
+        line-height: normal;
+        width: auto;
+        height: auto;
+    }
+
+    ul.pagination li:first-of-type:before,
+    ul.pagination li:last-of-type:before {
+        padding: 0;
+        transform: none;
+        display: none;
+    }
+    
+    </style>
+  <main>
+    {% include '_alerts.html' %}
+    <div class="page-title-with-or-without-btn">
+        <span class="farm headingtop">Log Details</span>
+    </div>
+    <div class="card card-padding">
+        <div class="container">
+            <form action="" method="get">
+                <div class="row d-flex">
+                    <div class="col-md-3 mb-3">
+                        <label for="">Log Type<span class="asteriskField">*</span></label>
+                        <select id="" name="log_type" class="form-control">
+                            <option value=''> Select Log Type </option>
+                            {% if get_log_type == "User" %}
+                            <option  value="User" selected>User</option>
+                            <option  value="Grower">Grower</option>
+                            <option  value="Farm">Farm</option>
+                            <option  value="Field">Field</option>
+                            <option  value="Storage">Storage</option>
+                            <option  value="FieldActivity">FieldActivity</option>
+                            <option  value="EntryFeeds">EntryFeeds</option>
+                            <option  value="GrowerPayments">GrowerPayments</option>
+                            <option  value="GrowerPayee">GrowerPayee</option>
+                            <option  value="GrowerShipment">GrowerShipment</option>
+                            <option  value="ProcessorUser">ProcessorUser</option>
+                            <option  value="ProcessorUser2">ProcessorUser2</option>
+                            <option  value="ClassingReport">ClassingReport</option>
+                            <option  value="ClassingListTier2">ClassingListTier2</option>
+                            <option  value="LinkGrowerToProcessor">LinkGrowerToProcessor</option>
+                            <option  value="ProductionManagement">ProductionManagement</option>
+                            <option  value="ShipmentManagement">ShipmentManagement</option>
+                            {% elif get_log_type == "Grower" %}
+                            <option  value="User">User</option>
+                            <option  value="Grower" selected>Grower</option>
+                            <option  value="Farm">Farm</option>
+                            <option  value="Field">Field</option>
+                            <option  value="Storage">Storage</option>
+                            <option  value="FieldActivity">FieldActivity</option>
+                            <option  value="EntryFeeds">EntryFeeds</option>
+                            <option  value="GrowerPayments">GrowerPayments</option>
+                            <option  value="GrowerPayee">GrowerPayee</option>
+                            <option  value="GrowerShipment">GrowerShipment</option>
+                            <option  value="ProcessorUser">ProcessorUser</option>
+                            <option  value="ProcessorUser2">ProcessorUser2</option>
+                            <option  value="ClassingReport">ClassingReport</option>
+                            <option  value="ClassingListTier2">ClassingListTier2</option>
+                            <option  value="LinkGrowerToProcessor">LinkGrowerToProcessor</option>
+                            <option  value="ProductionManagement">ProductionManagement</option>
+                            <option  value="ShipmentManagement">ShipmentManagement</option>
+                            {% elif get_log_type == "Farm" %}
+                            <option  value="User">User</option>
+                            <option  value="Grower">Grower</option>
+                            <option  value="Farm" selected>Farm</option>
+                            <option  value="Field">Field</option>
+                            <option  value="Storage">Storage</option>
+                            <option  value="FieldActivity">FieldActivity</option>
+                            <option  value="EntryFeeds">EntryFeeds</option>
+                            <option  value="GrowerPayments">GrowerPayments</option>
+                            <option  value="GrowerPayee">GrowerPayee</option>
+                            <option  value="GrowerShipment">GrowerShipment</option>
+                            <option  value="ProcessorUser">ProcessorUser</option>
+                            <option  value="ProcessorUser2">ProcessorUser2</option>
+                            <option  value="ClassingReport">ClassingReport</option>
+                            <option  value="ClassingListTier2">ClassingListTier2</option>
+                            <option  value="LinkGrowerToProcessor">LinkGrowerToProcessor</option>
+                            <option  value="ProductionManagement">ProductionManagement</option>
+                            <option  value="ShipmentManagement">ShipmentManagement</option>
+                            {% elif get_log_type == "Field" %}
+                            <option  value="User">User</option>
+                            <option  value="Grower">Grower</option>
+                            <option  value="Farm">Farm</option>
+                            <option  value="Field" selected>Field</option>
+                            <option  value="Storage">Storage</option>
+                            <option  value="FieldActivity">FieldActivity</option>
+                            <option  value="EntryFeeds">EntryFeeds</option>
+                            <option  value="GrowerPayments">GrowerPayments</option>
+                            <option  value="GrowerPayee">GrowerPayee</option>
+                            <option  value="GrowerShipment">GrowerShipment</option>
+                            <option  value="ProcessorUser">ProcessorUser</option>
+                            <option  value="ProcessorUser2">ProcessorUser2</option>
+                            <option  value="ClassingReport">ClassingReport</option>
+                            <option  value="ClassingListTier2">ClassingListTier2</option>
+                            <option  value="LinkGrowerToProcessor">LinkGrowerToProcessor</option>
+                            <option  value="ProductionManagement">ProductionManagement</option>
+                            <option  value="ShipmentManagement">ShipmentManagement</option>
+                            {% elif get_log_type == "Storage" %}
+                            <option  value="User">User</option>
+                            <option  value="Grower">Grower</option>
+                            <option  value="Farm">Farm</option>
+                            <option  value="Field">Field</option>
+                            <option  value="Storage" selected>Storage</option>
+                            <option  value="FieldActivity">FieldActivity</option>
+                            <option  value="EntryFeeds">EntryFeeds</option>
+                            <option  value="GrowerPayments">GrowerPayments</option>
+                            <option  value="GrowerPayee">GrowerPayee</option>
+                            <option  value="GrowerShipment">GrowerShipment</option>
+                            <option  value="ProcessorUser">ProcessorUser</option>
+                            <option  value="ProcessorUser2">ProcessorUser2</option>
+                            <option  value="ClassingReport">ClassingReport</option>
+                            <option  value="ClassingListTier2">ClassingListTier2</option>
+                            <option  value="LinkGrowerToProcessor">LinkGrowerToProcessor</option>
+                            <option  value="ProductionManagement">ProductionManagement</option>
+                            <option  value="ShipmentManagement">ShipmentManagement</option>
+                            {% elif get_log_type == "FieldActivity" %}
+                            <option  value="User">User</option>
+                            <option  value="Grower">Grower</option>
+                            <option  value="Farm">Farm</option>
+                            <option  value="Field">Field</option>
+                            <option  value="Storage">Storage</option>
+                            <option  value="FieldActivity" selected>FieldActivity</option>
+                            <option  value="EntryFeeds">EntryFeeds</option>
+                            <option  value="GrowerPayments">GrowerPayments</option>
+                            <option  value="GrowerPayee">GrowerPayee</option>
+                            <option  value="GrowerShipment">GrowerShipment</option>
+                            <option  value="ProcessorUser">ProcessorUser</option>
+                            <option  value="ProcessorUser2">ProcessorUser2</option>
+                            <option  value="ClassingReport">ClassingReport</option>
+                            <option  value="ClassingListTier2">ClassingListTier2</option>
+                            <option  value="LinkGrowerToProcessor">LinkGrowerToProcessor</option>
+                            <option  value="ProductionManagement">ProductionManagement</option>
+                            <option  value="ShipmentManagement">ShipmentManagement</option>
+                            {% elif get_log_type == "GrowerShipment" %}
+                            <option  value="User">User</option>
+                            <option  value="Grower">Grower</option>
+                            <option  value="Farm">Farm</option>
+                            <option  value="Field">Field</option>
+                            <option  value="Storage">Storage</option>
+                            <option  value="FieldActivity">FieldActivity</option>
+                            <option  value="EntryFeeds">EntryFeeds</option>
+                            <option  value="GrowerPayments">GrowerPayments</option>
+                            <option  value="GrowerPayee">GrowerPayee</option>
+                            <option  value="GrowerShipment" selected>GrowerShipment</option>
+                            <option  value="ProcessorUser">ProcessorUser</option>
+                            <option  value="ProcessorUser2">ProcessorUser2</option>
+                            <option  value="ClassingReport">ClassingReport</option>
+                            <option  value="ClassingListTier2">ClassingListTier2</option>
+                            <option  value="LinkGrowerToProcessor">LinkGrowerToProcessor</option>
+                            <option  value="ProductionManagement">ProductionManagement</option>
+                            <option  value="ShipmentManagement">ShipmentManagement</option>
+                            {% elif get_log_type == "ProcessorUser" %}
+                            <option  value="User">User</option>
+                            <option  value="Grower">Grower</option>
+                            <option  value="Farm">Farm</option>
+                            <option  value="Field">Field</option>
+                            <option  value="Storage">Storage</option>
+                            <option  value="FieldActivity">FieldActivity</option>
+                            <option  value="EntryFeeds">EntryFeeds</option>
+                            <option  value="GrowerPayments">GrowerPayments</option>
+                            <option  value="GrowerPayee">GrowerPayee</option>
+                            <option  value="GrowerShipment">GrowerShipment</option>
+                            <option  value="ProcessorUser" selected>ProcessorUser</option>
+                            <option  value="ProcessorUser2">ProcessorUser2</option>
+                            <option  value="ClassingReport">ClassingReport</option>
+                            <option  value="ClassingListTier2">ClassingListTier2</option>
+                            <option  value="LinkGrowerToProcessor">LinkGrowerToProcessor</option>
+                            <option  value="ProductionManagement">ProductionManagement</option>
+                            <option  value="ShipmentManagement">ShipmentManagement</option>
+                            {% elif get_log_type == "EntryFeeds" %}
+                            <option  value="User">User</option>
+                            <option  value="Grower">Grower</option>
+                            <option  value="Farm">Farm</option>
+                            <option  value="Field">Field</option>
+                            <option  value="Storage">Storage</option>
+                            <option  value="FieldActivity">FieldActivity</option>
+                            <option  value="EntryFeeds" selected>EntryFeeds</option>
+                            <option  value="GrowerPayments">GrowerPayments</option>
+                            <option  value="GrowerPayee">GrowerPayee</option>
+                            <option  value="GrowerShipment">GrowerShipment</option>
+                            <option  value="ProcessorUser">ProcessorUser</option>
+                            <option  value="ProcessorUser2">ProcessorUser2</option>
+                            <option  value="ClassingReport">ClassingReport</option>
+                            <option  value="ClassingListTier2">ClassingListTier2</option>
+                            <option  value="LinkGrowerToProcessor">LinkGrowerToProcessor</option>
+                            <option  value="ProductionManagement">ProductionManagement</option>
+                            <option  value="ShipmentManagement">ShipmentManagement</option>
+                            {% elif get_log_type == "GrowerPayments" %}
+                            <option  value="User">User</option>
+                            <option  value="Grower">Grower</option>
+                            <option  value="Farm">Farm</option>
+                            <option  value="Field">Field</option>
+                            <option  value="Storage">Storage</option>
+                            <option  value="FieldActivity">FieldActivity</option>
+                            <option  value="EntryFeeds">EntryFeeds</option>
+                            <option  value="GrowerPayments" selected>GrowerPayments</option>
+                            <option  value="GrowerPayee">GrowerPayee</option>
+                            <option  value="GrowerShipment">GrowerShipment</option>
+                            <option  value="ProcessorUser">ProcessorUser</option>
+                            <option  value="ProcessorUser2">ProcessorUser2</option>
+                            <option  value="ClassingReport">ClassingReport</option>
+                            <option  value="ClassingListTier2">ClassingListTier2</option>
+                            <option  value="LinkGrowerToProcessor">LinkGrowerToProcessor</option>
+                            <option  value="ProductionManagement">ProductionManagement</option>
+                            <option  value="ShipmentManagement">ShipmentManagement</option>
+                            {% elif get_log_type == "GrowerPayee" %}
+                            <option  value="User">User</option>
+                            <option  value="Grower">Grower</option>
+                            <option  value="Farm">Farm</option>
+                            <option  value="Field">Field</option>
+                            <option  value="Storage">Storage</option>
+                            <option  value="FieldActivity">FieldActivity</option>
+                            <option  value="EntryFeeds">EntryFeeds</option>
+                            <option  value="GrowerPayments">GrowerPayments</option>
+                            <option  value="GrowerPayee" selected>GrowerPayee</option>
+                            <option  value="GrowerShipment">GrowerShipment</option>
+                            <option  value="ProcessorUser">ProcessorUser</option>
+                            <option  value="ProcessorUser2">ProcessorUser2</option>
+                            <option  value="ClassingReport">ClassingReport</option>
+                            <option  value="ClassingListTier2">ClassingListTier2</option>
+                            <option  value="LinkGrowerToProcessor">LinkGrowerToProcessor</option>
+                            <option  value="ProductionManagement">ProductionManagement</option>
+                            <option  value="ShipmentManagement">ShipmentManagement</option>
+                            {% elif get_log_type == "ClassingReport" %}
+                            <option  value="User">User</option>
+                            <option  value="Grower">Grower</option>
+                            <option  value="Farm">Farm</option>
+                            <option  value="Field">Field</option>
+                            <option  value="Storage">Storage</option>
+                            <option  value="FieldActivity">FieldActivity</option>
+                            <option  value="EntryFeeds">EntryFeeds</option>
+                            <option  value="GrowerPayments">GrowerPayments</option>
+                            <option  value="GrowerPayee">GrowerPayee</option>
+                            <option  value="GrowerShipment">GrowerShipment</option>
+                            <option  value="ProcessorUser">ProcessorUser</option>
+                            <option  value="ProcessorUser2">ProcessorUser2</option>
+                            <option  value="ClassingReport" selected>ClassingReport</option>
+                            <option  value="ClassingListTier2">ClassingListTier2</option>
+                            <option  value="LinkGrowerToProcessor">LinkGrowerToProcessor</option>
+                            <option  value="ProductionManagement">ProductionManagement</option>
+                            <option  value="ShipmentManagement">ShipmentManagement</option>
+                            {% elif get_log_type == "ClassingListTier2" %}
+                            <option  value="User">User</option>
+                            <option  value="Grower">Grower</option>
+                            <option  value="Farm">Farm</option>
+                            <option  value="Field">Field</option>
+                            <option  value="Storage">Storage</option>
+                            <option  value="FieldActivity">FieldActivity</option>
+                            <option  value="EntryFeeds">EntryFeeds</option>
+                            <option  value="GrowerPayments">GrowerPayments</option>
+                            <option  value="GrowerPayee">GrowerPayee</option>
+                            <option  value="GrowerShipment">GrowerShipment</option>
+                            <option  value="ProcessorUser">ProcessorUser</option>
+                            <option  value="ProcessorUser2">ProcessorUser2</option>
+                            <option  value="ClassingReport">ClassingReport</option>
+                            <option  value="ClassingListTier2" selected>ClassingListTier2</option>
+                            <option  value="LinkGrowerToProcessor">LinkGrowerToProcessor</option>
+                            <option  value="ProductionManagement">ProductionManagement</option>
+                            <option  value="ShipmentManagement">ShipmentManagement</option>
+                            {% elif get_log_type == "ProcessorUser2" %}
+                            <option  value="User">User</option>
+                            <option  value="Grower">Grower</option>
+                            <option  value="Farm">Farm</option>
+                            <option  value="Field">Field</option>
+                            <option  value="Storage">Storage</option>
+                            <option  value="FieldActivity">FieldActivity</option>
+                            <option  value="EntryFeeds">EntryFeeds</option>
+                            <option  value="GrowerPayments">GrowerPayments</option>
+                            <option  value="GrowerPayee">GrowerPayee</option>
+                            <option  value="GrowerShipment">GrowerShipment</option>
+                            <option  value="ProcessorUser">ProcessorUser</option>
+                            <option  value="ProcessorUser2" selected>ProcessorUser2</option>
+                            <option  value="ClassingReport">ClassingReport</option>
+                            <option  value="ClassingListTier2">ClassingListTier2</option>
+                            <option  value="LinkGrowerToProcessor">LinkGrowerToProcessor</option>
+                            <option  value="ProductionManagement">ProductionManagement</option>
+                            <option  value="ShipmentManagement">ShipmentManagement</option>
+                            {% elif get_log_type == "LinkGrowerToProcessor" %}
+                            <option  value="User">User</option>
+                            <option  value="Grower">Grower</option>
+                            <option  value="Farm">Farm</option>
+                            <option  value="Field">Field</option>
+                            <option  value="Storage">Storage</option>
+                            <option  value="FieldActivity">FieldActivity</option>
+                            <option  value="EntryFeeds">EntryFeeds</option>
+                            <option  value="GrowerPayments">GrowerPayments</option>
+                            <option  value="GrowerPayee">GrowerPayee</option>
+                            <option  value="GrowerShipment">GrowerShipment</option>
+                            <option  value="ProcessorUser">ProcessorUser</option>
+                            <option  value="ProcessorUser2">ProcessorUser2</option>
+                            <option  value="ClassingReport">ClassingReport</option>
+                            <option  value="ClassingListTier2">ClassingListTier2</option>
+                            <option  value="LinkGrowerToProcessor" selected>LinkGrowerToProcessor</option>
+                            <option  value="ProductionManagement">ProductionManagement</option>
+                            <option  value="ShipmentManagement">ShipmentManagement</option>
+                            {% elif get_log_type == "ProductionManagement" %}
+                            <option  value="User">User</option>
+                            <option  value="Grower">Grower</option>
+                            <option  value="Farm">Farm</option>
+                            <option  value="Field">Field</option>
+                            <option  value="Storage">Storage</option>
+                            <option  value="FieldActivity">FieldActivity</option>
+                            <option  value="EntryFeeds">EntryFeeds</option>
+                            <option  value="GrowerPayments">GrowerPayments</option>
+                            <option  value="GrowerPayee">GrowerPayee</option>
+                            <option  value="GrowerShipment">GrowerShipment</option>
+                            <option  value="ProcessorUser">ProcessorUser</option>
+                            <option  value="ProcessorUser2">ProcessorUser2</option>
+                            <option  value="ClassingReport">ClassingReport</option>
+                            <option  value="ClassingListTier2">ClassingListTier2</option>
+                            <option  value="LinkGrowerToProcessor">LinkGrowerToProcessor</option>
+                            <option  value="ProductionManagement" selected>ProductionManagement</option>
+                            <option  value="ShipmentManagement">ShipmentManagement</option>
+                            {% elif get_log_type == "ShipmentManagement" %}
+                            <option  value="User">User</option>
+                            <option  value="Grower">Grower</option>
+                            <option  value="Farm">Farm</option>
+                            <option  value="Field">Field</option>
+                            <option  value="Storage">Storage</option>
+                            <option  value="FieldActivity">FieldActivity</option>
+                            <option  value="EntryFeeds">EntryFeeds</option>
+                            <option  value="GrowerPayments">GrowerPayments</option>
+                            <option  value="GrowerPayee">GrowerPayee</option>
+                            <option  value="GrowerShipment">GrowerShipment</option>
+                            <option  value="ProcessorUser">ProcessorUser</option>
+                            <option  value="ProcessorUser2">ProcessorUser2</option>
+                            <option  value="ClassingReport">ClassingReport</option>
+                            <option  value="ClassingListTier2">ClassingListTier2</option>
+                            <option  value="LinkGrowerToProcessor">LinkGrowerToProcessor</option>
+                            <option  value="ProductionManagement">ProductionManagement</option>
+                            <option  value="ShipmentManagement" selected>ShipmentManagement</option>
+                            
+                            
+                            {% else %}
+                            <option  value="User">User</option>
+                            <option  value="Grower">Grower</option>
+                            <option  value="Farm">Farm</option>
+                            <option  value="Field">Field</option>
+                            <option  value="Storage">Storage</option>
+                            <option  value="FieldActivity">FieldActivity</option>
+                            <option  value="EntryFeeds">EntryFeeds</option>
+                            <option  value="GrowerPayments">GrowerPayments</option>
+                            <option  value="GrowerPayee">GrowerPayee</option>
+                            <option  value="GrowerShipment">GrowerShipment</option>
+                            <option  value="ProcessorUser">ProcessorUser</option>
+                            <option  value="ProcessorUser2">ProcessorUser2</option>
+                            <option  value="ClassingReport">ClassingReport</option>
+                            <option  value="ClassingListTier2">ClassingListTier2</option>
+                            <option  value="LinkGrowerToProcessor">LinkGrowerToProcessor</option>
+                            <option  value="ProductionManagement">ProductionManagement</option>
+                            <option  value="ShipmentManagement">ShipmentManagement</option>
+                            {% endif %}
+                        </select>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="">Log Status<span class="asteriskField">*</span></label>
+                        <select id="" name="log_status" class="form-control">
+                            <option value=''> Select Log Status </option>
+                            {% if get_log_status == "Added" %}
+                            <option  value="Added" selected>Added</option>
+                            <option  value="Edited">Edited</option>
+                            <option  value="Deleted">Deleted</option>
+                            <option  value="Password changed">Password changed</option>
+                            {% elif get_log_status == "Edited" %}
+                            <option  value="Added">Added</option>
+                            <option  value="Edited" selected>Edited</option>
+                            <option  value="Deleted">Deleted</option>
+                            <option  value="Password changed">Password changed</option>
+                            {% elif get_log_status == "Deleted" %}
+                            <option  value="Added">Added</option>
+                            <option  value="Edited">Edited</option>
+                            <option  value="Deleted" selected>Deleted</option>
+                            <option  value="Password changed">Password changed</option>
+                            {% elif get_log_status == "Password changed" %}
+                            <option  value="Added">Added</option>
+                            <option  value="Edited">Edited</option>
+                            <option  value="Deleted">Deleted</option>
+                            <option  value="Password changed" selected>Password changed</option>
+                            {% else %}
+                            <option  value="Added">Added</option>
+                            <option  value="Edited">Edited</option>
+                            <option  value="Deleted">Deleted</option>
+                            <option  value="Password changed">Password changed</option>
+                            {% endif %}
+                        </select>
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <label for="">From Date<span class="asteriskField">*</span></label>
+                        <input type="date" name="from_date" data-date="" id="from_date" data-date-format="MM-DD-YYYY" class="form-control" value="{{get_from_date}}">
+                        <!-- <input type="date" data-date="" data-date-format="MM DD YYYY" value="2015-08-09"> -->
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <label for="">To Date<span class="asteriskField">*</span></label>
+                        <!-- <input type="date" name="to_date" id="to_date" class="form-control" value="{{get_to_date}}"> -->
+                        <input type="date" name="to_date" data-date="" id="to_date" data-date-format="MM-DD-YYYY" class="form-control" value="{{get_to_date}}">
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <input type="submit" name="" id="submitBtn" class="btn-save-submit" value="search" style="margin-top: 35px;">
+                    </div>
+                </div>
+
+                <div class="row">
+                    <label>Show <select id="example_length" name="example_length" aria-controls="example" class="">
+                        {% if get_example_length == 100 %}
+                        <option value="100" selected>100</option>
+                        <option value="250">250</option>
+                        <option value="500">500</option>
+                        {% elif get_example_length == 250 %}
+                        <option value="100">100</option>
+                        <option value="250" selected>250</option>
+                        <option value="500">500</option>
+                        {% elif get_example_length == 500 %}
+                        <option value="100">100</option>
+                        <option value="250">250</option>
+                        <option value="500" selected>500</option>
+                        {% else %}
+                        <option value="100">100</option>
+                        <option value="250">250</option>
+                        <option value="500">500</option>
+                        {% endif %}
+                    </select> entries</label>
+                </div>
+            </form>
+        </div>
+        
+        <div class="container">
+            <div class="simple-responsive-table">
+                <table id="" class="table table-striped dt-responsive nowrap">
+                    <thead>
+                        <tr style="border-bottom: 2px solid #e0e0e0">
+                        <th>Log Type</th>
+                        <th>Log Status</th>
+                        <th>Name</th>
+                        <th>Action By</th>
+                        <th>Action By Role</th>
+                        <th>Action Date Time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for object in all_log %}
+                        <tr>
+                        <td>{{object.log_type}}</td>
+                        <td>{{object.log_status}}</td>
+                        <td>{{object.log_name}}</td>
+                        <td>{{object.action_by_username}}</td>
+                        <td>{{object.action_by_role}}</td>
+                        <td>{{object.action_datetime}}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table> 
+            </div>
+
+            <div class="row align-items-center">
+                <div class="col-md-12 col-sm-12 col-12 text-center">
+                    {% if all_log.has_other_pages %}
+                    <ul class="pagination" id="nav_1">
+                    {% if all_log.has_previous %}
+                        <li><a href="?log_type={{get_log_type}}&log_status={{get_log_status}}&from_date={{get_from_date}}&to_date={{get_to_date}}&example_length={{get_example_length}}&page={{ all_log.previous_page_number }}">&laquo;</a></li>
+                        {% else %}
+                        <li class="disabled"><span>&laquo;</span></li>
+                        {% endif %}
+                        {% for i in all_log.paginator.page_range %}
+                        {% if all_log.number == i %}
+                        <li class="active pagi" id="getactive"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+                        {% else %}
+                        <li><a href="?log_type={{get_log_type}}&log_status={{get_log_status}}&from_date={{get_from_date}}&to_date={{get_to_date}}&example_length={{get_example_length}}&page={{i}}">{{ i }}</a></li>
+                        {% endif %}
+                        {% endfor %}
+                        {% if all_log.has_next %}
+                        <li><a href="?log_type={{get_log_type}}&log_status={{get_log_status}}&from_date={{get_from_date}}&to_date={{get_to_date}}&example_length={{get_example_length}}&page={{ all_log.next_page_number }}">&raquo;</a></li>
+                        {% else %}
+                        <li class="disabled"><span>&raquo;</span></li>
+                    {% endif %}
+                    </ul>
+                    {% endif %}
+                </div>
+                <div class="col-md-12 col-sm-12 col-12 text-center mt-2" style="text-align:right">
+                    <span>Showing  {{ all_log.start_index }} - {{ all_log.end_index }} of {{ all_log.paginator.count }} entries</span>
+                </div>
+            </div>
+        </div>
+      </div>
+
+  </main>
+  {% include 'footer.html' %}
+</div>
+{% endblock %}
+
+{% block jquery %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.3/moment.min.js"></script>
+
+<script>
+    
+    $("#from_date").on("change", function() {
+    this.setAttribute(
+        "data-date",
+        moment(this.value, "YYYY-MM-DD")
+
+        .format( this.getAttribute("data-date-format") )
+    )
+    if ($('#from_date').val() == ""){
+        this.setAttribute(
+        "data-date",
+        moment('{{get_from_date}}', "YYYY-MM-DD")
+
+        .format( this.getAttribute("data-date-format") )
+        )
+        
+        }
+    
+    
+    }).trigger("change")
+
+
+    $("#to_date").on("change", function() {
+    this.setAttribute(
+        "data-date",
+        moment(this.value, "YYYY-MM-DD")
+        .format( this.getAttribute("data-date-format") )
+    )
+    if ($('#to_date').val() == ""){
+        this.setAttribute(
+        "data-date",
+        moment('{{get_to_date}}', "YYYY-MM-DD")
+
+        .format( this.getAttribute("data-date-format") )
+        )
+        
+        }
+    }).trigger("change")
+
+    $(document).ready(function() {
+        $('#example_length').change( function () {
+        $('#submitBtn').click();
+        });
+        });
+</script>
+<script>
+    $('#Setting-Configuration-active').addClass('activeLink');
+  
+    $('#Setting-Configuration-down').addClass('down');
+    $('#Setting-Configuration-sub').show();
+  
+    $('#Activity-Log').addClass('activeLink active-nav');
+  
+  </script>
+{% endblock jquery %}

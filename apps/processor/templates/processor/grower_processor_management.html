@@ -1,0 +1,250 @@
+{% extends "base.html" %} {% load static %}
+{% block title %} Processor Grower Management {% endblock title %}
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+{% load crispy_forms_tags %}
+{% block content %}
+{% include 'navbar.html' %}
+<style>
+    .bootstrap-select .dropdown-menu li.disabled.selected{display: none;}
+    .dropdown.bootstrap-select.form-control .btn{border: 1px solid #B2BEB5; padding: 12px 8px;}
+    .bootstrap-select .dropdown-menu{max-width: 280px;}
+    .bootstrap-select .dropdown-menu li.selected.active .dropdown-item.active.selected{margin-left: 0;padding: 0;}
+</style>
+<div class="main-content">
+    {% include 'header.html' %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.0/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.bootstrap4.min.css">
+
+    <main>
+        {% include '_alerts.html' %}
+        <div class="page-title-with-or-without-btn">
+            <span class="farm headingtop">Processor Grower Management</span>
+            <!-- Create button for Account-->
+            {% if 'Processor Management' in request.user.get_role_perm or request.user.is_superuser or 'SubAdmin' in request.user.get_role or 'SuperUser' in request.user.get_role  %}
+            {% if not request.user.is_processor %}
+            <div class="flex-header-btn">
+                <a href="{% url 'link_grower_processor' %}" class="btn-close-cancel">Link Grower To Processor</a>
+            </div>
+            {% endif %}
+            {% endif %}
+        </div>      
+               
+        <div class="card card-padding">
+            <div class="main-simple-table-with-search">
+                <div class="row">
+                    <div class="col-6">
+                        <form action="" method="get" class="">
+                            <div class="inline-apply-filter">
+                                <div class="three-fields-with-label">
+                                    <select id="growerSelction" class="form-control selectpicker" name="grower_id" data-live-search="true">
+                                        <option value='all' selected> Select All Growers</option>
+                                        {% for i in grower %}
+                                        {% if i == selectedGrower %}
+                                        <option value="{{ i.pk }}" selected>{{i.name}} - {{ i.pk }}
+                                        </option>
+                                        {% else %}
+                                        <option value="{{ i.pk }}" >{{i.name}} - {{ i.pk }}</option>
+                                        {% endif %}
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <input style="display : none;" id="submitBtn" type="submit"
+                                    class="apply-filter-btn primary-btn" value="Apply Filter" />
+                            </div>
+                        </form>
+                    </div>
+                    <div class="col-6">
+                        <div class="form-inline justify-content-end">
+                            <div class="table-filter-col ml-auto">
+                                <ul class="nav nav-tabs">
+                                    <li class="nav-item">
+                                        <a class="nav-link active" href="">
+                                            <img src="/static/img/tbIcon-b-1.svg" class="tbIcon tbIcon-b">
+                                            <img src="/static/img/tbIcon-w-1.svg" class="tbIcon tbIcon-w">
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link"
+                                            href="{% url 'all_grower_map_to_processor' %}">
+                                            <img src="/static/img/tbIcon-b-2.svg" class="tbIcon tbIcon-b">
+                                            <img src="/static/img/tbIcon-w-2.svg" class="tbIcon tbIcon-w">
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+                <div class="both-data-in" style="display: inherit;">
+                    <div class="simple-responsive-table">
+                        <table id="processorList_tbl" class="table table-striped dt-responsive nowrap" style="width:100%">
+                            <thead>
+                                <tr style="border-bottom: 2px solid #e0e0e0;">
+                                    <th width="60%">Grower</th>
+                                    {% if 'Processor' in request.user.get_role and request.user.is_processor %}
+                                    {% else %}
+                                    <th width="30%">processor</th>
+                                    {% endif %}
+                                    <th width="10%" >Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for grower_processor in grower_processor %}
+                                <tr>
+                                    <td>{{grower_processor.grower.name}}</td>   
+                                    {% if 'Processor' in request.user.get_role and request.user.is_processor %}
+                                    {% else %}                              
+                                    <td>{{grower_processor.processor.entity_name}}</td>  
+                                    {% endif %}                               
+                                    <td class="backk action-td" >
+                                        <li>
+                                        <a href="{% url 'grower_map_to_processor' grower_processor.grower.pk %}" class="map-icon-link" alt="view linked grower field and storage map" title="view linked grower field and storage map"><span class="fas fa-map-marked-alt map-Icon"></span></a>
+                                        </li>
+                                        <!-- <li>
+                                        <a href="" class="update-btn-link" alt="edit linked grower to processor" title="edit linked grower to processor"> <span class="fas fa-at"></span> </a>
+                                        </li> -->
+                                        {% if 'Processor' in request.user.get_role and request.user.is_processor %}
+                                        {% else %}
+                                        <li>
+                                            <a type="button"
+                                        data-mdb-toggle="modal" data-mdb-target="#deleteModal{{grower_processor.id}}" alt="delete linked grower to processor" title="delete linked processor to processor">
+                                        <span class="fas fa-trash"></span></a>
+                                        </li>
+
+                                        <div class="modal fade" id="deleteModal{{grower_processor.id}}" aria-hidden="true" aria-labelledby="exampleModalToggleLabel22" tabindex="-1">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                          
+                                                    <div class="modal-body">
+                                                    <button type="button" class="btn-close cust-close-ds-btn" data-mdb-dismiss="modal" aria-label="Close"></button>
+                                                    <div class="center-content-status">
+                                                        <img src="{% static 'img/trash.png' %}" alt="right" id="rightImg" class="warning-icon">
+                                                        <p id="message" class="modal-title titlepad">Are you sure you want to delete?</p>
+                                                    </div>
+                                                    <div class="modal-center-btn-footer">
+                                                        <button onclick="reloadwindow()" id="closeBtnpopup" type="button" class="btn-close-cancel btn-space"
+                                                        data-mdb-dismiss="modal">
+                                                        Close
+                                                        </button>
+                                                        <!-- <button type="submit" class="btn-save-submit">Delete</button> -->
+                                                        
+                                                        <a href="{% url 'delete-grower-processor' grower_processor.id %}" id="storageDelete" ><button type=""
+                                                            class="btn-save-submit">Delete</button></a>
+                                                    
+                                                    </div>
+                                                    </div>
+                                          
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% endif %}  
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        <div class="col-md-12 col-sm-12 col-12 text-center mt-2" style="text-align:right">
+                            <span>Showing {{ grower_processor.start_index }} - {{ grower_processor.end_index }} of {{ grower_processor.paginator.count }} entries</span>
+                          </div>
+                          <!-- Pagination controls -->
+                          <div class="row d-flex justify-content-center align-items-center">
+                              <div class="col-sm-4"></div>
+                              <div class="col-sm-4">
+                                  {% if grower_processor.has_other_pages %}
+                                  <ul class="pagination" id="nav_1">
+                                      {% if grower_processor.has_previous %}
+                                      <li><a href="?grower_id={{ selectedGrower }}&page={{ grower_processor.previous_page_number }}">&laquo;</a></li>
+                                      {% else %}
+                                      <li class="disabled"><span>&laquo;</span></li>
+                                      {% endif %}
+                                      {% for i in grower_processor.paginator.page_range %}
+                                      {% if grower_processor.number == i %}
+                                      <li class="active pagi" id="getactive"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+                                      {% else %}
+                                      <li><a href="?grower_id={{ selectedGrower }}&page={{ i }}">{{ i }}</a></li>
+                                      {% endif %}
+                                      {% endfor %}
+                                      {% if grower_processor.has_next %}
+                                      <li><a href="?grower_id={{ selectedGrower }}&page={{ grower_processor.next_page_number }}">&raquo;</a></li>
+                                      {% else %}
+                                      <li class="disabled"><span>&raquo;</span></li>
+                                      {% endif %}
+                                  </ul>
+                                  {% endif %}
+                              </div>
+                              <div class="col-sm-4"></div>
+                          </div>
+                    </div>
+                </div>
+            
+            </div>
+            </div>
+        </div>
+    </main>
+    {% include 'footer.html' %}
+</div>
+
+{% endblock content %}
+
+{% block scripts %}
+<script src="https://cdn.datatables.net/1.11.0/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.0/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/responsive.bootstrap4.min.js"></script>
+
+<script src="{% static 'js/farm/farm_list.js' %}"></script>
+
+<script>
+    $(document).ready(function () {
+        $('#processorList_tbl').DataTable();
+    });
+    
+    $(document).ready(function () {
+        $('#growerSelction').change(function () {
+            $('#submitBtn').click();
+        });
+    });
+// delete storage
+function delStorage(url){
+    $('#storageDelete').show();
+    $('#storageDelete').attr('url',url);
+}
+
+function storagedeleteNow(){
+  url = $('#storageDelete').attr('url');
+  console.log(url)
+  $.ajax({
+  url: url,
+  data: { },
+  success: function (data) {
+    if (data==1){
+      location.reload();
+    }
+  }
+});
+}
+</script>
+<script>
+    $('#Processor-active').addClass('activeLink');
+  
+    $('#Processor-down').addClass('down');
+    $('#Processor-sub').show();
+  
+    $('#Grower-to-Processor').addClass('activeLink active-nav');
+  
+  </script>
+{% endblock scripts %}

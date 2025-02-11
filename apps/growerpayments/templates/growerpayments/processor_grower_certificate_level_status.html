@@ -1,0 +1,416 @@
+{% extends "base.html" %} {% load static %}
+{% block title %} Bale Info For Gin {% endblock title %}
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+
+{% load crispy_forms_tags %}
+{% block content %}
+{% include 'navbar.html' %}
+
+<div class="main-content">
+    {% include 'header.html' %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.0/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.bootstrap4.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/fixedcolumns/4.2.1/css/fixedColumns.dataTables.min.css">
+
+    <style>
+        table.classing tbody tr td {
+            vertical-align: top;
+        }
+    
+        ul.pagination {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+        }
+    
+        ul.pagination li {
+            list-style: none;
+            line-height: 45px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 500;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.3s ease;
+        }
+    
+        ul.pagination li {
+            display: none;
+            position: relative;
+        }
+    
+    
+        ul.pagination li:first-of-type,
+        ul.pagination li:nth-of-type(2),
+        ul.pagination li:last-of-type,
+        ul.pagination li:has( + li:last-of-type),
+        ul.pagination li.active,
+        ul.pagination li.active + li,
+        ul.pagination li.active + li + li,
+        ul.pagination li:has(+ li.active),
+        ul.pagination li:has(+ li + li.active){
+            display: block;
+        }
+    
+        ul.pagination li:has(+ li + li.active){
+            padding-left: 35px;
+        }
+    
+        ul.pagination li.active + li + li {
+            padding-right: 35px;
+        }
+    
+        ul.pagination li:has( + li + li.active) a:before,
+        ul.pagination li.active + li + li a:after {
+            content: "...";
+            font-size: 16px;
+            display: inline-block;
+            width: 35px;
+            height: 40px;
+            position: absolute;
+            top: -1px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+        }
+    
+        ul.pagination li:has( + li + li.active) a:before {
+            left: -35px;
+        }
+    
+        ul.pagination li.active + li + li a:after {
+            right: -35px;
+        }
+    
+        ul.pagination li:nth-of-type(1) a:before,
+        ul.pagination li:nth-of-type(2) a:before,
+        ul.pagination li:nth-of-type(3) a:before {
+            display: none !important;
+        }
+    
+        ul.pagination li:nth-of-type(1),
+        ul.pagination li:nth-of-type(2),
+        ul.pagination li:nth-of-type(3) {
+            padding-left: 0 !important;
+        }
+    
+        ul.pagination li:nth-of-type(1) a:after,
+        ul.pagination li:nth-of-type(2) a:after,
+        ul.pagination li:nth-of-type(3) a:after {
+            display: none !important;
+        }
+    
+        ul.pagination li:nth-of-type(1),
+        ul.pagination li:nth-of-type(2),
+        ul.pagination li:nth-of-type(3) {
+            padding-left: 0 !important;
+        }
+        .bootstrap-select .dropdown-menu li.disabled.selected{display: none;}
+        .dropdown.bootstrap-select.form-control .btn{border: 1px solid #ddd; padding: 6px 8px; border-radius: 0;}
+        .bootstrap-select .dropdown-menu{max-width: 280px;}
+        .bootstrap-select .dropdown-menu li.selected.active .dropdown-item.active.selected{margin-left: 0;padding: 0;}  
+    
+    
+    </style>
+    <main>
+        {% include '_alerts.html' %}
+        <div class="page-title-with-or-without-btn">
+            <span class="farm headingtop">Bale info for Gin</span>
+            <!-- Create button for Add-->
+            <div class="flex-header-btn">
+                <div id="Export_CSV" style="margin-right: 10px;"></div>
+            </div>
+        </div>
+        
+        <div class="card card-padding">
+            <div class="main-simple-table-with-search col-12">
+                <form method="get">
+                <div class="row">
+                        <!-- Processor -->
+                        <div class="col-md-2 mb-3">
+                            
+                                <div>
+                                    <label for="">Processor<span class="asteriskField">*</span></label>
+                                    <select id="proSelction" name="proSelction" class="textinput textInput form-control selectpicker" data-live-search="true">
+                                        <option value='All'>All</option>
+                                        {% for processor in processors %}
+                                        {% if processor == selectedprocessor  %}
+                                        <option  value="{{ processor.id }}" selected>{{processor.entity_name}} - {{processor.id}}</option>
+                                        {% else %}
+                                        <option  value="{{ processor.id }}">{{processor.entity_name}} - {{processor.id}}</option>
+                                        {% endif %}
+                                        {% endfor %}
+                                    </select>
+                                    <!-- <input type="text" style="display: none;" value="{{selectedGrower}}" id="getselectedGrower">                             -->
+                                </div>
+                                
+                        </div>
+                        <!-- Grower -->
+                        <div class="col-md-2 mb-3">
+                            <div>
+                                <label for="">Grower<span class="asteriskField">*</span></label>
+                                <select id="groSelction" name="groSelction" class="textinput textInput form-control selectpicker" data-live-search="true">
+                                    <option value='All'>All</option>
+                                    {% for grower in growers %}
+                                    {% if grower == selectedgrower  %}
+                                    <option  value="{{ grower.id }}" selected>{{grower.name}} - {{grower.id}}</option>
+                                    {% else %}
+                                    <option  value="{{ grower.id }}">{{grower.name}} - {{grower.id}}</option>
+                                    {% endif %}
+                                    {% endfor %}
+                                </select>
+                                <!-- <input type="text" style="display: none;" value="{{selectedGrower}}" id="getselectedGrower">                             -->
+                            </div>
+                            
+                    </div>
+                        <!-- Level -->
+                        <div class="col-md-2 mb-3">
+                                <div>
+                                    <label for="">Level<span class="asteriskField">*</span></label>
+                                    <select id="lelSelction" name="lelSelction" class="textinput textInput form-control">
+                                        <option value='All' >All</option>
+                                                {% if selectedLel == 'Llano Super' %}
+                                                <option value="Llano Super" selected>Llano Super</option>
+                                                <option value="Gold">Gold</option>
+                                                <option value="Silver">Silver</option>
+                                                <option value="Bronze">Bronze</option>
+                                                <option value="None">None</option>
+                                                {% elif selectedLel == 'Gold' %}
+                                                <option value="Llano Super">Llano Super</option>
+                                                <option value="Gold" selected>Gold</option>
+                                                <option value="Silver">Silver</option>
+                                                <option value="Bronze">Bronze</option>
+                                                <option value="None">None</option>
+                                                {% elif selectedLel == 'Silver' %}
+                                                <option value="Llano Super">Llano Super</option>
+                                                <option value="Gold">Gold</option>
+                                                <option value="Silver" selected>Silver</option>
+                                                <option value="Bronze">Bronze</option>
+                                                <option value="None">None</option>
+                                                {% elif selectedLel == 'Bronze' %}
+                                                <option value="Llano Super">Llano Super</option>
+                                                <option value="Gold">Gold</option>
+                                                <option value="Silver">Silver</option>
+                                                <option value="Bronze" selected>Bronze</option>
+                                                <option value="None">None</option>
+                                                {% elif selectedLel == 'None' %}
+                                                <option value="Llano Super">Llano Super</option>
+                                                <option value="Gold">Gold</option>
+                                                <option value="Silver">Silver</option>
+                                                <option value="Bronze">Bronze</option>
+                                                <option value="None" selected>None</option>
+                                                {% else %}
+                                                <option value="Llano Super">Llano Super</option>
+                                                <option value="Gold">Gold</option>
+                                                <option value="Silver">Silver</option>
+                                                <option value="Bronze">Bronze</option>
+                                                <option value="None">None</option>
+                                                {% endif %}
+                                    </select>
+                                </div>
+                        </div>
+                        <!-- Certificate -->
+                        <div class="col-md-2 mb-3">         
+                            <div>
+                                <label for="">Certificate<span class="asteriskField">*</span></label>
+                                <select id="cerSelction" name="cerSelction" class="textinput textInput form-control">
+                                    <option value='All' >All</option>
+                                    {% if selectedCre == 'Pass' %}
+                                    <option value="Pass" selected>Pass</option>
+                                    <option value="Fail">Fail</option>
+                                    <option value="None">None</option>
+                                    {% elif selectedCre == 'Fail' %}
+                                    <option value="Pass">Pass</option>
+                                    <option value="Fail" selected>Fail</option>
+                                    <option value="None">None</option>
+                                    {% elif selectedCre == 'None' %}
+                                    <option value="Pass">Pass</option>
+                                    <option value="Fail">Fail</option>
+                                    <option value="None" selected>None</option>
+                                    {% else %}
+                                    <option value="Pass">Pass</option>
+                                    <option value="Fail">Fail</option>
+                                    <option value="None">None</option>
+                                    {% endif %}
+                                </select>
+                            </div>
+                    </div>
+                        <!-- Payment status -->
+                        <div class="col-md-2 mb-3">
+                                <div>
+                                    <label for="">Payment status<span class="asteriskField">*</span></label>
+                                    <select id="paymentSelction" name="paymentSelction" class="textinput textInput form-control">
+                                        <option value='All' > All </option>
+                                        {% if selectedpayment == 'Paid' %}
+                                        <option value='Paid' selected> Paid </option>
+                                        <option value='Unpaid'> Unpaid </option>
+                                        {% elif selectedpayment == 'Unpaid' %}
+                                        <option value='Paid' > Paid </option>
+                                        <option value='Unpaid' selected> Unpaid </option>
+                                        {% else %}
+                                        <option value='Paid'> Paid </option>
+                                        <option value='Unpaid'> Unpaid </option>
+                                        {% endif %}
+                                    </select>
+                                </div>
+                                 
+                        </div>
+                        <div class="col-md-2 mb-3" style="margin-top: 30px;">
+                            <a href="{% url 'processor_grower_certificate_level_status_csv_download' selectedprocessor selectedgrower selectedLel selectedCre selectedpayment %}" class="btn-close-cancel" target="_blank" style=" white-space: nowrap;padding: 8px 10px;">Download CSV</a>
+                            {% comment %} <a href="{% url 'processor_grower_certificate_level_status_csv_download' selectedprocessor selectedgrower selectedLel selectedCre selectedpayment %}" class="btn-close-cancel" target="_blank">Download CSV</a> {% endcomment %}
+                        </div>
+                </div>
+                <input style="display: none;" id="submitBtn" type="submit" class="btn-save-submit" value="Save">  
+                </form>    
+                </div>
+                
+                <div class="">
+                    <div class="simple-responsive-table">
+                        <table id="" class="table table-striped dt-responsive nowrap"
+                            style="width:100%">
+                            <thead>
+                                <tr style="border-bottom: 2px solid #e0e0e0;">
+                                    <th width="10%">Bale ID</th>
+                                    <!-- <th width="20%">Processor</th> -->
+                                    <th width="10%">Grower</th>
+                                    <th width="10%">Level</th>
+                                    <th width="10%">Certificate</th>
+                                    <th width="10%">Net Weight</th>
+                                    <th width="10%">Farm</th>
+                                    <th width="10%">Field</th>
+                                    <!-- <th width="10%">Paid status</th> -->
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for grower_payment in grower_payment %}
+                                <tr>
+                                    <td>{{grower_payment.bale_id}}</td>
+                                    <!-- <td>{{grower_payment.processor}}</td> -->
+                                    <td>{{grower_payment.ob3}}</td>
+                                    <td style="background: {%if grower_payment.level  == 'Llano Super' %}#03f4fc {%elif grower_payment.level == 'Gold' %}#FFD700 {% elif grower_payment.level == 'Silver' %} #C0C0C0 {% elif grower_payment.level == 'Bronze' %} #CD7F32 {% else %} #ffffff {% endif %}">{{grower_payment.level}}</td>
+                                    <td style="background-color: {% if grower_payment.ob5 == 'Fail' %} #991f14 {% elif grower_payment.ob5 == 'Pass' %} #257a3c {% else %} #000 {% endif %}; color:#fff">{{grower_payment.ob5}}</td>
+                                    <td>{{grower_payment.net_wt}}</td>
+                                    <td>{{grower_payment.farm_name}}</td>
+                                    <td>{{grower_payment.field_name}}</td>
+                                    <!-- <td>{{grower_payment.paid_status}}</td> -->
+                                </tr>
+                                {% endfor %}
+                                {% if data_text == 'No Record Found' %}
+                                <tr>
+                                    <td colspan="9" align="center">{{ data_text }}</td>
+                                </tr>
+                                {% endif %}
+                            </tbody>
+                           
+                        </table>
+                    </div>
+                    <div class="row align-items-center">
+                        <div class="col-md-12 col-sm-12 col-12 text-center">
+                            {% if grower_payment.has_other_pages %}
+                            <ul class="pagination" id="nav_1">
+                            {% if grower_payment.has_previous %}
+                                <li><a href="?proSelction={%if selectedprocessor.id %}{{selectedprocessor.id}}{% else %}{{selectedprocessor}}{% endif %}&groSelction={%if selectedgrower.id %}{{selectedgrower.id}}{% else %}{{selectedgrower}}{% endif %}&lelSelction={{selectedLel}}&cerSelction={{selectedCre}}&paymentSelction={{selectedpayment}}&page={{ grower_payment.previous_page_number }}">&laquo;</a></li>
+                                {% else %}
+                                <li class="disabled"><span>&laquo;</span></li>
+                                {% endif %}
+                                {% for i in grower_payment.paginator.page_range %}
+                                {% if grower_payment.number == i %}
+                                <li class="active pagi" id="getactive"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+                                {% else %}
+                                <li><a href="?proSelction={%if selectedprocessor.id %}{{selectedprocessor.id}}{% else %}{{selectedprocessor}}{% endif %}&groSelction={%if selectedgrower.id %}{{selectedgrower.id}}{% else %}{{selectedgrower}}{% endif %}&lelSelction={{selectedLel}}&cerSelction={{selectedCre}}&paymentSelction={{selectedpayment}}&page={{ i }}">{{ i }}</a></li>
+                                {% endif %}
+                                {% endfor %}
+                                {% if grower_payment.has_next %}
+                                <li><a href="?proSelction={%if selectedprocessor.id %}{{selectedprocessor.id}}{% else %}{{selectedprocessor}}{% endif %}&groSelction={%if selectedgrower.id %}{{selectedgrower.id}}{% else %}{{selectedgrower}}{% endif %}&lelSelction={{selectedLel}}&cerSelction={{selectedCre}}&paymentSelction={{selectedpayment}}&page={{ grower_payment.next_page_number }}">&raquo;</a></li>
+                                {% else %}
+                                <li class="disabled"><span>&raquo;</span></li>
+                            {% endif %}
+                            </ul>
+                        {% endif %}
+                        </div>
+                        <div class="col-md-12 col-sm-12 col-12 text-center mt-2" style="text-align:right">
+                            {% if user.is_superuser %}
+                            {% if report_grower_index %}
+                            <span>
+                                Showing {{ report_grower_index }} of {{ report_grower_index }} entries
+                            </span>
+                            {% else %}
+                            <span>Showing  {{ grower_payment.start_index }} - {{ grower_payment.end_index }} of {{ grower_payment.paginator.count }} entries
+                            </span>
+                            {% endif %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+</div>
+</main>
+{% include 'footer.html' %}
+</div>
+
+
+{% endblock content %}
+
+{% block scripts %}
+<script src="https://cdn.datatables.net/1.11.0/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.0/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/responsive.bootstrap4.min.js"></script>
+<script src="{% static 'js/dataTables.buttons.min.js' %}"></script>
+<script src="{% static 'js/buttons.html5.min.js' %}"></script>
+<script src="https://cdn.datatables.net/fixedcolumns/4.2.1/js/dataTables.fixedColumns.min.js"></script>
+
+<script>
+     $(document).ready(function() {
+    $('#groSelction').change( function () {
+    $('#submitBtn').click();
+    });
+    });
+
+     $(document).ready(function() {
+    $('#proSelction').change( function () {
+    $('#submitBtn').click();
+    });
+    });
+
+    $(document).ready(function() {
+    $('#cerSelction').change( function () {
+    $('#submitBtn').click();
+    });
+    });
+    
+    $(document).ready(function() {
+    $('#lelSelction').change( function () {
+    $('#submitBtn').click();
+    });
+    });
+    $(document).ready(function() {
+    $('#paymentSelction').change( function () {
+    $('#submitBtn').click();
+    });
+    });
+</script>
+<script>
+    $('#Growers-Payments-active').addClass('activeLink');
+                  
+    $('#Growers-Payments-down').addClass('down');
+    $('#Growers-Payments-sub').show();
+    
+    $('#Bale-Csv-Download').addClass('activeLink active-nav');
+</script>
+{% endblock scripts %}

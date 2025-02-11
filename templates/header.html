@@ -1,0 +1,206 @@
+{% load static %}
+
+<style>
+  .btn-transparent {
+    margin-left: auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    color: #fff;
+    background-color: transparent;
+  }
+
+  .btn-transparent:hover {
+    color: #fff !important;
+  }
+  .btn-transparent{position: relative;}
+  .btn-transparent i{font-size: 18px;}
+  .btn-transparent .notification_count{position: absolute;
+  background-color: #dc3545;
+  top: -10px;
+  left: 5px;
+}
+.dropdown.main-header-login a i{ font-size: 18px !important;}
+.notification_reason_class{
+  padding: 8px;
+  font-size: 12px;
+  font-weight: bold;
+  padding-bottom: 0px;
+  
+}
+.bgclass{background-color: #b3d9ff !important;}
+.bgclass:first-of-type{
+  border-radius: 10px 10px 0 0;
+}
+#lastdiv{
+  padding: 0px 8px 8px 8px;
+  font-size: 8px;
+  font-weight: normal;
+}
+.lastbor{display: block; }
+.lastbor:not(:last-of-type){
+  border-bottom:1px dashed #999;
+}
+
+
+</style>
+
+<header>
+  <h2>
+    <label for="nav-toggle">
+      <span
+        ><img src="{% static 'img/icon.png' %}" class="for-head-img pointer"
+      /></span>
+      {% comment %} <span class="dboard">Dashboard</span> {% endcomment %}
+    </label>
+  </h2>
+  {% if request.user.is_authenticated %}
+  <!-- Notification  -->
+  <!-- Dropdown toggle -->
+  {% if request.user.is_superuser or 'SubAdmin' in request.user.get_role or 'SuperUser' in request.user.get_role %}
+  {% else %}
+  <div class="dropdown ms-auto" onclick="shownotification()">
+      <a href="javascript:void(0)"  class="dropdown-toggle btn-transparent" type="button" data-mdb-toggle="dropdown" aria-expanded="false">
+        <i class="fa fa-bell"></i>
+        <!-- id_notification_count -->
+        <div class="notification_count badge badge-danger" id="id_notification_count"></div>
+      </a>
+    
+    <div class="dropdown-menu" id="id_notification" style="color: #333; width: 250px; position: absolute; top: 4px !important; left: -150px !important; box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px; border-radius: 10px; padding: 0px !important; overflow-y: scroll; max-height:500px"></div>
+  </div>
+  {% endif %}
+  <!-- Notification  -->
+  <!-- Dropdown toggle -->
+  <div class="dropdown main-header-login">
+    <a
+      class="dropdown-toggle activebtn"
+      href="javascript:void(0)"
+      role="button"
+      id="dropdownMenuLink"
+      data-mdb-toggle="dropdown"
+      aria-expanded="false"
+    >
+    <i class="fas fa-user"></i>  {{request.user.first_name}} {{request.user.last_name}}
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+      
+      <li><a class="dropdown-item" href="javascript:void(0)"><i class="fas fa-user"></i> 
+        {{request.user.first_name}} {{request.user.last_name}}</a>      
+      </li>
+      
+      {% if request.user.is_superuser  %}
+			  <li><a class="dropdown-item" href="{% url 'admin:index' %}" target="_blank"><i class="fas fa-user-cog"></i> Admin Console</a></li>
+			  {% comment %} <li><a class="dropdown-item" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a></li> {% endcomment %}
+        {% comment %}  {% endcomment %}
+      <a href="#" class="dropdown-item" onclick="document.getElementById('logout-form').submit();">
+          <i class="fas fa-sign-out-alt"></i> Logout
+      </a>
+      <form id="logout-form" method="post" action="{% url 'logout' %}" style="display: none;">
+        {% csrf_token %}
+      </form>
+      {% comment %}  {% endcomment %}
+			{% else %}
+      <li><a class="dropdown-item" href="{% url 'HelpAndGuideView' %}"><i class="fas fa-question-circle"></i> Help And Guide</a></li>
+      <li><a class="dropdown-item" href="{% url 'change_password' %}"><i class="fas fa-key"></i> Change Password</a></li>
+      {% comment %} <li><a class="dropdown-item" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a></li> {% endcomment %}
+      {% comment %}  {% endcomment %}
+      <a href="#" class="dropdown-item" onclick="document.getElementById('logout-form').submit();">
+          <i class="fas fa-sign-out-alt"></i> Logout
+      </a>
+      <form id="logout-form" method="post" action="{% url 'logout' %}" style="display: none;">
+        {% csrf_token %}
+      </form>
+      {% comment %}  {% endcomment %}
+      {% endif %}
+    </ul>
+    </div>
+  <!-- end -->
+
+  {% else %}
+    <!-- Dropdown toggle -->
+    <div class="dropdown main-header-login">
+      <a
+        class="dropdown-toggle activebtn"
+        href="javascript:void(0)"
+        role="button"
+        id="dropdownMenuLink"
+        data-mdb-toggle="dropdown"
+        aria-expanded="false"
+      >
+      Hi, You are not logged in!
+      </a>
+      <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+        <li><a class="dropdown-item" href="{% url 'login' %}"><i class="fas fa-sign-out-alt"></i> Login</a></li>
+      </ul>
+      </div>
+    <!-- end -->
+    {% endif %}
+
+    {% block scripts %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    {% if request.user.is_authenticated %}
+    {% if request.user.is_superuser or 'SubAdmin' in request.user.get_role or 'SuperUser' in request.user.get_role %}
+    {% else %}
+    <script>
+      jQuery(document).ready(function($) {
+        // Function to fetch notification count
+        function show_notification_counter() {
+          $.ajax({
+            type: "GET",
+            url: "/accounts/show_notification_counter/",
+            contentType: false,
+            cache: false,
+            processData: false,
+            success: function(response) {
+              console.log('show_notification_counter', response);
+              if (response.msg_count !== undefined && response.msg_count !== 0) {
+                $('#id_notification_count').text(response.msg_count);
+              } else {
+                $('#id_notification_count').empty();
+              }
+            },
+            error: function(xhr, status, error) {
+              console.error("Error fetching notification count:", error);
+            }
+          });
+        }
+    
+        // Initial call and periodic updates for notification count
+        setInterval(show_notification_counter, 3000);
+        
+        
+        // setInterval(function(){ shownotification()},3000);
+        function shownotification() {
+          document.getElementById('id_notification').innerHTML = "";
+          $.ajax({
+            type: "GET",
+            url: "/accounts/show_notification/",
+            data: {},
+            contentType: false,
+            cache: false,
+            processData: false,
+            success: function(response) {
+              response.msg?.forEach(element => {
+                if (element.status == 'UNREAD') {
+                  document.getElementById('id_notification').innerHTML += `<a href="${element.myhref}" style="color: #333 !important;" class="lastbor bgclass"><div class="notification_reason_class">${element.notification_reason}</div><div style="font-size:11px; padding: 0px 8px">${element.msg}</div><div id="lastdiv">${element.added_data_time}</div></a>`;
+                } else {
+                  document.getElementById('id_notification').innerHTML += `<a href="${element.myhref}" style="color: #333 !important;" class="lastbor"><div class="notification_reason_class">${element.notification_reason}</div><div style="font-size:11px; padding: 0px 8px">${element.msg}</div><div id="lastdiv">${element.added_data_time}</div></a>`;
+                }
+              });
+            },
+            error: function(xhr, status, error) {
+              console.error("Error fetching notifications:", error);
+            }
+          });
+        }
+    
+        // Bind shownotification() function to dropdown click event
+        $('.dropdown.ms-auto').on('click', function() {
+          shownotification();
+        });
+      });
+        
+    </script>
+    {% endif %}
+    {% endif %}
+    {% endblock scripts %}
+</header>

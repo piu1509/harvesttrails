@@ -1,0 +1,437 @@
+{% extends "base.html" %} {% load static %}
+{% block title %} Upcoming Inbound Management {% endblock title %}
+{% load crispy_forms_tags %}
+{% block content %}
+{% include 'navbar.html' %}
+
+<div class="main-content">
+    {% include 'header.html' %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.0/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.bootstrap4.min.css">
+
+    <main>
+        {% include '_alerts.html' %}
+        <div class="page-title-with-or-without-btn">
+            <span class="farm headingtop">Upcoming Inbound Management</span>
+            <!-- Create button for Account-->
+
+            <!-- <div class="flex-header-btn">
+                <a href="{% url 'processor_receive_delivery' %}" class="btn-close-cancel">Receive Delivery</a>
+            </div> -->
+            <a href="{% url 'processor_inbound_management' %}" class="btn-close-cancel btn-space">Back</a>
+        </div>
+        {% if request.user.is_processor or request.user.is_superuser or 'SubAdmin' in request.user.get_role or 'SuperUser' in request.user.get_role%}
+        <div class="card card-padding">
+            <div class="main-simple-table-with-search col-12">                
+                <form action="" method="get" class="">
+                    <div class="row d-flex mb-3">
+                        <div class="col-8">
+                            <div class="inline-apply-filter">
+                                <div class="three-fields-with-label">
+                                    <select id="growerSelction" name="selectgrower_id" class="form-control selectpicker" data-live-search="true">
+                                        <option value='All' selected> Select All Growers </option>
+                                        {% for i in grower %}
+                                        {% if i.pk == selectedGrower %}
+                                        <option value="{{ i.pk }}" selected>{{i.name}} - {{ i.pk }}
+                                        </option>
+                                        {% else %}
+                                        <option value="{{ i.pk }}">{{i.name}} - {{ i.pk }}</option>
+                                        {% endif %}
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <input style="display : none;" id="submitBtn" type="submit"
+                                    class="apply-filter-btn primary-btn" value="Apply Filter" />
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="row">
+                                <div class="col-8">
+                                    <input class="form-control" name="search_name" type="search" placeholder="Search" autocomplete="off" aria-label="Search" id="search_name" value="{{get_search_name}}">
+                                </div>
+                                <div class="col-4">
+                                    <button class="btn btn-outline-success btn-block" type="submit">Search</button>
+                                </div>
+                            </div>                                    
+                        </div>
+                    </div>    
+                </form>
+                    
+                <div class="both-data-in" style="display: inherit;">
+                    <div class="simple-responsive-table">
+                        <table id="processorList_tbl" class="table table-striped dt-responsive nowrap"
+                            style="width:100%">
+                            <thead>
+                                <tr style="border-bottom: 2px solid #e0e0e0;">
+                                    <th width="10%">Shipment ID</th>
+                                    <th width="10%">Shipment Date</th>
+                                    <th width="10%">Grower</th>
+                                    <th width="10%">Field</th>
+                                    <th width="10%">Item , Variety</th>
+                                    <th width="10%">MODULE TAG #</th>
+                                    <th width="10%">Weight</th>
+                                    <th width="10%">Processor</th>
+                                    <th width="20%">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for grower_shipment in grower_shipment %}
+                                <div class="modal fade" id="shipmentModal{{grower_shipment.id}}" aria-hidden="true" aria-labelledby="exampleModalToggleLabel22" tabindex="-1">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header" style="text-align: center;">
+                                                <button type="button" class="btn-close cust-close-ds-btn close_modal_addqueModal"
+                                                    data-mdb-dismiss="modal" aria-label="Close" onclick="closeAddModal()"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div class="modal-center-btn-footer">
+                                                    <div class="row">
+                                                        <div class="col-lg-12">
+                                                            <div>
+                                                                <h5 class="text-decoration-underline">QR CODE</h5>
+                                                            </div>
+                                                         
+                                                            <img id="qr_id" src="/media/{{grower_shipment.qr_code}}" alt="qr code" style="max-width: 100%;">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <tr>
+                                    <td>{{grower_shipment.shipment_id}} </td>
+                                    <td>{{grower_shipment.date_time|date:"M d, Y"}} </td>
+                                    <td>{{grower_shipment.grower.name}}</td>
+                                    <td>{{grower_shipment.field.name}}</td>
+                                    <td>{{grower_shipment.crop}} , {{grower_shipment.variety}} </td>
+                                    <td>{{grower_shipment.module_number}}</td>
+                                    <td>{{grower_shipment.amount}} {{grower_shipment.unit_type}}
+                                        {% if grower_shipment.amount2|length > 0 %}
+                                        + {{grower_shipment.amount2}} {{grower_shipment.unit_type2}}
+                                        {% endif %}
+                                    </td>
+                                    <td>{{grower_shipment.processor.entity_name}}</td>
+                                    <td class="backk action-td rmv-bd">
+                                        <ul>
+                                            <li>
+                                                <a class="map-icon-link" data-bs-toggle="modal" href="#shipmentModal{{grower_shipment.id}}" ><span
+                                                    class="fas fa-qrcode" alt="view QR code" title="view QR code"></span></a>
+                                            </li>
+                                            <li>
+                                                <a href="{% url 'processor_inbound_management_view' grower_shipment.id %}"
+                                                    class="update-btn-link" alt="view inbound management" title="view inbound management"> <span class="fas fa-eye"></span> </a>
+                                            </li> 
+                                            <li>
+                                                <a href="{% url 'processor_inbound_management_edit' grower_shipment.id %}" class="update-btn-link" alt="edit inbound management" title="edit inbound management"> <span class="fas fa-edit"></span></a>
+                                            </li>
+                                        </ul>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        <div class="row align-items-center">
+                            <div class="col-md-12 col-sm-12 col-12 text-center">
+                                {% if grower_shipment.has_other_pages %}
+                                <ul class="pagination" id="nav_1">
+                                {% if grower_shipment.has_previous %}
+                                    <li><a href="?selectgrower_id={{selectedGrower}}&search_name={% if get_search_name  %}{{get_search_name}}{% endif %}&page={{ grower_shipment.previous_page_number }}">&laquo;</a></li>
+                                    {% else %}
+                                    <li class="disabled"><span>&laquo;</span></li>
+                                    {% endif %}
+                                    {% for i in grower_shipment.paginator.page_range %}
+                                    {% if grower_shipment.number == i %}
+                                    <li class="active pagi" id="getactive"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+                                    {% else %}
+                                    <li><a href="?selectgrower_id={{selectedGrower}}&search_name={% if get_search_name  %}{{get_search_name}}{% endif %}&page={{ i }}">{{ i }}</a></li>
+                                    {% endif %}
+                                    {% endfor %}
+                                    {% if grower_shipment.has_next %}
+                                    <li><a href="?selectgrower_id={{selectedGrower}}&search_name={% if get_search_name  %}{{get_search_name}}{% endif %}&page={{ grower_shipment.next_page_number }}">&raquo;</a></li>
+                                    {% else %}
+                                    <li class="disabled"><span>&raquo;</span></li>
+                                {% endif %}
+                                </ul>
+                            {% endif %}
+                            </div>
+                            <div class="col-md-12 col-sm-12 col-12 text-center mt-2" style="text-align:right">
+                                <span>Showing  {{ grower_shipment.start_index }} - {{ grower_shipment.end_index }} of {{ grower_shipment.paginator.count }} entries
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        {% if request.user.is_processor2 %}
+        <form action="" method="get" class="">
+            <div class="card card-padding">
+                <div class="main-simple-table-with-search col-12">
+                    <div class="row d-flex">
+                        <div class="col-3">                            
+                                <select name="pro_id" id="mult_select"  class="form-control selectpicker" data-live-search="true">
+                                    <option value='all'>Select Processor</option>
+                                    {% for pro in processor2 %}
+                    
+                                {% if select_processor == pro.id %}
+                                    <option value="{{pro.id}}" selected>{{pro.entity_name}}</option>
+                                {% else %}
+                                    <option value="{{pro.id}}">{{pro.entity_name}}</option>
+                                {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
+                       <div class="col-5"></div>
+
+                        <!-- Search section on the right side -->
+                        <div class="col-4">
+                            <div class="row justify-content-end">
+                                <div class="col-8">
+                                    <input class="form-control" name="search_name" type="search" placeholder="Search" autocomplete="off" aria-label="Search" id="search_name" {% if search_name %}value="{{search_name}}"{% else %}{% endif %} >
+                                </div>
+                                <div class="col-3">
+                                    <button class="btn btn-outline-success btn-block" type="submit">Search</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+        
+                    <br>
+
+                    <div class="both-data-in" style="display: inherit;">
+                        <div class="table-responsive">
+                            <table id="" class="table table-striped dt-responsive nowrap"
+                                style="width:100%">
+                                <thead>
+                                    <tr style="border-bottom: 2px solid #e0e0e0;">
+                                        <th width="5%">Shipment ID</th>
+                                        <th width="5%">Shipment Date</th>
+                                        <th width="10%">STORAGE BIN</th>
+                                        <th width="10%">PROCESSOR (Sender)</th>
+                                        <th width="10%">SENDER SKU ID</th>                                        
+                                        <th width="10%">Weight</th>                                        
+                                        <th width="10%">PROCESSOR (Receiver)</th>
+                                        <th width="10%">RECEIVER SKU ID</th>
+                                        <th width="10%">RECEIVE Date</th>
+                                        <th width="10%">ACTION</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    
+                                    {% for shipment in shipments %}
+                                    <div class="modal fade" id="shipmentModal{{shipment.id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" >
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header" style="text-align: center;">
+                                                    <button type="button" class="btn-close cust-close-ds-btn close_modal_addqueModal"
+                                                        data-mdb-dismiss="modal" aria-label="Close" onclick="closeAddModal()"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <div class="modal-center-btn-footer">
+                                                        <div class="row">
+                                                            <div class="col-lg-12">
+                                                                <div>
+                                                                    <h5 class="text-decoration-underline">QR CODE</h5>
+                                                                </div>
+                                                                
+                                                                <img id="qr_id" src="/media/{{shipment.qr_code_processor}}" alt="qr code" style="max-width: 100%;">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <tr>
+                                        <td>{{shipment.shipment_id}}</td>
+                                        <td>{{shipment.date_pulled|date:"M d, Y"}}</td>
+                                        <td>{{shipment.bin_location}}</td>
+                                        <td>{% if shipment.processor_e_name %} {{shipment.processor_e_name}}-{{shipment.sender_processor_type}} {% endif %}</td>
+                                        <td>{{shipment.storage_bin_send}}</td>                                        
+                                        <td>{{shipment.weight_of_product}}</td>                                        
+                                        <td>{{shipment.processor2_name}} - {{shipment.receiver_processor_type}}</td>
+                                        <td>{% if shipment.storage_bin_recive %}
+                                            {{shipment.storage_bin_recive}}
+                                        {% else %}
+                                        -
+                                        {% endif %}</td>
+                                        <td>{% if shipment.recive_delivery_date %}
+                                            {{shipment.recive_delivery_date.date}}
+                                        {% else %}
+                                        -
+                                        {% endif %}</td>
+                                        
+                                        <td class="backk action-td rmv-bd">
+                                        <ul>
+                                            <li>
+                                                <a class="map-icon-link" data-bs-toggle="modal" href="#shipmentModal{{shipment.id}}" ><span
+                                                        class="fas fa-qrcode" alt="view QR code" title="view QR code"></span></a>
+                                            </li>
+                                            <li>
+                                                <a href="{% url 'processor_inbound_management_view' shipment.id %}"
+                                                    class="update-btn-link" alt="view inbound management" title="view inbound management"> <span class="fas fa-eye"></span> </a>
+                                            </li>    
+                                            <li>
+                                                <a href="{% url 'processor_inbound_management_edit' shipment.id %}" class="update-btn-link" alt="edit inbound management" title="edit inbound management"> <span class="fas fa-edit"></span></a>
+                                            </li>
+                                           {% if request.user.is_superuser or 'SubAdmin' in request.user.get_role or 'SuperUser' in request.user.get_role %}
+                                            <li>
+                                                <a onclick="delShipment('{% url 'processor_inbound_management_delete' shipment.id %}')"
+                                                    href="{% url 'processor_inbound_management_delete' shipment.id %}"
+                                                    data-mdb-toggle="modal" data-mdb-target="#deleteModal" alt="delete inbound management" title="delete inbound management">
+                                                    <span class="fas fa-trash"></span></a>
+                                            </li>
+                                           {% endif %}
+                                        </ul>
+                                        </td>
+                                    </tr>                                    
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div> 
+                        <div class="row align-items-center">
+                            <div class="col-md-12 col-sm-12 col-12 text-center mt-2" style="text-align:right">
+                                <span>Showing  {{ shipments.start_index }} - {{ shipments.end_index }} of {{ shipments.paginator.count }} entries
+                                </span>
+                            </div>
+                            <div class="col-md-12 col-sm-12 col-12 text-center">
+                                {% if shipments.has_other_pages %}
+                                <ul class="pagination" id="nav_1">
+                                {% if shipments.has_previous %}
+                                    <li><a href="?pro_id={{ select_processor }}&search_name={% if get_search_name  %}{{get_search_name}}{% endif %}&page={{ shipments.previous_page_number }}">&laquo;</a></li>
+                                    {% else %}
+                                    <li class="disabled"><span>&laquo;</span></li>
+                                    {% endif %}
+                                    {% for i in shipments.paginator.page_range %}
+                                    {% if shipments.number == i %}
+                                    <li class="active pagi" id="getactive"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+                                    {% else %}
+                                    <li><a href="?pro_id={{ select_processor }}&search_name={% if get_search_name  %}{{get_search_name}}{% endif %}&page={{ i }}">{{ i }}</a></li>
+                                    {% endif %}
+                                    {% endfor %}
+                                    {% if shipments.has_next %}
+                                    <li><a href="?pro_id={{ select_processor }}&search_name={% if get_search_name  %}{{get_search_name}}{% endif %}&page={{ shipments.next_page_number }}">&raquo;</a></li>
+                                    {% else %}
+                                    <li class="disabled"><span>&raquo;</span></li>
+                                {% endif %}
+                                </ul>
+                            {% endif %}
+                            </div>                            
+                        </div>                       
+                    </div>
+                </div>
+            </div>
+        </form>
+        {% endif %}
+    </div>
+</main>
+{% include 'footer.html' %}
+</div>
+<!-- end -->
+<!-- Delete Popup -->
+<div class="modal fade" id="deleteModal" aria-hidden="true" aria-labelledby="exampleModalToggleLabel22"
+    tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-body">
+                <button type="button" class="btn-close cust-close-ds-btn" data-mdb-dismiss="modal"
+                    aria-label="Close"></button>
+                <div class="center-content-status">
+                    <img src="{% static 'img/trash.png' %}" alt="right" id="rightImg" class="warning-icon">
+                    <p id="message" class="modal-title titlepad">Are you sure you want to delete?</p>
+                </div>
+                <div class="modal-center-btn-footer">
+                    <button onclick="reloadwindow()" id="closeBtnpopup" type="button"
+                        class="btn-close-cancel btn-space" data-mdb-dismiss="modal">
+                        Close
+                    </button>
+
+                    <a onclick="shipmentdeleteNow()" href="" id="shipmentDelete"><button type=""
+                            class="btn-save-submit">Delete</button></a>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<!-- end -->
+    {% endblock content %}
+
+    {% block scripts %}
+    <script src="https://cdn.datatables.net/1.11.0/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.0/js/dataTables.bootstrap4.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.2.9/js/responsive.bootstrap4.min.js"></script>
+
+    <script src="{% static 'js/farm/farm_list.js' %}"></script>
+
+    <script>
+        // delete storage
+        function delShipment(url) {
+            $('#shipmentDelete').show();
+            $('#shipmentDelete').attr('url', url);
+        }
+
+        function shipmentdeleteNow() {
+            url = $('#shipmentDelete').attr('url');
+            console.log(url)
+            $.ajax({
+                url: url,
+                data: {},
+                success: function (data) {
+                    if (data == 1) {
+                        location.reload();
+                    }
+                }
+            });
+        }
+    </script>
+
+    <script>
+        {% comment %} $(document).ready(function () {
+            $('#processorList_tbl').DataTable();
+        }); {% endcomment %}
+        $(document).ready(function () {
+            $('#processorList_tbl').DataTable({
+                "ordering": false  // Disable initial ordering
+            });
+        });
+        function showQR(grower_shipment_pk) {
+            console.log(grower_shipment_pk)
+            $.ajax({
+                type: "GET",
+                url: `/processor/qr_code_view/${grower_shipment_pk}`,
+                data: {},
+                contentType: false,
+                cache: false,
+                processData: false,
+                success: function (response) {
+                    console.log('response1', response)
+                    var qrimgsrc = document.getElementById("qr_id").src;
+                    console.log(qrimgsrc)
+                    $('#qr_id').attr("src", "/media/" + response);
+
+                }
+            });
+            $('#addqueModal').modal('show');
+        }
+
+        function closeAddModal() {
+            $('#addqueModal').modal('hide');
+        }
+    </script>
+    <script>
+        $('#Processor-active').addClass('activeLink');
+      
+        $('#Processor-down').addClass('down');
+        $('#Processor-sub').show();
+      
+        $('#Inbound-Management').addClass('activeLink active-nav');
+      
+      </script>
+    {% endblock scripts %}

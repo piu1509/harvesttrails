@@ -1,0 +1,250 @@
+
+class FreeCourseStudentDashboard(APIView):
+    authentication_classes = (TokenAuthentication,) 
+    permission_classes = (IsAuthenticated,)
+    
+    def get(self, request):
+        data = {"status":status.HTTP_400_BAD_REQUEST, "message":None, "data":[]}
+        try:
+            user = request.user
+            check_student = Student.objects.filter(user=user)
+            courses = []
+            if check_student:
+                joined_courses = FreeCourseJoinee.objects.filter(student__user=user).values_list("course_id", flat=True) 
+                           
+                if len(joined_courses) > 0:                
+                    
+                    for course_id in joined_courses:
+                        c_data = {"course_id":None,"course_name":None,"quiz":{},"practice":{},"mock":{}}
+                        course = FreeCourse.objects.filter(id=course_id).first()
+                        c_data["course_id"] = course.id
+                        c_data["course_name"] = course.name                                                
+                        check_quiz_attempt = QuizQuestionAttempts.objects.filter(student__user=user,course=course)
+                        check_mock_attempt = MockCompilerQuestionResult.objects.filter(student__user=user, course=course)
+                        check_practice_attempt = FreeCourseCompilerQuestionAttempt.objects.filter(student__user=user, question__practice_mock=False, course=course)
+                        if check_quiz_attempt:
+                            get_quiz_attempt = check_quiz_attempt.last()
+                            attempt_number = get_quiz_attempt.attempt_number
+                            score = max(list(check_quiz_attempt.filter(syllabus=get_quiz_attempt.syllabus).values_list("attempt_score", flat=True)))
+                            max_attempts = get_quiz_attempt.syllabus.max_attempts
+                            max_score = get_quiz_attempt.syllabus.max_score 
+                            print(max_attempts, max_score)                       
+                            
+                            if score >= max_score and not(course.section_number == get_quiz_attempt.syllabus.number):
+                                next_syllabus_id = int(get_quiz_attempt.syllabus.id) + 1
+                                next_syllabus = FreeCourseSyllabus.objects.filter(id=next_syllabus_id).first()
+                                next_quiz = FreeCourseQuizQuestion.objects.filter(
+                                    course_section_question__course_section__id=next_syllabus_id)
+                                if next_quiz.exists():                                    
+                                    c_data["quiz"]["is_lock"] = False
+                                    c_data["quiz"]["syllabus_id"] = next_syllabus_id
+                                    c_data["quiz"]["syllabus_name"] = next_syllabus.name
+                                    c_data["quiz"]["max_attempts"] = next_syllabus.max_attempts
+                                    c_data["quiz"]["max_score"] = next_syllabus.max_score
+                                    c_data["quiz"]["attempt_number"] = 0
+                                    c_data["quiz"]["score"] = 0
+                                    c_data["quiz"]["msg"] = None
+                                    c_data["quiz"]["time"] = get_quiz_attempt.attempted_at
+                                else:
+                                    c_data["quiz"]["is_lock"] = True
+                                    c_data["quiz"]["syllabus_id"] = next_syllabus_id
+                                    c_data["quiz"]["syllabus_name"] = next_syllabus.name
+                                    c_data["quiz"]["max_attempts"] = next_syllabus.max_attempts
+                                    c_data["quiz"]["max_score"] = next_syllabus.max_score
+                                    c_data["quiz"]["attempt_number"] = 0
+                                    c_data["quiz"]["score"] = 0
+                                    c_data["quiz"]["msg"] = "Reach out to support team as no question is added."
+                                    c_data["quiz"]["time"] = get_quiz_attempt.attempted_at
+                            elif score >= max_score and (course.section_number == get_quiz_attempt.syllabus.number):
+                                first_syllabus = FreeCourseSyllabus.objects.filter(course=course).first()
+                                
+                                c_data["quiz"]["is_lock"] = False
+                                c_data["quiz"]["syllabus_id"] = first_syllabus.id
+                                c_data["quiz"]["syllabus_name"] = first_syllabus.name
+                                c_data["quiz"]["max_attempts"] = first_syllabus.max_attempts
+                                c_data["quiz"]["max_score"] = first_syllabus.max_score
+                                c_data["quiz"]["attempt_number"] = 0
+                                c_data["quiz"]["score"] = 0
+                                c_data["quiz"]["msg"] = None
+                                c_data["quiz"]["time"] = get_quiz_attempt.attempted_at
+                            else:
+                                if attempt_number == max_attempts:
+                                    c_data["quiz"]["is_lock"] = True
+                                    c_data["quiz"]["syllabus_id"] = get_quiz_attempt.syllabus.id
+                                    c_data["quiz"]["syllabus_name"] = get_quiz_attempt.syllabus.name
+                                    c_data["quiz"]["max_attempts"] = get_quiz_attempt.syllabus.max_attempts
+                                    c_data["quiz"]["max_score"] = get_quiz_attempt.syllabus.max_score
+                                    c_data["quiz"]["attempt_number"] = attempt_number
+                                    c_data["quiz"]["score"] = score
+                                    c_data["quiz"]["msg"] = "Reach out to support team to unlock your quiz as you have exceeded your attempt limit."
+                                    c_data["quiz"]["time"] = get_quiz_attempt.attempted_at
+                                else:
+                                    c_data["quiz"]["is_lock"] = False
+                                    c_data["quiz"]["syllabus_id"] = get_quiz_attempt.syllabus.id
+                                    c_data["quiz"]["syllabus_name"] = get_quiz_attempt.syllabus.name
+                                    c_data["quiz"]["max_attempts"] = get_quiz_attempt.syllabus.max_attempts
+                                    c_data["quiz"]["max_score"] = get_quiz_attempt.syllabus.max_score
+                                    c_data["quiz"]["attempt_number"] = attempt_number
+                                    c_data["quiz"]["score"] = score
+                                    c_data["quiz"]["msg"] = None
+                                    c_data["quiz"]["time"] = get_quiz_attempt.attempted_at
+                        if check_mock_attempt:
+                            get_mock_attempt = check_mock_attempt.last()
+                            attempt_number = get_mock_attempt.attempt_number
+                            score = max(list(check_mock_attempt.filter(course_section=get_mock_attempt.course_section).values_list("score", flat=True)))
+                            max_attempts = get_mock_attempt.course_section.max_attempts_mock
+                            max_score = get_mock_attempt.course_section.max_score_mock  
+
+                            if score >= max_score and not(course.section_number == get_mock_attempt.course_section.number):
+                                next_syllabus_id = int(get_mock_attempt.course_section.id) + 1
+                                next_syllabus = FreeCourseSyllabus.objects.filter(id=next_syllabus_id).first()
+                                next_mock = FreeCourseCompilerQuestion.objects.filter(course_section_id=next_syllabus_id, practice_mock=True, disable=False)
+                               
+                                if next_mock.exists():
+                                    c_data["mock"]["is_lock"] = False
+                                    c_data["mock"]["syllabus_id"] = next_syllabus_id
+                                    c_data["mock"]["syllabus_name"] = next_syllabus.name
+                                    c_data["mock"]["max_attempts"] = next_syllabus.max_attempts_mock
+                                    c_data["mock"]["max_score"] = next_syllabus.max_score_mock
+                                    c_data["mock"]["attempt_number"] = 0
+                                    c_data["mock"]["score"] = 0
+                                    c_data["mock"]["msg"] = None
+                                    c_data["mock"]["time"] = get_mock_attempt.attempted_at
+                                else:
+                                    c_data["mock"]["is_lock"] = True
+                                    c_data["mock"]["syllabus_id"] = next_syllabus_id
+                                    c_data["mock"]["syllabus_name"] = next_syllabus.name
+                                    c_data["mock"]["max_attempts"] = next_syllabus.max_attempts_mock
+                                    c_data["mock"]["max_score"] = next_syllabus.max_score_mock
+                                    c_data["mock"]["attempt_number"] = 0
+                                    c_data["mock"]["score"] = 0
+                                    c_data["mock"]["msg"] = "Reach out to support team as no question is added."
+                                    c_data["mock"]["time"] = get_mock_attempt.attempted_at
+                            elif score >= max_score and (course.section_number == get_mock_attempt.course_section.number):
+                                first_syllabus = FreeCourseSyllabus.objects.filter(course=course).first()
+                                
+                                c_data["mock"]["is_lock"] = False
+                                c_data["mock"]["syllabus_id"] = first_syllabus.id
+                                c_data["mock"]["syllabus_name"] = first_syllabus.name
+                                c_data["mock"]["max_attempts"] = first_syllabus.max_attempts_mock
+                                c_data["mock"]["max_score"] = first_syllabus.max_score_mock
+                                c_data["mock"]["attempt_number"] = 0
+                                c_data["mock"]["score"] = 0
+                                c_data["mock"]["msg"] = None
+                                c_data["mock"]["time"] = get_mock_attempt.attempted_at
+                            else:
+                                if attempt_number == max_attempts:
+                                    c_data["mock"]["is_lock"] = True
+                                    c_data["mock"]["syllabus_id"] = get_mock_attempt.course_section.id
+                                    c_data["mock"]["syllabus_name"] = get_mock_attempt.course_section.name
+                                    c_data["mock"]["max_attempts"] = get_mock_attempt.course_section.max_attempts_mock
+                                    c_data["mock"]["max_score"] = get_mock_attempt.course_section.max_score_mock
+                                    c_data["mock"]["attempt_number"] = attempt_number
+                                    c_data["mock"]["score"] = score
+                                    c_data["mock"]["msg"] = "Reach out to support team to unlock your quiz as you have exceeded your attempt limit."
+                                    c_data["mock"]["time"] = get_mock_attempt.attempted_at
+                                else:
+                                    c_data["mock"]["is_lock"] = False
+                                    c_data["mock"]["syllabus_id"] = get_mock_attempt.course_section.id
+                                    c_data["mock"]["syllabus_name"] = get_mock_attempt.course_section.name
+                                    c_data["mock"]["max_attempts"] = get_mock_attempt.course_section.max_attempts_mock
+                                    c_data["mock"]["max_score"] = get_mock_attempt.course_section.max_score_mock
+                                    c_data["mock"]["attempt_number"] = attempt_number
+                                    c_data["mock"]["score"] = score
+                                    c_data["mock"]["msg"] = None
+                                    c_data["mock"]["time"] = get_mock_attempt.attempted_at
+
+                        if check_practice_attempt:
+                            get_practice_attempt = check_practice_attempt.last()
+                            check_next_practice_ques = FreeCourseCompilerQuestion.objects.filter(course_section_id=get_practice_attempt.syllabus.id, practice_mock=False, question_number=(int(get_practice_attempt.question.question_number) + 1))
+                            if get_practice_attempt.status == True:
+                                if check_next_practice_ques:
+                                    c_data["practice"]["is_lock"] = False
+                                    c_data["practice"]["syllabus_id"] = get_practice_attempt.syllabus.id
+                                    c_data["practice"]["syllabus_name"] = get_practice_attempt.syllabus.name
+                                    c_data["practice"]["question_id"] = int(get_practice_attempt.question.id) + 1
+                                    c_data["practice"]["max_score"] = get_practice_attempt.syllabus.max_score_practice
+                                    c_data["practice"]["attempt_number"] = 0
+                                    c_data["practice"]["score"] = 0
+                                    c_data["practice"]["msg"] = None
+                                    c_data["practice"]["time"] = get_practice_attempt.time
+                                else:
+                                    check_right_ans = check_practice_attempt.filter(syllabus=get_practice_attempt.syllabus, status=True)
+                                    check_ques = FreeCourseCompilerQuestion.objects.filter(course_section_id=get_practice_attempt.syllabus.id, practice_mock=False)
+                                    max_score = (check_right_ans.count()/check_ques.count()) * 100
+                                    next_syllabus = FreeCourseSyllabus.objects.filter(id=(int(get_practice_attempt.syllabus.id) + 1)).first()
+                                    
+                                    if max_score >= get_practice_attempt.syllabus.max_score_practice and next_syllabus:
+                                        next_syllabus_ques = FreeCourseCompilerQuestion.objects.filter(course_section_id=next_syllabus.id, practice_mock=False)
+                                        if next_syllabus_ques:
+                                            c_data["practice"]["is_lock"] = False
+                                            c_data["practice"]["syllabus_id"] = next_syllabus.id
+                                            c_data["practice"]["syllabus_name"] = next_syllabus.name
+                                            c_data["practice"]["question_id"] = next_syllabus_ques.first().id
+                                            c_data["practice"]["max_score"] = get_practice_attempt.syllabus.max_score_practice
+                                            c_data["practice"]["attempt_number"] = 0
+                                            c_data["practice"]["score"] = 0
+                                            c_data["practice"]["msg"] = None
+                                            c_data["practice"]["time"] = get_practice_attempt.time
+                                        else:
+                                            c_data["practice"]["is_lock"] = True
+                                            c_data["practice"]["syllabus_id"] = next_syllabus.id
+                                            c_data["practice"]["syllabus_name"] = next_syllabus.name
+                                            c_data["practice"]["question_id"] = None
+                                            c_data["practice"]["max_score"] = get_practice_attempt.syllabus.max_score_practice
+                                            c_data["practice"]["attempt_number"] = 0
+                                            c_data["practice"]["score"] = 0
+                                            c_data["practice"]["msg"] = "Reach out to support team as no question is added."
+                                            c_data["practice"]["time"] = get_practice_attempt.time
+
+                                    elif max_score >= get_practice_attempt.syllabus.max_score_practice and not next_syllabus :
+                                        first_syllabus = FreeCourseSyllabus.objects.filter(course=course).first()
+                                        first_syllabus_practice = FreeCourseCompilerQuestion.objects.filter(course_section=first_syllabus, practice_mock=False).first()
+                                        c_data["practice"]["is_lock"] = False
+                                        c_data["practice"]["syllabus_id"] = first_syllabus.id
+                                        c_data["practice"]["syllabus_name"] = first_syllabus.name
+                                        c_data["practice"]["question_id"] = first_syllabus_practice.id
+                                        c_data["practice"]["max_score"] = first_syllabus.max_score_practice
+                                        c_data["practice"]["attempt_number"] = 0
+                                        c_data["practice"]["score"] = 0
+                                        c_data["practice"]["msg"] = None
+                                        c_data["practice"]["time"] = get_practice_attempt.time
+                                    else:
+                                        failed_question = FreeCourseCompilerQuestionAttempt.objects.filter(student__user=user, course=course, syllabus_id=get_practice_attempt.syllabus.id, question__practice_mock=False, status=False)
+                                        c_data["practice"]["is_lock"] = False
+                                        c_data["practice"]["syllabus_id"] = get_practice_attempt.syllabus.id
+                                        c_data["practice"]["syllabus_name"] = get_practice_attempt.syllabus.name
+                                        c_data["practice"]["question_id"] = failed_question.first().id if failed_question else get_practice_attempt.question.id
+                                        c_data["practice"]["max_score"] = get_practice_attempt.syllabus.max_score_practice
+                                        c_data["practice"]["attempt_number"] = get_practice_attempt.attepmt_number
+                                        c_data["practice"]["score"] = 100
+                                        c_data["practice"]["msg"] = None
+                                        c_data["practice"]["time"] = get_practice_attempt.time
+                            else:
+                                c_data["practice"]["is_lock"] = False
+                                c_data["practice"]["syllabus_id"] = get_practice_attempt.syllabus.id
+                                c_data["practice"]["syllabus_name"] = get_practice_attempt.syllabus.name
+                                c_data["practice"]["question_id"] = get_practice_attempt.question.id
+                                c_data["practice"]["max_score"] = get_practice_attempt.syllabus.max_score_practice
+                                c_data["practice"]["attempt_number"] = get_practice_attempt.attepmt_number
+                                c_data["practice"]["score"] = 0
+                                c_data["practice"]["msg"] = None
+                                c_data["practice"]["time"] = get_practice_attempt.time
+                        courses.append(c_data)
+                    data["status"] = status.HTTP_200_OK
+                    data["message"] = "Data fetched successfully."
+                    data["data"] = courses
+                else:
+                    data["status"] = status.HTTP_404_NOT_FOUND
+                    data["message"] = "Not registered to any course yet."
+                    data["data"] = courses
+            else:
+                data["status"] = status.HTTP_404_NOT_FOUND
+                data["message"] = "Student not found."
+                data["data"] = courses
+        except Exception as e:
+            data["status"] = status.HTTP_400_BAD_REQUEST
+            data["message"] = f"{str(e)}"
+            data["data"] = []
+        return Response(data)
+ 

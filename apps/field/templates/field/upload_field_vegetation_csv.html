@@ -1,0 +1,137 @@
+{% extends "base.html" %} {% load static %}
+{% block title %} Field Vegetation Report Upload {% endblock title %}
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+
+{% load crispy_forms_tags %}
+{% block content %}
+{% include 'navbar.html' %}
+
+<div class="main-content">
+    {% include 'header.html' %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.0/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.bootstrap4.min.css">
+
+    <main>
+        {% include '_alerts.html' %}
+        <div class="page-title-with-or-without-btn">
+            <span class="farm headingtop">Field Vegetation Report Upload </span>
+            <!-- Create button for add-location-->
+            
+        </div>
+        <div class="card card-padding">
+            <div class="main-simple-table-with-search">                
+                <div class="both-data-in" style="display: inherit;">
+                    <form action="" method="post" class="farm-fields-form"
+                    enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-4" id="div1">
+                            <div class="">
+                                <label for="">Upload File</label>
+                                <div class="file-upload-wrapper" data-text="fieldvegetationreport.csv">
+                                    <input type="file" name="csv_file" accept=".csv"
+                                        class="clearablefileinput file-upload-field" id="id_csv_file" required>
+                                </div>
+                                <p id="disp2" style="color: red;"></p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <p>Example : <a href="{{ '/media/example_csv/fieldvegetationreport.csv' }}">fieldvegetationreport.csv</a></p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-btn-row">
+                                <a href="{% url 'field-list' %}" class="btn-close-cancel btn-space">Cancel</a>
+                                <input id="hide_btn1" type="submit" class="btn-save-submit" value="Save">
+                                <!-- <input type="button" class="btn-save-submit" value="Save" onclick="activityButton1()"> -->
+                            </div>
+                        </div>
+                        
+                </form>
+                </div>
+            </div>
+    </main>
+    {% include 'footer.html' %}
+</div>
+
+{% endblock content %}
+
+{% block scripts %}
+<script src="https://cdn.datatables.net/1.11.0/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.0/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/responsive.bootstrap4.min.js"></script>
+
+<script src="{% static 'js/farm/farm_list.js' %}"></script>
+
+<script>
+    // $(document).ready(function () {
+    //     $('#processorList_tbl').DataTable();
+    // });
+    
+</script>
+{% endblock scripts %}
+
+{% block jquery %}
+<script>
+    // $('#processor_id').on('change', function (e) {
+
+    //     var value = $(this).val();
+    //     $('#grower_select').click();
+    //     // processor_id = document.getElementById('processor_id').value;
+    //     // alert(processor_id);
+        
+    // })
+    // function activityButton1(){
+    //     var id_csv_file = $('#id_csv_file').val();
+    //     var grower_id = $('#grower_id').val();
+    //     // var processor_id = $('#processor_id').val();
+    //     // alert(id_csv_file)
+    //     // alert(grower_id)
+    //     if (id_csv_file != '' && grower_id != null) {
+    //         $('#hide_btn1').click();
+    //     }else{
+    //         if (grower_id == null) {
+    //             document.getElementById("disp1").innerHTML = "*Please Select a Grower";
+    //         }
+    //         if (grower_id != null) {
+    //             document.getElementById("disp1").innerHTML = "";
+    //         }
+    //         if (id_csv_file == '') {
+    //             document.getElementById("disp2").innerHTML = "*Please Upload CSV";
+    //         }
+    //         if (id_csv_file != '') {
+    //             document.getElementById("disp2").innerHTML = "";
+    //         }
+    //         // if (processor_id == null) {
+    //         //     document.getElementById("disp0").innerHTML = "*Please Select a Processor";
+    //         // }
+    //         // if (processor_id != null) {
+    //         //     document.getElementById("disp0").innerHTML = "";
+    //         // }
+    //     }
+    // }
+</script>
+<script>
+$('#Farm-Configuration-active').addClass('activeLink');
+                
+$('#Farm-Configuration-down').addClass('down');
+$('#Farm-Configuration-sub').show();
+
+$('#Field-Management').addClass('activeLink active-nav');
+</script>
+{% endblock jquery %}

@@ -1,0 +1,1631 @@
+{% extends "base.html" %} {% load static %} {% block title %} Update Field {% endblock title %} 
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+{% block content %} 
+{% include 'navbar.html' %}
+<style>
+     table tbody tr:last-child  {
+        background-color: #cdcdcd !important;
+        color: #fff;
+    }
+    table tbody tr:last-child td{font-weight: 500;font-size: 16px;}
+    .pre-table h4 {
+        font-weight: 700;
+        color: #000;
+        font-size: 16px;
+        margin-top: 30px;
+    }
+
+    .pre-table table thead th {
+        background-color: #848484;
+        color: #fff;
+    }
+
+    .pre-table table tbody td:nth-child(2), td:nth-child(3), td:last-child {  white-space: normal;}
+
+    .pre-table table tbody tr:nth-child(even) {
+        background-color: #fff;
+    }
+
+    .pre-table table tbody td {
+        height: 2.5rem;
+    }
+
+    .btn-close-cancel:hover {
+        color: #fff !important;
+    }
+    select option:disabled{text-decoration: line-through; background-color: #ccc; font-style: italic;}
+
+    .custom-input-group .btn-save-submit {
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+    }
+    .readonly{
+        background: #e4e4e4;
+        pointer-events: none;
+    }
+
+</style>
+<div class="main-content">
+    {% include 'header.html' %} {% load crispy_forms_tags %}
+    <main>
+        <!-- {% include '_alerts.html' %} -->
+        
+            <form method="post" class="farm-fields-form" id="form_1">
+                {% csrf_token %}
+                <div class="row d-flex align-items-center">
+                    <div class="col-md-3">
+                        <span class="farm headingtop">Update Field</span>
+                    </div>
+                    <div class="col-md-9">
+                        <div class="input-group align-items-center custom-input-group">
+                            <div class="input-group-prepend pe-1">
+                              <label for=""><strong>Select Crop Year</strong></label>
+                            </div>
+                            <select name="scrop_year" class="select form-control" id="scrop_year">
+                                <option value="">Select Crop Year</option>
+                                {% if selected_scrop_year == "2022" %}
+                                <option value="2022" selected>2022</option>
+                                <option value="2023">2023</option>
+                                {% elif selected_scrop_year == "2023" %}
+                                <option value="2022">2022</option>
+                                <option value="2023" selected>2023</option>
+                                {% else %}
+                                <option value="2022">2022</option>
+                                <option value="2023">2023</option>
+                                {% endif %}
+                            </select>
+                            <div class="input-group-append">
+                                <input type="submit" class="btn-save-submit" value="Apply filter">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    {% include '_alerts.html' %}
+                </div>
+                
+        <div class="card farm-fields-container">
+            <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <label for="id_name" class=" requiredField">Name<span class="asteriskField">*</span></label>
+                            <input type="text" name="fname" id="id_name" class="textinput textInput form-control" value="{{update_field.name}}" required>
+                            <!-- as_crispy_field -->
+                        </div>
+                        <div class="col-md-4">
+                            <div id="div_id_farm" class="form-group">
+                                <label for="id_farm" class=" requiredField">Farm<span class="asteriskField">*</span></label>
+                                <div>
+                                    <select name="farm" class="select form-control" id="id_farm" required>
+                                        {% for frm in farms %}
+                                            {% if selected_farm == frm.id %}
+                                            <option value="{{frm.id}}" selected>{{frm.name}}-{{frm.id}}</option>
+                                            {% else %}
+                                            <option value="{{frm.id}}">{{frm.name}}-{{frm.id}}</option>
+                                            {% endif %}
+                                        <!-- <option value="{{frm.id}}" {% if selected_farm == frm.id %}selected{% endif %}>{{frm.name}}-{{frm.id}}</option> -->
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div id="div_id_grower" class="form-group">
+                                <label for="id_grower" class=" requiredField">Grower<span class="asteriskField">*</span></label>
+                                <div>
+                                    <select name="grower" class="select form-control" id="id_grower" required>
+                                        {% for gwdp in growers_dpdwn %}
+                                        <option value="{{gwdp.id}}" {% if selected_grower == gwdp.id %}selected{% endif %}>{{gwdp.name}}-{{gwdp.id}}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <label for="id_batch_id" class=" requiredField">Batch id</label>
+                            <input type="text" name="batch_id" id="id_batch_id" class="textinput textInput form-control" value='{% if update_field.batch_id %}{{update_field.batch_id}}{% else %}{% endif %}'>
+                            <!-- as_crispy_field -->
+                        </div>
+                        <div class="col-md-4">
+                            <label for="id_acreage" class=" requiredField">Acreage<span class="asteriskField">*</span></label>
+                            <input type="number" min="0" step="any" name="acreage" id="id_acreage" class="textinput textInput form-control" value='{% if update_field.acreage %}{{update_field.acreage}}{% else %}{% endif %}' required>
+                            <!-- as_crispy_field -->
+                        </div>
+                        <div class="col-md-4">
+                            <label for="id_fsa_farm_number" class=" requiredField">FSA Farm Number<span class="asteriskField">*</span></label>
+                            <input type="number" min="0" name="fsa_farm_number" id="id_fsa_farm_number" class="textinput textInput form-control" value='{% if update_field.fsa_farm_number %}{{update_field.fsa_farm_number}}{% else %}{% endif %}'>
+                            <!-- as_crispy_field -->
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 mt-3">
+                            <label for="id_fsa_tract_number" class=" requiredField">FSA Tract Number<span class="asteriskField">*</span></label>
+                            <input type="number" min="0" name="fsa_tract_number" id="id_fsa_tract_number" class="textinput textInput form-control" value='{% if update_field.fsa_tract_number %}{{update_field.fsa_tract_number}}{% else %}{% endif %}'>
+                            <!-- as_crispy_field -->
+                        </div>
+                        <div class="col-md-4 mt-3">
+                            <label for="id_fsa_field_number" class=" requiredField">FSA Field Number<span class="asteriskField">*</span></label>
+                            <input type="number" min="0" name="fsa_field_number" id="id_fsa_field_number" class="textinput textInput form-control" value='{% if update_field.fsa_field_number %}{{update_field.fsa_field_number}}{% else %}{% endif %}'>
+                            <!-- as_crispy_field -->
+                        </div>
+                        <!-- .... -->
+                        <div class="col-md-4 mt-3">
+                            <label for="id_eschlon_id" class=" requiredField">Echelon Id</label>
+                            <input type="text" name="eschlon_id" id="id_eschlon_id" class="textinput textInput form-control" value='{% if update_field.eschlon_id %}{{update_field.eschlon_id}}{% else %}{% endif %}'>
+                            <!-- as_crispy_field -->
+                        </div>
+                        
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4 mt-3">
+                            <label for="id_latitude" class=" requiredField">Latitude</label>
+                            <input type="number" step="any" name="latitude" id="id_latitude" class="textinput textInput form-control" value='{% if update_field.latitude %}{{update_field.latitude}}{% else %}{% endif %}'>
+                            <!-- as_crispy_field -->
+                        </div>
+                        <div class="col-md-4 mt-3">
+                            <label for="id_longitude" class=" requiredField">Longitude</label>
+                            <input type="number" step="any" name="longitude" id="id_longitude" class="textinput textInput form-control" value='{% if update_field.longitude %}{{update_field.longitude}}{% else %}{% endif %}'>
+                            <!-- as_crispy_field -->
+                        </div>
+                        <div class="col-md-4 mt-3">
+                            <label for="id_crop" class=" requiredField">Crop<span class="asteriskField">*</span></label>
+                            <select name="crop" class="select form-control readonly" id="id_crop" >
+                                {% if update_field.crop == 'COTTON' %}
+                                <option value="COTTON" selected>COTTON</option>
+                                <option value="RICE">RICE</option>
+                                <option value="WHEAT">WHEAT</option>
+                                {% elif update_field.crop == 'RICE' %}
+                                <option value="COTTON">COTTON</option>
+                                <option value="RICE" selected>RICE</option>
+                                <option value="WHEAT">WHEAT</option>
+                                {% elif update_field.crop == 'WHEAT' %}
+                                <option value="COTTON">COTTON</option>
+                                <option value="RICE">RICE</option>
+                                <option value="WHEAT" selected>WHEAT</option>
+                                {% else %}
+                                <option value="">------</option>
+                                <option value="COTTON">COTTON</option>
+                                <option value="RICE">RICE</option>
+                                <option value="WHEAT">WHEAT</option>
+                                {% endif %}
+                            </select>
+                            <!-- <input type="text" name="crop" id="id_crop" class="textinput textInput form-control" value='{% if update_field.crop %}{{update_field.crop}}{% else %}{% endif %}' required> -->
+                            <!-- as_crispy_field -->
+                        </div>
+                        <!-- <div class="col-md-12 mt-3" ><span style="color: red;">Any changes done to the above form-fields will change the main record of the field.</span></div> -->
+                        <div class="col-md-12 mt-3" ><span style="color: red;">Any changes to above fields are applied to all crop years.</span></div>
+                    </div>
+                    <div class="row">
+                        {% if selected_scrop_year %}
+                        <div class="col-md-12 p-2 mt-1 " style="background-color: #3b3b3b;color: #fff; margin-left: 10px; margin-right: 10px;">Field variables for {{selected_scrop_year}}</div>
+                        <div class="col-md-4 mt-3">
+                            <label for="id_variety" class=" requiredField">Variety</label>
+                            <select name="crop_variety" class="select form-control" id="id_variety">
+                                <option value="-----" >-----</option>
+                                {% for i in variety_list %}
+                                    {% if i == new_update_field.variety %}
+                                    <option value="{{i}}" selected>{{i}}</option>
+                                    {% else %}
+                                    <option value="{{i}}">{{i}}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                            <!-- as_crispy_field -->
+                        </div>
+                        <div class="col-md-4 mt-3">
+                            <label for="id_yield_per_acre" class=" requiredField">Yield Per Acre</label>
+                            <input type="number" min="0" step="any" name="yield_per_acre" id="id_yield_per_acre" class="textinput textInput form-control" value='{% if new_update_field.yield_per_acre %}{{new_update_field.yield_per_acre}}{% else %}{% endif %}'>
+                            <!-- as_crispy_field -->
+                        </div>
+                        <div class="col-md-4 mt-3">
+                            <label for="id_total_yield" class=" requiredField">Total Yield</label>
+                            <input type="number" min="0" step="any" name="total_yield" id="id_total_yield" class="textinput textInput form-control" value='{% if new_update_field.total_yield %}{{new_update_field.total_yield}}{% else %}{% endif %}'>
+                            <!-- as_crispy_field -->
+                        </div>
+                        
+                    </div>
+                    <div class="row">
+                        <!-- ....... -->
+                        <div class="col-md-4 mt-3">
+                            <label for="id_crop_tech" class=" requiredField">Crop Tech</label>
+                            <input type="number" min="0" step="any" name="crop_tech" id="id_crop_tech" class="textinput textInput form-control" value='{% if new_update_field.crop_tech %}{{new_update_field.crop_tech}}{% else %}{% endif %}'>
+                            <!-- as_crispy_field -->
+                        </div>
+                        <div class="col-md-4 mt-3">
+                            <label for="id_previous_crop" class=" requiredField">Previous Crop</label>
+                            <input type="text" name="previous_crop" id="id_previous_crop" class="textinput textInput form-control" value='{% if new_update_field.previous_crop %}{{new_update_field.previous_crop}}{% else %}{% endif %}'>
+                            <!-- as_crispy_field -->
+                        </div>
+                        <div class="col-md-4 mt-3">
+                            <label for="id_stand_count" class=" requiredField">Stand Count</label>
+                            <input type="text" name="stand_count" id="id_stand_count" class="textinput textInput form-control" value='{% if new_update_field.stand_count %}{{new_update_field.stand_count}}{% else %}{% endif %}'>
+                            <!-- as_crispy_field -->
+                        </div> 
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 mt-3">
+                            <label for="id_plant_date" class=" requiredField">Plant Date</label>
+                            <input type="date" name="plant_date" id="id_plant_date" class="textinput textInput form-control" value='{% if crop_plant_date %}{{crop_plant_date}}{% else %}{% endif %}'>
+                            <!-- as_crispy_field -->
+                        </div>
+                        <div class="col-md-4 mt-3">
+                            <label for="id_harvest_date" class=" requiredField">Harvest Date</label>
+                            <input type="date" name="harvest_date" id="id_harvest_date" class="textinput textInput form-control" value='{% if crop_harvest_date %}{{crop_harvest_date}}{% else %}{% endif %}'>
+                            <!-- as_crispy_field -->
+                        </div>
+                    </div>
+                    
+                    {% else %} 
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-btn-row">
+                                <a href="{% url 'field-list' %}" class="btn-close-cancel btn-space">Cancel</a>
+                                <input type="text" name="btnvariable" id="btnvariable" value="" style="display: none;">
+                                <input type="button" class="btn-save-submit" value="Save" onclick="updateField()">
+                                <input type="submit" class="btn-save-submit" value="Save" id="id_updateField" style="display: none;">
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </form>
+
+                {% if selected_scrop_year %}
+                <hr>
+                <form method="post" class="farm-fields-form" action="{% url 'fieldActivity' %}" id="form_2">
+                    {% csrf_token %}
+                    <input type="hidden" name="hidden_field_id" id="hidden_field_id" value="" />
+                    <input type="hidden" name="hidden_field_name" id="hidden_field_name" value="" />
+                    <input type="hidden" name="hidden_field_farm" id="hidden_field_farm" value="" />
+                    <input type="hidden" name="hidden_field_grower" id="hidden_field_grower" value="" />
+                    <input type="hidden" name="hidden_field_batch_id" id="hidden_field_batch_id" value="" />
+                    <input type="hidden" name="hidden_field_acreage" id="hidden_field_acreage" value="" />
+                    <input type="hidden" name="hidden_field_fsa_farm_number" id="hidden_field_fsa_farm_number" value="" />
+                    <input type="hidden" name="hidden_field_fsa_tract_number" id="hidden_field_fsa_tract_number" value="" />
+                    <input type="hidden" name="hidden_field_fsa_field_number" id="hidden_field_fsa_field_number" value="" />
+                    <input type="hidden" name="hidden_field_latitude" id="hidden_field_latitude" value="" />
+                    <input type="hidden" name="hidden_field_longitude" id="hidden_field_longitude" value="" />
+                    <input type="hidden" name="hidden_field_crop" id="hidden_field_crop" value="" />
+                    <input type="hidden" name="hidden_field_yield_per_acre" id="hidden_field_yield_per_acre" value="" />
+                    <input type="hidden" name="hidden_field_total_yield" id="hidden_field_total_yield" value="" />
+                    <input type="hidden" name="hidden_field_crop_tech" id="hidden_field_crop_tech" value="" />
+                    <input type="hidden" name="hidden_field_plant_date" id="hidden_field_plant_date" value="" />
+                    <input type="hidden" name="hidden_field_harvest_date" id="hidden_field_harvest_date" value="" />
+                    <input type="hidden" name="hidden_field_previous_crop" id="hidden_field_previous_crop" value="" />
+                    <input type="hidden" name="hidden_field_stand_count" id="hidden_field_stand_count" value="" />
+                    <input type="hidden" name="hidden_field_crop_year" id="hidden_field_crop_year" value="{{selected_scrop_year}}" />
+                    <input type="hidden" name="hidden_field_updated_field_id" id="hidden_field_updated_field_id" value="{{hidden_field_updated_field_id}}" />
+                    <input type="hidden" name="hidden_field_crop_variety" id="hidden_field_crop_variety" value="" />
+                    
+                
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div id="div_id_variety2" class="form-group">
+                                <label for="id_variety2" class="">
+                                    Field Activity
+                                </label>
+                                <div>
+                                    <select name="variety" class="select form-control" id="id_variety2">
+                                        <option value="" selected>Select</option>
+                                        <!-- <option value="Pre_Fert">Pre Fert</option>
+                                        <option value="Early_Post_Fert">Early Post Fert</option>
+                                        <option value="Foliar_Fert_App">Foliar Fert App</option>
+                                        <option value="Pre_Flood_Fert">Pre Flood Fert</option>
+                                        <option value="Post_Flood_Mid_Season_Fert">Post Flood / Mid Season Fert</option>
+                                        <option value="Boot_Fertilizer">Boot Fertilizer</option> -->
+                                        <option value="Burndown_Chemical">Burndown Chemical</option>
+                                        <option value="Preemergence_Chemical">Preemergence Chemical</option>
+                                        <option value="Emergence_Chemical">Emergence Chemical</option>
+                                        <option value="Post_Emergence_Chemical">Post Emergence Chemical</option>
+                                        <option value="Fungicide_Micro_Nutrients">Fungicide / Micro Nutrients</option>
+                                        <option value="Insecticide_Application">Insecticide Application</option>
+                                        <option value="Litter">Litter</option>
+                                        <option value="Sodium_Chlorate">Sodium Chlorate</option>
+                                        <option value="Measure_Water">Measured Water Use</option>
+                                        <option value="NPK_Application">NPK Application</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    
+                    <div class="activity-f1" id="af_1" style="display: none;">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div id="div_id_date" class="form-group">
+                                    <label for="id_date" class="">
+                                        Date of Activity
+                                    </label>
+                                    <div>
+                                        <input type="date" name="date" class="numberinput form-control"
+                                            id="id_batch_id_date" >
+                                    </div>
+                                    <p id="disp0" style="color: red;"></p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div id="div_id_date" class="form-group">
+                                    <label for="id_date" class="">
+                                        Mode of Application
+                                    </label>
+                                    <div>
+                                        <input type="text" name="mode_of_application" class="numberinput form-control"
+                                            id="id_batch_id">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div id="div_id_date" class="form-group">
+                                    <label for="id_date" class="">
+                                        Label Name
+                                    </label>
+                                    <div>
+                                        <input type="text" name="label_name" class="numberinput form-control"
+                                            id="id_batch_id">
+                                    </div>
+                                </div>
+                            </div>
+
+                            
+
+                            <div class="col-md-6">
+                                <div id="div_id_date" class="form-group">
+                                    <label for="id_date" class="">
+                                        Amount
+                                    </label>
+                                    <div>
+                                        <input type="number" name="amount_per_acre" class="numberinput form-control"
+                                            id="id_batch_id_apa" step="0.0001">
+                                    </div>
+                                    <p id="disp1" style="color: red;"></p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div id="div_id_date" class="form-group">
+                                    <label for="id_date" class="">
+                                        Unit of measure 
+                                    </label>
+                                    <select name="unit_of_acre" class="select form-control" id="id_variety3">
+                                        <option value="" selected>Select</option>
+                                        <option value="Ounce/Acre">Ounce / acre</option>
+                                        <option value="Fl Ounce/Acre">Fl Ounce / acre</option>
+                                        <option value="Gal/Acre">Gal / acre</option>
+                                        <option value="LBS/Acre">LBS / acre</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div id="div_id_date" class="form-group">
+                                    <label for="id_date" class="">
+                                        Special Notes
+                                    </label>
+                                    <div>
+                                        <textarea type="text" name="special_notes" class="numberinput form-control"
+                                            id="id_batch_id"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="row mb-4">
+                            <div class="form-btn-row" style="text-align: left;">
+                                <input style="display : none;" id="submitActivityButton1" type="submit" class="btn-save-submit" value="Add">
+                                <input type="button" class="btn-save-submit" value="Add" onclick="activityButton1()">
+                                <a href="/field/list/" class="btn-close-cancel btn-space">Discard</a>
+
+                            </div>
+                        </div>
+                    </div>
+
+               
+                    <div class="activity-f2" id="af_2" style="display: none;">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div id="div_id_date" class="form-group">
+                                    <label for="id_date" class="">
+                                        Date of Activity
+                                    </label>
+                                    <div>
+                                        <input type="date" name="date_2" class="numberinput form-control"
+                                            id="id_batch_id_date2">
+                                    </div>
+                                    <p id="disp2" style="color: red;"></p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div id="div_id_date" class="form-group">
+                                    <label for="id_date" class="">
+                                        Activity Type 
+                                    </label>
+                                    <select name="type_of_application" class="select form-control" id="id_variety3">
+                                        <option value="" selected>Select</option>
+                                        <option value="Pre Fert">Pre Fert</option>
+                                        <option value="Early Post Fert">Early Post Fert</option>
+                                        <option value="Foliar Fert App">Foliar Fert App</option>
+                                        <option value="Pre Flood Fert">Pre Flood Fert</option>
+                                        <option value="Post Flood Mid Season Fert">Post Flood / Mid Season Fert</option>
+                                        <option value="Boot Fertilizer">Boot Fertilizer</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div id="div_id_date" class="form-group">
+                                    <label for="id_date" class="">
+                                        Mode of Application
+                                    </label>
+                                    <div>
+                                        <input type="text" name="mode_of_application_2" class="numberinput form-control"
+                                            id="id_batch_id">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div id="div_id_date" class="form-group">
+                                    <label for="id_date" class="">
+                                        N-Nitrogen
+                                    </label>
+                                    <div>
+                                        <input type="number" name="nitrogen" class="numberinput form-control"
+                                            id="id_batch_id_nitrogen" step="0.0001">
+                                    </div>
+                                    <p id="disp3" style="color: red;"></p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div id="div_id_date" class="form-group">
+                                    <label for="id_date" class="">
+                                        P-Phosporus
+                                    </label>
+                                    <div>
+                                        <input type="number" name="phosporus" class="numberinput form-control"
+                                            id="id_batch_id_phosporus" step="0.0001">
+                                    </div>
+                                    <p id="disp4" style="color: red;"></p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div id="div_id_date" class="form-group">
+                                    <label for="id_date" class="">
+                                        K-Potassium
+                                    </label>
+                                    <div>
+                                        <input type="number" name="potassium" class="numberinput form-control"
+                                            id="id_batch_id_potassium" step="0.0001">
+                                    </div>
+                                    <p id="disp5" style="color: red;"></p>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div id="div_id_date" class="form-group">
+                                    <label for="id_date" class="">
+                                        Special Notes
+                                    </label>
+                                    <div>
+                                        <textarea type="text" name="special_notes_2" class="numberinput form-control"
+                                            id="id_batch_id"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="row  mb-4">
+                            <div class="form-btn-row" style="text-align: left;">
+                                <input style="display : none;" id="submitActivityButton2" type="submit" class="btn-save-submit" value="Add">
+                                <input type="button" class="btn-save-submit" value="Add" onclick="activityButton2()">
+                                <a href="/field/list/" class="btn-close-cancel btn-space">Discard</a>
+
+                            </div>
+                        </div>
+                    </div>
+                    
+                    
+                    <!--1 field_Pre_Fert -->
+                    <!-- {% if field_Pre_Fert|length > 0 %}
+                    <div id="pre_fert_table_1" class="pre-table mb-4">
+                        <h4 id="root">Pre Fert</h4>
+                        <table class="table table-striped table-bordered dt-responsive nowrap">
+                            <thead>
+                                <tr>
+                                    <th>Date of Activity</th>
+                                    <th>Mode of Application</th>
+                                    <th>Label Name</th>
+                                    <th>Amount Per Acre</th>
+                                    <th>UoM</th>
+                                    <th>Special Notes</th>
+                                    <th>ACTION</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for i in field_Pre_Fert %}
+                                <tr>
+                                    <td>{{ i.date_of_activity }}</td>
+                                    <td>{{ i.mode_of_application }}</td>
+                                    <td>{{ i.label_name }}</td>
+                                    <td>{{ i.amount_per_acre }}</td>
+                                    <td>{{ i.unit_of_acre }}</td>
+                                    <td>{{ i.special_notes }}</td>
+                                    <td>
+                                        <a onclick="delActivityField('{% url 'fieldActivity-delete' i.id  %}')" href="javascript:void(0)"
+                                        data-mdb-toggle="modal" data-mdb-target="#deleteModal"><span class="fas fa-trash"></span></a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                <tr>
+                                    <td>Total</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td>{{ sum_Pre_Fert }}</td>
+                                    <td>LBS / acre</td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    {% endif %} -->
+                        
+                  <!--2 Early_Post_Fert  -->
+                  <!-- {% if field_activity_Early_Post_Fert|length > 0 %}
+                  <div id="pre_fert_table_1" class="pre-table mb-4">
+                      <h4 id="root">Early Post Fert</h4>
+                      <table class="table table-striped table-bordered dt-responsive nowrap">
+                          <thead>
+                              <tr>
+                                  <th>Date of Activity</th>
+                                  <th>Mode of Application</th>
+                                  <th>Label Name</th>
+                                  <th>Amount Per Acre</th>
+                                  <th>UoM</th>
+                                  <th>Special Notes</th>
+                                  <th>ACTION</th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                              {% for i in field_activity_Early_Post_Fert %}
+                              <tr>
+                                  <td>{{ i.date_of_activity }}</td>
+                                  <td>{{ i.mode_of_application }}</td>
+                                  <td>{{ i.label_name }}</td>
+                                  <td>{{ i.amount_per_acre }}</td>
+                                  <td>LBS / acre</td>
+                                  <td>{{ i.special_notes }}</td>
+                                  <td>
+                                    <a onclick="delActivityField('{% url 'fieldActivity-delete' i.id  %}')" href="javascript:void(0)"
+                                    data-mdb-toggle="modal" data-mdb-target="#deleteModal"><span class="fas fa-trash"></span></a>
+                                </td>
+                              </tr>
+                              {% endfor %}
+                              <tr>
+                                  <td>Total</td>
+                                  <td></td>
+                                  <td></td>
+                                  <td>{{sum_Early_Post_Fert}}</td>
+                                  <td>LBS / acre</td>
+                                  <td></td>
+                                  <td></td>
+                              </tr>
+                          </tbody>
+                      </table>
+                  </div>
+                  {% endif %} -->
+
+                  <!--3 Foliar Fert App  -->
+                  <!-- {% if field_activity_Foliar_Fert_App|length > 0 %}
+                  <div id="pre_fert_table_1" class="pre-table mb-4">
+                      <h4 id="root">Foliar Fert App</h4>
+                      <table class="table table-striped table-bordered dt-responsive nowrap">
+                          <thead>
+                              <tr>
+                                  <th>Date of Activity</th>
+                                  <th>Mode of Application</th>
+                                  <th>Label Name</th>
+                                  <th>Amount Per Acre</th>
+                                  <th>UoM</th>
+                                  <th>Special Notes</th>
+                                  <th>ACTION</th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                              {% for i in field_activity_Foliar_Fert_App %}
+                              <tr>
+                                  <td>{{ i.date_of_activity }}</td>
+                                  <td>{{ i.mode_of_application }}</td>
+                                  <td>{{ i.label_name }}</td>
+                                  <td>{{ i.amount_per_acre }}</td>
+                                  <td>LBS / acre</td>
+                                  <td>{{ i.special_notes }}</td>
+                                  <td>
+                                    <a onclick="delActivityField('{% url 'fieldActivity-delete' i.id  %}')" href="javascript:void(0)"
+                                    data-mdb-toggle="modal" data-mdb-target="#deleteModal"><span class="fas fa-trash"></span></a>
+                                </td>
+                              </tr>
+                              {% endfor %}
+                              <tr>
+                                  <td>Total</td>
+                                  <td></td>
+                                  <td></td>
+                                  <td>{{sum_Foliar_Fert_App}}</td>
+                                  <td>LBS / acre</td>
+                                  <td></td>
+                                  <td></td>
+                              </tr>
+                          </tbody>
+                      </table>
+                  </div>
+                  {% endif %} -->
+
+                  <!--4 Pre Flood Fert  -->
+                  <!-- {% if field_activity_Pre_Flood_Fert|length > 0 %}
+                  <div id="pre_fert_table_1" class="pre-table mb-4">
+                      <h4 id="root">Pre Flood Fert</h4>
+                      <table class="table table-striped table-bordered dt-responsive nowrap">
+                          <thead>
+                              <tr>
+                                  <th>Date of Activity</th>
+                                  <th>Mode of Application</th>
+                                  <th>Label Name</th>
+                                  <th>Amount Per Acre</th>
+                                  <th>UoM</th>
+                                  <th>Special Notes</th>
+                                  <th>ACTION</th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                              {% for i in field_activity_Pre_Flood_Fert %}
+                              <tr>
+                                  <td>{{ i.date_of_activity }}</td>
+                                  <td>{{ i.mode_of_application }}</td>
+                                  <td>{{ i.label_name }}</td>
+                                  <td>{{ i.amount_per_acre }}</td>
+                                  <td>LBS / acre</td>
+                                  <td>{{ i.special_notes }}</td>
+                                  <td>
+                                    <a onclick="delActivityField('{% url 'fieldActivity-delete' i.id  %}')" href="javascript:void(0)"
+                                    data-mdb-toggle="modal" data-mdb-target="#deleteModal"><span class="fas fa-trash"></span></a>
+                                </td>
+                              </tr>
+                              {% endfor %}
+                              <tr>
+                                  <td>Total</td>
+                                  <td></td>
+                                  <td></td>
+                                  <td>{{sum_Pre_Flood_Fert}}</td>
+                                  <td>LBS / acre</td>
+                                  <td></td>
+                                  <td></td>
+                              </tr>
+                          </tbody>
+                      </table>
+                  </div>
+                  {% endif %} -->
+
+                  <!--5 Post Flood / Mid Season Fert  -->
+                  <!-- {% if field_activity_Post_Flood_Mid_Season_Fert|length > 0 %}
+                  <div id="pre_fert_table_1" class="pre-table mb-4">
+                      <h4 id="root">Post Flood / Mid Season Fert</h4>
+                      <table class="table table-striped table-bordered dt-responsive nowrap">
+                          <thead>
+                              <tr>
+                                  <th>Date of Activity</th>
+                                  <th>Mode of Application</th>
+                                  <th>Label Name</th>
+                                  <th>Amount Per Acre</th>
+                                  <th>UoM</th>
+                                  <th>Special Notes</th>
+                                  <th>ACTION</th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                              {% for i in field_activity_Post_Flood_Mid_Season_Fert %}
+                              <tr>
+                                  <td>{{ i.date_of_activity }}</td>
+                                  <td>{{ i.mode_of_application }}</td>
+                                  <td>{{ i.label_name }}</td>
+                                  <td>{{ i.amount_per_acre }}</td>
+                                  <td>LBS / acre</td>
+                                  <td>{{ i.special_notes }}</td>
+                                  <td>
+                                    <a onclick="delActivityField('{% url 'fieldActivity-delete' i.id  %}')" href="javascript:void(0)"
+                                    data-mdb-toggle="modal" data-mdb-target="#deleteModal"><span class="fas fa-trash"></span></a>
+                                </td>
+                              </tr>
+                              {% endfor %}
+                              <tr>
+                                  <td>Total</td>
+                                  <td></td>
+                                  <td></td>
+                                  <td>{{sum_Flood_Mid_Season_Fert}}</td>
+                                  <td>LBS / acre</td>
+                                  <td></td>
+                                  <td></td>
+                              </tr>
+                          </tbody>
+                      </table>
+                  </div>
+                  {% endif %} -->
+
+
+                  <!--6 Boot Fertilizer  -->
+                  <!-- {% if field_activity_Boot_Fertilizer|length > 0 %}
+                  <div id="pre_fert_table_1" class="pre-table mb-4">
+                      <h4 id="root">Boot Fertilizer</h4>
+                      <table class="table table-striped table-bordered dt-responsive nowrap">
+                          <thead>
+                              <tr>
+                                  <th>Date of Activity</th>
+                                  <th>Mode of Application</th>
+                                  <th>Label Name</th>
+                                  <th>Amount Per Acre</th>
+                                  <th>UoM</th>
+                                  <th>Special Notes</th>
+                                  <th>ACTION</th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                              {% for i in field_activity_Boot_Fertilizer %}
+                              <tr>
+                                  <td>{{ i.date_of_activity }}</td>
+                                  <td>{{ i.mode_of_application }}</td>
+                                  <td>{{ i.label_name }}</td>
+                                  <td>{{ i.amount_per_acre }}</td>
+                                  <td>LBS / acre</td>
+                                  <td>{{ i.special_notes }}</td>
+                                  <td>
+                                    <a onclick="delActivityField('{% url 'fieldActivity-delete' i.id  %}')" href="javascript:void(0)"
+                                    data-mdb-toggle="modal" data-mdb-target="#deleteModal"><span class="fas fa-trash"></span></a>
+                                </td>
+                              </tr>
+                              {% endfor %}
+                              <tr>
+                                  <td>Total</td>
+                                  <td></td>
+                                  <td></td>
+                                  <td>{{sum_Boot_Fertilizer}}</td>
+                                  <td>LBS / acre</td>
+                                  <td></td>
+                                  <td></td>
+                              </tr>
+                          </tbody>
+                      </table>
+                  </div>
+                  {% endif %} -->
+
+
+                  <!--7 Burndown Chemical  -->
+                  {% if field_activity_Burndown_Chemical|length > 0 %}
+                  <div id="pre_fert_table_1" class="pre-table mb-4">
+                      <h4 id="root">Burndown Chemical</h4>
+                      <table class="table table-striped table-bordered dt-responsive nowrap">
+                          <thead>
+                              <tr>
+                                  <th>Date of Activity</th>
+                                  <th>Mode of Application</th>
+                                  <th>Label Name</th>
+                                  <th>Amount Per Acre</th>
+                                  <th>UoM</th>
+                                  <th>Special Notes</th>
+                                  <th>ACTION</th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                              {% for i in field_activity_Burndown_Chemical %}
+                              <tr>
+                                  <td>{{ i.date_of_activity }}</td>
+                                  <td>{{ i.mode_of_application }}</td>
+                                  <td>{{ i.label_name }}</td>
+                                  <td>{{ i.amount_per_acre }}</td>
+                                  <td>{{ i.unit_of_acre }}</td>
+                                  <td>{{ i.special_notes }}</td>
+                                  <td>
+                                    <a onclick="delActivityField('{% url 'fieldActivity-delete' i.id  %}')" href="javascript:void(0)"
+                                    data-mdb-toggle="modal" data-mdb-target="#deleteModal"><span class="fas fa-trash"></span></a>
+                                </td>
+                              </tr>
+                              {% endfor %}
+                              <tr>
+                                  <td>Total</td>
+                                  <td></td>
+                                  <td></td>
+                                  <td></td>
+                                  <!-- <td>{{sum_Burndown_Chemical}}</td> -->
+                                  <td>{{ i.unit_of_acre }}</td>
+                                  <td></td>
+                                  <td></td>
+                              </tr>
+                          </tbody>
+                      </table>
+                  </div>
+                  {% endif %}
+
+                  <!--8 Preemergence Chemical  -->
+                  {% if field_activity_Preemergence_Chemical|length > 0 %}
+                  <div id="pre_fert_table_1" class="pre-table mb-4">
+                      <h4 id="root">Preemergence Chemical</h4>
+                      <table class="table table-striped table-bordered dt-responsive nowrap">
+                          <thead>
+                              <tr>
+                                  <th>Date of Activity</th>
+                                  <th>Mode of Application</th>
+                                  <th>Label Name</th>
+                                  <th>Amount Per Acre</th>
+                                  <th>UoM</th>
+                                  <th>Special Notes</th>
+                                  <th>ACTION</th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                              {% for i in field_activity_Preemergence_Chemical %}
+                              <tr>
+                                  <td>{{ i.date_of_activity }}</td>
+                                  <td>{{ i.mode_of_application }}</td>
+                                  <td>{{ i.label_name }}</td>
+                                  <td>{{ i.amount_per_acre }}</td>
+                                  <td>{{ i.unit_of_acre }}</td>
+                                  <td>{{ i.special_notes }}</td>
+                                  <td>
+                                    <a onclick="delActivityField('{% url 'fieldActivity-delete' i.id  %}')" href="javascript:void(0)"
+                                    data-mdb-toggle="modal" data-mdb-target="#deleteModal"><span class="fas fa-trash"></span></a>
+                                </td>
+                              </tr>
+                              {% endfor %}
+                              <tr>
+                                <td>Total</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <!-- <td>{{sum_Preemergence_Chemical}}</td> -->
+                                <!-- <td>LBS / acre</td> -->
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                          </tbody>
+                      </table>
+                  </div>
+                  {% endif %}
+
+                  <!--9 Post Emergence Chemical  -->
+                  {% if field_activity_Post_Emergence_Chemical|length > 0 %}
+                  <div id="pre_fert_table_1" class="pre-table mb-4">
+                      <h4 id="root">Post Emergence Chemical</h4>
+                      <table class="table table-striped table-bordered dt-responsive nowrap">
+                          <thead>
+                              <tr>
+                                  <th>Date of Activity</th>
+                                  <th>Mode of Application</th>
+                                  <th>Label Name</th>
+                                  <th>Amount Per Acre</th>
+                                  <th>UoM</th>
+                                  <th>Special Notes</th>
+                                  <th>ACTION</th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                              {% for i in field_activity_Post_Emergence_Chemical %}
+                              <tr>
+                                  <td>{{ i.date_of_activity }}</td>
+                                  <td>{{ i.mode_of_application }}</td>
+                                  <td>{{ i.label_name }}</td>
+                                  <td>{{ i.amount_per_acre }}</td>
+                                  <td>{{ i.unit_of_acre }}</td>
+                                  <td>{{ i.special_notes }}</td>
+                                  <td>
+                                    <a onclick="delActivityField('{% url 'fieldActivity-delete' i.id  %}')" href="javascript:void(0)"
+                                    data-mdb-toggle="modal" data-mdb-target="#deleteModal"><span class="fas fa-trash"></span></a>
+                                </td>
+                              </tr>
+                              {% endfor %}
+                              <tr>
+                                <td>Total</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <!-- <td>{{sum_Post_Emergence_Chemical}}</td> -->
+                                <!-- <td>LBS / acre</td> -->
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                          </tbody>
+                      </table>
+                  </div>
+                  {% endif %}
+
+
+
+                  <!--10 Emergence Chemical  -->
+                  {% if field_activity_Emergence_Chemical|length > 0 %}
+                  <div id="pre_fert_table_1" class="pre-table mb-4">
+                      <h4 id="root">Emergence Chemical</h4>
+                      <table class="table table-striped table-bordered dt-responsive nowrap">
+                          <thead>
+                              <tr>
+                                  <th>Date of Activity</th>
+                                  <th>Mode of Application</th>
+                                  <th>Label Name</th>
+                                  <th>Amount Per Acre</th>
+                                  <th>UoM</th>
+                                  <th>Special Notes</th>
+                                  <th>ACTION</th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                              {% for i in field_activity_Emergence_Chemical %}
+                              <tr>
+                                  <td>{{ i.date_of_activity }}</td>
+                                  <td>{{ i.mode_of_application }}</td>
+                                  <td>{{ i.label_name }}</td>
+                                  <td>{{ i.amount_per_acre }}</td>
+                                  <td>{{ i.unit_of_acre }}</td>
+                                  <td>{{ i.special_notes }}</td>
+                                  <td>
+                                    <a onclick="delActivityField('{% url 'fieldActivity-delete' i.id  %}')" href="javascript:void(0)"
+                                    data-mdb-toggle="modal" data-mdb-target="#deleteModal"><span class="fas fa-trash"></span></a>
+                                </td>
+                              </tr>
+                              {% endfor %}
+                              <tr>
+                                <td>Total</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <!-- <td>{{sum_Post_Emergence_Chemical}}</td> -->
+                                <!-- <td>LBS / acre</td> -->
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                          </tbody>
+                      </table>
+                  </div>
+                  {% endif %}
+
+
+                  <!--11 Fungicide / Micro Nutrients  -->
+                  {% if field_activity_Fungicide_Micro_Nutrients|length > 0 %}
+                  <div id="pre_fert_table_1" class="pre-table mb-4">
+                      <h4 id="root">Fungicide / Micro Nutrients</h4>
+                      <table class="table table-striped table-bordered dt-responsive nowrap">
+                          <thead>
+                              <tr>
+                                  <th>Date of Activity</th>
+                                  <th>Mode of Application</th>
+                                  <th>Label Name</th>
+                                  <th>Amount Per Acre</th>
+                                  <th>UoM</th>
+                                  <th>Special Notes</th>
+                                  <th>ACTION</th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                              {% for i in field_activity_Fungicide_Micro_Nutrients %}
+                              <tr>
+                                  <td>{{ i.date_of_activity }}</td>
+                                  <td>{{ i.mode_of_application }}</td>
+                                  <td>{{ i.label_name }}</td>
+                                  <td>{{ i.amount_per_acre }}</td>
+                                  <td>{{ i.unit_of_acre }}</td>
+                                  <td>{{ i.special_notes }}</td>
+                                  <td>
+                                    <a onclick="delActivityField('{% url 'fieldActivity-delete' i.id  %}')" href="javascript:void(0)"
+                                    data-mdb-toggle="modal" data-mdb-target="#deleteModal"><span class="fas fa-trash"></span></a>
+                                </td>
+                              </tr>
+                              {% endfor %}
+                              <tr>
+                                <td>Total</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <!-- <td>{{sum_Fungicide_Micro_Nutrients}}</td> -->
+                                <td>{{ i.unit_of_acre }}</td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                          </tbody>
+                      </table>
+                  </div>
+                  {% endif %}
+
+                  <!--11 Insecticide Application  -->
+                  {% if field_activity_Insecticide_Application|length > 0 %}
+                  <div id="pre_fert_table_1" class="pre-table mb-4">
+                      <h4 id="root">Insecticide Application</h4>
+                      <table class="table table-striped table-bordered dt-responsive nowrap">
+                          <thead>
+                              <tr>
+                                  <th>Date of Activity</th>
+                                  <th>Mode of Application</th>
+                                  <th>Label Name</th>
+                                  <th>Amount Per Acre</th>
+                                  <th>UoM</th>
+                                  <th>Special Notes</th>
+                                  <th>ACTION</th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                              {% for i in field_activity_Insecticide_Application %}
+                              <tr>
+                                  <td>{{ i.date_of_activity }}</td>
+                                  <td>{{ i.mode_of_application }}</td>
+                                  <td>{{ i.label_name }}</td>
+                                  <td>{{ i.amount_per_acre }}</td>
+                                  <!-- <td>LBS / acre</td> -->
+                                  <td></td>
+                                  <td>{{ i.special_notes }}</td>
+                                  <td>
+                                    <a onclick="delActivityField('{% url 'fieldActivity-delete' i.id  %}')" href="javascript:void(0)"
+                                    data-mdb-toggle="modal" data-mdb-target="#deleteModal"><span class="fas fa-trash"></span></a>
+                                </td>
+                              </tr>
+                              {% endfor %}
+                              <tr>
+                                <td>Total</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <!-- <td>{{sum_Insecticide_Application}}</td> -->
+                                <td>{{ i.unit_of_acre }}</td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                          </tbody>
+                      </table>
+                  </div>
+                  {% endif %}
+
+                  <!--12 Litter  -->
+                  {% if field_activity_Litter|length > 0 %}
+                  <div id="pre_fert_table_1" class="pre-table mb-4">
+                      <h4 id="root">Litter </h4>
+                      <table class="table table-striped table-bordered dt-responsive nowrap">
+                          <thead>
+                              <tr>
+                                  <th>Date of Activity</th>
+                                  <th>Mode of Application</th>
+                                  <th>Label Name</th>
+                                  <th>Amount Per Acre</th>
+                                  <th>UoM</th>
+                                  <th>Special Notes</th>
+                                  <th>ACTION</th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                              {% for i in field_activity_Litter %}
+                              <tr>
+                                  <td>{{ i.date_of_activity }}</td>
+                                  <td>{{ i.mode_of_application }}</td>
+                                  <td>{{ i.label_name }}</td>
+                                  <td>{{ i.amount_per_acre }}</td>
+                                  <!-- <td>LBS / acre</td> -->
+                                  <td></td>
+                                  <td>{{ i.special_notes }}</td>
+                                  <td>
+                                    <a onclick="delActivityField('{% url 'fieldActivity-delete' i.id  %}')" href="javascript:void(0)"
+                                    data-mdb-toggle="modal" data-mdb-target="#deleteModal"><span class="fas fa-trash"></span></a>
+                                </td>
+                              </tr>
+                              {% endfor %}
+                              <tr>
+                                <td>Total</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <!-- <td>{{sum_Litter}}</td> -->
+                                <td>{{ i.unit_of_acre }}</td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                          </tbody>
+                      </table>
+                  </div>
+                  {% endif %}
+
+                  <!--12 Sodium Chlorate  -->
+                  {% if field_activity_Sodium_Chlorate|length > 0 %}
+                  <div id="pre_fert_table_1" class="pre-table mb-4">
+                      <h4 id="root">Sodium Chlorate</h4>
+                      <table class="table table-striped table-bordered dt-responsive nowrap">
+                          <thead>
+                              <tr>
+                                  <th>Date of Activity</th>
+                                  <th>Mode of Application</th>
+                                  <th>Label Name</th>
+                                  <th>Amount Per Acre</th>
+                                  <th>UoM</th>
+                                  <th>Special Notes</th>
+                                  <th>ACTION</th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                              {% for i in field_activity_Sodium_Chlorate %}
+                              <tr>
+                                  <td>{{ i.date_of_activity }}</td>
+                                  <td>{{ i.mode_of_application }}</td>
+                                  <td>{{ i.label_name }}</td>
+                                  <td>{{ i.amount_per_acre }}</td>
+                                  <!-- <td>LBS / acre</td> -->
+                                  <td></td>
+                                  <td>{{ i.special_notes }}</td>
+                                  <td>
+                                    <a onclick="delActivityField('{% url 'fieldActivity-delete' i.id  %}')" href="javascript:void(0)"
+                                    data-mdb-toggle="modal" data-mdb-target="#deleteModal"><span class="fas fa-trash"></span></a>
+                                </td>
+                              </tr>
+                              {% endfor %}
+                              <tr>
+                                  <td>Total</td>
+                                  <td></td>
+                                  <td></td>
+                                  <td></td>
+                                  <!-- <td>{{sum_Sodium_Chlorate}}</td> -->
+                                  <td>{{ i.unit_of_acre }}</td>
+                                  <td></td>
+                                  <td></td>
+                              </tr>
+                          </tbody>
+                      </table>
+                  </div>
+                  {% endif %}
+
+
+                  <!--10 Measure Water  -->
+                  {% if field_activity_Measure_Water|length > 0 %}
+                  <div id="pre_fert_table_1" class="pre-table mb-4">
+                      <h4 id="root">Measured Water Use</h4>
+                      <table class="table table-striped table-bordered dt-responsive nowrap">
+                          <thead>
+                              <tr>
+                                  <th>Date of Activity</th>
+                                  <th>Mode of Application</th>
+                                  <th>Label Name</th>
+                                  <th>Amount Per Acre</th>
+                                  <th>UoM</th>
+                                  <th>Special Notes</th>
+                                  <th>ACTION</th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                              {% for i in field_activity_Measure_Water %}
+                              <tr>
+                                  <td>{{ i.date_of_activity }}</td>
+                                  <td>{{ i.mode_of_application }}</td>
+                                  <td>{{ i.label_name }}</td>
+                                  <td>{{ i.amount_per_acre }}</td>
+                                  <td>{{ i.unit_of_acre }}</td>
+                                  <td>{{ i.special_notes }}</td>
+                                  <td>
+                                    <a onclick="delActivityField('{% url 'fieldActivity-delete' i.id  %}')" href="javascript:void(0)"
+                                    data-mdb-toggle="modal" data-mdb-target="#deleteModal"><span class="fas fa-trash"></span></a>
+                                </td>
+                              </tr>
+                              {% endfor %}
+                              <tr>
+                                <td>Total</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <!-- <td>{{sum_Post_Emergence_Chemical}}</td> -->
+                                <!-- <td>LBS / acre</td> -->
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                          </tbody>
+                      </table>
+                  </div>
+                  {% endif %}
+        
+
+                    <!-- include NPK -->
+                    {% if field_activity_npk|length > 0 %}
+                    <div id="pre_fert_table_2" class="pre-table">
+                        <h4>NPK Application</h4>
+                        <table class="table table-striped table-bordered dt-responsive nowrap">
+                            <thead>
+                                <tr>
+                                    <th style="width:10%">Date of Activity</th>
+                                    <th style="width:10%">Activity Type</th>
+                                    <th style="width:10%">Mode</th>
+                                    <th style="width:10%">N-Nitrogen</th>
+                                    <th style="width:10%">P-Phosporus</th>
+                                    <th style="width:10%">K-Potassium</th>
+                                    <th style="width:10%">UoM</th>
+                                    <th style="width:20%">Special Notes</th>
+                                    <th style="width:10%">ACTION</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                               
+                                {% for i in field_activity_npk %}
+                                <tr>  
+                                    <td>{{ i.date_of_activity }}</td>
+                                    <td>{{ i.type_of_application }}</td>
+                                    <td>{{ i.mode_of_application }}</td>
+                                    <td>{{ i.n_nitrogen }}</td>
+                                    <td>{{ i.p_phosporus }}</td>
+                                    <td>{{ i.k_potassium }}</td>
+                                    <td>LBS / acre</td>
+                                    <td>{{ i.special_notes }}</td>
+                                    <td>
+                                    <a onclick="delActivityField('{% url 'fieldActivity-delete' i.id  %}')" href="javascript:void(0)"
+                                    data-mdb-toggle="modal" data-mdb-target="#deleteModal"><span class="fas fa-trash"></span></a>
+                                </td>
+                                </tr>
+                                {% endfor %}
+                                
+                                <tr>
+                                    <td>Total</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td>{{sum_nitrogen}}</td>
+                                    <td>{{sum_phosporus}}</td>
+                                    <td>{{sum_potassium}}</td>
+                                    <td>LBS / acre</td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    {% endif %}
+                    <div class='row'>
+                        <div class='col-16 '>
+                            <div id='ExtraTextBoxesGroup'>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-btn-row">
+                                <a href="{% url 'field-list' %}" class="btn-close-cancel btn-space">Cancel</a>
+                                <!-- <input type="button" class="btn-save-submit" value="Save" onclick="formOneButton()"> -->
+                                <input type="submit" class="btn-save-submit" value="Save" id="qqqq">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- <input style="display : none;" id="submitBtn" type="submit" class="apply-filter-btn primary-btn"
+                    value="Apply Filter" /> -->
+                    
+                </form>
+                {% endif %}
+            </div>
+        </div>
+    </main>
+    {% include 'footer.html' %}
+</div>
+
+<!-- Delete Popup -->
+<div class="modal fade" id="deleteModal" aria-hidden="true" aria-labelledby="exampleModalToggleLabel22" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+  
+        <div class="modal-body">
+          <button type="button" class="btn-close cust-close-ds-btn" data-mdb-dismiss="modal" aria-label="Close"></button>
+          <div class="center-content-status">
+            <img src="{% static 'img/trash.png' %}" alt="right" id="rightImg" class="warning-icon">
+            <p id="message" class="modal-title titlepad">Are you sure you want to delete?</p>
+          </div>
+          <div class="modal-center-btn-footer">
+            <button onclick="reloadwindow()" id="closeBtnpopup" type="button" class="btn-close-cancel btn-space"
+              data-mdb-dismiss="modal">
+              Close
+            </button>
+            <a onclick="fieldacdeleteNow()" id="fieldacDelete" pkidhref=""><button type=""
+                class="btn-save-submit">Delete</button></a>
+            </a>
+          </div>
+        </div>
+  
+      </div>
+    </div>
+</div>
+
+{% endblock %}
+{% block jquery %}
+<script>
+    $(document).ready(function(e){
+        //$('#id_variety').val('');
+        $('#id_variety').find('option').prop('disabled', false);
+        var crop_val = $('#id_crop').val();
+        if(crop_val == 'RICE')
+        {
+            $('#id_variety option').filter('[value="DG 2425 XF"],[value="DG 3450 B2XF"],[value="DG 3470 B3XF"],[value="DG 3570 B3XF"],[value="DG 3635 B2XF"],[value="DG 3544 B2XF"],[value="DG 3651NR B2XF"],[value="DG 3109 B2XF"],[value="DG 3387 B3XF"],[value="DG 3421 B3XF"],[value="DG H929 B3XF"],[value="DG 3555 B3XF"],[value="DG 3402 B3XF"],[value="DG H959 B3XF"],[value="DG 3469 B3XF"],[value="DG 3615 B3XF"],[value="DG P224 B3XF"],[value="DG 3385 B2XF"],[value="DG 3422 B3XF"],[value="DG 3799 B3XF"],[value="DG-Wheat"],[value="DG 1464"],[value="DG3605"],[value="DG 3215 B3XF"]').prop('disabled', true);
+        }
+
+        if(crop_val == 'COTTON')
+        {
+            $('#id_variety option').filter('[value="DG-263L"],[value="DG-Wheat"]').prop('disabled', true);
+        }
+
+    });
+    
+    $('#id_crop').on('change', function(e){
+        $('#id_variety').val('');
+        $('#id_variety').find('option').prop('disabled', false);
+        var crop_val = $(this).val();
+        if(crop_val == 'RICE')
+        {
+            $('#id_variety option').filter('[value="DG 2425 XF"],[value="DG 3450 B2XF"],[value="DG 3470 B3XF"],[value="DG 3570 B3XF"],[value="DG 3635 B2XF"],[value="DG 3544 B2XF"],[value="DG 3651NR B2XF"],[value="DG 3109 B2XF"],[value="DG 3387 B3XF"],[value="DG 3421 B3XF"],[value="DG H929 B3XF"],[value="DG 3555 B3XF"],[value="DG 3402 B3XF"],[value="DG H959 B3XF"],[value="DG 3469 B3XF"],[value="DG 3615 B3XF"],[value="DG P224 B3XF"],[value="DG 3385 B2XF"],[value="DG 3422 B3XF"],[value="DG 3799 B3XF"],[value="DG-Wheat"],[value="DG 1464"],[value="DG3605"],[value="DG 3215 B3XF"]').prop('disabled', true);
+        }
+
+        if(crop_val == 'COTTON')
+        {
+            $('#id_variety option').filter('[value="DG-263L"],[value="DG-Wheat"]').prop('disabled', true);
+        }
+        if(crop_val == 'WHEAT')
+        {
+            $('#id_variety option').filter('[value="DG-263L"],[value="DG 2425 XF"],[value="DG 3450 B2XF"],[value="DG 3470 B3XF"],[value="DG 3570 B3XF"],[value="DG 3635 B2XF"],[value="DG 3544 B2XF"],[value="DG 3651NR B2XF"],[value="DG 3109 B2XF"],[value="DG 3387 B3XF"],[value="DG 3421 B3XF"],[value="DG H929 B3XF"],[value="DG 3555 B3XF"],[value="DG 3402 B3XF"],[value="DG H959 B3XF"],[value="DG 3469 B3XF"],[value="DG 3615 B3XF"],[value="DG P224 B3XF"],[value="DG 3385 B2XF"],[value="DG 3422 B3XF"],[value="DG 3799 B3XF"],[value="DG 1464"],[value="DG3605"],[value="DG 3215 B3XF"]').prop('disabled', true);
+        }
+    });
+</script>
+<script>
+    function delActivityField(url){
+    $('#fieldacDelete').show();
+    $('#fieldacDelete').attr('url',url);
+  }
+  function fieldacdeleteNow(){
+    url = $('#fieldacDelete').attr('url');
+    $.ajax({
+    url: url,
+    data: { },
+    success: function (data) {
+      if (data==1){
+        location.reload();
+      }
+    }
+  });
+  }
+</script>
+<script>
+    $('#id_variety2').on('change', function (e) {
+        var selected_value = $(this).val();
+        if (selected_value == '') 
+        {
+            af_1.style.display='none'
+            af_2.style.display='none'
+        }
+        else if (selected_value == 'NPK_Application') {
+            af_1.style.display='none'
+            af_2.style.display='block'
+        }
+        else{
+            af_1.style.display='block'
+            af_2.style.display='none'
+        }
+    
+    });
+    
+
+    function formOneButton(){
+        $('#submitBtn').click();
+    }
+
+
+    function activityButton1(){
+        var activity_date = $('#id_batch_id_date').val();
+        var activity_apa = $('#id_batch_id_apa').val();
+
+        if(activity_date != '' && activity_apa != ''){
+            $('#submitActivityButton1').click();
+        }else{
+            if(activity_date == '')
+                  {
+                    $('#id_batch_id_date').css('border-color', 'red');
+                    document.getElementById("disp0").innerHTML = "*Please select a date";
+                  }
+                  else{
+                    $('#id_batch_id_date').css('border-color', '#bdbdbd');
+                    document.getElementById("disp0").innerHTML = "";
+                  }
+
+                  if(activity_apa == '')
+                  {
+                    $('#id_batch_id_apa').css('border-color', 'red');
+                    document.getElementById("disp1").innerHTML = "* It can't be empty";
+                  }
+                  else{
+                    $('#id_batch_id_apa').css('border-color', '#bdbdbd');
+                    document.getElementById("disp1").innerHTML = "";
+                  }
+        }
+
+        
+    }
+
+
+    function activityButton2(){
+        var activity_date2 = $('#id_batch_id_date2').val();
+        var activity_nitrogen = $('#id_batch_id_nitrogen').val();
+        var activity_phosporus = $('#id_batch_id_phosporus').val();
+        var activity_potassium = $('#id_batch_id_potassium').val();
+
+        if(activity_date2 != '' && activity_nitrogen != '' && activity_phosporus != '' && activity_potassium != '' ){
+            $('#submitActivityButton2').click();
+        }else{
+            if(activity_date2 == '')
+                  {
+                    $('#id_batch_id_date2').css('border-color', 'red');
+                    document.getElementById("disp2").innerHTML = "*Please select a date";
+                  }
+                  else{
+                    $('#id_batch_id_date2').css('border-color', '#bdbdbd');
+                    document.getElementById("disp2").innerHTML = "";
+                  }
+
+                  if(activity_nitrogen == '')
+                  {
+                    $('#id_batch_id_nitrogen').css('border-color', 'red');
+                    document.getElementById("disp3").innerHTML = "*Please select";
+                  }
+                  else{
+                    $('#id_batch_id_nitrogen').css('border-color', '#bdbdbd');
+                    document.getElementById("disp3").innerHTML = "";
+                  }
+
+                  if(activity_phosporus == '')
+                  {
+                    $('#id_batch_id_phosporus').css('border-color', 'red');
+                    document.getElementById("disp4").innerHTML = "*Please select";
+                  }
+                  else{
+                    $('#id_batch_id_phosporus').css('border-color', '#bdbdbd');
+                    document.getElementById("disp4").innerHTML = "";
+                  }
+
+                  if(activity_potassium == '')
+                  {
+                    $('#id_batch_id_potassium').css('border-color', 'red');
+                    document.getElementById("disp5").innerHTML = "*Please select";
+                  }
+                  else{
+                    $('#id_batch_id_potassium').css('border-color', '#bdbdbd');
+                    document.getElementById("disp5").innerHTML = "";
+                  }
+        }
+
+        
+    }
+
+
+
+    $(document).ready(function () {
+        const field_pk = window.location.pathname.split('/')[2]
+        $('#hidden_field_id').val(field_pk);
+
+     $('#id_name').on('change', function (e) {
+        var name = $(this).val();
+        $('#hidden_field_name').val(name);
+     })
+
+     $('#id_farm').on('change', function (e) {
+        var farm = $(this).val();
+        $('#hidden_field_farm').val(farm);
+     })
+
+     $('#id_grower').on('change', function (e) {
+        var grower = $(this).val();
+        $('#hidden_field_grower').val(grower);
+     })
+
+     $('#id_batch_id').on('change', function (e) {
+        var batch_id = $(this).val();
+        $('#hidden_field_batch_id').val(batch_id);
+     })
+        
+     $('#id_acreage').on('change', function (e) {
+        var acreage = $(this).val();
+        $('#hidden_field_acreage').val(acreage);
+     })
+
+     $('#id_fsa_farm_number').on('change', function (e) {
+        var fsa_farm_number = $(this).val();
+        $('#hidden_field_fsa_farm_number').val(fsa_farm_number);
+     })
+
+     $('#id_fsa_tract_number').on('change', function (e) {
+        var fsa_tract_number = $(this).val();
+        $('#hidden_field_fsa_tract_number').val(fsa_tract_number);
+     })
+
+     $('#id_fsa_field_number').on('change', function (e) {
+        var fsa_field_number = $(this).val();
+        $('#hidden_field_fsa_field_number').val(fsa_field_number);
+     })
+
+     $('#id_latitude').on('change', function (e) {
+        var latitude = $(this).val();
+        $('#hidden_field_latitude').val(latitude);
+     })
+
+     $('#id_longitude').on('change', function (e) {
+        var longitude = $(this).val();
+        $('#hidden_field_longitude').val(longitude);
+     })
+
+     $('#id_crop').on('change', function (e) {
+        var crop = $(this).val();
+        $('#hidden_field_crop').val(crop);
+     })
+
+     $('#id_yield_per_acre').on('change', function (e) {
+        var yield_per_acre = $(this).val();
+        $('#hidden_field_yield_per_acre').val(yield_per_acre);
+     })
+
+     $('#id_total_yield').on('change', function (e) {
+        var total_yield = $(this).val();
+        $('#hidden_field_total_yield').val(total_yield);
+     })
+
+     $('#id_crop_tech').on('change', function (e) {
+        var crop_tech = $(this).val();
+        $('#hidden_field_crop_tech').val(crop_tech);
+     })
+
+     $('#id_plant_date').on('change', function (e) {
+        var plant_date = $(this).val();
+        console.log(plant_date)
+        $('#hidden_field_plant_date').val(plant_date);
+     })
+
+     $('#id_harvest_date').on('change', function (e) {
+        var harvest_date = $(this).val();
+        console.log(harvest_date)
+        $('#hidden_field_harvest_date').val(harvest_date);
+     })
+     
+     $('#id_stand_count').on('change', function (e) {
+        var stand_count = $(this).val();
+        console.log(stand_count)
+        $('#hidden_field_stand_count').val(stand_count);
+     })
+     $('#id_previous_crop').on('change', function (e) {
+        var previous_crop = $(this).val();
+        console.log(previous_crop)
+        $('#hidden_field_previous_crop').val(previous_crop);
+     })
+     $('#id_variety').on('change', function (e) {
+        var crop_v = $(this).val();
+        console.log(crop_v)
+        $('#hidden_field_crop_variety').val(crop_v);
+     })
+        
+    })
+
+    // document.getElementById("form_2").addEventListener("submit", function(e){
+    //     console.log('click')
+    //     $('#submitBtn').click();
+    // });
+</script>
+<script>
+    function updateField(){
+        document.getElementById('btnvariable').value = 'updateField';
+        // $('#btnvariable').val('updateField');
+        $('#id_updateField').click();
+    }
+</script>
+<script>
+$('#Farm-Configuration-active').addClass('activeLink');
+                
+$('#Farm-Configuration-down').addClass('down');
+$('#Farm-Configuration-sub').show();
+
+$('#Field-Management').addClass('activeLink active-nav');
+</script>
+{% endblock jquery %}

@@ -1,0 +1,233 @@
+{% extends "base.html" %} {% load static %}
+{% block title %} Admin Processor Contract View {% endblock title %}
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+{% load crispy_forms_tags %}
+{% block content %}
+{% include 'navbar.html' %}
+
+<div class="main-content">
+    {% include 'header.html' %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.0/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.bootstrap4.min.css">
+
+    <style>
+        .main_file .elements {
+            max-width: 100%;
+            height: 100px;
+            object-fit: contain;
+            border: 1px dotted rgba(105, 105, 105, 0.933);
+            display: inline-block;
+            position: relative;
+            margin-bottom: 40px;
+            width: 100%;
+            text-decoration: none;
+        }
+        .main_file .row{
+            margin-top: 20px;
+        }
+        .main_file .elements .img_wrapper{
+            display: block;
+            height: 100px;
+            text-align: center;
+        }
+
+        .main_file .elements img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: inline-block;
+        }
+        object{
+            width: 100%;
+            height: auto;
+            object-fit: contain;
+        }
+        .inner_wrapper{
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .for_object_main{
+            position: relative;
+            display: inline-block;
+            border: 1px dotted rgba(105, 105, 105, 0.933);
+            width: 100%;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            background: #d0cccb;
+        }
+        
+      
+        .main_file .inner_wrapper{
+            background-color: #fff;
+            border: 1px solid #e9e9e9;
+            box-shadow: 0 10px 20px #c7c7c78f;
+            margin-top: 15px;
+            border-radius: 0px;
+        }
+        .doc_name{
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: #000;
+            text-align: center;
+            margin-top: 5px;
+        }
+    </style>
+
+    <main>
+        {% include '_alerts.html' %}
+        <div class="page-title-with-or-without-btn">
+            <span class="farm headingtop">Contract Detail</span>
+            <!-- Create button for Account-->
+            
+        </div>
+
+        <div class="card farm-fields-container">
+            <div class="container-fluid">                
+                    <div class="row">
+                        <h2 style="background-color: #d7d5d5;color: #0b6c39;font-size: 22px;font-weight: 600;margin: 20px 0;padding: 12px 0;text-align: center">Contract details</h2>
+                        <div class="col-md-4" style="margin-bottom: 10px;">
+                            <label for="shipment" style="font-weight:bold;">Contract Id</label>
+                            <p>{{contract.secret_key}}</p>                            
+                        </div>
+                        <div class="col-md-4" style="margin-bottom: 10px;">
+                            <label for="shipment" style="font-weight:bold;">Processor Id</label>
+                            <p>{{contract.processor_id}}</p>                            
+                        </div>
+                        <div class="col-md-4" style="margin-bottom: 10px;">
+                            <label for="shipment"style="font-weight:bold;">Processor Entity Name</label>
+                            <p>{{contract.processor_entity_name}}</p>                            
+                        </div>
+                        <div class="col-md-4" style="margin-bottom: 10px;">
+                            <label for="shipment"style="font-weight:bold;">Processor Type</label>
+                            <p>{{contract.processor_type}}</p>                            
+                        </div> 
+                        <div class="col-md-4" style="margin-bottom: 10px;">
+                            <label for="shipment"style="font-weight:bold;">Contract Type</label>
+                            <p>{{contract.contract_type}}</p>                            
+                        </div> 
+                        <div class="col-md-4" style="margin-bottom: 10px;">
+                            <label for="Balance"style="font-weight:bold;">Contract Start Date</label>
+                            <p>{{contract.contract_start_date}}</p>                            
+                        </div>
+                        <div class="col-md-4" style="margin-bottom: 10px;">
+                            <label for="shipment"style="font-weight:bold;">Contract Period</label>
+                            <p>{{contract.contract_period}} {{contract.contract_period_choice}}</p>                            
+                        </div>                        
+                        <div class="col-md-4" style="margin-bottom: 10px;">
+                            <label for="shipment"style="font-weight:bold;">Contract End Date</label>
+                            <p>{{contract.end_date}}</p>                           
+                        </div>                         
+                        <div class="col-md-4" style="margin-bottom: 10px;">
+                            <label for="shipment"style="font-weight:bold;">Contract Status</label>
+                            <p>{{contract.status}}</p>                            
+                        </div>
+                                                
+                        <div class="col-md-4" style="margin-bottom: 10px;">
+                            <label for="shipment"style="font-weight:bold;">Created At</label>
+                            <p>{{contract.created_at}}</p>                            
+                        </div> 
+                    </div>
+                    <div class="row">
+                        <h2 style="background-color: #d7d5d5;color: #0b6c39;font-size: 22px;font-weight: 600;margin: 20px 0;padding: 12px 0;text-align: center">Crop details</h2>
+                        <div class="col-md-12">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Crop</th>
+                                        <th>Crop Type</th>
+                                        <th>Contract Amount</th>
+                                        <th>Per Unit Rate</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for crop in contract.contractCrop.all %}
+                                    <tr>
+                                        <td>{{ crop.crop }}</td>
+                                        <td>{{ crop.crop_type }}</td>
+                                        <td>{{ crop.contract_amount }} {{ crop.amount_unit }}</td>
+                                        <td>&#36; {{ crop.per_unit_rate }}</td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="4">No crop details available.</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                    </div>
+                    <div class="row">
+                        <h2 style="background-color: #d7d5d5;color: #0b6c39;font-size: 22px;font-weight: 600;margin: 20px 0;padding: 12px 0;text-align: center">Documents</h2>
+                        <div class="col-md-6" >
+                            <label for="UploadedFiles" style="font-weight:bold;">Uploaded Documents</label>
+                            {% for document in documents %}
+                            <div class="row mt-3">
+                            {%  if document.document %}                        
+                            <span>{{document.name}}:  <a href="{{ document.document.url }}" class="" target="_blank">{{ document.name }}</a></span>
+                               
+                            {% else %}
+                            <span>{{document.name}}:  Not uploaded yet.</span>
+                            {% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>                                        
+                    </div>
+                   
+                    <div class="row" style="margin-top: 10px;">
+                        <div class="form-btn-row">
+                            <a href="{% url 'list-contract' %}" class="btn-close-cancel btn-space">Back</a>
+                        </div>
+                    </div> 
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+{% include 'footer.html' %}
+</div>
+{% endblock content %}
+
+{% block scripts %}
+<script src="https://cdn.datatables.net/1.11.0/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.0/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/responsive.bootstrap4.min.js"></script>
+
+<script src="{% static 'js/farm/farm_list.js' %}"></script>
+
+<script>
+    $(document).ready(function () {
+        $('#processorList_tbl').DataTable();
+    });
+
+
+</script>
+<script>
+    $('#Contracts-active').addClass('activeLink');
+  
+    $('#Contracts-down').addClass('down');
+    $('#Contracts-sub').show();
+  
+    $('#Contract-List').addClass('activeLink active-nav');
+  
+</script>
+{% endblock scripts %}

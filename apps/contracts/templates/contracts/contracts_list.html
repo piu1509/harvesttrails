@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %} Contract List
+{% endblock title %}
+{% load crispy_forms_tags %}
+{% block content %}
+{% include 'navbar.html' %}
+
+<div class="main-content">
+  {% include 'header.html' %}
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css">
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.11.0/css/dataTables.bootstrap4.min.css">
+  <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.bootstrap4.min.css">
+  <main>
+    {% include '_alerts.html' %}
+    <div class="page-title-with-or-without-btn">
+      <span class="farm headingtop">CONTRACT LIST</span>
+      <!-- Create button for Account-->
+      <div class="flex-header-btn">
+        {% if 'Field Edit' in request.user.get_role_perm or request.user.is_superuser %}
+<!--        <a title="Upload CSV file with all the required coloumns" href="{% url 'csv-field-create' %}"-->
+<!--          class="btn-close-cancel btn-space">Create Field via CSV</a>-->
+<!--        <a href="{% url 'field-create' %}" class="btn-close-cancel">Create Field</a>-->
+        {% endif %}
+      </div>
+    </div>
+    <div class="card card-padding">
+
+      <div class="main-simple-table-with-search">
+        <div class="simple-responsive-table">
+          <table id="fieldListtbl" class="table table-striped table-bordered dt-responsive nowrap" style="width:100%">
+            <thead>
+              <tr style="border-bottom: 2px solid #e0e0e0;">
+                <th data-title="Contract" data-breakpoints="xs sm" width="80%">Contract Name</th>
+                {% if request.user.is_superuser %}
+                  <th width="20%">Envelope</th>
+                  <th width="20%">Growers Signed</th>
+                {% else %}
+                  <th width="20%">Actions</th>
+                {% endif %}
+              </tr>
+            </thead>
+            <tbody>
+              {% for contract in object_list %}
+              <tr>
+                <td>{{contract.name}}</td>
+                <td class="backk action-td">
+                  {% if request.user.is_superuser %}
+                    {{contract.envelope_id}}
+                  {% else %}
+                      {% if contract.is_signed == True %}
+                        <li> Signed
+                        </li>
+                      {% else %}
+                        <li> <a class="signtext-td" href="{{contract.url}}" target="_blank">Sign</a>
+                        </li>
+                      {% endif %}
+                  {% endif %}
+                </td>
+                {% if request.user.is_superuser %}
+                  <td>{{contract.signed_contract_count}}</td>
+                {% endif %}
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+
+        </div>
+      </div>
+    </div>
+  </main>
+  {% include 'footer.html' %}
+</div>
+
+<!-- end -->
+{% comment %} <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+<script src="https://cdn.datatables.net/1.11.0/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.0/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/responsive.bootstrap4.min.js"></script>
+
+{% endcomment %}
+<script type="text/javascript" src="{% static 'js/field/field_list.js' %}"></script>
+{% endblock content %}
+
+{% block scripts %}
+
+<script src="https://cdn.datatables.net/1.11.0/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.0/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/responsive.bootstrap4.min.js"></script>
+
+<script src="{% static 'js/farm/farm_list.js' %}"></script>
+{% endblock scripts %}
+{% block jquery %}
+<script>
+    $(document).ready(function() {
+        $('#fieldListtbl').DataTable({
+          columnDefs: [
+            {
+                orderable: false,
+                targets: [2]
+            }
+        ]
+        });
+    });
+</script>
+<script>
+  $('#Documents-and-Photos-active').addClass('activeLink');
+
+  $('#Documents-and-Photos-down').addClass('down');
+  $('#Documents-and-Photos-sub').show();
+
+  $('#Contracts-List').addClass('activeLink active-nav');
+  {% comment %} $('#Contracts-active').addClass('activeLink');
+
+  $('#Contracts-down').addClass('down');
+  $('#Contracts-sub').show();
+
+  $('#Contracts-List').addClass('activeLink active-nav'); {% endcomment %}
+
+</script>
+{% endblock jquery %}

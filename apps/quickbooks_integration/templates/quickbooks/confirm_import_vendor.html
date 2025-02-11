@@ -1,0 +1,130 @@
+{% extends "base.html" %} {% load static %}
+{% block title %} QuickBooks Vendor Management {% endblock title %}
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+
+{% load crispy_forms_tags %}
+{% block content %}
+{% include 'navbar.html' %}
+<style>
+    .table>:not(caption)>*>*{
+        border-bottom-width:0px
+    }
+    .align-columns {
+        table-layout: fixed;
+        width: 100%;
+    }
+
+    .align-columns th,
+    .align-columns td {
+        text-align: left;
+        word-wrap: break-word;
+    }
+</style>
+<div class="main-content">
+    {% include 'header.html' %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.0/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.bootstrap4.min.css">
+
+    <main>
+        {% include '_alerts.html' %}
+        <div class="page-title-with-or-without-btn">
+            <span class="farm headingtop">Confirm Vendor Import</span>
+            <!-- Create button for add-processor-->
+            
+        </div>
+
+        {% if existing_vendors %}
+        <h5 class="text-center font-weight-bold mb-3">Existing Vendors</h5>
+        <table id="distributorList_tbl" class="table table-striped table-bordered align-columns">
+            <thead>
+                <tr>
+                    <th>Sl No.</th>
+                    <th>Name</th>
+                    <th>QuickBooks ID</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for vendor in existing_vendors %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ vendor.name }}</td>
+                        <td>{{ vendor.id }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <p class="mt-3">These vendors already exist. Their details will be updated.</p>
+    {% endif %}
+
+    {% if new_vendors %}
+        <h5 class="font-weight-bold text-center mb-3">New Vendors</h5>
+        <table id="distributorList_tbl" class="table table-striped table-bordered align-columns">
+            <thead>
+                <tr>
+                    <th>Sl No. </th>
+                    <th>Name</th>
+                    <th>QuickBooks ID</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for vendor in new_vendors %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ vendor.data.Vendor.DisplayName }}</td>
+                        <td>{{ vendor.id }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <p class="mt-3">Confirm to import these vendors.</p>
+    {% endif %}
+    <form method="GET" action="{% url 'import_vendor' %}">
+        <input type="hidden" name="confirm" value="true">
+        <input type="hidden" name="skip_existing" value="true"> 
+
+        {% for vendor in new_vendors %}
+            <input type="hidden" name="vendor_ids" value="{{ vendor.id }}">
+        {% endfor %}
+      
+        {% for vendor in existing_vendors %}
+            <input type="hidden" name="vendor_ids" value="{{ vendor.id }}">
+        {% endfor %}
+
+        <div class="row">
+            <div class="form-btn-row">                
+                <a href="{% url 'vendors' %}" class="btn-close-cancel btn-space">Cancel</a>
+                <input type="submit" class="btn-save-submit" value="Confirm"> 
+            </div>
+        </div>
+    </form>
+</div>
+</main>
+{% include 'footer.html' %}
+</div>
+
+{% endblock content %}
+
+{% block scripts %}
+<script>
+    $('#Quickbooks-active').addClass('activeLink');
+  
+    $('#Quickbooks-down').addClass('down');
+    $('#Quickbooks-sub').show();
+
+    $('#Vendor-List').addClass('activeLink active-nav');
+
+</script>
+{% endblock scripts %}

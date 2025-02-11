@@ -1,0 +1,274 @@
+{% extends "base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}Processor Contract Shipment List{% endblock title %}
+
+{% block content %}
+{% include 'navbar.html' %}
+<div class="main-content">
+    {% include 'header.html' %}
+    <main>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+        <!-- Include Select2 CSS -->
+        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+        <!-- Include Select2 JS -->
+        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+        <style>
+            .select2-container--default .select2-results__option--highlighted.select2-results__option--selectable {
+                background-color:#0b6c39;
+                
+            }
+        </style>
+        {% include '_alerts.html' %}
+        <div class="page-title-with-or-without-btn">
+            <span class="farm headingtop">Processor Contract Shipment Management</span>
+            <!-- Create button for add-processor-->
+            {% if request.user.is_superuser or 'SubAdmin' in request.user.get_role or 'SuperUser' in request.user.get_role or request.user.is_processor or request.user.is_processor2 %}
+            <div class="flex-header-btn">
+                <a href="{% url 'add-processor-shipment' %}" class="btn-close-cancel">Send Shipment</a>
+                &nbsp;
+                <a href="{%url 'processor_shipment_csv_download' %}" class="btn-close-cancel">Download CSV</a>
+            </div>
+            {% endif %}
+        </div>
+        <div class="card farm-fields-container">            
+            <div class="">
+                <div class="main-simple-table-with-search col-12"> 
+                    <form method="GET">                       
+                        <div class="row d-flex justify-content-center">
+                            {% if request.user.is_superuser or 'SubAdmin' in request.user.get_role or 'SuperUser' in request.user.get_role %}
+                            <div class="col-3">                                                            
+                                <select name="selected_processor" id="processor_id" class="form-control select2" onchange="this.form.submit();" required style="height: 35px !important;">
+                                    <option value="All">Select Processor</option>
+                                    
+                                    {% with t1_processors=processor|dictsort:"type" %}
+                                        {% if t1_processors %}
+                                            <optgroup label="Select T1 Processor">
+                                            {% for pro in t1_processors %}
+                                                {% if pro.type == "T1" %}
+                                                <option value="{{pro.id}}_{{pro.type}}"{% if selected_processor_id == pro.id  and selected_processor_type == pro.type %}selected{% endif %}>{{pro.entity_name}}</option>
+                                                {% endif %}
+                                            {% endfor %}
+                                            </optgroup>
+                                        {% endif %}
+                                    {% endwith %}
+
+                                    {% with t2_processors=processor|dictsort:"type" %}
+                                        {% if t2_processors %}
+                                            <optgroup label="Select T2 Processor">
+                                            {% for pro in t2_processors %}
+                                                {% if pro.type == "T2" %}
+                                                    <option value="{{pro.id}}_{{pro.type}}"{% if selected_processor_id == pro.id and selected_processor_type == pro.type %}selected{% endif %}>{{pro.entity_name}}</option>
+                                                {% endif %}
+                                            {% endfor %}
+                                            </optgroup>
+                                        {% endif %}
+                                    {% endwith %} 
+                                    {% with t3_processors=processor|dictsort:"type" %}
+                                        {% if t3_processors %}
+                                            <optgroup label="Select T3 Processor">
+                                            {% for pro in t3_processors %}
+                                                {% if pro.type == "T3" %}
+                                                    <option value="{{pro.id}}_{{pro.type}}"{% if selected_processor_id == pro.id and selected_processor_type == pro.type %}selected{% endif %}>{{pro.entity_name}}</option>
+                                                {% endif %}
+                                            {% endfor %}
+                                            </optgroup>
+                                        {% endif %}
+                                    {% endwith %}
+                                    {% with t4_processors=processor|dictsort:"type" %}
+                                        {% if t4_processors %}
+                                            <optgroup label="Select T4 Processor">
+                                            {% for pro in t4_processors %}
+                                                {% if pro.type == "T4" %}
+                                                    <option value="{{pro.id}}_{{pro.type}}"{% if selected_processor_id == pro.id and selected_processor_type == pro.type %}selected{% endif %}>{{pro.entity_name}}</option>
+                                                {% endif %}
+                                            {% endfor %}
+                                            </optgroup>
+                                        {% endif %}
+                                    {% endwith %}
+                                </select>
+                            </div>
+                            <input style="display : none;" id="submitBtn" type="submit"
+                                class="apply-filter-btn primary-btn" value="Apply Filter" />                           
+                            {% endif %}
+                            <!-- Search section on the right side -->
+                            <div class="col-6">                            
+                                <div class="main_col-6_wrapper">
+                                    <label for="start_date">From:</label>
+                                    <input type="date" id="start_date" name="start_date" class="btn text-start px-2 shadow-none border border-dark" value="{{ start_date|date:'Y-m-d' }}" style="height: 35px;">
+
+                                    <label for="end_date">To:</label>
+                                    <input type="date" id="end_date" name="end_date" class="btn text-start px-2 shadow-none border border-dark" value="{{ end_date|date:'Y-m-d' }}" style="height: 35px;">
+
+                                    <button type="submit" class="btn btn-outline-success">Filter</button>
+                                </div>                              
+                            </div>
+                            <div class="col-3">
+                                <div class="row justify-content-end">
+                                    <div class="col-8">
+                                        <input class="form-control" name="search_name" type="search" placeholder="Search.." autocomplete="off" aria-label="Search" id="search_name" {% if search_name %}value="{{search_name}}"{% else %}{% endif %}>
+                                    </div>
+                                    <div class="col-4">
+                                        <button type="submit" class="btn btn-outline-success ml-2">Search</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div> 
+                    </form>                      
+                    <br>    
+                    <div class="both-data-in" style="display: inherit;">
+                        <div class="table-responsive">
+                            <table id="" class="table table-striped dt-responsive nowrap"
+                                style="width:100%">
+                                <thead>
+                                    <tr style="border-bottom: 2px solid #e0e0e0;">  
+                                        <th style="min-width: 150px; max-width: 200px;">Shipment Id</th> 
+                                        <th style="min-width: 150px; max-width: 200px;">Invoice Id</th>                                          
+                                        <th style="min-width: 150px; max-width: 200px;">Contract Id</th>
+                                        <th style="min-width: 150px; max-width: 200px;" >Origin</th>  
+                                        <th style="min-width: 300px; max-width: 350px;">Crop  || Weight || Lot Number</th>                                                                             
+                                        <th style="min-width: 150px; max-width: 200px;">Carrier</th>                                            
+                                        <th style="min-width: 150px; max-width: 200px;">Outbound type</th>
+                                        <th style="min-width: 150px; max-width: 200px;">Purchase Order Name</th> 
+                                                                              
+                                        <th style="min-width: 150px; max-width: 200px;">Date Shipped</th>
+                                        <th style="min-width: 150px; max-width: 200px;">Date Received</th>                                            
+                                        <th style="min-width: 150px; max-width: 200px;">Destination</th>
+                                        <th style="min-width: 150px; max-width: 200px;">Status</th>
+                                        <th style="min-width: 150px; max-width: 200px;">Due Date</th>
+                                        <th >Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    
+                                    {% if contracts %}
+                                        {% for item in contracts %}  
+                                                                            
+                                        <tr>
+                                            <td>{{item.shipment_id}}</td>
+                                            <td>{{item.invoice_id}}</td> 
+                                            <td>{{item.contract.secret_key}}</td>
+                                            <td>{{item.processor_entity_name}}</td>
+                                            <td>
+                                            {% for crop in item.processor_shipment_crop.all %}
+                                            {{crop.crop}} || {{crop.net_weight}} {{crop.weight_unit}} || {{crop.lot_number}}
+                                            <br>
+                                            {% endfor %}
+                                            </td>
+                                            <td>{{item.carrier_type}}</td>
+                                            <td>{{item.outbound_type}}</td>
+                                            
+                                            <td>{{item.purchase_order_name}}</td>                                              
+                                                                                 
+                                            <td>{{item.date_pulled.date}}</td>
+                                            <td>{% if item.distributor_receive_date %}{{item.distributor_receive_date.date}}{% else %} - {%endif %}</td>
+                                            <td>{% if item.warehouse_name %}{{item.warehouse_name}}{% else %}{{item.customer_name}}{% endif %}</td>
+                                            <td>{{item.status}}</td>
+                                            <td>{% if item.final_payment_date %}{{item.final_payment_date.date}}{% else %} - {%endif %}</td>
+                                            <td class="backk action-td rmv-bd">
+                                                <ul>
+                                                    <li><a href="{% url 'view-processor-shipment' item.id %}" class="update-btn-link" alt="view shipment details" title="view shipment details"> <span class="fas fa-eye"></span></a></li>
+                                                    <li><a href="{% url 'edit-processor-shipment' item.id %}" class="update-btn-link" alt="update shipment details" 
+                                                            title="update shipment details"><span class="fas fa-edit"></span></a>
+                                                    </li>                                                        
+                                                    {% if item.invoice_approval %}
+                                                    <li><a href="{% url 'warehouse-shipment-invoice' item.id 'processor' %}" class="update-btn-link" alt="view invoice details" title="view invoice details"> <span class="fas fa-file-invoice"></span></a></li>
+                                                    {% endif %}
+                                                    <li><a href="{% url 'processor_shipment_current_location_track' item.id  %}" class="update-btn-link" alt="view current location" title="view current location"> <span class="fas fa-map-marker-alt"></span></a></li>
+                                                    {% if request.user.is_superuser or 'SubAdmin' in request.user.get_role or 'SuperUser' in request.user.get_role%}
+                                                    <li>                                                           
+                                                        <a href="#deleteModal-{{ item.id }}" class="update-btn-link" alt="delete shipment details" title="delete shipment details" data-toggle="modal">
+                                                            <span class="fas fa-trash"></span>
+                                                        </a>
+                                                    </li>
+                                                    {% endif %}
+                                                </ul>
+                                            </td>
+                                        </tr>
+                                        
+                                        <div class="modal fade" id="deleteModal-{{ item.id }}" aria-hidden="true" aria-labelledby="exampleModalToggleLabel22" tabindex="-1">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-body">
+                                                        <button type="button" class="btn-close cust-close-ds-btn" data-mdb-dismiss="modal" aria-label="Close"></button>
+                                                        <div class="center-content-status">
+                                                            <img src="{% static 'img/trash.png' %}" alt="right" id="rightImg" class="warning-icon">
+                                                            <p id="message" class="modal-title titlepad">Are you sure you want to delete?</p>
+                                                        </div>                                                            
+                                                        <form method="POST" action="{% url 'delete-processor-shipment' item.id %}">
+                                                            {% csrf_token %}
+                                                            <div class="modal-footer justify-content-center">
+                                                                <button type="submit" class="btn-save-submit">Delete</button>
+                                                                <a href="{% url 'list-processor-shipment' %}" class="btn-close-cancel btn-space" data-dismiss="modal">Close</a>
+                                                            </div>
+                                                        </form>                                                            
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    {% else %}
+                                        <tr>
+                                            <td colspan="12" style="text-align:center;">No Result Found</td>
+                                        </tr>
+                                    {% endif %} 
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="row align-items-center">
+                            <div class="col-md-12 col-sm-12 col-12 text-center">
+                                {% if contracts.has_other_pages %}
+                                    <ul class="pagination" id="nav_1">
+                                        {% if contracts.has_previous %}
+                                            <li><a href="?selected_processor={{ selected_processor_id }}&search_name={{ search_name }}&page={{ contracts.previous_page_number }}">&laquo;</a></li>
+                                        {% else %}
+                                            <li class="disabled"><span>&laquo;</span></li>
+                                        {% endif %}
+                                        {% for i in contracts.paginator.page_range %}
+                                            {% if contracts.number == i %}
+                                                <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+                                            {% else %}
+                                                <li><a href="?selected_processor={{ selected_processor_id }}&search_name={{ search_name }}&page={{ i }}">{{ i }}</a></li>
+                                            {% endif %}
+                                        {% endfor %}
+                                        {% if contracts.has_next %}
+                                            <li><a href="?selected_processor={{ selected_processor_id }}&search_name={{ search_name }}&page={{ contracts.next_page_number }}">&raquo;</a></li>
+                                        {% else %}
+                                            <li class="disabled"><span>&raquo;</span></li>
+                                        {% endif %}
+                                    </ul>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-12 col-sm-12 col-12 text-center mt-2" style="text-align:right">
+                                <span>Showing  {{ contracts.start_index }} - {{ contracts.end_index }} of {{ contracts.paginator.count }} entries
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>           
+        </div>
+    </main>
+</div>
+{% endblock content %}
+
+{% block jquery %}
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('#processor_id').select2({
+            placeholder: "Select a Processor",
+            allowClear: true
+        });
+    });
+</script>
+<script>
+    $('#Warehouse-active').addClass('activeLink');
+    $('#Warehouse-down').addClass('down');
+    $('#Warehouse-sub_unic').show();
+    $('#Processor-Shipment').addClass('activeLink active-nav');
+</script>
+{% endblock jquery %}

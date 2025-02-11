@@ -1,0 +1,155 @@
+{% extends "base.html" %} {% load static %}
+{% block title %} Shipment Management View {% endblock title %}
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+{% load crispy_forms_tags %}
+{% block content %}
+{% include 'navbar.html' %}
+
+<div class="main-content">
+    {% include 'header.html' %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.0/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.bootstrap4.min.css">
+
+    <main>
+        {% include '_alerts.html' %}
+        <div class="page-title-with-or-without-btn">
+            <span class="farm headingtop">Shipment Detail</span>
+            <!-- Create button for Account-->
+            
+        </div>
+
+        <div class="card farm-fields-container">
+            <div class="container-fluid">
+                {% for i in report %}
+                    <div class="row" style="margin-bottom: 20px;">
+                        <div class="col-md-4" style="margin-bottom: 10px;">
+                            <label for="shipment" style="font-weight:bold;">Bin Location</label>
+                            <p>{{i.bin_location}}</p>                            
+                        </div>
+                        <div class="col-md-4" style="margin-bottom: 10px;">
+                            <label for="shipment"style="font-weight:bold;">Sender Processor</label>
+                            <p>{{i.processor_e_name}}</p>                            
+                        </div>
+                        <div class="col-md-4" style="margin-bottom: 10px;">
+                            <label for="shipment"style="font-weight:bold;">Receiver Processor</label>
+                            <p>{{i.processor2_name}}</p>                            
+                        </div>                        
+                        <div class="col-md-4" style="margin-bottom: 10px;">
+                            <label for="shipment"style="font-weight:bold;">Milled Volume</label>
+                            <p>{{i.milled_volume}}</p>                            
+                        </div>
+                        <div class="col-md-4" style="margin-bottom: 10px;">
+                            <label for="shipment"style="font-weight:bold;">Volume Shipped</label>
+                            <p>{{i.volume_shipped}} Lbs</p>                            
+                        </div>
+                        <div class="col-md-4" style="margin-bottom: 10px;">
+                            <label for="Balance"style="font-weight:bold;">Balance</label>
+                            <p>{{i.volume_left}} Lbs</p>                            
+                        </div>
+                        <div class="col-md-4" style="margin-bottom: 10px;">
+                            <label for="shipment"style="font-weight:bold;">Date Pulled</label>
+                            <p>{{i.date_pulled}}</p>                            
+                        </div>                        
+                        <div class="col-md-4" style="margin-bottom: 10px;">
+                            <label for="shipment"style="font-weight:bold;">Equipment Type</label>
+                            <p>{{i.equipment_type}}</p>                           
+                        </div>                         
+                        <div class="col-md-4" style="margin-bottom: 10px;">
+                            <label for="shipment"style="font-weight:bold;">Equipment ID</label>
+                            <p>{{i.equipment_id}}</p>                            
+                        </div>
+                        <div class="col-md-4" style="margin-bottom: 10px;">
+                            <label for="shipment"style="font-weight:bold;">Sender SKU ID</label>
+                            <p>{{i.storage_bin_send}}</p>                           
+                        </div>                        
+                        <div class="col-md-4" style="margin-bottom: 10px;">
+                            <label for="shipment"style="font-weight:bold;">Weight Of Product</label>
+                            <p>{{i.weight_of_product}} {{i.weight_of_product_unit}}</p>                            
+                        </div>
+                        <div class="col-md-4" style="margin-bottom: 10px;">
+                            <label for="shipment"style="font-weight:bold;">Expected Yield</label>
+                            <p>{{i.excepted_yield}} {{i.excepted_yield_unit}}</p>                            
+                        </div>
+                        <div class="col-md-4" style="margin-bottom: 10px;">
+                            <label for="shipment"style="font-weight:bold;">Moisture Percentage (%)</label>
+                            <p>{{i.moisture_percent}}</p>                            
+                        </div>
+                        <div class="col-md-4" style="margin-bottom: 10px;">
+                            <label for="shipment"style="font-weight:bold;">Purchase Order Number</label>
+                            <p>{{i.purchase_order_number}}</p>                            
+                        </div>
+                        <div class="col-md-4" style="margin-bottom: 10px;">
+                            <label for="shipment"style="font-weight:bold;">Lot Number</label>
+                            <p>{{i.lot_number}}</p>                            
+                        </div>                     
+                        <div class="col-md-4" style="margin-bottom: 10px;">
+                            <label for="shipment"style="font-weight:bold;">Destination</label>
+                            <p>{{i.processor2_name}} / ({{i.processor2_idd}})</p>                       
+                        </div>                                
+                        <div class="col-md-4" >
+                            <label for="UploadedFiles" style="font-weight:bold;">Uploaded Files</label>
+                            <div>
+                                {% if files %}
+                                    {% for file in files %}
+                                    <li><a href="/media/{{ file.file }}" target="_blank">{{ file.name }}</a></li>
+                                    {% endfor %}                            
+                                {% else %}
+                                    <p>No files available</p>
+                                {% endif %}
+                            </div>
+                        </div>                        
+                    </div>
+                    {% endfor %} 
+                    <div class="row" style="margin-top: 10px;">
+                        <div class="form-btn-row">
+                            <a href="{% url 'outbound_shipment_mgmt' %}" class="btn-close-cancel btn-space">Back</a>
+                        </div>
+                    </div> 
+                </div>
+            </div>
+        </div>
+    </main>
+{% include 'footer.html' %}
+</div>
+
+
+{% endblock content %}
+
+{% block scripts %}
+<script src="https://cdn.datatables.net/1.11.0/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.0/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/responsive.bootstrap4.min.js"></script>
+
+<script src="{% static 'js/farm/farm_list.js' %}"></script>
+
+<script>
+    $(document).ready(function () {
+        $('#processorList_tbl').DataTable();
+    });
+
+
+</script>
+<script>
+    $('#Processor-active').addClass('activeLink');
+  
+    $('#Processor-down').addClass('down');
+    $('#Processor-sub').show();
+  
+    $('#Shipment-Management').addClass('activeLink active-nav');
+  
+  </script>
+{% endblock scripts %}

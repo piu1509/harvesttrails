@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block title %} Create Crop {% endblock title %}
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+{% block content %}
+{% include 'navbar.html' %}
+<div class="main-content">
+    {% include 'header.html' %}
+    
+    <main>
+        <span class="farm headingtop">Create Crop</span>
+        <div class="card farm-fields-container">
+            <div class="container-fluid">        
+                <form method="post" class="farm-fields-form">
+                    {% csrf_token %}
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <label for="id_name">Crop Name</label>
+                            <input type="text" name="name" id="id_name" required class="form-control" placeholder="Enter crop name">
+                        </div>
+                    </div>
+                    
+                    <!-- Varieties Section -->
+                    <div class="container p-0">                        
+                        <div class="d-flex justify-content-between align-items-center" style="background-color: #d7d5d5; padding: 12px; width: 100%;">
+                            <h2 class="m-0" style="color: #0b6c39; font-size: 22px; font-weight: 600; flex-grow: 1; text-align: center;">
+                                Add Variety
+                            </h2>
+                            <button type="button" class="btn btn-sm font-weight-bold btn-primary" id="add-variety" style="flex-shrink: 0;">
+                                +
+                            </button>
+                        </div>
+                        
+                        <div id="variety-formset">
+                            <div class="row variety-item mt-3 p-2 align-items-center">
+                                <div class="col-md-10">
+                                    <input type="text" name="variety_name" required class="form-control" placeholder="Enter variety name">
+                                </div>
+                                <div class="col-md-2 d-flex justify-content-end">
+                                    <button type="button" class="btn btn-danger btn-sm remove-variety" aria-label="Remove" style="font-size: 1rem; flex-shrink: 0;">-</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="container mt-4 p-0">
+                        <div class="d-flex justify-content-between align-items-center" style="background-color: #d7d5d5; padding: 12px; width: 100%;">
+                            <h2 class="m-0" style="color: #0b6c39; font-size: 22px; font-weight: 600; flex-grow: 1; text-align: center;">
+                                Add Type
+                            </h2>
+                            <button type="button" class="btn btn-sm font-weight-bold btn-primary" id="add-type" style="flex-shrink: 0;">
+                                +
+                            </button>
+                        </div>
+                        
+                        <div id="type-formset">
+                            <div class="row type-item mt-3 p-2 align-items-center">
+                                <div class="col-md-10">
+                                    <input type="text" name="crop_type" required class="form-control" placeholder="Enter Type">
+                                </div>
+                                <div class="col-md-2 d-flex justify-content-end">
+                                    <button type="button" class="btn btn-danger btn-sm remove-type" aria-label="Remove" style="font-size: 1rem;">-</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Submit Section -->
+                    <div class="row mt-4">
+                        <div class="form-btn-row">
+                            <a href="{% url 'crop_management_list' %}" class="btn-close-cancel">Cancel</a>
+                            <input type="submit" class="btn-save-submit" value="Save">
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+    
+    {% include 'footer.html' %}
+</div>
+{% endblock %}
+
+{% block jquery %}
+<script>
+    $('#crop_management').addClass('activeLink');
+    // Add a new variety form dynamically
+    $('#add-variety').click(function(e) {
+        e.preventDefault();
+        
+        // Clone the first variety form and reset its values
+        let newForm = $('.variety-item:first').clone();
+        newForm.find('input').val('');  // Clear input values
+
+        // Append the new form
+        $('#variety-formset').append(newForm);
+    });
+
+    // Handle removing variety items
+    $(document).on('click', '.remove-variety', function() {
+        $(this).closest('.variety-item').remove();
+    });
+</script>
+<script>
+   
+    // Add a new variety form dynamically
+    $('#add-type').click(function(e) {
+        e.preventDefault();
+        
+        // Clone the first variety form and reset its values
+        let newForm = $('.type-item:first').clone();
+        newForm.find('input').val('');  // Clear input values
+
+        // Append the new form
+        $('#type-formset').append(newForm);
+    });
+
+    // Handle removing variety items
+    $(document).on('click', '.remove-type', function() {
+        $(this).closest('.type-item').remove();
+    });
+</script>
+{% endblock %}

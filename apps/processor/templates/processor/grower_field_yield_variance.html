@@ -1,0 +1,270 @@
+{% extends "base.html" %} {% load static %} {% block title %} Grower Yield Variance {% endblock title %} {% block content %} {% include 'navbar.html' %}
+<div class="main-content">
+    {% include 'header.html' %} {% load crispy_forms_tags %}
+
+
+    <style>
+        table.payset{width:95%; border: 1px solid #333; font-size:12px; font-family: Arial, Helvetica, sans-serif; margin: 0 auto;}
+        table.payset td{border: 1px solid #333; padding: 4px;}
+        .bigfont{font-size: 16px; font-weight: bold; font-family: Arial, Helvetica, sans-serif;}
+        .toobigfont{font-size: 24px; font-weight: bold; font-family: Arial, Helvetica, sans-serif;}
+        .canvasjs-chart-credit{display: none !important;}
+    </style>
+
+  <main>
+    {% include '_alerts.html' %}
+    <div class="page-title-with-or-without-btn">
+        <span class="farm headingtop"> Grower Yield Variance </span>
+        <!-- Create button for Add-->
+        <div class="flex-header-btn">
+            <!-- <button id="exportButton" type="button">Export as PDF</button> -->
+            <input type="button" value="Export Image" id="btn-download" class="btn-close-cancel"/>
+            &nbsp;
+            <a href="{% url 'grower_field_yield_variance_download' selectedCrop  selectedFarm_id selectedField_id selectedGrower_id %}" class="btn-close-cancel" target="_blank">Download CSV</a>
+        </div>
+    </div>
+
+    <div class="card farm-fields-container">
+        <div class="container-fluid">
+            <div id="chartContainer" style="width: 100%; height: 600px;">
+                <!-- <canvas id="myChart"></canvas> -->
+            </div>
+            <form method="get" class="farm-fields-form mt-2">
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <div>
+                            <label for="grower_crop">Crop<span class="asteriskField">*</span></label>
+                            <select id="grower_crop" name="grower_crop" class="textinput textInput form-control">
+                                <option value='all'> Select Crop </option>
+                                {% if selectedCrop == 'COTTON' %}
+                                <option value='COTTON' selected> COTTON </option>
+                                <option value='RICE'> RICE </option>
+                                {% elif selectedCrop == 'RICE' %}
+                                <option value='COTTON'> COTTON </option>
+                                <option value='RICE' selected> RICE </option>
+                                {% else %}
+                                <option value='COTTON'> COTTON </option>
+                                <option value='RICE'> RICE </option>
+                                {% endif %}
+                            </select>
+                            <p id="p2" style="color: red;"></p>
+                        </div>
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <div>
+                            <label for="field">Grower<span class="asteriskField">*</span></label>
+                            <select id="grower_id" name="grower_id" class="textinput textInput form-control">
+                                <option value='all'>Select All Growers</option>
+                                {% for grower in growers %}
+                                {% if grower == selectedGrower %}
+                                <option value={{grower.id}} selected> {{grower.name}} - {{grower.id}}</option>
+                                {% else %}
+                                <option value={{grower.id}}> {{grower.name}} - {{grower.id}}</option>
+                                {% endif %}
+                                {% endfor %}
+                            </select>
+                            <p id="p3" style="color: red;"></p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div>
+                            <label for="">Farm<span class="asteriskField">*</span></label>
+                            <select id="farm_id" name="farm_id" class="textinput textInput form-control">
+                                <option value='all'> Select All Farms </option>
+                                {% for farm in farms %}
+                                {% if farm == selectedFarm %}
+                                <option selected value="{{ farm.pk }}">{{farm.name}} - {{farm.id}}</option>
+                                {% else %}
+                                <option value="{{ farm.pk }}">{{farm.name}} - {{farm.id}}</option>
+                                {% endif %}
+                                {% endfor %}
+                            </select>
+                            <p id="p1" style="color: red;"></p>
+                        </div>
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <div>
+                            <label for="field">Field<span class="asteriskField">*</span></label>
+                            <select id="field_id" name="field_id" class="textinput textInput form-control">
+                                <option value='all'>Select All Fields</option>
+                                {% for field in fields %}
+                                {% if field == selectedField %}
+                                <option value={{field.id}} selected> {{field.name}} - {{field.id}}</option>
+                                {% else %}
+                                <option value={{field.id}}> {{field.name}} - {{field.id}}</option>
+                                {% endif %}
+                                {% endfor %}
+                            </select>
+                            <p id="p3" style="color: red;"></p>
+                        </div>
+                    </div>
+                    
+                    <input style="display: none;" id="submitBtn2" type="submit" class="btn-save-submit" value="Save">
+                    <div class="col-md-2 mb-3" style="margin-top: 26px;">
+                        <a href="{% url 'grower_field_yield_variance' %}" class="btn-save-submit" style="border-radius: 0px;height: 52px;padding: 5px 15px;background-color: red;">Reset Button</a>
+                    </div>
+                </div>
+            </form>
+            <div class="both-data-in" style="display: inherit;">
+                <div class="simple-responsive-table">
+                    <table id="processorList_tbl" class="table table-striped dt-responsive nowrap"
+                        style="width:100%">
+                        <thead>
+                            <tr style="border-bottom: 2px solid #e0e0e0;">
+                                <th width="20%">Field</th>
+                                <th width="20%">Farm</th>
+                                <th width="10%">Crop</th>
+                                <th width="10%">Projected Yield (LBS)</th>
+                                <th width="10%">Reported Yield (LBS)</th>
+                                <th width="10%">Difference</th>
+                                <th width="10%">Deviation %</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+                            {% for yield_variance in yield_variance %}
+                            <tr>
+                                <td>{{yield_variance.field}}</td>
+                                <td>{{yield_variance.farm}}</td>
+                                <td>{{yield_variance.crop}}</td>
+                                <td>{{yield_variance.projected_yeild}}</td>
+                                <td>{{yield_variance.reported_yeild}}</td>
+                                <td>{{yield_variance.diff}} </td>
+                                <td>
+                                    {% if yield_variance.variance == 'N/A' %}
+                                    {{yield_variance.variance}}
+                                    {% else %}
+                                    {{yield_variance.variance}}%
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                       
+                    </table>
+                </div>
+                <div class="row align-items-center">
+                    <div class="col-md-12 col-sm-12 col-12 text-center">
+                        {% if yield_variance.has_other_pages %}
+                        <ul class="pagination" id="nav_1">
+                        {% if yield_variance.has_previous %}
+                            <li><a href="?grower_crop={% if selectedCrop %}{{selectedCrop}}{% else %}{{selectedCrop}}{% endif %}&farm_id={% if selectedFarm.id %}{{selectedFarm.id}}{% else %}{{selectedFarm}}{% endif %}&field_id={% if selectedField.id %}{{selectedField.id}}{% else %}{{selectedField}}{% endif %}&grower_id={% if selectedGrower.id %}{{selectedGrower.id}}{% else %}{{selectedGrower}}{% endif %}&page={{ yield_variance.previous_page_number }}">&laquo;</a></li>
+                            {% else %}
+                            <li class="disabled"><span>&laquo;</span></li>
+                            {% endif %}
+                            {% for i in yield_variance.paginator.page_range %}
+                            {% if yield_variance.number == i %}
+                            <li class="active pagi" id="getactive"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+                            {% else %}
+                            <li><a href="?grower_crop={% if selectedCrop %}{{selectedCrop}}{% else %}{{selectedCrop}}{% endif %}&farm_id={% if selectedFarm.id %}{{selectedFarm.id}}{% else %}{{selectedFarm}}{% endif %}&field_id={% if selectedField.id %}{{selectedField}}{% else %}{{selectedField}}{% endif %}&grower_id={% if selectedGrower.id %}{{selectedGrower.id}}{% else %}{{selectedGrower}}{% endif %}&page={{ i }}">{{ i }}</a></li>
+                            {% endif %}
+                            {% endfor %}
+                            {% if yield_variance.has_next %}
+                            <li><a href="?grower_crop={% if selectedCrop %}{{selectedCrop}}{% else %}{{selectedCrop}}{% endif %}&farm_id={% if selectedFarm.id %}{{selectedFarm.id}}{% else %}{{selectedFarm}}{% endif %}&field_id={% if selectedField.id %}{{selectedField}}{% else %}{{selectedField}}{% endif %}&grower_id={% if selectedGrower.id %}{{selectedGrower.id}}{% else %}{{selectedGrower}}{% endif %}&page={{ yield_variance.next_page_number }}">&raquo;</a></li>
+                            {% else %}
+                            <li class="disabled"><span>&raquo;</span></li>
+                        {% endif %}
+                        </ul>
+                    {% endif %}
+                    </div>
+                    <div class="col-md-12 col-sm-12 col-12 text-center mt-2" style="text-align:right">
+                        <span>Showing  {{ yield_variance.start_index }} - {{ yield_variance.end_index }} of {{ yield_variance.paginator.count }} entries
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+  </main>
+  {% include 'footer.html' %}
+</div>
+{% endblock %}
+
+{% block jquery %}
+
+<script>
+    $(document).ready(function() {
+    $('#grower_id').change( function () {
+    $('#submitBtn2').click();
+    });
+    });
+
+    $(document).ready(function() {
+    $('#grower_crop').change( function () {
+    $('#submitBtn2').click();
+    });
+    });
+
+
+    $(document).ready(function() {
+    $('#farm_id').change( function () {
+    $('#submitBtn2').click();
+    });
+    });
+
+
+    $(document).ready(function() {
+    $('#field_id').change( function () {
+    $('#submitBtn2').click();
+    });
+    });
+
+</script>
+
+
+<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+<script>
+    window.onload = function () {
+    
+    var chart = new CanvasJS.Chart("chartContainer", {
+        animationEnabled: true,
+        zoomEnabled: true,
+        title:{
+            text: ""
+        },
+        axisX: {
+            title:"DEVIATION %",
+            minimum: -{{max_min}},
+            maximum: {{max_min}}
+        },
+        axisY:{
+            title: "REPORTED YIELD (LBS)"
+            // valueFormatString: "$#,##0k"
+        },
+        data: [{
+            type: "scatter",
+            click: onClick,
+            toolTipContent: "<b>FIELD : </b>{z}<br/><b>DEVIATION : </b>{x}%<br/><b>REPORTED YIELD : </b>{y}(LBS)",
+            dataPoints: [
+            {% for yield_variance in all_record %}
+            {% if yield_variance.reported_yeild != 'N/A' %}
+                { x: {{yield_variance.variance}}, y: {{yield_variance.reported_yeild}}, z: '{{yield_variance.field}}', h: '{{yield_variance.field_idd}}' }{% if forloop.last %}{% else %},{% endif %}
+            {% endif %}
+            {% endfor %}
+            ]
+        }]
+    });
+    chart.render();
+    //onclick redirect 
+    function onClick(e) {
+        window.location.href=`${window.location.protocol + "//" + window.location.host}/field/${e.dataPoint.h}/update/`
+	}
+    const date = new Date();
+    let day = date.getDate();
+    let month = date.getMonth() + 1;
+    let mstr = month.toString()
+    let year = date.getFullYear();
+    let currentDate = `${mstr.length === 2 ? '' : 0}${month}-${day}-${year}`;
+    const fileName = `Outlier ${currentDate}`
+    // img export
+    document.getElementById("btn-download").addEventListener("click",function(){
+    	chart.exportChart({format: "jpg",fileName: fileName});
+    }); 
+
+    }
+
+    
+    
+</script>
+
+{% endblock jquery %}

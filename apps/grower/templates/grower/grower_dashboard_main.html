@@ -1,0 +1,214 @@
+{% extends "base.html" %} {% load static %} {% block title %} Grower Dashboard {% endblock title %}
+
+
+{% block content %} {% include "navbar.html" %}
+<div class="main-content">
+	{% include 'header.html' %}
+
+	<main> <span class="farm headingtop">Grower Dashboard</span>
+		<!-- <div class="container"> -->
+		<div class="row">
+			<div class="col-lg-12">
+				<div class="remark-point">
+					<div class="alert alert-warning" role="alert">
+						<p class="note-point">
+							<span class="fw-600">Note: </span>View full detail of chart please click on respective
+							chart.
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="card card-padding">
+			<div class="row">
+				<div class="col-lg-4">
+					<div class="three-fields-with-label">
+						<!-- For Grower Dashboard button-->
+						{% if user.is_superuser %}
+						<label for="grower">Grower</label>
+						<select name="grower" id="grower-selection" style="border-radius:5px;">
+							{% for grower_name in grower_names %}
+							<option value={{grower_name}}>{{grower_name}}</option>
+							{% endfor %}
+							{% endif %}
+							{% if user.is_consultant %}
+							<div>
+								<select name="grower" id="grower-selection" style="border-radius:5px;">
+									{% for grower_name in grower_names %}
+									<option value="{{grower_name.id}}">{{grower_name.name}}</option>
+									{% endfor %}
+							</div>
+							{% endif %}
+
+						</select>
+					</div>
+
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-6">
+				{% if user.is_authenticated and user.is_superuser %}
+				<div class="card cardleft p-3">
+					<div class="chart-title-flex">
+						<!-- For Savings drop downbutton Dashboard button-->
+						<div class="inner-chart-title-filter">
+							<span class="chart-heading">Most Savings Variety</span>
+							<select name="savings" id="savings-selection1" style="border-radius:5px;">
+
+								{% for savings_type in savings_types %}
+								<option value={{savings_type}}>{{savings_type}}</option>
+								{% endfor %}
+
+							</select>
+						</div>
+
+						<!-- <span class="select-dropdown" id="selectwidth1">
+								<select id="mostsavingsvariety">
+									<option>Select Year</option>
+									<option value="2021">2021</option>
+									<option value="2020">2020</option>
+									<option value="2019">2019</option>
+								</select>
+							</span> -->
+
+					</div id="chart1">
+					<a href="{% url 'grower_dashboard1' %}">
+						<canvas id="mostsavingsvar2021"></canvas>
+						<!-- <canvas id="mostsavingsvar2020" style="display: none;"></canvas>
+								<canvas id="mostsavingsvar2019" style="display: none;"></canvas> -->
+					</a>
+				</div>
+			</div>
+		
+			<div class="col-md-6">
+				<div class="card cardleft p-3">
+					<div class="chart-title-flex">
+						<span class="chart-heading">Highest Yield Variety</span>
+						<!-- <div class="select-dropdown" id="selectwidth1">
+								<select id="highyieldvariety">
+									<option>Select Year</option>
+									<option value="2019">2019</option>
+									<option value="2020">2020</option>
+									<option value="2021">2021</option>
+								</select>
+							</div> -->
+					</div>
+					<a href="{% url 'grower_dashboard2' %}">
+						<canvas id="highyieldvar2021"></canvas>
+						<canvas id="highyieldvar2020" style="display: none;"></canvas>
+						<canvas id="highyieldvar2019" style="display: none;"></canvas>
+
+					</a>
+				</div>
+			</div>
+			{% endif %}
+		</div>
+		<div class="row">
+			<div class="col-md-6">
+
+				<div class="card cardleft p-3">
+					<div class="chart-title-flex">
+						<div class="inner-chart-title-filter">
+							<span class="chart-heading">Most savings across by region</span>
+							<select name="savings" id="savings-selection2" style="border-radius:5px;">
+
+
+								{% for savings_type in savings_types %}
+								<option value={{savings_type}}>{{savings_type}}</option>
+								{% endfor %}
+
+							</select>
+						</div>
+						<!-- <span class="select-dropdown" id="selectwidth1">
+								<select id="mywatersaving">
+									<option>Select Year</option>
+									<option value="20202021">2020-2021</option>
+									<option value="20192020">2019-2020</option>
+									<option value="20182019">2018-2019</option>
+								</select>
+							</span> -->
+					</div>
+					<a href="{% url 'grower_dashboard2' %}">
+						<canvas id="mostsavingsacross2021"></canvas>
+					</a>
+				</div>
+			</div>
+			<div class="col-md-6">
+
+				<div class="card cardleft p-3">
+					<div class="chart-title-flex">
+						<span class="chart-heading">Water use savings</span>
+						<!-- <div class="select-dropdown" id="selectwidth1">
+								<select id="myvariety">
+									<option>Select Year</option>
+									<option value="2019">2019</option>
+									<option value="2020">2020</option>
+									<option value="2021">2021</option>
+								</select>
+							</div> -->
+					</div>
+					<a href="{% url 'grower_dashboard1' %}" s>
+						<canvas id="waterusesavings2021"></canvas>
+					</a>
+				</div>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-md-6">
+				<div class="card cardleft p-3">
+					<div class="chart-title-flex">
+						<span class="chart-heading">Carbon Emission</span>
+						<!-- <div class="select-dropdown" id="selectwidth1">
+								<select id="emissioneffect">
+									<option>Select Year</option>
+									<option value="2019">2019</option>
+									<option value="2020">2020</option>
+									<option value="2021">2021</option>
+								</select>
+							</div> -->
+					</div>
+					<a href="{% url 'grower_dashboard1' %}">
+						<canvas id="carbonemission2021"></canvas>
+					</a>
+				</div>
+			</div>
+			<div class="col-md-6">
+
+				<div class="card cardleft p-3">
+					<div class="chart-title-flex">
+						<span class="chart-heading">Land savings</span>
+						<!-- <span class="select-dropdown" id="selectwidth1">
+								<select id="landsaving">
+									<option>Select Year</option>
+									<option value="2021">2021</option>
+									<option value="2020">2020</option>
+									<option value="2019">2019</option>
+								</select>
+							</span> -->
+					</div>
+					<a href="{% url 'grower_dashboard2' %}">
+						<canvas id="landuse2021"></canvas>
+					</a>
+				</div>
+			</div>
+		</div>
+
+</div>
+</main>
+<footer>
+	<div class="last-section">
+		<spna>Copyright @ 2021-2022 Agreeta reserved</spna>
+	</div>
+</footer>
+
+{% endblock content %}
+
+{% block scripts %}
+
+<script type="text/javascript" src="{% static 'js/chart.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/customcharts.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/grower/grower_dashboard_main.js' %}"></script>
+{% endblock scripts %}

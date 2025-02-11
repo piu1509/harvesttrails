@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% load static %} {% block title %} Survey Score {% endblock title %} {% block content %}
+
+<div class="main-content">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.0/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.bootstrap4.min.css">
+    <main id="for_pdf_gen"> 
+      <div class="page-title-with-or-without-btn">
+        <span class="farm headingtop">Sustainability Score</span>
+        <!-- Create button for Account-->
+      </div>
+  
+      <div class="card card-padding">
+        <div class="main-simple-table-with-search">
+          <div class="simple-responsive-table">
+            <div class="chartfilterrow">
+            <div class="row mt-5">
+              <div class="col-md-12">
+                <div id="set_chart_data">
+                    <div class="chart-title-flex">
+                        <div class="inner-chart-title-filter d-flex align-items-center">
+                          <h6 class="chart-heading mb-0">SRP Scroling Dashboard</h6>
+                          <h6 class="mb-0 ml-auto">Grower : <span style="color: #00b258;">{{grower_data.name}}</span></h6>
+                          <h6 class="mb-0 ml-auto">Date of Export : <span style="color: #00b258;">{{some_date}}</span></h6>
+                          <h6 class="mb-0 ml-auto">Provisional Score : <span style="color: #00b258;">{{Avg_Percentage_Score}}%</span></h6>
+                        </div>
+                    </div>
+                </div>
+                <img src="{{chart_data}}" id="chart-image-tag" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card card-padding">
+        <div class="main-simple-table-with-search">
+          <div class="simple-responsive-table" id="set_question_answer_marks__">
+            <table
+            id="question_answer_marks"
+            class="table table-striped table-bordered dt-responsive nowrap"
+            style="width: 100%"
+        >
+            <thead>
+            <tr style="border-bottom: 2px solid #e0e0e0">
+                <th class="text-center" width="10%">Order</th>
+                <th width="20%">
+                <div class="d-flex align-items-center">
+                    Questions
+                </div>
+                </th>
+                <th width="20%">
+                  <div class="d-flex align-items-center">
+                      Selection
+                  </div>
+                </th>
+                <th width="20%" class="text-center">
+                    Survey Type
+                </th>
+                <th width="10%" class="text-center">
+                Attachments
+                </th>
+                <th width="10%" class="text-center">Farmer point</th>
+                <th class="text-center" width="10%">Acreage</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr><td colspan="7">&nbsp;</td></tr>
+            {% for marks_data in completed_input_survey_data %}    
+            <tr>
+                <td width="10%" class="text-center" align="center">{{ forloop.counter }}</td>
+                <td width="25%" style="white-space: normal;">{{marks_data.questionsurvey}}</td>
+                <td width="25%" style="white-space: normal;">
+                  <ul style="margin: 0px; padding: 0px;">
+                      {% for option in marks_data.get_options %}
+                          <li>{{ forloop.counter }} - {{option.optionname}}</li>
+                      {% endfor %}
+                  </ul>
+                </td>
+                <td width="20%" style="white-space: normal;" align="center">{{marks_data.namesurvey.typesurvey}}</td>
+                <td width="10%" class="text-center" align="center">
+                    <a href="javascript:void(0);" data-evidence="{{marks_data.get_evidence}}" 
+                    class="{% if marks_data.get_evidence_count > 0 %}get-evidence{% endif %}">
+                        <div class="attachment-td">
+                            <img src="/static/img/attachment.svg" class="att-icon">
+                            <div class="att-number">{{marks_data.get_evidence_count}}</div>
+                        </div>
+                    </a>
+                </td>
+                <td width="10%" class="text-center" align="center">
+                <div class="farmerpoint-td">
+                    {{marks_data.optionscore}}
+                </div>
+                </td>
+              </td>
+              <td class="text-center" width="10%" align="center">
+                  <div>
+                      {{marks_data.field.acreage}}
+                  </div>
+              </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+          </div>
+        </div>
+      </div>
+  </main>
+</div>
+{% include 'footer.html' %}
+<!-- <script type="text/javascript" src="/static/js/chart.js"></script> -->
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.0/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.0/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/responsive.bootstrap4.min.js"></script>
+<script src="{% static 'js/dataTables.buttons.min.js' %}"></script>
+<script src="{% static 'js/buttons.html5.min.js' %}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.4/jspdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.3/moment.min.js"></script>
+{% endblock scripts %}
+{% block jquery %}
+
+{% endblock jquery %}

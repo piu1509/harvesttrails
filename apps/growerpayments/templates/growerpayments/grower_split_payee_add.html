@@ -1,0 +1,408 @@
+{% extends "base.html" %} {% load static %} {% block title %} Add Grower Split Payee {% endblock title %} 
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+{% block content %} {% include 'navbar.html' %}
+<div class="main-content">
+    {% include 'header.html' %} {% load crispy_forms_tags %}
+
+    <style>
+        .input-icon {
+  position: relative;
+}
+
+.input-icon > i {
+  position: absolute;
+  display: block;
+  transform: translate(0, -50%);
+  top: 69%;
+  pointer-events: none;
+  width: 25px;
+  text-align: center;
+	font-style: normal;
+}
+
+.input-icon > input {
+  padding-left: 25px;
+	padding-right: 0;
+}
+
+.input-icon-right > i {
+  right: 10px;
+}
+
+.input-icon-right > input {
+  padding-left: 0;
+  padding-right: 25px;
+  text-align: right;
+}
+.bootstrap-select .dropdown-menu li.disabled.selected{display: none;}
+.dropdown.bootstrap-select.form-control .btn{border: 1px solid; padding: 16px 8px; border-radius: 0;}
+.bootstrap-select .dropdown-menu{max-width: 280px;}
+.bootstrap-select .dropdown-menu li.selected.active .dropdown-item.active.selected{margin-left: 0;padding: 0;}
+
+    </style>
+  <main>
+    {% include '_alerts.html' %}
+    <span class="farm headingtop"> Add Grower Split Payee </span>
+    <div class="card farm-fields-container">
+        <div class="container-fluid">
+            <form method="post" class="farm-fields-form">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <div>
+                            <label for="">Grower<span class="asteriskField">*</span></label>
+                            <select id="growerSelction" name="grower_id" class="textinput textInput form-control selectpicker" required data-live-search="true">
+                                <option value='' selected disabled> Select All Growers </option>
+                                {% for grower in growers %}
+                                {% if grower == selectedGrower %}
+                                <option selected value="{{ grower.pk }}">{{grower.name}} - {{grower.id}}</option>
+                                {% else %}
+                                <option value="{{ grower.pk }}">{{grower.name}} - {{grower.id}}</option>
+                                {% endif %}
+                                {% endfor %}
+                            </select>
+                            <p id="p1" style="color: red;"></p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div>
+                            <label for="field">Field<span class="asteriskField">*</span></label>
+                            <select id="field_id" name="field_id" class="textinput textInput form-control">
+                                <option value='' selected disabled>Select All Fields</option>
+                                {% for field in fields %}
+                                {% if field == selectedField %}
+                                <option value={{field.id}} selected> {{field.name}} - {{field.id}}</option>
+                                {% else %}
+                                <option value={{field.id}}> {{field.name}} - {{field.id}}</option>
+                                {% endif %}
+                                {% endfor %}
+                            </select>
+                            <p id="p3" style="color: red;"></p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div>
+                            <label for="grower_crop">Crop<span class="asteriskField">*</span></label>
+                            <select id="grower_crop" name="grower_crop" class="textinput textInput form-control">
+                                <option value='' selected disabled> Select Crop </option>
+                                <option value={{crops}} selected> {{crops}} </option>
+                            </select>
+                            <p id="p2" style="color: red;"></p>
+                        </div>
+                    </div>
+                    {% if selectedGrower and selectedField %}
+                    <hr>
+                    <h3>Grower Payee Details</h3>
+                    <div class="col-md-4 mb-3">
+                        <label for=""><strong>Payee Entity Name</strong></label>
+                        <input type="text" class="textinput textInput form-control" name="payee_entity_name">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for=""><strong>Payee Tax ID</strong></label>
+                        <input type="text" class="textinput textInput form-control" name="payee_tax_id">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for=""><strong>Payee Physical Address</strong></label>
+                        <input type="text" class="textinput textInput form-control" name="payee_physical_address">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for=""><strong>Payee Mailing Address</strong></label>
+                        <input type="text" class="textinput textInput form-control" name="payee_mailing_address">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for=""><strong>Payee Phone</strong></label>
+                        <input type="text" class="textinput textInput form-control" name="payee_phone">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for=""><strong>Payee Email</strong></label>
+                        <input type="text" class="textinput textInput form-control" name="payee_email">
+                    </div>
+                    <hr>
+                    <div class="col-md-6 mb-3">
+                        <label for=""><strong>Lien Holder</strong><span class="asteriskField">*</span></label>
+                        <select id="lien_holder" name="lien_holder" class="textinput textInput form-control" required>
+                            <option value=''> Select </option>
+                            <option value='YES'> YES </option>
+                            <option value='NO'> NO </option>
+                    </select>
+                    </div> 
+                    <div class="col-md-6 mb-3">
+                    <label for=""><strong>Payment Splits</strong><span class="asteriskField">*</span></label>
+                    <select id="payment_splits" name="payment_splits" class="textinput textInput form-control" required>
+                        <option value=''> Select </option>
+                        <option value='YES'> YES </option>
+                        <option value='NO'> NO </option>
+                    </select>
+                    </div>
+                    <div id="lien_holder_show" style="display: none;">
+                        <hr>
+                        <h3>Lien Holder Details</h3>
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <label for=""><strong>Lien Holder Entity Name</strong></label>
+                                <input type="text" class="textinput textInput form-control" name="lien_name">
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for=""><strong>Lien Holder Tax ID</strong></label>
+                                <input type="text" class="textinput textInput form-control" name="lien_tax_id">
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for=""><strong>Lien Holder Physical Address</strong></label>
+                                <input type="text" class="textinput textInput form-control" name="lien_physical_add">
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for=""><strong>Lien Holder Mailing Address</strong></label>
+                                <input type="text" class="textinput textInput form-control" name="lien_mailing">
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for=""><strong>Lien Holder Contact Person</strong></label>
+                                <input type="text" class="textinput textInput form-control" name="lien_contact_person">
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for=""><strong>Lien Holder Phone</strong></label>
+                                <input type="text" class="textinput textInput form-control" name="lien_phone">
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for=""><strong>Lien Holder Email</strong></label>
+                                <input type="text" class="textinput textInput form-control" name="lien_email">
+                            </div>
+                            <div class="col-md-3 mb-3 input-icon input-icon-right">
+                                <label for=""><strong>Add Split Payee % Of Net Payee</strong></label>
+                                <input type="text" class="textinput textInput form-control" name="lien_split_payee_percentage" placeholder="0.00">
+                                <i>%</i>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="split_payee_show" style="display: none;">
+                        <hr>
+                        <h3>Split Payee Details</h3>
+                        <div id="add-newrow-id">
+                        <div class="row" id="remove-newrow-id_1">
+                            <div class="col-md-3 mb-3">
+                                <label for=""><strong>Split Payee Name</strong></label>
+                                <input type="text" class="textinput textInput form-control" name="split_name">
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for=""><strong>Split Payee Tax ID</strong></label>
+                                <input type="text" class="textinput textInput form-control" name="split_tax_id">
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for=""><strong>Split Payee Physical Address</strong></label>
+                                <input type="text" class="textinput textInput form-control" name="split_physical_add">
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for=""><strong>Split Payee Mailing Address</strong></label>
+                                <input type="text" class="textinput textInput form-control" name="split_mailing">
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for=""><strong>Split Payee Contact Person</strong></label>
+                                <input type="text" class="textinput textInput form-control" name="split_contact_person">
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for=""><strong>Split Payee Phone</strong></label>
+                                <input type="text" class="textinput textInput form-control" name="split_phone">
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for=""><strong>Split Payee Email</strong></label>
+                                <input type="text" class="textinput textInput form-control" name="split_email">
+                            </div>
+                            <div class="col-md-3 mb-3 input-icon input-icon-right">
+                                <label for=""><strong>Add Split Payee % Of Net Payee</strong></label>
+                                <input type="text" class="textinput textInput form-control" name="split_split_payee_percentage" placeholder="0.00">
+                                <i>%</i>
+                            </div>
+                        </div>
+                        </div>
+                        <div id="root"></div>
+                        <button id="add_more_split" class="btn-save-submit" type="button">Add More</button>
+                        <input type="hidden" id="add-row-number" value="1" name="counter">
+
+                    </div>  
+                    {% endif %}
+                   
+                <div class="row">
+                    <div class="form-btn-row">
+                        <a href="{% url 'grower_payment_split_list' %}" class="btn-close-cancel btn-space">Cancel</a>
+                        <input style="display: none;" id="submitBtn2" type="submit" class="btn-save-submit" value="Save"> 
+                        <input type="button" class="btn-save-submit" value="Save" onclick="activityButton1()">
+                    </div>
+                </div>
+        </div>
+        </form>
+  </main>
+  {% include 'footer.html' %}
+</div>
+{% endblock %}
+
+{% block jquery %}
+<script>
+    $(document).ready(function() {
+    $('#growerSelction').change( function () {
+    $('#submitBtn2').click();
+    });
+    });
+    
+    $(document).ready(function() {
+    $('#field_id').change( function () {
+    $('#submitBtn2').click();
+    });
+    });
+
+
+    $(document).ready(function() {
+    $('#lien_holder').change( function () {
+        lien_holder = document.getElementById('lien_holder').value
+        if (lien_holder=='YES'){
+            document.getElementById('lien_holder_show').style.display = 'block'
+        }else{
+            document.getElementById('lien_holder_show').style.display = 'none'
+        }
+        
+    });
+    });
+    $(document).ready(function() {
+    $('#payment_splits').change( function () {
+        payment_splits = document.getElementById('payment_splits').value
+        if (payment_splits=='YES'){
+            document.getElementById('split_payee_show').style.display = 'block'
+        }else{
+            document.getElementById('split_payee_show').style.display = 'none'
+        }
+        
+    });
+    });
+
+
+    $(document).ready(function() {
+    $('#payment_splits').change( function () {
+        lien_holder = document.getElementById('lien_holder').value
+        
+    });
+    });
+    
+
+//     function createSelect(){
+//     var counter = $('#product_counter').val();
+//     var counter = eval(counter)+1;
+//     $('#product_counter').val(counter);
+//     const root = document.querySelector('#root')
+//     root.innerHTML += `
+//                     <hr>
+//                     <div class="row">                  
+//                     <div class="col-md-3">
+//                         <div>
+//                             <label for="split_name${counter}"><strong>Split Payee Name ${counter}</strong></label>
+//                             <input type="text" name="split_name${counter}" id="split_name${counter}" class="textinput textInput form-control">
+//                         </div>
+//                     </div>
+//                     <div class="col-md-3">
+//                         <div>
+//                             <label for="split_tax_id${counter}"><strong>Split Payee Tax ID</strong></label>
+//                             <input type="text" name="split_tax_id${counter}" id="split_tax_id${counter}" class="textinput textInput form-control">
+//                         </div>
+//                     </div>
+//                     <div class="col-md-3">
+//                         <div>
+//                             <label for="split_physical_add${counter}"><strong>Split Payee Physical Address</strong></label>
+//                             <input type="text" name="split_physical_add${counter}" id="split_physical_add${counter}" class="textinput textInput form-control">
+//                         </div>
+//                     </div>
+//                     <div class="col-md-3">
+//                         <div>
+//                             <label for="split_mailing${counter}"><strong>Split Payee Mailing Address</strong></label>
+//                             <input type="text" name="split_mailing${counter}" id="split_mailing${counter}" class="textinput textInput form-control">
+//                         </div>
+//                     </div>
+//                     <div class="col-md-3">
+//                         <div>
+//                             <label for="split_contact_person${counter}"><strong>Split Payee Contact Person</strong></label>
+//                             <input type="text" name="split_contact_person${counter}" id="split_contact_person${counter}" class="textinput textInput form-control">
+//                         </div>
+//                     </div>
+//                     <div class="col-md-3">
+//                         <div>
+//                             <label for="split_phone${counter}"><strong>Split Payee Phone</strong></label>
+//                             <input type="text" name="split_phone${counter}" id="split_phone${counter}" class="textinput textInput form-control">
+//                         </div>
+//                     </div>
+//                     <div class="col-md-3">
+//                         <div>
+//                             <label for="split_email${counter}"><strong>Split Payee Email</strong></label>
+//                             <input type="text" name="split_email${counter}" id="split_email${counter}" class="textinput textInput form-control">
+//                         </div>
+//                     </div>
+//                     <div class="col-md-3" style="margin-bottom: 15px;">
+//                         <div>
+//                             <label for="split_split_payee_percentage${counter}"><strong>Add Split Payee % Of Net Payee</strong></label>
+//                             <input type="text" name="split_split_payee_percentage${counter}" id="split_split_payee_percentage${counter}" class="textinput textInput form-control">
+//                         </div>
+//                     </div>
+//                 </div>`
+    
+// }
+
+
+
+    function activityButton1(){
+        growerSelction = document.getElementById("growerSelction").value
+        grower_crop = document.getElementById("grower_crop").value
+
+        if (growerSelction != "" && grower_crop != ""){
+            $('#submitBtn2').click();
+        }
+        else{
+            if (growerSelction == "all"){
+                document.getElementById("p1").innerHTML = "*Please Select A Grower";
+            }
+            if (grower_crop == "all"){
+                document.getElementById("p2").innerHTML = "*Please Select A Crop";
+            }
+            if (contracted_payment_option == "all"){
+                document.getElementById("p3").innerHTML = "*Please Select Contracted Payment Option";
+            }
+            if (contract_base_price == ""){
+                document.getElementById("p4").innerHTML = "*Please Give Contract Base Price / LBS";
+            }
+            if (sustainability_premium == ""){
+                document.getElementById("p5").innerHTML = "*Please Give Sustainability Premium / LBS";
+            }
+            // if (quality_premium == ""){
+            //     document.getElementById("p6").innerHTML = "*Please Give Quality Premium / LBS";
+            // }
+            
+        }
+    }
+
+
+
+    $("#add_more_split").click(function(e){	
+	var number_1 = $("#add-row-number").val().trim();
+	var number_2 = parseInt(number_1)+parseInt(1);
+	$("#add-row-number").val(number_2);
+	var serialNumber = $("#add-row-number").val().trim();
+	
+	$("#add-newrow-id").append('<div class="row" id="remove-newrow-id_' + serialNumber + '"><div class="col-md-3 mb-3"><label for=""><strong>Split Payee Name</strong></label><input type="text" class="textinput textInput form-control" name="split_name' + serialNumber + '"></div><div class="col-md-3 mb-3"><label for=""><strong>Split Payee Tax ID</strong></label><input type="text" class="textinput textInput form-control" name="split_tax_id' + serialNumber + '"></div><div class="col-md-3 mb-3"><label for=""><strong>Split Payee Physical Address</strong></label><input type="text" class="textinput textInput form-control" name="split_physical_add' + serialNumber + '"></div><div class="col-md-3 mb-3"><label for=""><strong>Split Payee Mailing Address</strong></label><input type="text" class="textinput textInput form-control" name="split_mailing' + serialNumber + '"></div><div class="col-md-3 mb-3"><label for=""><strong>Split Payee Contact Person</strong></label><input type="text" class="textinput textInput form-control" name="split_contact_person' + serialNumber + '"></div><div class="col-md-3 mb-3"><label for=""><strong>Split Payee Phone</strong></label><input type="text" class="textinput textInput form-control" name="split_phone' + serialNumber + '"></div><div class="col-md-3 mb-3"><label for=""><strong>Split Payee Email</strong></label><input type="text" class="textinput textInput form-control" name="split_email' + serialNumber + '"></div><div class="col-md-3 mb-3 input-icon input-icon-right"><label for=""><strong>Add Split Payee % Of Net Payee</strong></label><input type="text" class="textinput textInput form-control" name="split_split_payee_percentage' + serialNumber + '" placeholder="0.00"><i>%</i></div></div>');
+	
+});
+</script>
+<script>
+    $('#Growers-Payments-active').addClass('activeLink');
+                  
+    $('#Growers-Payments-down').addClass('down');
+    $('#Growers-Payments-sub').show();
+    
+    $('#Grower-Payee-List').addClass('activeLink active-nav');
+</script>
+{% endblock jquery %}

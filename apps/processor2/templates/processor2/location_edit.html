@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %} Location Update {% endblock title %}
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+{% block content %}
+{% include 'navbar.html' %}
+<style>
+    .gro_dd {
+        border-color: #ccc;
+        margin-top: 0px;
+        height: 50px;
+    }
+    .storagetextbox{width: 300px; height: 45px; border:1px solid #ccc; padding: 5px 10px;}
+    .mystyle {
+        display: none;
+    }
+    .bootstrap-select .dropdown-menu li.disabled.selected{display: none;}
+    .dropdown.bootstrap-select.form-control .btn{border: 1px solid #B2BEB5; padding: 14px 8px; border-radius:0;}
+    .bootstrap-select .dropdown-menu{max-width: 280px;}
+    .bootstrap-select .dropdown-menu li.selected.active .dropdown-item.active.selected{margin-left: 0;padding: 0;}
+</style>
+<div class="main-content">
+    {% include 'header.html' %}
+    {% load crispy_forms_tags %}
+    {% include '_alerts.html' %}
+    <main>
+        {% include '_alerts.html' %}
+        <div class="page-title-with-or-without-btn">
+            <span class="farm headingtop">Location Update</span>
+        </div>
+        <form action="" method="post" class="farm-fields-form"
+        enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-md-4">
+                {{form.name|as_crispy_field}}
+            </div>
+            {% if 'Processor' in request.user.get_role and request.user.is_processor %}
+            {% else %}
+            <div class="col-md-4" class="gro_dd">
+                <label>processor Name</label>
+                <select id="growerSelction" name="processor_name" class="storagetextbox form-control selectpicker" style="width: 100%;" data-live-search="true">
+                    {% for processor in processor %}
+                    <option value="{{processor.id}}" {% if selectedprocessor == processor.id %}selected{% endif %}>{{processor.entity_name}}-{{processor.id}} </option>
+                    {% endfor %}
+                </select>
+            </div>
+            {% endif %}
+            <div class="col-md-4">
+                <label>Upload Type</label>
+               
+                <select id="id_upload_type" name="uploadtypeSelction" class="textinput textInput form-control" onchange="myFunction()">
+                    {% for location in location %}
+                    {% if location.upload_type == 'shapefile' %}
+                    <option selected value="{{ location.upload_type }}">Shapefile</option>
+                    <option  value="coordinates">Coordinates</option>
+                    {% else %}
+                    <option selected value="{{ location.upload_type }}">Coordinates</option>
+                    <option  value="shapefile">Shapefile</option>
+                    {% endif %}
+                    {% endfor %}
+                </select>
+            </div>          
+            
+            <div class="col-md-4" id="div1" {% if uploadtypeselect == 'coordinates' %} style="display:none" {% endif %}>
+                
+                <!-- {{form.shapefile_id|as_crispy_field}} -->
+                <label>Shapefile ID</label>
+                <!-- <input type="file" name="zip_file" accept=".zip" id="ShapefileID" class="storagetextbox"> -->
+                <div data-text="shapefilename.zip">
+                    <input type="file" name="zip_file" accept=".zip" class="textinput textInput form-control" id="ShapefileID" />
+                        
+                </div>
+                {% for location in location %}
+                {{location.shapefile_id}}
+                {% endfor %}
+                
+            </div>
+            
+            <div class="col-md-4" id="div4" {% if uploadtypeselect == 'shapefile' %} {% endif %}>
+                {{ form.eschlon_id|as_crispy_field }}
+            </div>
+            
+            <div class="col-md-4" id="div2" {% if uploadtypeselect == 'shapefile' %} style="display:none" {% endif %}>
+                
+                {{form.latitude|as_crispy_field}}
+                
+            </div>
+            <div class="col-md-4" id="div3" {% if uploadtypeselect == 'shapefile' %} style="display:none" {% endif %}>
+               {{form.longitude|as_crispy_field}}
+            </div>
+           
+           
+            <div class="row">
+                <div class="form-btn-row">
+                    <a href="{% url 'location_list_processor2' %}" class="btn-close-cancel btn-space">Cancel</a>
+                    <input type="submit" class="btn-save-submit" value="Save">
+                </div>
+            </div>
+            
+        </div>
+ 
+        </form>
+    </main>
+    {% include 'footer.html' %}
+</div>
+{% endblock content %}
+{% block scripts %}
+<script>
+function myFunction() {
+
+var upload_type = document.getElementById("id_upload_type").value
+//alert(upload_type);
+if (upload_type === "shapefile") {
+    document.getElementById("div1").style.display="block";
+    document.getElementById("div4").style.display="block";
+    document.getElementById("div2").style.display="none";
+    document.getElementById("div3").style.display="none";
+}
+else if (upload_type === "coordinates") {
+    document.getElementById("div1").style.display="none";
+    document.getElementById("div4").style.display="none";
+    document.getElementById("div2").style.display="block";
+    document.getElementById("div3").style.display="block";
+}
+else if (upload_type === "") {
+    document.getElementById("div1").classList.add("mystyle");
+    document.getElementById("div4").classList.add("mystyle");
+    document.getElementById("div2").classList.add("mystyle");
+    document.getElementById("div3").classList.add("mystyle");
+}
+}
+</script>
+<script>
+    $('#Tier2-Processor-active').addClass('activeLink');
+    
+      $('#Tier2-Processor-down').addClass('down');
+      $('#Tier2-Processor-sub').show();
+    
+      $('#Location-Management-Processor2').addClass('activeLink active-nav');
+  
+  </script>
+{% endblock scripts %}
+{% block jquery %}
+{% endblock jquery %}

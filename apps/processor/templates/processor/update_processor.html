@@ -1,0 +1,110 @@
+{% extends "base.html" %} {% load static %} {% block title %} Processor Update {% endblock title %} 
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+{% block content %} {% include 'navbar.html' %}
+<div class="main-content">
+    {% include 'header.html' %} {% load crispy_forms_tags %}
+  <main>
+    <span class="farm headingtop">Processor Update</span>
+    <div class="card farm-fields-container">
+        <div class="container-fluid">
+            <form method="post" class="farm-fields-form">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-4">
+                        {{ form.fein|as_crispy_field }}
+                    </div>
+                    <div class="col-md-4">
+                        {{ form.entity_name|as_crispy_field }}
+                    </div>
+                    <div class="col-md-4">
+                        {{ form.billing_address|as_crispy_field }}
+                    </div>
+                    <div class="col-md-4">
+                        {{ form.shipping_address|as_crispy_field }}
+                    </div>
+                    <div class="col-md-4">
+                        {{ form.main_email|as_crispy_field }}
+                    </div>
+                    <div class="col-md-4">
+                        {{ form.main_number|as_crispy_field }}
+                    </div>
+                    <div class="col-md-4">
+                        {{ form.main_fax|as_crispy_field }}
+                    </div>
+                    <div class="col-md-4">
+                        {{ form.website|as_crispy_field }}
+                    </div>
+                    {% if request.user.is_processor2 %}
+                    <div class="col-md-4" style="display:none;">
+                        {{ form.processor_type|as_crispy_field }}
+                    </div>
+                    {% endif %}
+                    <br>
+                    <hr>
+
+                    <div class="row">
+                    <div class="col-md-3">
+                        <div>
+                            <label for="contact_name">Contact Name<span class="asteriskField">*</span></label>
+                            <input value="{{p_user.contact_name}}" type="text" name="contact_name1" id="contact_name1" class="textinput textInput form-control" required>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div>
+                            <label for="contact_email">Contact Email<span class="asteriskField">*</span></label>
+                            <input value="{{p_user.contact_email}}" type="email" name="contact_email1" id="contact_email1" class="textinput textInput form-control" required>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div>
+                            <label for="contact_phone">Contact Phone</label>
+                            <input value="{{p_user.contact_phone}}" type="number" name="contact_phone1" id="contact_phone1" class="textinput textInput form-control">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div>
+                            <label for="ccontact_fax">Contact Fax</label>
+                            <input value="{{p_user.contact_fax}}" type="number" name="contact_fax1" id="contact_fax1" class="textinput textInput form-control">
+                        </div>
+                    </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="form-btn-row">
+                        <a href="{% url 'list-processor' %}" class="btn-close-cancel btn-space">Cancel</a>
+                        <input type="submit" class="btn-save-submit" value="Save"> 
+                    </div>
+                </div>
+        </div>
+            </form>
+    
+  </main>
+  {% include 'footer.html' %}
+</div>
+{% endblock %}
+
+{% block jquery %}
+
+<script>
+    $('#Processor-active').addClass('activeLink');
+  
+    $('#Processor-down').addClass('down');
+    $('#Processor-sub').show();
+  
+    $('#Processor-Management').addClass('activeLink active-nav');
+  
+  </script>
+{% endblock jquery %}

@@ -1,0 +1,47 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+    <title> 
+    {% block title %}
+    
+    {% endblock title %}
+    </title>
+    <link rel="icon" href="img/icons/favicon.png" type="image/x-icon" />
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.2/css/all.css" />
+	<link rel="stylesheet" href="{% static 'css/mdb.min.css' %} " />
+	<link rel="stylesheet" href="{% static 'css/footable.bootstrap.css' %}" >
+	<link rel="stylesheet" href="{% static 'css/style.css' %} ">
+	<link rel="stylesheet" href="{% static 'css/responsive.css' %} ">
+    <!-- Place inside the head tag -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/simplelightbox/2.7.0/simple-lightbox.css" integrity="sha512-8WAX0xL/cHZ38RXoX2gtuqkAwmDVAzGwoFVmHvn46IDHGWOjTHx0vcl9OapNrfOzpFtql0SNkv+0y0b5Fm8ZkA==" crossorigin="anonymous" />
+
+</head>
+
+<body>
+{% include '_alerts.html' %}
+    {% block content %}
+
+    {% endblock content %}
+    <script type="text/javascript" src="{% static 'js/jquery-3.6.0.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/mdb.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/jquery.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/footable.js' %}"></script>
+    <!-- Custom scripts -->
+
+<script type="text/javascript" src="{% static 'js/custom.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/charts.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/datatable.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/photo-and-dashboard' %}"></script>
+{% comment %} <script type="text/javascript" src="{% static 'js/jquery-for-tooltip.js' %}"></script>  {% endcomment %}
+
+
+
+<!-- Place at the bottom of the body tag -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/simplelightbox/2.7.0/simple-lightbox.min.js" integrity="sha512-ZajFBgnksNp8Rj+AbmYe8ueOu45HiSjtf3QpqnRbHlq719m6VK0FkbYIqQ8wEnlVuJ1i9pC+z6Z9ewmDnUTMCg==" crossorigin="anonymous"></script>
+</body>
+</html>

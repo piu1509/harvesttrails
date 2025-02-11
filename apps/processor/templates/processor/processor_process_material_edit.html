@@ -1,0 +1,167 @@
+{% extends "base.html" %} {% load static %}
+{% block title %} Process Material Edit {% endblock title %}
+{% load crispy_forms_tags %}
+{% block content %}
+{% include 'navbar.html' %}
+
+<div class="main-content">
+    {% include 'header.html' %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.0/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.bootstrap4.min.css">
+
+    <main>
+        {% include '_alerts.html' %}
+        <div class="page-title-with-or-without-btn">
+            <span class="farm headingtop">Process Material Edit</span>
+            <!-- Create button for Account-->
+        </div>
+
+        <div class="card farm-fields-container">
+            <div class="container-fluid">
+                
+                    <div class="row" style="margin-bottom: 20px;">
+                        <div class="col-md-4" style="margin-bottom: 10px;">
+                            <label for="shipment"><strong>SHIPMENT ID</strong></label>
+                            <div>{{grower_shipment.shipment_id}}</div>
+                            <!-- <input type="text" value="{{grower_shipment.shipment_id}}"
+                                class="textinput textInput form-control" readonly> -->
+                        </div>
+                        <div class="col-md-4" style="margin-bottom: 10px;">
+                            <label for="shipment"><strong>MODULE TAG #</strong></label>
+                            <div>{{grower_shipment.module_number}}</div>
+                            <!-- <input type="text" value="{{grower_shipment.module_number}}"
+                                class="textinput textInput form-control" readonly> -->
+                        </div>
+                        <div class="col-md-4" style="margin-bottom: 10px;">
+                            <label for="shipment"><strong>FIELD</strong></label>
+                            <div>{{grower_shipment.field.name}}</div>
+                            <!-- <input type="text" value="{{grower_shipment.field.name}}"
+                                class="textinput textInput form-control" readonly> -->
+                        </div>
+                        <div class="col-md-4" style="margin-bottom: 10px;">
+                            <label for="shipment"><strong>GROWER</strong></label>
+                            <div>{{grower_shipment.grower.name}}</div>
+                            <!-- <input type="text" value="{{grower_shipment.grower.name}}"
+                                class="textinput textInput form-control" readonly> -->
+                        </div>
+                        {% if request.user.is_processor %}
+                        {% else %}
+                        <div class="col-md-4" style="margin-bottom: 10px;">
+                            <label for="shipment"><strong>PROCESSOR</strong></label>
+                            <div>{{grower_shipment.processor.entity_name}}</div>
+                            <!-- <input type="text" value="{{grower_shipment.processor.entity_name}}"
+                                class="textinput textInput form-control" readonly> -->
+                        </div>
+                        {% endif %}
+                        <!-- <div class="col-md-4" style="margin-bottom: 10px;">
+                            <label for="shipment"># OF ROLLS</label>
+                            <input type="text" value="{{grower_shipment.amount}}"
+                                class="textinput textInput form-control" readonly>
+                        </div>
+                        <div class="col-md-4" style="margin-bottom: 10px;">
+                            <label for="shipment">TYPE OF UNITS</label>
+                            <input type="text" value="{{grower_shipment.unit_type}}"
+                                class="textinput textInput form-control" readonly>
+                        </div> -->
+                        <div class="col-md-4" style="margin-bottom: 10px;">
+                            <label for="shipment"><strong>CROP</strong></label>
+                            <div>{{grower_shipment.crop}}</div>
+                            <!-- <input type="text" value="{{grower_shipment.crop}}" class="textinput textInput form-control" readonly> -->
+                                
+                        </div>
+                        <div class="col-md-4" style="margin-bottom: 10px;">
+                            <label for="shipment"><strong>VARIETY</strong></label>
+                            <div>{{grower_shipment.variety}}</div>
+                            <!-- <input type="text" value="{{grower_shipment.variety}}"
+                                class="textinput textInput form-control" readonly> -->
+                        </div>
+                    
+                        <div class="col-md-4" style="margin-bottom: 10px;">
+                            <label for="shipment"><strong>SUSTAINABILITY SCORE</strong></label>
+                            <div>{{grower_shipment.sustainability_score}}</div>
+                            <!-- <input type="text" value="{{grower_shipment.sustainability_score}}"
+                                class="textinput textInput form-control" readonly> -->
+                        </div>
+                        <div class="col-md-4" style="margin-bottom: 10px;">
+                            <label for="shipment"><strong>DATE AND TIME</strong></label>
+                            <div>{{grower_shipment.date_time}}</div>
+                            <!-- <input type="text" value="{{grower_shipment.date_time}}"
+                                class="textinput textInput form-control" readonly> -->
+                        </div>
+                        <div class="col-md-4" style="margin-bottom: 10px;">
+                            <label for="shipment"><strong>ECHELON ID</strong></label>
+                            <div>{{grower_shipment.echelon_id}}</div>
+                            <!-- <input type="text" value="{{grower_shipment.echelon_id}}"
+                                class="textinput textInput form-control" readonly> -->
+                        </div>
+                        <div class="col-md-12" style="margin-bottom: 10px;">
+                            <label for="shipment"><b>Weight</b></label>
+                            <div style="font-size: 20px">
+                                    <span style="font-size: 30px">{{grower_shipment.amount}}</span>  {{grower_shipment.unit_type}}
+                                    {% if grower_shipment.amount2|length > 0 %}
+                                    + <span style="font-size: 30px">{{grower_shipment.amount2}}</span> {{grower_shipment.unit_type2}}
+                                    =
+                                    <span style="font-size: 30px">{{grower_shipment.total_amount}}</span> LBS
+                                    {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    <form action="" method="post">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-12 row">
+                            <div class="col-md-3" style="margin-bottom: 10px;">
+                                <label for="id_rolls">Weight (LBS)<span class="asteriskField">*</span></label>
+                                <input value="{{grower_shipment.process_amount}}" type="text" name="id_rolls" id="id_rolls"  class="textinput textInput form-control" required>
+                            </div>
+                            <div class="col-md-3" style="margin-bottom: 10px;">
+                                <label for="id_date">Date<span class="asteriskField">*</span></label>
+                                <input type="date" name="id_date" id="id_date" class="textinput textInput form-control" value="{{date_shipment}}" required>
+                            </div>
+                            <div class="col-md-3" style="margin-bottom: 10px;">
+                                <label for="id_time">Time<span class="asteriskField">*</span></label>
+                                <input type="time" name="id_time" id="id_time" class="textinput textInput form-control" value="{{time_shipment}}" required>
+                            </div>
+                            <div class="col-md-3" style="margin-bottom: 10px;">
+                                <label for="id_sku">SKU<span class="asteriskField">*</span></label>
+                                <input value="{{grower_shipment.sku}}" type="text" name="id_sku" id="id_sku"  class="textinput textInput form-control" required>
+                            </div>
+
+                            <div class="row" style="margin-top: 10px;">
+                                <div class="form-btn-row">
+                                    <a href="{% url 'processor_outbound_list' %}" class="btn-close-cancel btn-space">Back</a>
+                                    <input type="submit" class="btn-save-submit" value="Save"> 
+                                </div>
+                            </div>
+                        </div> 
+                    </div>
+                </form>
+            </div>
+        </div>
+</div>
+</main>
+{% include 'footer.html' %}
+</div>
+
+
+{% endblock content %}
+
+{% block scripts %}
+<script src="https://cdn.datatables.net/1.11.0/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.0/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/responsive.bootstrap4.min.js"></script>
+
+<script src="{% static 'js/farm/farm_list.js' %}"></script>
+
+<script>
+    // $(document).ready(function () {
+    //     $('#processorList_tbl').DataTable();
+    // });
+
+
+</script>
+{% endblock scripts %}

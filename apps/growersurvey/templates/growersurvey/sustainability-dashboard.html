@@ -1,0 +1,469 @@
+{% extends "base.html" %}
+{% load static %} {% block title %} Survey List {% endblock title %} {% block content %}
+{% include 'navbar.html' %}
+<style>
+  .bootstrap-select .dropdown-menu li.disabled.selected{display: none;}
+  .dropdown.bootstrap-select.form-control .btn{border: 1px solid #ddd; padding: 6px 8px; border-radius: 0;}
+  .bootstrap-select .dropdown-menu{max-width: 280px;}
+  .bootstrap-select .dropdown-menu li.selected.active .dropdown-item.active.selected{margin-left: 0;padding: 0;}
+</style>
+<div class="main-content">
+    {% include 'header.html' %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.0/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.bootstrap4.min.css">
+    <main id="for_pdf_gen"> 
+      <div class="page-title-with-or-without-btn">
+        <span class="farm headingtop">Sustainability Score</span>
+        <!-- Create button for Account-->
+        <div>
+          <a class="btn-close-cancel" href="{% url 'download_all_survey_record' %}" target="_blank">Download All Survey</a>
+        </div>
+      </div>
+  
+      <div class="card card-padding">
+        <div class="main-simple-table-with-search">
+          <div class="simple-responsive-table">
+            <div class="chartfilterrow">
+              <div class="row">
+                <div class="col-lg-12">
+                  <div id="set_chart_data_for_all"><canvas id="survey_chart_for_all"></canvas></div>
+                </div>
+                <div class="col-lg-12">
+                  <div id="set_ctx_for_all_line"><canvas id="ctx_for_all_line"></canvas></div>
+                </div>
+              </div>
+              <div class="row px-2">
+                <div class="col-xl-2 col-lg-3 col-sm-6 col-12 px-1" id="set_question_answer_marks_go">
+                    <div class="form-group">
+                        <select class="selectpicker form-control" data-live-search="true" data-live-search-style="startsWith" name="growers" id="growers">
+                            {% for grower in get_growers %}
+                            <option value="{{grower.id}}">{{grower.name}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="col-xl-2 col-lg-3 col-sm-6 col-12 px-1">
+                    <div class="form-group">
+                        <select name="farm" id="farm">
+                    </select>
+                    </div>
+                </div>
+                <div class="col-xl-2 col-lg-3 col-sm-6 col-12 px-1">
+                    <div class="form-group">
+                        <select name="field" id="field">
+                        </select>
+                    </div>
+                </div>
+                <div class="col-xl-2 col-lg-3 col-sm-6 col-12 px-1">
+                    <div class="form-group">
+                        <select name="year" id="year">
+                            {% for year in survey_year_list %}
+                            <option value="{{year.surveyyear}}">{{year.surveyyear}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="col-xl-4 col-lg-12 col-sm-12 col-12 text-center text-md-right sub-db-btn-custom px-1">
+                  <div class="d-flex justify-content-end">
+                    <button type="button" class="btn-save-submit" id="apply_filter">Apply Filter</button>
+                
+                    <div id="Export_CSV" class="ms-2"></div>
+                    <button style="display: none; border-radius: 50px; padding: 5px 15px;" type="button" class="btn btn-secondary btn-export ms-2" id="Export_pdf_new">PDF</button>
+                  </div>
+                </div>
+              </div>
+              
+            <div class="row mt-5">
+              <div class="col-md-12">
+                <div id="set_chart_data"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card card-padding">
+        <div class="main-simple-table-with-search">
+          <div class="simple-responsive-table" id="set_question_answer_marks"></div>
+        </div>
+      </div>
+  </main>
+
+  <div class="modal fade" id="evidence_file_data" aria-hidden="true" aria-labelledby="exampleModalToggleLabel22"  tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-body">
+          <button
+            type="button"
+            class="btn-close cust-close-ds-btn"
+            data-mdb-dismiss="modal"
+            aria-label="Close"
+            onclick="closeFileMoadl()"
+          ></button>
+          <div class="center-content-status">
+            <img
+              src="/static/img/attachment.svg"
+              alt="right"
+              id="rightImg"
+              class="warning-icon"
+            />
+            <p id="message" class="modal-title titlepad">
+              <ul id="file_list"></ul>
+            </p>
+          </div>
+          <div class="modal-center-btn-footer">
+            <button
+              id="closeBtnpopup"
+              type="button"
+              class="btn-close-cancel btn-space"
+              data-mdb-dismiss="modal"
+              onclick="closeFileMoadl()"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% include 'footer.html' %}
+<!-- <script type="text/javascript" src="/static/js/chart.js"></script> -->
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.0/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.0/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/responsive.bootstrap4.min.js"></script>
+<script src="{% static 'js/dataTables.buttons.min.js' %}"></script>
+<script src="{% static 'js/buttons.html5.min.js' %}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.4/jspdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.3/moment.min.js"></script>
+{% endblock scripts %}
+
+{% block jquery %}
+
+<script>
+
+</script>
+
+<script>
+  $(document).ready(function(e){
+    //alert(sessionStorage.getItem('grower_id'));
+    if(sessionStorage.getItem('grower_id'))
+    {
+      $('#growers').val(sessionStorage.getItem('grower_id'));
+      sessionStorage.removeItem('grower_id');
+    }
+    
+    $('#growers').selectpicker('refresh');
+
+    if(sessionStorage.getItem('survey_year'))
+    {
+      $('#year').val(sessionStorage.getItem('survey_year'));
+      sessionStorage.removeItem('survey_year');
+    }
+
+    $('#growers').change();
+
+    // setTimeout(function(){
+    //    $('#farm').change();
+    // }, 200);
+
+    // setTimeout(function(){
+    //     $('#apply_filter').click();
+    // }, 500);
+
+  });
+
+  $('#growers').on('change', function(e){
+      var grower_id = $(this).val();
+      if(grower_id > 0)
+      {
+        $.ajax({ // create an AJAX call...
+                  data: {grower_id:grower_id}, // get the form data
+                  type: 'GET', // GET or POST
+                  url: "{% url 'get-all-farm' %}", // the file to call 
+                  dataType: 'JSON',
+                  success: function(response) { // on success..
+                      var farm_items = [];
+                      for (const [val, key] of response.farm_list) {
+                        farm_items.push("<option value='" + key + "'>" + val + "</option>");
+                      }
+                      var farm_items_options = farm_items.join("");
+                      $('#farm').html(farm_items_options);
+
+                      //
+                      if(sessionStorage.getItem('farm_id'))
+                      {
+                        $('#farm').val(sessionStorage.getItem('farm_id'));
+                        sessionStorage.removeItem('farm_id');
+                      }
+
+                      setTimeout(function(){ $('#farm').change(); }, 100);
+                  }
+              });
+      }
+      else
+      {
+        $('#farm').html('');
+      }
+  });
+
+  $('#farm').on('change', function(e){
+    var farm_id = $(this).val();
+    if(farm_id > 0)
+    {
+      $.ajax({ // create an AJAX call...
+              data: {farm_id:farm_id}, // get the form data
+              type: 'GET', // GET or POST
+              url: "{% url 'get-all-field' %}", // the file to call 
+              dataType: 'JSON',
+              success: function(response) { // on success..
+                  var field_items = [];
+                  for (const [val, key] of response.field_list) {
+                    field_items.push("<option value='" + key + "'>" + val + "</option>");
+                  }
+                  var field_items_options = field_items.join("");
+
+                  //
+                  
+                  $('#field').html(field_items_options);
+                  if(sessionStorage.getItem('field_id'))
+                  {
+                    //set_question_answer_marks_go
+
+                    $('#field').val(sessionStorage.getItem('field_id'));
+                    $('html, body').animate({
+                        scrollTop: $("#set_question_answer_marks_go").offset().top
+                    }, 500);
+                    sessionStorage.removeItem('field_id');
+                  }
+                  setTimeout(function(){
+                      $('#apply_filter').click();
+                  }, 300);
+              }
+          });
+
+    }
+    else
+    {
+      $('#field').html('');
+    }
+  });
+
+  
+
+  $('#Export_pdf_new').on('click', function(e){
+    var apply_growers = $('#growers').val();
+    var apply_farm = $('#farm').val();
+    var apply_field = $('#field').val();
+    var apply_year = $('#year').val();
+
+    //var chart_image_data = localStorage.getItem('chartdata');
+
+    //console.log(chart_image_data);
+
+    var pdf_url = "/growersurvey/myview";
+    pdf_url_param = pdf_url + '/' + apply_growers + '/' + apply_farm + '/' + apply_field + '/' + apply_year;
+
+    window.open(pdf_url_param, '_blank');
+
+  });
+
+  $('#apply_filter').on('click', function(e){
+    var apply_growers = $('#growers').val();
+    var apply_farm = $('#farm').val();
+    var apply_field = $('#field').val();
+    var apply_year = $('#year').val();
+
+      // console.log(apply_growers);
+      // console.log(apply_farm);
+      // console.log(apply_field);
+      // console.log(apply_year);
+      $('#set_question_answer_marks').html("No Data Found");
+      $('#set_chart_data').html("No Data Found");
+
+      if(apply_growers > 0 && apply_farm > 0 && apply_field > 0 && apply_year > 0)
+      {
+        $.ajax({ // create an AJAX call...
+              data: {apply_growers:apply_growers, apply_farm:apply_farm, apply_field:apply_field, apply_year:apply_year}, // get the form data
+              type: 'GET', // GET or POST
+              url: "{% url 'get-sustainability-result' %}", // the file to call 
+              success: function(response) { // on success..
+                  //console.log(response);
+                $('#set_question_answer_marks').html(response);
+
+                var set_question_answer_marks = $('#set_question_answer_marks').html();
+                
+              }
+        });
+
+        $.ajax({ // create an AJAX call...
+              data: {apply_growers:apply_growers, apply_farm:apply_farm, apply_field:apply_field, apply_year:apply_year}, // get the form data
+              type: 'GET', // GET or POST
+              url: "{% url 'get-chart-result' %}", // the file to call 
+              success: function(response) { // on success..
+                  //console.log(response);
+                  $('#set_chart_data').html(response);
+                  var set_chart_data = $('#set_chart_data').html();
+                  //$('#Export_pdf_new').show();
+                  $('#Export_pdf_new').css({"display":"flex"});
+                  
+              }
+        });
+
+      }
+  });
+
+  function closeFileMoadl()
+  {
+    $('#evidence_file_data').modal('hide');
+  }
+</script>
+<script>
+  $(function(){
+  
+      var score_arr_for_all = [];
+      var label_arr_for_all = [];
+
+      {% for type in survey_type %}
+        label_arr_for_all.push('{{type}}');
+      {% endfor %}
+
+      {% for score in survey_score_data %}
+        score_arr_for_all.push('{{score}}');
+      {% endfor %}
+      
+  
+  //get the line chart canvas
+  var ctx_for_all = $("#survey_chart_for_all");
+  
+  //bar chart data
+  var data_for_all = {
+    labels: label_arr_for_all,
+    datasets: [
+      {
+        label: "SRP SCORING FOR ALL",
+        data: score_arr_for_all,
+        backgroundColor: [
+            /*  ('#797ef6'),
+              ('#658354'),
+              ('#4b6043'),
+              ('#1aa7ec'),
+              ('#03045e'),
+              ('#315a39'), */
+
+              ('#B0C69F'),
+              ('#B39CC0'),
+              ('#81A179'),
+              ('#957292'),
+              ('#6E0A3E'),
+              ('#0A6C38'),
+
+          ],
+        fill: false,
+        lineTension: 0,
+        radius: 5,
+      },
+    ]
+  };
+  
+  //options
+  var options_for_all = {
+    responsive: true,
+
+    scales: {
+        yAxes: [{
+            display: true,
+            stacked: true,
+            ticks: {
+                min: 0, // minimum value
+                max: 100 // maximum value
+            }
+        }]
+    },
+
+    title: {
+      display: true,
+      position: "left",
+      text: "",
+      position: "top",
+      fontSize: 16,
+      fontColor: "#111",
+      colors: ['red','green', 'purple'],
+    },
+  
+    legend: {
+      display: true,
+      position: "bottom",
+      labels: {
+        fontColor: "#333",
+        fontSize: 16
+      }
+    }
+  
+  
+  };
+  
+  
+  //create Chart class object
+  var chart_for_all = new Chart(ctx_for_all, {
+    type: "bar",
+    data: data_for_all,
+    options: options_for_all
+  });
+
+//   line_labels = [];
+
+//   {% for line_grower in line_survey_grower_list %}
+//       line_labels.push('{{line_grower}}');
+//   {% endfor %}
+
+//   console.log(line_labels);
+
+
+//   var lineData = {
+//   labels: ['Data 1', 'Data 2', 'Data 3', 'Data 4', 
+//            'Data 5', 'Data 6', 'Data 7'],
+//   datasets: [{
+//     label: "Survey Type 1",
+//     data: [20, 30, 80, 20, 40, 10, 60]
+//   }, {
+//     label: "Survey Type 2",
+//     data: [60, 10, 40, 30, 80, 30, 20]
+//   }]
+// }
+
+//console.log(lineData);
+
+// var ctx_for_all_line = document.getElementById('ctx_for_all_line');
+
+// var chart_for_all = new Chart(ctx_for_all_line, {
+//     type: "line",
+//     data: lineData,
+//     options: {
+//         scales: {
+//             y: {
+//                 stacked: true
+//             }
+//         }
+//     }
+//   });
+
+});
+</script>
+<script>
+  $('#Sustainability-active').addClass('activeLink');
+                
+  $('#Sustainability-down').addClass('down');
+  $('#Sustainability-sub').show();
+  
+  $('#Sustainability-Dashboard').addClass('activeLink active-nav');
+</script>
+{% endblock jquery %}

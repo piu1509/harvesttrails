@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Files</title>
+</head>
+
+<body>
+	<h2>Dear {{processor|title }}</h2>
+	<h5>Your Shipment Information is here..</h5>
+	<h5>Please find the credentials below-</h5>
+	<h5>Shipment Id : {{shipment_id}}</h5>
+	<h5>Grower Name : {{grower_name}}</h5>
+	<h5>crop : {{crop}}</h5>
+	<h5>Variety : {{variety}}</h5>
+	<h5>Weight : {{amount}}</h5>
+	<h5>Field Name : {{field_name}}</h5>
+	<h5>Storage : {{storage}}</h5>
+	<h5>Field Eschlon id : {{echelon_id}}</h5>
+	<h5>Sustainability Score : {{surveyscore}}</h5>
+	<h5>URL : https://traceableoutcomes.tech/</h5>
+
+	<h3>Thanks</h3>
+
+	<img src="https://traceableoutcomes.tech/static/img/logo.png"
+		alt="logo.png" style="width:15%;">
+</body>
+
+</html>

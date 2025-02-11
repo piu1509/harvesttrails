@@ -1,0 +1,401 @@
+{% extends "base.html" %} {% load static %} {% block title %} Grower Payment Statement {% endblock title %} 
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+{% block content %} {% include 'navbar.html' %}
+<div class="main-content">
+    {% include 'header.html' %} {% load crispy_forms_tags %}
+
+
+    <style>
+        table.payset{width:95%; border: 1px solid #333; font-size:12px; font-family: Arial, Helvetica, sans-serif; margin: 0 auto;}
+        table.payset td{border: 1px solid #333; padding: 4px;}
+        .bigfont{font-size: 16px; font-weight: bold; font-family: Arial, Helvetica, sans-serif;}
+        .toobigfont{font-size: 24px; font-weight: bold; font-family: Arial, Helvetica, sans-serif;}
+    </style>
+    <style>
+        .selected {
+            margin-top: 0;
+            margin-left: 0;
+            padding-left: 12px;
+            padding-right: 10px;
+            font-size: 16px;
+        }
+    
+     
+    .bootstrap-select .dropdown-menu li.disabled.selected{display: none;}
+    .dropdown.bootstrap-select.form-control .btn{border: 1px solid; padding: 14px 8px; border-radius:0;}
+    .bootstrap-select .dropdown-menu{max-width: 280px;}
+    .bootstrap-select .dropdown-menu li.selected.active .dropdown-item.active.selected{margin-left: 0;padding: 0;}
+    </style>
+  <main>
+    {% include '_alerts.html' %}
+    <div class="page-title-with-or-without-btn">
+        <span class="farm headingtop"> Grower Payment Statement </span>
+        <!-- Create button for Add-->
+        <div class="flex-header-btn">
+            <input type="button" onclick="printDiv()" value="PDF Export" class="btn-close-cancel"/>
+            &nbsp;
+            <a href="{% url 'grower_split_payee_add' %}" class="btn-close-cancel">ADD GROWER SPLIT PAYEE</a>
+        </div>
+    </div>
+
+    <div class="card farm-fields-container">
+        <div class="container-fluid">
+            <form method="post" class="farm-fields-form">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <div>
+                            <label for="">Grower<span class="asteriskField">*</span></label>
+                            <select id="growerSelction" name="grower_id" class="form-control selectpicker" data-live-search="true">
+                                <option value='all' selected disabled> Select All Growers </option>
+                                {% for grower in growers %}
+                                {% if grower == selectedGrower %}
+                                <option selected value="{{ grower.pk }}">{{grower.name}} - {{grower.id}}</option>
+                                {% else %}
+                                <option value="{{ grower.pk }}">{{grower.name}} - {{grower.id}}</option>
+                                {% endif %}
+                                {% endfor %}
+                            </select>
+                            <p id="p1" style="color: red;"></p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div>
+                            <label for="field">Field<span class="asteriskField">*</span></label>
+                            <select id="field_id" name="field_id" class="form-control selectpicker" data-live-search="true">
+                                <option value='' selected disabled>Select All Fields</option>
+                                {% for field in fields %}
+                                {% if field == selectedField %}
+                                <option value={{field.id}} selected> {{field.name}} - {{field.id}}</option>
+                                {% else %}
+                                <option value={{field.id}}> {{field.name}} - {{field.id}}</option>
+                                {% endif %}
+                                {% endfor %}
+                            </select>
+                            <p id="p3" style="color: red;"></p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div>
+                            <label for="grower_crop">Crop<span class="asteriskField">*</span></label>
+                            <select id="grower_crop" name="grower_crop" class="form-control selectpicker" data-live-search="true">
+                                <option value='' selected disabled> Select Crop </option>
+                                {% for crop in crops %}
+                                <option value='{{crop.code}}' {% if selectedCrop == crop.code %}selected {% endif %}> {{crop.code}} </option>
+                                {% endfor %}
+                                
+                            </select>
+                            <p id="p2" style="color: red;"></p>
+                        </div>
+                    </div>
+                    <h3 class="toobigfont">Date Range (Payment Due Date)</h3>
+                    <div class="col-md-5 mb-3">
+                        <label for=""><strong>Select Start Date</strong><span class="asteriskField">*</span></label>
+                        <input type="date" name="start_date" id="" class="textinput textInput form-control" value="{{selected_start_date}}">
+                    </div>
+                    <div class="col-md-5 mb-3">
+                        <label for=""><strong>Select To Date</strong><span class="asteriskField">*</span></label>
+                        <input type="date" name="end_date" id="" class="textinput textInput form-control" value="{{selected_end_date}}">
+                    </div>
+                    <div class="col-md-2 mb-3 mt-4">
+                        <input name="" id="" type="submit" class="btn-save-submit" value="search">
+                    </div>
+                    {% if selectedGrower and selectedField %}
+                    {% if grower_payee|length == 1 %}
+                    <hr>
+                    <div id="printableArea">
+                    <h3 class="toobigfont" style="padding-bottom: 20px;">Payment Settlement Statement</h3>
+                        <table class="payset" cellpadding="0" cellspacing="0" style="margin-bottom: 30px;" border="1">
+                        <tr>
+                            <td style="width: 25%;"><strong>Date</strong></td>
+                            <td style="width: 25%;">{{today_date}}</td>
+                            <td style="width: 25%;"></td>
+                            <td style="width: 25%;"></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Crop</strong></td>
+                            <td>{{payment_splits_crop}}</td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>&nbsp;</td>
+                            <td></td>
+                            <td><strong>Lien</strong></td>
+                            <td>{{lien_status}}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Grower Name</strong></td>
+                            <td>{{payment_splits_grower}}</td>
+                            <td><strong>Lien Holder</strong></td>
+                            <td>
+                                {% if lien_status == 'YES' %}
+                                {{lien_Holer_name}}
+                                {% else %}
+                                N/A
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Address</strong></td>
+                            <td>{{payment_splits_address}}</td>
+                            <td><strong>Address</strong></td>
+                            <td>
+                                {% if lien_status == 'YES' %}
+                                {{lien_Holer_address}}
+                                {% else %}
+                                N/A
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Address</strong></td>
+                            <td>{{payment_splits_mail_address}}</td>
+                            <td><strong>Address</strong></td>
+                            <td>
+                                {% if lien_status == 'YES' %}
+                                {{lien_Holer_mail_address}}
+                                {% else %}
+                                N/A
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Phone</strong></td>
+                            <td>{{payment_splits_phone}}</td>
+                            <td><strong>Phone</strong></td>
+                            <td>
+                                {% if lien_status == 'YES' %}
+                                {{lien_Holer_phone}}
+                                {% else %}
+                                N/A
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Email</strong></td>
+                            <td>{{payment_splits_email}}</td>
+                            <td><strong>Email</strong></td>
+                            <td>
+                                {% if lien_status == 'YES' %}
+                                {{lien_Holer_email}}
+                                {% else %}
+                                N/A
+                                {% endif %}
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td colspan="4" class="bigfont"><strong>Payment Summary</strong></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Total LBS Delivered</strong></td>
+                            <td></td>
+                            <td>{{delivery_lbs}}</td>
+                            <td>&nbsp;</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Gross Payment</strong></td>
+                            <td></td>
+                            <td>${{delivered_value}}</td>
+                            <td>&nbsp;</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Less AR Rice Tax</strong></td>
+                            <td></td>
+                            <td>(${{ar_tax}})</td>
+                            <td>&nbsp;</td>
+                        </tr>
+                        <tr>
+                            <td class="bigfont"><strong>Net Pay</strong></td>
+                            <td></td>
+                            <td class="bigfont">${{net_pay}}</td>
+                            <td>&nbsp;</td>
+                        </tr>
+                        </table>
+                        &nbsp;
+                        <h3 class="toobigfont" style="padding-bottom: 20px;">Split by Fields</h3>
+                        <table class="payset" cellpadding="0" cellspacing="0" border="1">
+                            <tr >
+                                <td style="background-color: #000; color:#fff;" border="1" bordercolor="#999"><strong>Field Name</strong></td>
+                                <td colspan={{split_data|length}} style="background-color: #000; color:#fff;" border="1" bordercolor="#999"><strong>{{selectedField.name}}</strong></td>
+                            </tr>
+                            <tr>
+                                <td border="1" bordercolor="#999"><strong>Split %</strong></td>
+                                {% for i in split_data %}
+                                <td border="1" bordercolor="#999">{{i.split_data_split_percent}}%</td>
+                                {% endfor %}
+                            </tr>
+                            <tr>
+                                <td><strong>Payment Amount ($)</strong></td>
+                                {% for i in split_data %}
+                                <td>${{i.split_data_payment_amount}}</td>
+                                {% endfor %}
+                            </tr>
+                            <tr>
+                                <td><strong>Split Payee Name</strong></td>
+                                {% for i in split_data %}
+                                <td>{{i.split_data_entity_name}}</td>
+                                {% endfor %}
+                            </tr>
+                            <tr>
+                                <td><strong>Address</strong></td>
+                                {% for i in split_data %}
+                                <td>{{i.split_data_address}}</td>
+                                {% endfor %}
+                            </tr>
+                            <tr>
+                                <td><strong>Address</strong></td>
+                                {% for i in split_data %}
+                                <td>{{i.split_data_mail_address}}</td>
+                                {% endfor %}
+                            </tr>
+                            <tr>
+                                <td><strong>Tax Id</strong></td>
+                                {% for i in split_data %}
+                                <td>{{i.split_data_tax_id}}</td>
+                                {% endfor %}
+                            </tr>
+                            <tr>
+                                <td><strong>Phone</strong></td>
+                                {% for i in split_data %}
+                                <td>{{i.split_data_phone}}</td>
+                                {% endfor %}
+                            </tr>
+                        </table>
+                    <h3 class="toobigfont mt-3">Payment Details</h3>
+                                                                   
+                            <table class="payset" cellpadding="0" cellspacing="0" border="1">
+                                <thead>
+                                    <tr style="border-bottom: 2px solid #333;">
+                                        <td colspan="4"><strong>Payment Dates : </strong>{{ selected_start_date_low }} - {{ selected_end_date_low }}</td>
+                                        <td colspan="5"><strong>Payment Totals : </strong>{{delivered_value}}</td>
+                                        <td colspan="4"><strong>Field : </strong>{{selectedField.name}}</td>
+                                    </tr>
+                                    <tr style="border-bottom: 2px solid #333;">
+                                        <td width="7%" style="text-align:center;font-weight: bold;"><sup>Delivery</sup><br>Date</td>
+                                        <td width="7%" style="text-align:center;font-weight: bold;"><sup>Delivery</sup><br>Id</td>
+                                        <td width="7%" style="text-align:center;font-weight: bold;">Grower</td>
+                                        <td width="7%" style="text-align:center;font-weight: bold;">Crop</td>
+                                        <td width="7%" style="text-align:center;font-weight: bold;">Variety</td>
+                                        <td width="7%" style="text-align:center;font-weight: bold;">Field</td>
+                                        <td width="7%" style="text-align:center;font-weight: bold;"><sup>Delivered</sup><br>LBS</td>
+                                        <td width="7%" style="text-align:center;font-weight: bold;"><sup>Total Price</sup><br>/ LBS ($)</td>
+                                        <td width="7%" style="text-align:center;font-weight: bold;"><sup>Delivered</sup><br>Value ($)</td>
+                                        <td width="7%" style="text-align:center;font-weight: bold;"><sup>Payment</sup><br>Due Date</td>
+                                        <td width="7%" style="text-align:center;font-weight: bold;"><sup>Gross Payment</sup><br>Amount ($)</td>
+                                        <td width="7%" style="text-align:center;font-weight: bold;"><sup>AR Rice Tax</sup><br>0.135 %</td>
+                                        <td width="7%" style="text-align:left;font-weight: bold;">Net Pay</td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% if grower_payment|length > 0 %}
+                                    {% for grower_payment in grower_payment %}
+                                    <tr>
+                                        <td align="center" style="vertical-align: middle;">{{ grower_payment.delivery_date }}</td>
+                                        <td align="center" style="vertical-align: middle;">{{ grower_payment.delivery_id }}</td>
+                                        <td align="center" style="vertical-align: middle;">{{ grower_payment.grower_name }}</td>
+                                        <td align="center" style="vertical-align: middle;">{{ grower_payment.crop }}</td>
+                                        <td align="center" style="vertical-align: middle;">{{ grower_payment.variety }}</td>
+                                        <td align="center" style="vertical-align: middle;">{{ grower_payment.field }}</td>
+                                        <td align="center" style="vertical-align: middle;">{{ grower_payment.delivery_lbs }}</td>
+                                        <td align="center" style="vertical-align: middle;">{{ grower_payment.total_price }}</td>
+                                        <td align="center" style="vertical-align: middle;">{{ grower_payment.delivered_value }}</td>
+                                        <td align="center" style="vertical-align: middle;">{{ grower_payment.payment_due_date }}</td>
+                                        <td align="center" style="vertical-align: middle;">{{ grower_payment.delivered_value }}</td>
+                                        <td align="center" style="vertical-align: middle;">{{ grower_payment.payment_air_tax }}</td>
+                                        <td align="left" style="vertical-align: middle;">{{ grower_payment.payment_net_pay }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                    {% else %}
+                                    <tr>
+                                        <td align="center" style="vertical-align: middle;" colspan="13">No Records Found</td>
+                                    </tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                      
+                  
+                    {% else %}
+                    <p>No Records Found</p>
+                    </div>
+                    {% endif %}  
+                    {% endif %}  
+                <input style="display: none;" id="submitBtn2" type="submit" class="btn-save-submit" value="Save">
+                
+        </div>
+        </form>
+  </main>
+  {% include 'footer.html' %}
+</div>
+{% endblock %}
+
+{% block jquery %}
+
+<script>
+    function printDiv() {
+    var divToPrint = document.getElementById('printableArea');
+    var htmlToPrint = '' +
+        '<style type="text/css">' +
+        'table th, table td {' +
+        'border:1px solid #333;' +
+        'font-family: Arial;' +
+        'font-size: 12px;' +
+        'padding: 2px;' +
+        '}' + 'table {' +
+        'width: 95%;' +
+        'margin: 0 auto;' +
+        '}' +
+        '</style>';
+    htmlToPrint += divToPrint.outerHTML;
+    newWin = window.open("");
+    newWin.document.write(htmlToPrint);
+    newWin.print();
+    newWin.close();
+}
+</script>
+
+<script>
+$(document).ready(function() {
+    $('#growerSelction').change( function () {
+    $('#submitBtn2').click();
+    });
+    });
+    $(document).ready(function() {
+    $('#field_id').change( function () {
+    $('#submitBtn2').click();
+    });
+    });
+
+//     function printDiv(divName) {
+//      var printContents = document.getElementById(divName).innerHTML;
+//      var originalContents = document.body.innerHTML;
+
+//      document.body.innerHTML = printContents;
+
+//      window.print();
+
+//      document.body.innerHTML = originalContents;
+// }
+</script>
+<script>
+    $('#Growers-Payments-active').addClass('activeLink');
+                  
+    $('#Growers-Payments-down').addClass('down');
+    $('#Growers-Payments-sub').show();
+    
+    $('#Payment-Statement').addClass('activeLink active-nav');
+</script>
+{% endblock jquery %}

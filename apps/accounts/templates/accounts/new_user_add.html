@@ -1,0 +1,214 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Add New Account{% endblock title %}
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() {dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>  <!-- Include jQuery library -->
+{% endblock extrahead %}
+
+{% block content %}
+{% include 'navbar.html' %}
+<div class="main-content">
+    {% include 'header.html' %}
+    <main>
+        <span class="farm headingtop">Select Role</span>
+        <div class="card farm-fields-container">
+            <div class="container-fluid">
+                <form method="post" class="farm-fields-form">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div>
+                                <label for="">Role<span class="asteriskField">*</span></label>
+                                <select id="roleselection" name="role_id" class="textinput textInput form-control" required>
+                                    <option value='' selected > Select Role </option>
+                                    {% for role in roles %}
+                                    {% if role == selectedrole %}
+                                    <option selected value="{{ role.id }}">{{role.role}}- {{ role.id }}</option>
+                                    {% else %}
+                                    <option value="{{ role.id }}">{{role.role}} -{{ role.id }}</option>
+                                    {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div id="lien_holder_show" style="display: none;">
+                            <hr>
+                            <div class="col-md-4 mb-3">
+                                <label for=""><strong> Name</strong></label>
+                                <input type="text" class="textinput textInput form-control" name="name">
+                                <p id="p1" style="color: red;"></p>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for=""><strong>Number</strong></label>
+                                <input type="text" class="textinput textInput form-control" name="number">
+                                <p id="p2" style="color: red;"></p>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for=""><strong>Email</strong></label>
+                                <input type="email" class="textinput textInput form-control" name="email">
+                                <p id="p3" style="color: red;"></p>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for=""><strong>Phone</strong></label>
+                                <input type="text" class="textinput textInput form-control" name="phone">
+                                <p id="p4" style="color: red;"></p>
+                            </div>
+
+                            <div class="row">
+                                <div class="form-btn-row">
+                                    <a href="{% url 'grower_payment_split_list' %}" class="btn-close-cancel btn-space">Cancel</a>
+                                    <input style="display: none;" id="submitBtn2" type="submit" class="btn-save-submit" value="Save"> 
+                                    <input id="submitBtn2" type="submit" class="btn-save-submit" value="Save" onclick="activityButton1()"> 
+                                    {% comment %} <input type="button" id="submitBtn2" class="btn-save-submit" value="Save" onclick="activityButton1()" > {% endcomment %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="lien_holder_show2" style="display: none;">
+
+                            {% comment %} {% else %} {% endcomment %}
+                            <hr>
+                            <div class="col-md-4 mb-3">
+                                <label for=""><strong>Name</strong></label>
+                                <input type="text" class="textinput textInput form-control" name="name">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for=""><strong>Phone Number</strong></label>
+                                <input type="text" class="textinput textInput form-control" name="ph_number">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for=""><strong>Email</strong></label>
+                                <input type="text" class="textinput textInput form-control" name="email">
+                            </div>
+                            
+                            <div class="row">
+                                <div class="form-btn-row">
+                                    <a href="{% url 'grower_payment_split_list' %}" class="btn-close-cancel btn-space">Cancel</a>
+                                    <input style="display: none;" id="submitBtn2" type="submit" class="btn-save-submit" value="Save"> 
+                                    <input id="submitBtn2" type="submit" class="btn-save-submit" value="Save" onclick="activityButton1()"> 
+                                    {% comment %} <input type="button" id="submitBtn2" class="btn-save-submit" value="Save" onclick="activityButton1()" > {% endcomment %}
+                                </div>
+                            </div> 
+                            {% comment %} {% endif %}  {% endcomment %}
+                        </div>  
+                        
+                            
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div id="form-container"></div>
+    </main>
+    {% include 'footer.html' %}
+</div>
+{% endblock %}
+
+{% block jquery %}
+<script>
+{% comment %} $(document).ready(function() {
+    $('#roleselection').change(function() {
+        var selectedRole = $(this).val();
+        if (selectedRole != '') {
+            $('#additional-fields').show();
+        } else {
+            $('#additional-fields').hide();
+        }
+    });
+}); {% endcomment %}
+
+
+$(document).ready(function() {
+    $('#roleselection').change( function () {
+        var lien_holder = document.getElementById('roleselection').value;
+        //console.log("lien_holder========================================",lien_holder);
+        var selectedOption = document.getElementById('roleselection').options[document.getElementById('roleselection').selectedIndex];
+        var lien_holder_name = selectedOption.text.split(' ')[0].trim(); // Taking the first word
+        //console.log("Selected role: ================================", lien_holder_name);
+
+        if (lien_holder_name === "Consultant"){
+            document.getElementById('lien_holder_show').style.display = 'block'
+        }else{
+            document.getElementById('lien_holder_show').style.display = 'none'
+        }
+    });
+});
+
+$(document).ready(function() {
+    $('#roleselection').change( function () {
+        var lien_holder = document.getElementById('roleselection').value;
+        //console.log("lien_holder========================================",lien_holder);
+        var selectedOption = document.getElementById('roleselection').options[document.getElementById('roleselection').selectedIndex];
+        var lien_holder_name = selectedOption.text.split(' ')[0].trim(); // Taking the first word
+        //console.log("Selected role: ================================", lien_holder_name);
+
+        if (lien_holder_name != "Consultant"){
+            document.getElementById('lien_holder_show2').style.display = 'block'
+        }else{
+            document.getElementById('lien_holder_show2').style.display = 'none'
+        }
+    });
+});
+
+
+{% comment %} function activityButton1(){
+    var name = $("#name").val();
+    var number = $("#number").val();
+    var email = $("#email").val();
+    var phone = $("#phone").val();
+
+    if (name != "" && number != ""&& email != ""&& phone != ""){
+        $('#submitBtn2').click();
+    }
+    else{
+        if(name==''){
+            document.getElementById('p1').innerHTML = "Date can't be blank";
+        }
+        else{
+            document.getElementById('p1').innerHTML = "";  
+        }
+        
+        if(number==''){
+            document.getElementById('p2').innerHTML = "Date can't be blank";
+        }
+        else{
+            document.getElementById('p2').innerHTML = "";  
+        }
+        
+        if(email==''){
+            document.getElementById('p3').innerHTML = "Date can't be blank";
+        }
+        else{
+            document.getElementById('p3').innerHTML = "";  
+        }
+        
+        if(phone==''){
+            document.getElementById('p4').innerHTML = "Date can't be blank";
+        }
+        else{
+            document.getElementById('p4').innerHTML = "";  
+        }
+        
+    }
+}
+ {% endcomment %}
+
+
+
+
+$('#User-Management-active').addClass('activeLink');
+$('#User-Management-down').addClass('down');
+$('#User-Management-sub').show();
+$('#user-list').addClass('activeLink active-nav');
+</script>
+{% endblock jquery %}

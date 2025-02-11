@@ -1,0 +1,159 @@
+{% extends "base.html" %} {% load static %} {% block title %} Add New Account {% endblock title %} {% load crispy_forms_tags %} {% block content %} {% include 'navbar.html' %}
+<div class="main-content">
+    {% include 'header.html' %}
+    <main>
+        <span class="farm headingtop">Grower Registration Form</span>
+        <div class="card farm-fields-container">
+            <div class="container-fluid">
+                <form method="post" class="farm-fields-form">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-4">
+                            {{ form.name|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.phone|as_crispy_field }}
+                            {% comment %} <div id="div_id_phone" class="form-group">
+                                <label for="id_phone_0" class=" requiredField">
+                                    Phone Number<span class="asteriskField">*</span>
+                                </label>
+                                <div class="">
+                                    <input type="text" name="phone_0" size="13" maxlength="10" minlength="10" pattern="[0-9]{10}" class="textinput textInput" required="" id="id_phone_0"><span class="phone-field-ext">&nbsp;&nbsp;ext.&nbsp;&nbsp;</span><input type="text" name="phone_1"
+                                        size="4" class="textinput textInput" id="id_phone_1">
+                                    <small id="hint_id_phone" class="form-text text-muted">ex: 888-555-7423</small>
+                                </div>
+                            </div> {% endcomment %}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.email|as_crispy_field }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            {{ form.physical_address1|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.physical_address2|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.city1|as_crispy_field }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            {{ form.state1|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.zip_code1|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.mailing_address1|as_crispy_field }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            {{ form.mailing_address2|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.city2|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.state2|as_crispy_field }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            {{ form.zip_code2|as_crispy_field }}
+                        </div>
+                        
+                        
+                        <div class="col-md-4">
+                        {{ form.consultant|as_crispy_field }}
+                        {% if user.is_superuser %}
+                        <li> <a href="{% url 'add-consultant' %}" class="add-consultant-btn">Add Consultant</a></li>
+                        {% endif %}
+                        </div>
+                        
+                        
+                        
+
+                        <div class="col-md-4">
+                            {{ form.notes|as_crispy_field }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-btn-row">
+                            <a href="{% url 'account-list' %}" class="btn-close-cancel btn-space">Cancel</a>
+                            <input type="submit" class="btn-save-submit" value="Save">
+                        </div>
+                    </div>
+                </form>
+            </div>
+    </main>
+    {% include 'footer.html' %}
+    {% comment %}
+    <!-- Add Consultant Modal -->
+    <div class="modal fade" id="reasonModal" aria-hidden="true" aria-labelledby="exampleModalToggleLabel1" tabindex="-1">
+        <div class="modal-dialog add-consultant-modal">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <button type="button" class="btn-close cust-close-modal-btn" data-mdb-dismiss="modal" aria-label="Close"></button>
+                    <p class="modal-title titlepad custom-changetitle">Add Consultant</p>
+                    <form action="#" class="farm-fields-form">
+                        <div class="left-content-status add-consultant-content">
+
+                            <div class="form-group">
+                                <label for="name">Name</label>
+                                <input type="text" name="name" id="name" class="textinput textInput form-control">
+                            </div>
+                            <div class="form-group">
+                                <label for="number">Number</label>
+                                <input type="text" name="number" id="number" class="textinput textInput form-control">
+                            </div>
+                            <div class="form-group">
+                                <label for="number">Phone</label>
+                                <div class="inline-number-with-ext">
+                                    <input type="text" name="number" id="number" class="textinput textInput form-control btn-space">
+                                    <input type="text" name="number" id="ext." class="textinput textInput form-control">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="number">Email</label>
+                                <input type="email" name="email" id="email" class="textinput textInput form-control">
+                            </div>
+                        </div>
+                        <div class="modal-right-btn-footer">
+                            <button type="button" class="btn-close-cancel btn-space" data-mdb-dismiss="modal">Close</button>
+                            <button type="submit" class="btn-save-submit">Save</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End - Add Consultant Modal -->{% endcomment %}
+    </div>
+    {% endblock %}
+    {% block jquery %}
+    <script>
+        var super_user = '{{consults}}';
+        $('#id_consultant').removeClass('disabled-consultants');
+        if(super_user!="super")
+        {
+            $('#id_consultant').addClass('disabled-consultants');
+            $('#id_consultant option').prop('disabled', true);
+            var logged_in_consult_id = "{{consults}}";
+            $('#id_consultant').val(logged_in_consult_id);
+            $('#id_consultant option[value="'+logged_in_consult_id+'"]').prop('disabled', false);
+        }
+    </script>
+    <script>
+        $('#Grower-Configuration-active').addClass('activeLink');
+      
+        $('#Grower-Configuration-down').addClass('down');
+        $('#Grower-Configuration-sub').show();
+      
+        $('#Grower-Management').addClass('activeLink active-nav');
+      
+      </script>
+    {% endblock jquery %}

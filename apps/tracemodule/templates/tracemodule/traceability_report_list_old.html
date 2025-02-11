@@ -1,0 +1,972 @@
+{% extends "base.html" %} {% load static %} {% block title %} Trace Module {% endblock title %} 
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+{% block content %} {% include 'navbar.html' %}
+<div class="main-content">
+    {% include 'header.html' %} {% load crispy_forms_tags %}
+  <main>
+<style>
+.trace-module {
+    padding: 0;
+    list-style: none;
+    display: flex;
+}
+.trace-module li {
+    padding-right: 0;
+    position: relative;
+}
+.trace-module li:not(:first-of-type) .farm-tag {
+    padding-left: 30px;
+}
+.trace-module li .farm-tag {
+    background-color: #d3daed;
+    color: #000;
+    padding: 6px 6px;
+    font-size: 10px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.trace-module li.label .farm-tag {
+    background-color: #4473c5;
+    color: #fff;
+    padding-left: 30px;
+}
+.trace-module li.active .farm-tag {
+    background-color: #afd79b;
+}
+.trace-module li:not(:first-of-type)::before {
+    content: "";
+    position: absolute; 
+    left: 1px;
+    top: 0;
+    bottom: 0;
+    width: 17px;
+    background-color: #fff;
+    clip-path: polygon(0 0, 0% 100%, 100% 50%);
+}
+.trace-module li:not(:first-of-type)::after {
+    content: "";
+    position: absolute;
+    border-top: 28px solid transparent;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 14px;
+    background-color: #d3daed;
+    clip-path: polygon(0 0, 0% 100%, 100% 50%);
+}
+
+.trace-module li.label + li::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -1px;
+    width: 14px;
+    background-color: #4473c5;
+    clip-path: polygon(0 0, 0% 100%, 100% 50%);
+}
+.trace-module li.active + li::after {
+    content: "";
+    position: absolute; 
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 14px;
+    background-color: #afd79b;
+    clip-path: polygon(0 0, 0% 100%, 100% 50%);
+}
+
+.trace-module li:last-child .farm-tag::before {
+    content: "";
+    position: absolute;
+    right: -16px;
+    top: 0;
+    bottom: 0;
+    width: 17px;
+    background-color: #d3daed;
+    clip-path: polygon(0 0, 0% 100%, 100% 50%);
+}
+
+.trace-module li.label .farm-tag::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 62px;
+    background-color: #fff;
+    clip-path: polygon(0 0, 0% 100%, 21% 50%);
+}
+.trace-module li:last-child.active .farm-tag::before{
+    background-color: #afd79b;
+}
+
+.clickcss{
+    cursor: pointer;
+}
+
+</style>
+
+<div class="page-title-with-or-without-btn">
+    <span class="farm headingtop">Trace Module</span>
+    {% if origin_context %}
+    <div class="inline-apply-filter justify-content-center justify-content-md-end ewr-report">
+        <div>
+            <input type="button" onclick="printDiv()" value="PDF Export" class="btn-close-cancel"/>
+        </div>
+        &nbsp;
+        &nbsp;
+        <div>
+            <a href="{% url 'traceability_report_all_csv_download' select_crop get_search_by  search_text from_date to_date %}" class="btn-close-cancel">DOWNLOAD ALL CSV</a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<div class="card farm-fields-container">
+    <div class="container-fluid">
+        <form method="post" class="farm-fields-form">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-md-3">
+                    <label><strong>Select Crop</strong><span class="asteriskField">*</span></label>
+                    <select name="select_crop" id="select_crop_id" onchange="getText()" class="form-control" required>
+                        <option value='' >Select Crop</option>
+                        {% if select_crop == 'RICE' %}
+                        <option value='RICE' selected>RICE</option>
+                        <option value='COTTON' >COTTON</option>
+                        {% elif select_crop == 'COTTON' %}
+                        <option value='RICE' >RICE</option>
+                        <option value='COTTON' selected>COTTON</option>
+                        {% else %}
+                        <option value='RICE'>RICE</option>
+                        <option value='COTTON' >COTTON</option>
+                        {% endif %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label><strong>Select Crop Year</strong><span class="asteriskField">*</span></label>
+                    <select name="crop_year" id="" class="form-control" required>
+                        <option value='' >Select Crop Year</option>
+                        {% if crop_year == '2022' %}
+                        <option value='2022' selected>2022</option>
+                        <option value='2023' >2023</option>
+                        {% elif crop_year == '2023' %}
+                        <option value='2022' >2022</option>
+                        <option value='2023' selected>2023</option>
+                        {% else %}
+                        <option value='2022'>2022</option>
+                        <option value='2023'>2023</option>
+                        {% endif %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label><strong>From Date</strong><span class="asteriskField">*</span></label>
+                    <input name="from_date" value="{{from_date}}" type="date" class="form-control" required>
+                </div>
+                <div class="col-md-3">
+                    <label><strong>To Date</strong><span class="asteriskField">*</span></label>
+                    <input name="to_date" value="{{to_date}}" type="date" class="form-control" required>
+                </div>
+                <div class="col-md-3 mt-2">
+                    {% comment %} <select name="get_search_by" onchange="getText()" id="getTextid" class="form-control" style="padding-top: 9px;padding-bottom: 9px;" required> {% endcomment %}
+                    <select name="get_search_by" onchange="removeSelectedOption()" id="getTextid" class="form-control" style="padding-top: 9px;padding-bottom: 9px;">
+                        <option value='' >Select Search By</option>
+                        {% if get_search_by == 'grower' %}
+                        <option value='grower' selected>Grower</option>
+                        <option value='field'>Field</option>
+                        <option value='processor'>Processor</option>
+                        <option value='deliveryid'>Delivery id</option>
+                        {% elif get_search_by == 'field' %}
+                        <option value='grower'>Grower</option>
+                        <option value='field' selected>Field</option>
+                        <option value='processor'>Processor</option>
+                        <option value='deliveryid'>Delivery id</option>
+                        {% elif get_search_by == 'processor' %}
+                        <option value='grower'>Grower</option>
+                        <option value='field'>Field</option>
+                        <option value='processor' selected>Processor</option>
+                        <option value='deliveryid'>Delivery id</option>
+                        {% elif get_search_by == 'deliveryid' %}
+                        <option value='grower'>Grower</option>
+                        <option value='field'>Field</option>
+                        <option value='processor'>Processor</option>
+                        <option value='deliveryid' selected>Delivery id</option>
+                        {% else %}
+                        <option value='grower'>Grower</option>
+                        <option value='field'>Field</option>
+                        <option value='processor'>Processor</option>
+                        <option value='deliveryid'>Delivery id</option>
+                        {% endif %}
+                    </select>
+                </div>
+                <div class="col-md-6 mt-2">
+                    {% comment %} <input name="search_text" onkeyup="getText()" id="tags" value="{{search_text}}" type="text" class="form-control" placeholder="Search Delivery ID, Field, Grower, Processor, etc." required> {% endcomment %}
+                    <input name="search_text" onkeyup="getText()" id="tags" value="{{search_text}}" type="text" class="form-control" placeholder="Search Delivery ID, Field, Grower, Processor, etc." >
+                </div>
+                
+                <div class="col-md-3 text-left mt-2 pt-2">
+                    <input type="submit" class="btn-save-submit" value="search"> 
+                </div>
+            <div class="row">
+                <div class="form-btn-row">
+                    <!-- <input type="submit" class="btn-save-submit" value="search">  -->
+                </div>
+            </div>
+    </div>
+        </form>
+
+
+{% if origin_context %}
+<div class="main-simple-table-with-search" id="printableArea">
+    <!-- Origin -->
+    <div class="both-data-in" style="display: inherit;">
+        <div class="row">
+            <div class="col-10" style="background-color: #4473c5;padding: 12px 0px 0px 20px;text-align: left;color: #fff;font-size: 20px;">
+                <p>Origin</p>
+            </div>
+            <div class="col-2" style="background-color: #999;padding: 12px 0px 0px 0px;text-align: center;font-size: 16px;">
+                <a target="_blank" href="{% url 'traceability_report_Origin_csv_download' select_crop get_search_by  search_text from_date to_date %}" style="color: #000000;font-weight: bold;font-size: 20px;">Csv Download</a>
+            </div>
+        </div>
+        <div class="simple-responsive-table">
+            <table id="" class="table table-striped dt-responsive nowrap text-center" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>Crop</th>
+                        <th>Variety</th>
+                        <th>Field</th>
+                        <th>Grower</th>
+                        <th>Farm</th>
+                        <th>Harvest Date</th>
+                        <th>Projected Yield</th>
+                        <th>Actual Yield</th>
+                        <th>Yield Delta</th>
+                        <th>Storage Quanitty</th>
+                        <th>Sustainability Metrics</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for i in origin_context %}
+                    <tr>
+                        <td>{{ i.get_select_crop }}</td>
+                        <td>{{ i.variety}}</td>
+                        <td>{{ i.field_name}} - {{ i.field_id }}</td>
+                        <td>{{ i.grower_name}} - {{ i.grower_id }}</td>
+                        <td>{{ i.farm_name}} - {{ i.farm_id}}</td>
+                        <td>{{ i.harvest_date }}</td>
+                        <td>{{ i.projected_yeild }}</td>
+                        <td>{{ i.reported_yeild }}</td>
+                        <td>{{ i.yield_delta }}</td>
+                        <td>{{ i.storage_quanitty }}</td>
+                        <td>
+                            <a onclick="showTraceability({{i.field_id}})" class="update-btn-link" alt="view" title="view" style="cursor: pointer;" data-mdb-toggle="modal" data-mdb-target="#addqueModal"><span class="fas fa-eye"></span> </a>
+                            <p style="display: none;" id="search_by">{{search_by}}</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <!-- Outbound 1 WIP -->
+    <div class="both-data-in" style="display: inherit; margin-top: 25px;">
+        <div class="row">
+            <div class="col-10" style="background-color: #4473c5;padding: 12px 0px 0px 20px;text-align: left;color: #fff;font-size: 20px;">
+                <p>Outbound 1 WIP</p>
+            </div>
+            <div class="col-2" style="background-color: #999;padding: 12px 0px 0px 0px;text-align: center;font-size: 16px;">
+                <a target="_blank" href="{% url 'traceability_report_WIP1_csv_download' select_crop get_search_by  search_text from_date to_date %}" style="color: #000000;font-weight: bold;font-size: 20px;">Csv Download</a>
+            </div>
+        </div>
+        <!-- <h2 style="background-color: #4473c5;padding: 5px;text-align: center;color: #fff;">Outbound 1 WIP</h2> -->
+        <div class="simple-responsive-table">
+            <table id="" class="table table-striped dt-responsive nowrap text-center" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>Delivery ID Outbound</th>
+                        <th>Source</th>
+                        <th>Date</th>
+                        <th>Quantity Pounds</th>
+                        <th>Transportation Mode (Rail or Truck)</th>
+                        <th>Destination</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for i in outbound1_wip %}
+                    <tr>
+                        <td>{{ i.deliveryid }}</td>
+                        <td>{{ i.source }}</td>
+                        <td>{{ i.date }}</td>
+                        <td>{{ i.quantity }}</td>
+                        <td>{{ i.transportation }}</td>
+                        <td>{{ i.destination }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <!-- T1 Processor -->
+    <div class="both-data-in" style="display: inherit; margin-top: 25px;">
+        <div class="row">
+            <div class="col-10" style="background-color: #4473c5;padding: 12px 0px 0px 20px;text-align: left;color: #fff;font-size: 20px;">
+                <p>T1 Processor</p>
+            </div>
+            <div class="col-2" style="background-color: #999;padding: 12px 0px 0px 0px;text-align: center;font-size: 16px;">
+                <a target="_blank" href="{% url 'traceability_report_T1_Processor_csv_download' select_crop get_search_by  search_text from_date to_date %}" style="color: #000000;font-weight: bold;font-size: 20px;">Csv Download</a>
+            </div>
+        </div>
+        <div class="simple-responsive-table">
+            <table id="" class="table table-striped dt-responsive nowrap text-center" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>Processor Name / ID #</th>
+                        <th>Delivery ID</th>
+                        <th>SKU ID</th>
+                        <th>Grower</th>
+                        <th>Farm</th>
+                        <th>Field</th>
+                        <th>Date</th>
+                        <th>Quantity Pounds Shipped</th>
+                        <th>Quantity Pounds Received</th>
+                        <th>Quantity Delta</th>
+                        <th>Quality Metrics</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for i in t1_processor %}
+                    <tr>
+                        <td>{{ i.processor_name }} / {{ i.processor_id }}</td>
+                        <td>{{ i.deliveryid }}</td>
+                        <td>{{ i.skuid}}</td>
+                        <td>{{ i.grower }}</td>
+                        <td>{{ i.farm }}</td>
+                        <td>{{ i.field }}</td>
+                        <td>{{ i.date }}</td>
+                        <td>{{ i.pounds_shipped }}</td>
+                        <td>{{ i.pounds_received }}</td>
+                        <td>{{ i.pounds_delta }}</td>
+                        <td>
+                            <a onclick="showQuality({{i.deliveryid}})" class="update-btn-link" alt="view" title="view" style="cursor: pointer;" data-mdb-toggle="modal" data-mdb-target="#addQualityModal"><span class="fas fa-eye"></span> </a>
+                            <p style="display: none;" id="deliveryid">{{i.deliveryid}}</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <!-- Outbound 2 WIP -->
+    <div class="both-data-in" style="display: inherit; margin-top: 25px;">
+        <div class="row">
+            <div class="col-10" style="background-color: #4473c5;padding: 12px 0px 0px 20px;text-align: left;color: #fff;font-size: 20px;">
+                <p>Outbound 2 WIP</p>
+            </div>
+            <div class="col-2" style="background-color: #999;padding: 12px 0px 0px 0px;text-align: center;font-size: 16px;">
+                <a href="{% url 'traceability_report_WIP2_csv_download' select_crop get_search_by  search_text from_date to_date %}" style="color: #000000;font-weight: bold;font-size: 20px;">Csv Download</a>
+            </div>
+        </div>
+        <div class="simple-responsive-table">
+            <table id="" class="table table-striped dt-responsive nowrap text-center" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>Delivery ID Outbound</th>
+                        <th>T1 SKU ID</th>
+                        <th>Date</th>
+                        <th>Quantity Pounds</th>
+                        <th>Transportation Mode (Rail or Truck)/Equipment ID</th>
+                        <th>Destination</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for i in outbound2_wip %}
+                    <tr>
+                        <td>{{ i.deliveryid }}</td>
+                        <td>{{ i.storage_skuid }}</td>
+                        <td>{{ i.date }}</td>
+                        <td>{{ i.quantity }}</td>
+                        <td>{{ i.transportation }}  / {{i.equ_id}}</td>
+                        <td>{{ i.destination }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <!-- T2 Processor -->
+    <div class="both-data-in" style="display: inherit; margin-top: 25px;">
+        <div class="row">
+            <div class="col-10" style="background-color: #4473c5;padding: 12px 0px 0px 20px;text-align: left;color: #fff;font-size: 20px;">
+                <p>T2 Processor</p>
+            </div>
+            <div class="col-2" style="background-color: #999;padding: 12px 0px 0px 0px;text-align: center;font-size: 16px;">
+                <a href="{% url 'traceability_report_T2_Processor_csv_download' select_crop get_search_by  search_text from_date to_date %}" style="color: #000000;font-weight: bold;font-size: 20px;">Csv Download</a>
+            </div>
+        </div>
+        <div class="simple-responsive-table">
+            <table id="" class="table table-striped dt-responsive nowrap text-center" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>Processor Name / ID #</th>
+                        <th>Delivery ID</th>
+                        <th>SKU ID</th>
+                        <th>Date</th>
+                        <th>Quantity Pounds Shipped</th>
+                        <th>Quantity Pounds Received</th>
+                        <th>Quantity Delta</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for i in t2_processor %}
+                    <tr>
+                        <td>{{ i.processor_name }} / {{ i.processor_id }}</td>
+                        <td>{{ i.deliveryid }}</td>
+                        <td>{{ i.skuid }}</td>
+                        <td>{{ i.date }}</td>
+                        <td>{{ i.pounds_shipped }}</td>
+                        <td>{{ i.pounds_received }}</td>
+                        <td>{{ i.pounds_delta }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <!-- Outbound 3 WIP -->
+    <div class="both-data-in" style="display: inherit; margin-top: 25px;">
+        <div class="row">
+            <div class="col-10" style="background-color: #4473c5;padding: 12px 0px 0px 20px;text-align: left;color: #fff;font-size: 20px;">
+                <p>Outbound 3 WIP</p>
+            </div>
+            <div class="col-2" style="background-color: #999;padding: 12px 0px 0px 0px;text-align: center;font-size: 16px;">
+                <a href="" style="color: #000000;font-weight: bold;font-size: 20px;">Csv Download</a>
+            </div>
+        </div>
+        <div class="simple-responsive-table">
+            <table id="" class="table table-striped dt-responsive nowrap text-center" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>Delivery ID Outbound</th>
+                        <th>T2 SKU ID</th>
+                        <th>Date</th>
+                        <th>Quantity Pounds</th>
+                        <th>Transportation Mode (Rail or Truck)</th>
+                        <th>Destination</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <!-- T3 Processor -->
+    <div class="both-data-in" style="display: inherit; margin-top: 25px;">
+        <div class="row">
+            <div class="col-10" style="background-color: #4473c5;padding: 12px 0px 0px 20px;text-align: left;color: #fff;font-size: 20px;">
+                <p>T3 Processor</p>
+            </div>
+            <div class="col-2" style="background-color: #999;padding: 12px 0px 0px 0px;text-align: center;font-size: 16px;">
+                <a href="" style="color: #000000;font-weight: bold;font-size: 20px;">Csv Download</a>
+            </div>
+        </div>
+        <div class="simple-responsive-table">
+            <table id="" class="table table-striped dt-responsive nowrap text-center" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>Processor Name / ID #</th>
+                        <th>Delivery ID</th>
+                        <th>Date</th>
+                        <th>Quantity Pounds Shipped</th>
+                        <th>Quantity Pounds Received</th>
+                        <th>Quantity Delta</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <!-- Outbound 4 WIP -->
+    <div class="both-data-in" style="display: inherit; margin-top: 25px;">
+        <div class="row">
+            <div class="col-10" style="background-color: #4473c5;padding: 12px 0px 0px 20px;text-align: left;color: #fff;font-size: 20px;">
+                <p>Outbound 4 WIP</p>
+            </div>
+            <div class="col-2" style="background-color: #999;padding: 12px 0px 0px 0px;text-align: center;font-size: 16px;">
+                <a href="" style="color: #000000;font-weight: bold;font-size: 20px;">Csv Download</a>
+            </div>
+        </div>
+        <div class="simple-responsive-table">
+            <table id="" class="table table-striped dt-responsive nowrap text-center" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>Delivery ID Outbound</th>
+                        <th>Date</th>
+                        <th>Quantity Pounds</th>
+                        <th>Transportation Mode (Rail or Truck)</th>
+                        <th>Destination</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <!-- Buyer -->
+    <div class="both-data-in" style="display: inherit; margin-top: 25px;">
+        <div class="row">
+            <div class="col-10" style="background-color: #4473c5;padding: 12px 0px 0px 20px;text-align: left;color: #fff;font-size: 20px;">
+                <p>Buyer</p>
+            </div>
+            <div class="col-2" style="background-color: #999;padding: 12px 0px 0px 0px;text-align: center;font-size: 16px;">
+                <a href="" style="color: #000000;font-weight: bold;font-size: 20px;">Csv Download</a>
+            </div>
+        </div>
+        <div class="simple-responsive-table">
+            <table id="" class="table table-striped dt-responsive nowrap text-center" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>Buyer Name / ID #</th>
+                        <th>Delivery ID</th>
+                        <th>Date</th>
+                        <th>Quantity Pounds Shipped</th>
+                        <th>Quantity Pounds Received</th>
+                        <th>Quantity Delta</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% else %}
+<div style="margin-top: 5px;">
+    <h2>{{no_rec_found_msg}}</h2>
+</div>
+{% endif %}
+
+<!--  SUSTAINABILITY METRICS Popup -->
+<div class="modal fade" id="addqueModal" aria-hidden="true" aria-labelledby="exampleModalToggleLabel22" tabindex="-1">
+    <div class="modal-dialog" style="max-width: 800px !important;">
+        <div class="modal-content">
+            <div class="modal-header" style="text-align: center;" >
+                <button type="button" class="btn-close cust-close-ds-btn close_modal_addqueModal"
+                    data-mdb-dismiss="modal" aria-label="Close" onclick="closeAddModal()" style="top:14px"></button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-center-btn-footer">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div style="text-align: center;" align="center">
+                                <h5 class="text-decoration-underline">Sustainability Metrics</h5>
+                                <!-- <div style="width:100%" id="csv_name" class="csv_name_info"></div> -->
+                            </div>
+                            <div class="simple-responsive-table">
+                                <table id="" class="table dt-responsive nowrap classing" style="width:100%">
+                                    <tbody>
+                                        <tr>
+                                            <td><strong>Pass / Fail Sustainability :</strong>&nbsp;&nbsp;<span style="padding: 5px; color:#fff" id="pf_sus"></span><br>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Claims Scores :</strong><br>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Water Savings % :</strong>&nbsp;&nbsp;<span id="water_savings"></span><br>
+                                            </td>
+                                            <td><strong>Land Use Efficiency % :</strong>&nbsp;&nbsp;<span id="land_use"></span><br>
+                                            </td>
+                                            
+                                        </tr>
+                                        
+                                        <tr>
+                                            <td><strong>Less GHG % :</strong>&nbsp;&nbsp;<span id="less_GHG"></span><br>
+                                            </td>
+                                            <td><strong>Premiums to Growers % :</strong>&nbsp;&nbsp;<span id="premiums_to_growers"></span><br>
+                                            </td>
+                                        </tr>
+                                        {% if select_crop == 'RICE' %}
+                                        <tr>
+                                            <td><strong>CO2 EQ Footprint # :</strong>&nbsp;&nbsp;<span id="co2_eQ_footprint"></span><br>
+                                            </td>
+                                            <td><strong>Pounds of Water Per Pound Savings % :</strong>&nbsp;&nbsp;<span id="water_per_pound_savings"></span><br>
+                                            </td>
+                                        </tr>
+                                        {% endif %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!-- <div style="text-align: center; margin-top: 10px;" align="center">
+                                <h5 class="text-decoration-underline">Quality Metrics</h5>
+                            </div>
+                            <div class="simple-responsive-table">
+                                <table id="" class="table dt-responsive nowrap classing" style="width:100%">
+                                    <tbody>
+                                        {% if select_crop == 'COTTON' %}
+                                        <tr>
+                                            <td><strong>Level :</strong>&nbsp;&nbsp;<span style="padding: 5px;background: {%if level == 'Llano Super' %}#03f4fc {% elif level == 'Gold' %}#FFD700 {% elif level == 'Silver' %} #C0C0C0 {% elif level == 'Bronze' %} #CD7F32 {% else %} #ffffff {% endif %}">{{level}}</span><br>
+                                            </td>
+                                            <td><strong>Grade :</strong>&nbsp;&nbsp;<span>{{grade}}</span><br>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Leaf :</strong>&nbsp;&nbsp;<span>{{leaf}}</span><br>
+                                            </td>
+                                            <td><strong>Staple :</strong>&nbsp;&nbsp;<span>{{staple}}</span><br>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Length :</strong>&nbsp;&nbsp;<span>{{length}}</span><br>
+                                            </td>
+                                            <td><strong>Strength :</strong>&nbsp;&nbsp;<span>{{strength}}</span><br>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Mic :</strong>&nbsp;&nbsp;<span>{{mic}}</span><br>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                        {% elif select_crop == 'RICE' %}
+                                        <tr>
+                                            <td><strong>Milling Yield :</strong>&nbsp;&nbsp;<span>{{level}}</span><br>
+                                            </td>
+                                            <td><strong>Milling Total :</strong>&nbsp;&nbsp;<span>{{level}}</span><br>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Moisture :</strong>&nbsp;&nbsp;<span>{{level}}</span><br>
+                                            </td>
+                                            <td></td>
+                                            
+                                        </tr>
+                                        {% endif %}
+                                    </tbody>
+                                </table>
+                            </div> -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end -->
+<!--  •	Quality Metrics Popup -->
+<div class="modal fade" id="addQualityModal" aria-hidden="true" aria-labelledby="exampleModalToggleLabel22" tabindex="-1">
+    <div class="modal-dialog" style="max-width: 800px !important;">
+        <div class="modal-content">
+            <div class="modal-header" style="text-align: center;" >
+                <button type="button" class="btn-close cust-close-ds-btn close_modal_addqueModal"
+                    data-mdb-dismiss="modal" aria-label="Close" onclick="closeAddModal()" style="top:14px"></button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-center-btn-footer">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div style="text-align: center; margin-top: 10px;" align="center">
+                                <h5 class="text-decoration-underline">Quality Metrics</h5>
+                                <!-- <div style="width:100%" id="csv_name" class="csv_name_info"></div> -->
+                            </div>
+                            <div class="simple-responsive-table">
+                                <table id="" class="table dt-responsive nowrap classing" style="width:100%">
+                                    <tbody>
+                                        {% if select_crop == 'COTTON' %}
+                                        <tr>
+                                            <td><strong>Level :</strong>&nbsp;&nbsp;<span style="padding: 5px;" id="level"></span><br>
+                                            </td>
+                                            <td><strong>Grade :</strong>&nbsp;&nbsp;<span id="grade"></span><br>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Leaf :</strong>&nbsp;&nbsp;<span id="leaf"></span><br>
+                                            </td>
+                                            <td><strong>Staple :</strong>&nbsp;&nbsp;<span id="staple"></span><br>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Length :</strong>&nbsp;&nbsp;<span id="length"></span><br>
+                                            </td>
+                                            <td><strong>Strength :</strong>&nbsp;&nbsp;<span id="strength"></span><br>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Mic :</strong>&nbsp;&nbsp;<span id="mic"></span><br>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                        {% elif select_crop == 'RICE' %}
+                                        <tr>
+                                            <td><strong>Milling Yield :</strong>&nbsp;&nbsp;<span>{{level}}</span><br>
+                                            </td>
+                                            <td><strong>Milling Total :</strong>&nbsp;&nbsp;<span>{{level}}</span><br>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Moisture :</strong>&nbsp;&nbsp;<span>{{level}}</span><br>
+                                            </td>
+                                            <td></td>
+                                            
+                                        </tr>
+                                        {% endif %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end -->
+  </main>
+  {% include 'footer.html' %}
+</div>
+{% endblock %}
+
+{% block jquery %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.js">
+</script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.js">
+</script>
+
+<link href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/ui-lightness/jquery-ui.css" rel="stylesheet"
+    type="text/css" />
+
+<script>
+function printDiv() {
+    var divToPrint = document.getElementById('printableArea');
+    var htmlToPrint = '' +
+        '<style type="text/css">' +
+        'table th, table td {' +
+        'border:1px solid #333;' +
+        'font-family: Arial;' +
+        'font-size: 12px;' +
+        'padding: 2px;' +
+        '}' + 'table {' +
+        'width: 95%;' +
+        'margin: 0 auto;' +
+        '}' +
+        '</style>';
+    htmlToPrint += divToPrint.outerHTML;
+    newWin = window.open("");
+    newWin.document.write(htmlToPrint);
+    newWin.print();
+    newWin.close();
+}
+
+{% if search_by %}
+var get_search_by = document.getElementById('search_by').innerHTML;
+{% endif %}
+// var deliveryid = document.getElementById('deliveryid').innerHTML;
+
+function showTraceability(field_id){
+    $.ajax({
+        type: "GET",
+                url: `/tracemodule/showsustainability_metrics/${get_search_by}/${field_id}`,
+                data: {},
+                contentType: false,
+                cache: false,
+                processData: false,
+                success: function (response){
+                    document.getElementById('pf_sus').innerHTML = "";   
+                    document.getElementById('water_savings').innerHTML = "";   
+                    document.getElementById('land_use').innerHTML = "";
+                    document.getElementById('less_GHG').innerHTML = "";
+                    document.getElementById('premiums_to_growers').innerHTML = "";
+                    
+                    {% if select_crop == 'RICE' %}
+                    document.getElementById('co2_eQ_footprint').innerHTML = "";
+                    document.getElementById('water_per_pound_savings').innerHTML = "";
+
+                    var co2_eQ_footprint = response.co2_eQ_footprint;
+                    var water_per_pound_savings = response.water_per_pound_savings;
+
+                    document.getElementById('co2_eQ_footprint').innerHTML = co2_eQ_footprint;
+                    document.getElementById('water_per_pound_savings').innerHTML = water_per_pound_savings;
+                    {% endif %}
+
+                    var water_savings = response.water_savings;
+                    var land_use = response.land_use;
+                    var less_GHG = response.less_GHG;
+                    var premiums_to_growers = response.premiums_to_growers;
+                    
+                    document.getElementById('water_savings').innerHTML = water_savings;
+                    document.getElementById('land_use').innerHTML = land_use;
+                    document.getElementById('less_GHG').innerHTML = less_GHG;
+                    document.getElementById('premiums_to_growers').innerHTML = premiums_to_growers;                  
+
+                    var pf_sus = response.pf_sus;
+                    
+                    if(pf_sus == 'Pass'){
+                        document.getElementById('pf_sus').innerHTML = pf_sus;
+                        $("#pf_sus").css("background-color", "#257a3c");
+                    }
+                    else if(pf_sus == 'Fail'){
+                        document.getElementById('pf_sus').innerHTML = pf_sus;
+                        $("#pf_sus").css("background-color", "#991f14");
+                    }
+                    else{
+                        document.getElementById('pf_sus').innerHTML = pf_sus;
+                        $("#pf_sus").css("background-color", "#000");
+                    }
+
+                }
+
+    })
+}
+
+
+function showQuality(get_deliveryid){
+    $.ajax({
+        type: "GET",
+                url: `/tracemodule/showquality_metrics/${get_search_by}/${get_deliveryid}`,
+                data: {},
+                contentType: false,
+                cache: false,
+                processData: false,
+                success: function (response){
+                    document.getElementById('level').innerHTML = ""; 
+                    document.getElementById('grade').innerHTML = ""; 
+                    document.getElementById('leaf').innerHTML = ""; 
+                    document.getElementById('staple').innerHTML = ""; 
+                    document.getElementById('length').innerHTML = ""; 
+                    document.getElementById('strength').innerHTML = ""; 
+                    document.getElementById('mic').innerHTML = "";
+
+                    var grade = response.grade;
+                    var leaf = response.leaf;
+                    var staple = response.staple;
+                    var length = response.length;
+                    var strength = response.strength;
+                    var mic = response.mic;
+                    var level = response.level;
+
+                    document.getElementById('grade').innerHTML = grade; 
+                    document.getElementById('leaf').innerHTML = leaf; 
+                    document.getElementById('staple').innerHTML = staple; 
+                    document.getElementById('length').innerHTML = length; 
+                    document.getElementById('strength').innerHTML = strength; 
+                    document.getElementById('mic').innerHTML = mic; 
+                    // background: {%if level == 'Llano Super' %}#03f4fc {% elif level == 'Gold' %}#FFD700 
+                    // {% elif level == 'Silver' %} #C0C0C0 {% elif level == 'Bronze' %} #CD7F32 {% else %} #ffffff {% endif %}"
+                    if (level == 'Llano Super'){
+                        document.getElementById('level').innerHTML = level;
+                        $("#level").css("background-color", "#03f4fc");
+                    }
+                    else if (level == 'Gold'){
+                        document.getElementById('level').innerHTML = level;
+                        $("#level").css("background-color", "#FFD700");
+                    }
+                    else if (level == 'Silver'){
+                        document.getElementById('level').innerHTML = level;
+                        $("#level").css("background-color", "#C0C0C0");
+                    }
+                    else if (level == 'Bronze'){
+                        document.getElementById('level').innerHTML = level;
+                        $("#level").css("background-color", "#CD7F32");
+                    }
+                    else{
+                        document.getElementById('level').innerHTML = level;
+                        $("#level").css("background-color", "#ffffff");
+                    }
+                    
+                }
+
+    })
+}
+
+function getText(){
+    getTextid = $("#getTextid").val();
+    select_crop_id = $("#select_crop_id").val();
+
+    if (getTextid != '' && select_crop_id != ''){
+        $.ajax({
+            type: "GET",
+                url: `/tracemodule/autocomplete_suggestions/${getTextid}/${select_crop_id}/`,
+                data: {},
+                contentType: false,
+                cache: false,
+                processData: false,
+                success: function (response){
+                    var availableTags  = response.select_search;
+                    $("#tags").autocomplete({
+                        source: availableTags
+                    });
+                }
+        })
+    }
+}
+
+</script>
+<script>
+    function removeSelectedOption() {
+      var firstSelect = document.getElementById("getTextid");
+      var secondSelect = document.getElementById("tags");
+      secondSelect.value = "";
+      
+    }
+    </script>
+    
+<script>
+    $('#Traceability-Report').addClass('activeLink');
+</script>
+{% endblock jquery %}

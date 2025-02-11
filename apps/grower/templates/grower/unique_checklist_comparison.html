@@ -1,0 +1,154 @@
+{% extends "base.html" %} {% load static %}
+{% block title %} Checklist Comparison{% endblock title %}
+{% load crispy_forms_tags %}
+{% block content %}
+{% include 'navbar.html' %}
+<div class="main-content">
+    {% include 'header.html' %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.0/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+    table.dataTable.nowrap th:nth-child(6), table.dataTable.nowrap td:nth-child(6)
+    {white-space:unset !important}
+    </style>
+    <main>
+        {% include '_alerts.html' %}
+        <div class="page-title-with-or-without-btn">
+            <span class="farm headingtop">Checklist Comparison</span>
+            <div class="flex-header-btn">
+                <div id="Export_CSV" style="margin-right: 10px;"></div>
+              
+                <button class="btn-save-submit"><a href="{% url 'checklist_comparison' %}" style="color: white ; font-weight: 500;">ALL</a></button>
+            </div>
+        </div>
+        
+        <div class="card card-padding">
+            <div class="main-simple-table-with-search">
+                <div class="simple-responsive-table">
+                    <table id="checklistListtbl"
+                        class="table table-striped table-bordered dt-responsive nowrap table-fixed grower-compare"
+                        style="width: 100%">
+                        <thead>
+                            <tr style="border-bottom: 2px solid #e0e0e0">
+                                <th>Grower</th>
+                                <th>Contract</th>
+                                <th>Survey</th>
+                                <th>FSA</th>
+                                <!-- <th>Account information</th> -->
+                                <th>Farm</th>
+                                <th>Field</th>
+                                <th>Shapefile</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for grower in grower %}
+                            <tr>
+                                <td>{{grower.name}}</td>
+                                <td>
+                                    {% if grower.get_Grower_Contract == 1 %}
+                                    <i class="fa fa-check-circle-o"  style="color: green;"></i>
+                                    <span style="display: none;">complete</span>
+                                    {% else %}
+                                    <i class="far fa-times-circle" style="color: red;"></i>
+                                    <span style="display: none;">incomplete</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if grower.get_Onboarding_Survey_1 == 1 %}
+                                    <i class="fa fa-check-circle-o"  style="color: green;"></i>
+                                    <span style="display: none;">complete</span>
+                                    {% else %}
+                                    <i class="far fa-times-circle" style="color: red;"></i>
+                                    <span style="display: none;">incomplete</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if grower.get_FSA_ID_information == 1 %}
+                                    <i class="fa fa-check-circle-o"  style="color: green;"></i>
+                                    <span style="display: none;">complete</span>
+                                    {% else %}
+                                    <i class="far fa-times-circle" style="color: red;"></i>
+                                    <span style="display: none;">incomplete</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if grower.get_Farm_fully_set_up == 1 %}
+                                    <i class="fa fa-check-circle-o"  style="color: green;"></i>
+                                    <span style="display: none;">complete</span>
+                                    {% else %}
+                                    <i class="far fa-times-circle" style="color: red;"></i>
+                                    <span style="display: none;">incomplete</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if grower.get_Field_fully_set_up == 1 %}
+                                    <i class="fa fa-check-circle-o"  style="color: green;"></i>
+                                    <span style="display: none;">complete</span>
+                                    {% else %}
+                                    <i class="far fa-times-circle" style="color: red;"></i>
+                                    <span style="display: none;">incomplete</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if grower.get_Shapefile_upload_for_all_fields == 1 %}
+                                    <i class="fa fa-check-circle-o"  style="color: green;"></i>
+                                    <span style="display: none;">complete</span>
+                                    {% else %}
+                                    <i class="far fa-times-circle" style="color: red;"></i>
+                                    <span style="display: none;">incomplete</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{% url 'account-detail' grower.pk %}"><span class="fas fa-eye"></span>
+                                    </a>
+                                    <a href="{% url 'checklist_comparison_update' grower.pk %}"><span class="fas fa-user-cog" style="color: green;"></span>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                           
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+{% endblock content %}
+{% block scripts %}
+
+<script src="https://cdn.datatables.net/1.11.0/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.0/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/responsive.bootstrap4.min.js"></script>
+<script src="{% static 'js/dataTables.buttons.min.js' %}"></script>
+<script src="{% static 'js/buttons.html5.min.js' %}"></script>
+
+<script>
+    $(document).ready(function () {
+    let data_table_odj = $('#checklistListtbl').DataTable({
+        columnDefs: [ 
+            { 
+                
+            }
+        ],
+        buttons: [ 
+            { 
+                extend: 'csv', 
+                text: 'CSV EXPORT',
+                title: 'Checklist Comparison - {% now "jS F Y" %}', 
+                className: "btn-export", 
+                exportOptions: { 
+                    columns: 'th:not(:last-child)' 
+                } 
+            } 
+        ],
+        
+        "iDisplayLength": 100,
+    });
+    data_table_odj.buttons().container().appendTo('#Export_CSV');
+});
+
+</script>
+{% endblock scripts %}

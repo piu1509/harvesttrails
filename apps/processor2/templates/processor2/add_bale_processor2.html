@@ -1,0 +1,148 @@
+{% extends "base.html" %} {% load static %}
+{% block title %} Assign Bale To Tier 2 Processor {% endblock title %}
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+
+{% load crispy_forms_tags %}
+{% block content %}
+{% include 'navbar.html' %}
+
+<div class="main-content">
+    {% include 'header.html' %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.0/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.bootstrap4.min.css">
+
+    <main>
+        <div class="page-title-with-or-without-btn">
+            <span class="farm headingtop">Assign Bale To Tier 2 Processor</span>
+            <!-- Create button for add-location-->
+            
+        </div>
+        <div class="card card-padding">
+            {% include '_alerts.html' %}
+            <div class="main-simple-table-with-search">                
+                <div class="both-data-in" style="display: inherit;">
+                    <form action="" method="post" class="farm-fields-form"
+                    enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <lable for="">Select Tier 2 Processor<span class="asteriskField">*</span></lable>
+                            <select id="processor_id" name="processor_id" class="textinput textInput form-control" style="height: 52px; margin-top: 12px" required>
+                                <option value='All' selected disabled> Select Tier 2 Processor </option>
+                                {% for processor in get_processor2 %}
+                                {% if processor == p %}
+                                <option value="{{ processor.pk }}" selected>{{processor.entity_name}} - {{processor.pk }}</option>
+                                {% else %}
+                                <option value="{{ processor.pk }}">{{processor.entity_name}} - {{processor.pk }}</option>
+                                {% endif %}
+                                {% endfor %}
+                            </select>
+                            <p id="disp0" style="color: red;"></p>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="">Upload File<span class="asteriskField">*</span></label>
+                                <div class="file-upload-wrapper" data-text="assigned_bale.csv">
+                                    <input type="file" name="csv_file" accept=".csv" class="clearablefileinput file-upload-field" id="id_csv_file" required>
+                                </div>
+                        </div>
+                        <input style="display : none;" id="grower_select" type="submit"
+                                    class="apply-filter-btn primary-btn" value="Apply Filter" />
+                        <div class="row">
+                            
+                            <div class="form-btn-row">
+                                <div class="col-6 text-left">
+                                    <p>Sample CSV : <a href="{{ '/media/example_csv/assigned_bale.csv' }}">assigned_bale.csv</a></p>
+                                </div>
+                                <div>
+                                    <a href="{% url 'list_bale_processor2' %}" class="btn-close-cancel btn-space">Cancel</a>
+                                <input id="hide_btn1" type="submit" class="btn-save-submit" value="Save">
+                                </div>
+                                
+                            </div>
+                        </div>
+                </form>
+                </div>
+            </div>
+    </main>
+    {% include 'footer.html' %}
+</div>
+
+{% endblock content %}
+
+{% block scripts %}
+<script src="https://cdn.datatables.net/1.11.0/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.0/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/responsive.bootstrap4.min.js"></script>
+
+<script src="{% static 'js/farm/farm_list.js' %}"></script>
+
+<script>
+    // $(document).ready(function () {
+    //     $('#processorList_tbl').DataTable();
+    // });
+    
+</script>
+{% endblock scripts %}
+
+{% block jquery %}
+<!-- <script>
+    $('#processor_id').on('change', function (e) {
+
+        var value = $(this).val();
+        $('#grower_select').click();        
+    })
+
+    $('#grower_id').on('change', function (e) {
+        var value = $(this).val();
+        $('#grower_select').click();
+    })
+
+
+    function activityButton1(){
+        var id_csv_file = $('#id_csv_file').val();
+        var grower_id = $('#grower_id').val();
+        var id_field = $('#id_field').val();
+        
+        if (id_csv_file != '' && grower_id != null ) {
+            $('#hide_btn1').click();
+        }else{
+            if (grower_id == null) {
+                document.getElementById("disp1").innerHTML = "*Please Select a Grower";
+            }
+            if (grower_id != null) {
+                document.getElementById("disp1").innerHTML = "";
+            }
+            if (id_csv_file == '') {
+                document.getElementById("disp2").innerHTML = "*Please Upload CSV";
+            }
+            if (id_csv_file != '') {
+                document.getElementById("disp2").innerHTML = "";
+            }
+            
+        }
+    }
+</script> -->
+<script>
+    $('#Tier2-Processor-active').addClass('activeLink');
+  
+    $('#Tier2-Processor-down').addClass('down');
+    $('#Tier2-Processor-sub').show();
+  
+    $('#Assign-Bale-To-Tier2').addClass('activeLink active-nav');
+  
+  </script>
+{% endblock jquery %}

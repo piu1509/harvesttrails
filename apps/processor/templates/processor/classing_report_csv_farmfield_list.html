@@ -1,0 +1,185 @@
+{% extends "base.html" %} {% load static %}
+{% block title %} Classing Farm and Field CSV REPORT {% endblock title %}
+{% load crispy_forms_tags %}
+{% block content %}
+{% include 'navbar.html' %}
+
+<div class="main-content">
+    {% include 'header.html' %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.0/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.bootstrap4.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/fixedcolumns/4.2.1/css/fixedColumns.dataTables.min.css">
+  <style>
+    .dataTables_scrollHead,
+        .dataTables_scrollBody,
+        .dataTables_scrollFoot {
+            width: 100% !important;
+        }
+    </style>
+
+    <main>
+        {% include '_alerts.html' %}
+        <div class="page-title-with-or-without-btn">
+            <span class="farm headingtop">Classing Farm and Field CSV REPORT</span>
+            <!-- Create button for add-location-->
+            <div class="flex-header-btn">
+                <a href="{% url 'classing_report_farmfield_list' %}" class="btn-close-cancel">Back </a>
+                &nbsp;
+                <a href="{% url 'classing_report_farmfield_upload' %}" class="btn-close-cancel">Upload Classing Farm and Field CSV </a>
+                &nbsp;
+                <div id="Export_CSV" style="margin-right: 10px;"></div>
+            </div>
+        </div>
+        <div class="card card-padding">
+            <div class="main-simple-table-with-search">                
+                <div class="both-data-in" style="display: inherit;">
+                    <div class="simple-responsive-table">
+                        <table id="processorList_tbl" class="table table-striped dt-responsive nowrap" style="width:100%">
+                            <thead>
+                                <tr style="border-bottom: 2px solid #e0e0e0;">
+                                    <th width="10%" >prod id</th>
+                                    <th width="10%"> Farm Name</th>
+                                    <th width="10%"> Grower Name</th>
+                                    <!-- <th width="10%">sale status</th>
+                                    <th width="10%">wh id</th> -->
+                                    <th width="10%">bale id</th>
+                                    <th width="10%">WH id</th>
+                                    <th width="10%">date</th>
+                                    <th width="10%">net wt</th>
+                                    <th width="10%">farm id</th>
+                                    <th width="10%">load id</th>
+                                    <th width="10%">field name</th>
+                                    <th width="10%">Level</th>
+                                    <th width="10%">pk num</th>
+                                    <th width="10%">gr</th>
+                                    <th width="10%">lf</th>
+                                    <th width="10%">Stp</th>
+                                    <th width="10%">ex</th>
+                                    <th width="10%">rm</th>
+                                    <th width="10%">str</th>
+                                    <th width="10%">cgr</th>
+                                    <th width="10%">rd</th>
+                                    <th width="10%">+B</th>
+                                    <th width="10%">MIC</th>
+                                    <th width="10%">unif</th>
+                                    <th width="10%">len</th>
+                                    <th width="10%">elong</th>
+                                    <th width="10%">value</th>
+                                    <th width="10%"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for i in report %}                               
+                                <tr>
+                                    <td>{{i.prod_id}}</td>
+                                    <td>{{i.farm_name}}</td>
+                                    <td>{{i.classing.grower.name}}</td>
+                                    <!-- <td>{{i.sale_status}}</td>
+                                    <td>{{i.wh_id}}</td> -->
+                                    <td>{{i.bale_id}}</td>
+                                    <td>{{i.warehouse_wt}}</td>
+                                    <td>{{i.dt_class}}</td>
+                                    <td>{{i.net_wt}}</td>
+                                    <td>{{i.farm_id}}</td>
+                                    <td>{{i.load_id}}</td>
+                                    <td>{{i.field_name}}</td>
+                                    <td style="background: {%if i.get_check == 'Llano Super' %}#03f4fc {%elif i.get_check == 'Gold' %}#FFD700 {% elif i.get_check == 'Silver' %} #C0C0C0 {% elif i.get_check == 'Bronze' %} #CD7F32 {% else %} #ffffff {% endif %}">{{i.get_check}}</td>
+                                    <td>{{i.pk_num}}</td>
+                                    <td>{{i.gr}}</td>
+                                    <td >{{i.lf}}</td>
+                                    <td >{{i.st}}</td>
+                                    <td>{{i.ex}}</td>
+                                    <td>{{i.rm}}</td>
+                                    <td >{{i.str_no}}</td>
+                                    <td >
+                                        <!-- {{i.cgr | cut:"Jan" }} -->
+                                        {% if i.cgr == "31-Jan" %}
+                                        '31-1'
+                                        {% elif i.cgr == "21-Jan" %}
+                                        '21-1'
+                                        {% elif i.cgr == "21-Feb" %}
+                                        '21-2'
+                                        {% elif i.cgr == "21-Mar" %}
+                                        '21-3'
+                                        {% elif i.cgr == "21-Apr" %}
+                                        '21-4'
+                                        {% elif i.cgr == "31-Mar" %}
+                                        '31-3'
+                                        {% else %}
+                                        '{{ i.cgr }}'
+                                        {% endif %}
+                                    </td>
+                                    <td>{{i.rd}}</td>
+                                    <td>{{i.ob1}}</td>
+                                    <td >{{i.tr}}</td>
+                                    <td >{{i.unif}}</td>
+                                    <td>{{i.len_num}}</td>
+                                    <td>{{i.elong}}</td>
+                                    <td>{{i.value}}</td>
+                                    <td></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+    </main>
+    {% include 'footer.html' %}
+</div>
+
+<!--  -->
+<!-- end -->
+{% endblock content %}
+
+{% block scripts %}
+<script src="https://cdn.datatables.net/1.11.0/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.0/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/responsive.bootstrap4.min.js"></script>
+<script src="{% static 'js/dataTables.buttons.min.js' %}"></script>
+<script src="{% static 'js/buttons.html5.min.js' %}"></script>
+<script src="https://cdn.datatables.net/fixedcolumns/4.2.1/js/dataTables.fixedColumns.min.js"></script>
+<script>
+   
+    $(document).ready(function () {
+    let data_table_odj = $('#processorList_tbl').DataTable({
+        responsive: false,
+            "paging": true,
+            "pageLength": 100,
+			"autoWidth": true,
+            scrollY: "600px",
+            scrollX: true,
+            scrollCollapse: true,
+            fixedColumns: {
+                left: 3,
+                right: 0
+            },
+        // columnDefs: [ 
+        //     { 
+                
+        //     }
+        // ],
+        buttons: [ 
+            { 
+                extend: 'csv', 
+                text: 'CSV EXPORT',
+                title: 'CLASSING FARM AND FIELD CSV REPORT - {% now "jS F Y" %}', 
+                className: "btn-export", 
+                exportOptions: { 
+                    columns: 'th:not(:last-child)' 
+                } 
+            } 
+        ],
+        // "iDisplayLength": 50,
+        
+    });
+    data_table_odj.buttons().container().appendTo('#Export_CSV');
+    
+
+});
+// DT = data.table(processorList_tbl);
+// DT[Level == "Silver", .N];
+</script>
+{% endblock scripts %}

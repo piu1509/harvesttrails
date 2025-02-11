@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+{% load static %} {% block title %} Create Contract {% endblock title %} {% block content %}
+{% include 'navbar.html' %}
+<div class="main-content">
+    {% include 'header.html' %} {% load crispy_forms_tags %}
+    <main>
+        {% include '_alerts.html' %}
+        <span class="farm headingtop">Add Contract</span>
+        <div class="card farm-fields-container">
+            <div class="container-fluid">
+                <form id="contractForm" method="post" class="farm-fields-form" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-12">
+                            {{ form.name|as_crispy_field }}
+                        </div>
+                    </div>
+
+                    <!-- <div class="row">
+                        <div class="col-md-12">
+                            <label class=" requiredField">
+                                Contract <span class="asteriskField">*</span>
+                            </label>
+                            {% if is_create == True %}
+                                <textarea name="contract" id="tiny"></textarea>
+                            {% else %}
+                                <textarea name="contract" id="tiny" value="{{ form.contract|safe }}"></textarea>
+                            {% endif %}
+                        </div>
+                    </div> -->
+                    <div class="row">
+                        <div class="col-md-12">
+                            <!-- <label class=" requiredField">
+                                Contract Document <span class="asteriskField">*</span>
+                            </label> -->
+                            {{form.envelope_id|as_crispy_field}}
+                        </div>
+                    </div>
+
+                    <!-- <h3 style="margin-top:20px">Invite</h3>
+                    <div id="people-container">
+                        {% for i in '01'|make_list %}
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div id="div_id_name" class="form-group">
+                                    <label for="id_name" class=" requiredField">
+                                        Name<span class="asteriskField">*</span>
+                                    </label>
+                                    <div>
+                                        <input type="text" name="signer[{{ forloop.counter }}][name]" value="" maxlength="200" class="textinput textInput form-control" required="" id="id_name">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div id="div_id_name" class="form-group">
+                                    <label for="id_name" class=" requiredField">
+                                        Email<span class="asteriskField">*</span>
+                                    </label>
+                                    <div>
+                                        <input type="text" name="signer[{{ forloop.counter }}][email]" value="" maxlength="200" class="textinput textInput form-control" required="" id="id_name">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div> -->
+
+                    <!-- <a href="javascript:;" id="add-new-person">Add More</a>
+                    <input type="hidden" name="get_signers" id="signersFieldId" value=""> -->
+
+
+                    <div class="row">
+                        <div class="form-btn-row text-center text-md-end">
+                            <a href="{% url 'contract-list' %}" class="btn-close-cancel">Cancel</a>
+                            <button type="submit" class="btn-save-submit">Save</button> 
+                            <!-- <input type="button" id="contractFormSubmitButton" class="btn-save-submit" value="Save"> -->
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+    {% include 'footer.html' %}
+</div>
+{% endblock %}
+{% block jquery %}
+<!-- <script>
+    var super_user = '{{user.is_superuser}}';
+    $('#id_grower').removeClass('disabled-consultants');
+
+    if (super_user != "True") {
+        $('#id_grower').addClass('disabled-consultants');
+        $('#id_grower option').prop('disabled', true);
+        var logged_in_grower_id = "{{grower}}";
+        $('#id_grower').val(logged_in_grower_id);
+        $('#id_grower option[value="' + logged_in_grower_id + '"]').prop('disabled', false);
+    }
+</script> -->
+
+<!-- <script>
+    $('#id_crop').on('change', function(e){
+        $('#id_variety').val('');
+        $('#id_variety').find('option').prop('disabled', false);
+        var crop_val = $(this).val();
+        if(crop_val == 'RICE')
+        {
+            $('#id_variety option').filter('[value="DG 2425 XF"],[value="DG 3450 B2XF"],[value="DG 3470 B3XF"],[value="DG 3570 B3XF"],[value="DG 3635 B2XF"],[value="DG 3544 B2XF"],[value="DG 3651NR B2XF"],[value="DG 3109 B2XF"],[value="DG 3387 B3XF"],[value="DG 3421 B3XF"],[value="DG H929 B3XF"],[value="DG 3555 B3XF"],[value="DG 3402 B3XF"],[value="DG H959 B3XF"],[value="DG 3469 B3XF"],[value="DG 3615 B3XF"],[value="DG P224 B3XF"],[value="DG 3385 B2XF"],[value="DG 3422 B3XF"],[value="DG 4799 B3XF"]').prop('disabled', true);
+        }
+
+        if(crop_val == 'COTTON')
+        {
+            $('#id_variety option').filter('[value="DG-263L"]').prop('disabled', true);
+        }
+    });
+
+    $('textarea#tiny').tinymce({
+        height: 300,
+        menubar: false,
+        plugins: [
+
+        ],
+        toolbar: 'undo redo | a11ycheck casechange blocks | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist checklist outdent indent | removeformat | code table help'
+      });
+
+</script> -->
+<script>
+    {% comment %} $('#Contracts-active').addClass('activeLink');
+  
+    $('#Contracts-down').addClass('down');
+    $('#Contracts-sub').show(); {% endcomment %}
+    $('#Documents-and-Photos-active').addClass('activeLink');
+  
+    $('Documents-and-Photos-down').addClass('down');
+    $('#Documents-and-Photos-sub').show();
+  
+    $('#Add-Contracts').addClass('activeLink active-nav');
+  
+  </script>
+{% endblock jquery %}

@@ -1,0 +1,54 @@
+{% extends "base.html" %} {% load static %} {% block title %} Add Group {% endblock title %} 
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+{% block content %} {% include 'navbar.html' %}
+<div class="main-content">
+    {% include 'header.html' %} {% load crispy_forms_tags %}
+<main>
+    <span class="farm headingtop">Add Group</span>
+    <div class="card farm-fields-container">
+        <div class="container-fluid">
+            <form method="post" class="farm-fields-form">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-4">
+                        {{ form.grouping_criteria|as_crispy_field }}
+                    </div>  
+                </div>
+
+                <div class="row">
+                    <div class="form-btn-row">
+                        <a href="{% url 'grouping' %}" class="cancel-btn btn-inffo">Cancel</a>
+                        <input type="submit" class="addFarm-btn primary-btn" value="Save"> 
+                    </div>
+                </div>
+            </div>
+            
+            </form>
+        
+        </main>
+        {% include 'footer.html' %}
+    </div>
+    {% endblock %}
+
+{% block jquery %}
+    <script>
+        $('#Farm-Configuration-active').addClass('activeLink');
+              
+        $('#Farm-Configuration-down').addClass('down');
+        $('#Farm-Configuration-sub').show();
+        
+        $('#Farm-Grouping').addClass('activeLink active-nav');
+    </script>
+{% endblock jquery %}

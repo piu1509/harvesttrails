@@ -1,0 +1,222 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %} Shipment Invoice View {% endblock title %}
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}    
+{% load crispy_forms_tags %}
+{% block content %}
+{% include 'navbar.html' %}
+
+<div class="main-content">
+    {% include 'header.html' %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.0/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.bootstrap4.min.css">
+    
+    <main>
+        {% include '_alerts.html' %}
+
+        <div class="page-title-with-or-without-btn">
+            <span class="farm headingtop">Invoice</span>
+            <!-- Create button for add-processor-->
+            
+            <div class="flex-header-btn">
+                {% if request.user.is_customer %} 
+                {% if not shipment.is_paid %}
+                <form action="{% url 'create_payment_for_shipment' shipment.id type %}" method="POST">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-close-cancel me-3">Pay Now</button>
+                </form>
+                {% endif %}
+                {% endif %} 
+                <button id="download-pdf-new" class="btn-close-cancel">Download PDF</button>
+            </div>            
+        </div>    
+        <div class="invoice-container" style="padding-top:3rem; padding-bottom:2rem;" id="invoice">
+            
+            <div class="row row-header" style="padding-left: 3rem; padding-right: 3rem; margin-bottom:2rem;">
+                
+                <div class="col-8" >
+                    <div class="row" style="padding:0; margin:0;">
+                        <h3 style="color:#006400;  margin:0;"><strong>INVOICE</strong></h3>
+                    </div>
+                    <div class="row" style="padding:0; margin:0;">
+                        <div class="col-6">                        
+                            <p style="margin:5px 0; padding:0; font-size:15px;"><strong>Agreeta Solutions USA, LLC</strong></p>
+                            <p style="margin:5px 0; padding:0; font-size:15px;">107 Atlanta Tech Park</p>
+                            <p style="margin:5px 0; padding:0; font-size:15px;">Peachtree Corners, GA 30092</p>                        
+                        </div>
+                        <div class="col-6">
+                            <p style="margin:5px 0; padding:0; font-size:15px;">acctUS@agreeta.com</p>
+                            <p style="margin:5px 0; padding:0; font-size:15px;">+1 (833) 247-3382</p>
+                            <p style="margin:5px 0; padding:0; font-size:15px;">www.agreeta.com</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-4 d-flex justify-content-end align-items-center">
+                    <img src="{% static 'images/agreeta-logo.png' %}" alt="" style="max-width: 100%; height: auto;">
+                </div>
+            </div>
+            <div class="row" style="background-color:#E5E4E2;">
+                <div class="section" style="margin-top:2rem;padding-left: 4rem; padding-right: 4rem;">
+                    <p><strong>Bill to</strong></p>
+                    <p style="margin:5px 0; padding:0; font-size:15px;">{{customer.name}}</p>
+                    <p style="margin:5px 0; padding:0; font-size:15px;">{{customer.location}}</p>
+                    <p style="margin:5px 0; padding:0; font-size:15px;">Ph. - {{customer_user.contact_phone}}</p>
+                    <p style="margin:5px 0; padding:0; font-size:15px;">{{customer_user.contact_email}}</p>
+                </div>
+                <div class="section" style="margin-top:3rem;padding-left: 4rem; padding-right: 4rem;">
+                    <hr style="border: 1px dashed #0000004f;display: block"/>
+                </div>
+                <div class="section" style="margin-top:3rem;padding-left: 4rem; padding-right: 4rem; padding-bottom:2rem;">                    
+                    <p><strong>Invoice details</strong></p>
+                    <p style="margin:5px 0; padding:0; font-size:15px;">Invoice no.: {{invoice.invoice_number}}</p>
+                    <p style="margin:5px 0; padding:0; font-size:15px;">Terms: Net {{customer.credit_terms}} Days</p>
+                    <p style="margin:5px 0; padding:0; font-size:15px;">Invoice date: {{shipment.approval_time.date}}</p>
+                    <p style="margin:5px 0; padding:0; font-size:15px;">Due date: {{due_date.date}}</p>
+                </div>
+            </div>
+            <div class="row" style="margin-top:2rem;padding-left: 4rem; padding-right: 4rem;">
+                <table class="" style="width: 100%;">
+                    <thead >
+                        <tr style="border-bottom: 2px solid #ccc;">
+                            <th style="padding:15px;">#</th>
+                            <th>Date</th>
+                            <th>Product or service</th>
+                            <th>Description</th>
+                            <th>Qty</th>
+                            <th>Rate</th>
+                            <th>Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for crop in shipment_crops %}
+                        <tr style="border-bottom: 2px solid #ccc; background-color: white;">
+                            <td style="padding:15px;">{{forloop.counter}} .</td>
+                            <td>{{shipment.date_pulled.date}}</td>
+                            <td>{{crop.crop_type}} {{crop.crop}}</td>
+                            <td>{{crop.description}}</td>
+                            <td>{{crop.net_weight}} {{crop.weight_unit}}</td>
+                            <td>&#36; {{crop.per_unit_rate}}</td>
+                            <td>&#36; {{crop.payment_amount}}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                
+            </div>
+            <div class="row  d-flex justify-content-end" style="margin-top:2rem;padding-left: 4rem; padding-right: 4rem;">
+                <div class="section col-6 " style="margin-top:3rem;">                    
+                    <p style="margin:5px 0; padding:0; font-size:15px;"></p>                    
+                    <p style="margin:5px 0; padding:0; font-size:15px;">{{shipment.carrier_type}} ID: {{carrier_id}}</p>
+                    <p style="margin:5px 0; padding:0; font-size:15px;">Ship Date: {{shipment.date_pulled.date}}</p> 
+                                       
+                </div>
+                <div class="section col-6">
+                    <table >
+                        <tfoot>
+                            <tr>
+                                <td colspan="6" width="100%">
+                                    <table width="100%">
+                                        <tr style="border-bottom: 2px solid #ccc; background-color: white;">
+                                            <td colspan="5" class=""><strong>Subtotal:</strong></td>
+                                            <td class="text-right"><h6>&#36;{{shipment.product_payment_amount}}</h6></td>
+                                        </tr>
+                                        {% if customer.is_tax_payable %}
+                                        <tr style="border-bottom: 2px solid #ccc; background-color: white;">
+                                            <td colspan="5" class=""><strong>Tax:</strong></td>
+                                            <td class="text-right"><h6>&#36;{{shipment.tax_amount}}</h6></td>
+                                        </tr>
+                                        {% endif %}
+                                        <tr style="border-bottom: 2px solid #ccc; background-color: white;">
+                                            <td colspan="5" class=""><strong>Total:</strong></td>
+                                            <td class="text-right"><h5><strong>&#36;{{shipment.total_payment}}</strong></h5></td>
+                                        </tr>
+                                        <tr style="border-bottom: 2px solid #ccc; background-color: white;">
+                                            <td colspan="5" class=""><strong style="color:#FF5000; font-size: 20px;">Overdue:</strong></td>
+                                            <td class="text-right">{{due_date.date}}</td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>                            
+                        </tfoot>
+                    </table>
+                </div>
+            </div> 
+            <div class="row" style="margin-top:3rem;padding-left: 4rem; padding-right: 4rem; padding-bottom:3rem;">
+                <h5>Note to customer</h5>   
+                <p style="font-size:15px;"> All payments are to be directed and made payable to Agreeta Solutions USA, LLC.</p> 
+            </div>          
+        </div>     
+    </main>
+</div>
+{% endblock content %}
+
+{% block scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.2/jspdf.min.js"></script>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.getElementById('download-pdf-new').addEventListener('click', function () {
+            console.log('Download PDF button clicked');
+            
+            var invoiceElement = document.getElementById('invoice');
+            if (invoiceElement) {
+                console.log('Invoice element found');
+                
+                html2canvas(invoiceElement, {
+                    scale: 4,
+                    onrendered: function (canvas) {
+                        var imgData = canvas.toDataURL('image/png');
+                        var pdf = new jsPDF('p', 'mm', 'a4');
+                        var imgWidth = 210; // A4 width in mm
+                        var pageHeight = 295; // A4 height in mm
+                        var imgHeight = canvas.height * imgWidth / canvas.width;
+                        var heightLeft = imgHeight;
+                        var position = 0;
+
+                        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                        heightLeft -= pageHeight;
+
+                        while (heightLeft >= 0) {
+                            position = heightLeft - imgHeight;
+                            pdf.addPage();
+                            pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                            heightLeft -= pageHeight;
+                        }
+
+                        pdf.save('invoice.pdf');
+                    },
+                    logging: true, // Optional for debugging
+                    useCORS: true, // Ensure cross-origin resources are allowed
+                });
+            } else {
+                console.error('Invoice element not found');
+            }
+        });
+    });
+</script>
+<script>
+    $('#Warehouse-active').addClass('activeLink');
+  
+    $('#Warehouse-down').addClass('down');
+    $('#Warehouse-sub_unic').show();
+  
+    $('#Warehouse-Shipment').addClass('activeLink active-nav');
+  
+</script>
+
+{% endblock scripts %}

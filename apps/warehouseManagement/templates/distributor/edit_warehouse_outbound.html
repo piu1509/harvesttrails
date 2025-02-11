@@ -1,0 +1,593 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %} Edit Shipment {% endblock title %}
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAQ_OGAb4yuL8g55IMufP3Dwd4yjrWxrdI&libraries=places"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+{% block content %}
+{% include 'navbar.html' %}
+
+<style>
+    .shipment-custom-btn {
+        height: 100%;
+        display: flex;
+        align-items: flex-end;
+    }
+
+    .shipment-custom-btn .btn-save-submit {
+        padding-top: 11px;
+        padding-bottom: 11px;
+        border-radius: 4px;
+    }
+    .extra_border_select{
+        border: 1px solid #ccc
+    }
+
+.ui-menu{height: 20vh;overflow-y: auto;padding: 0px 10px;margin: 0px 15px;}
+.ui-menu::-webkit-scrollbar{width:6px;max-height:20px;padding-right: 10px;}
+.ui-menu::-webkit-scrollbar-track{background:#ccc}
+.ui-menu:-webkit-scrollbar-thumb{background-color:#000;border-radius:20px;min-height:20px}
+.bootstrap-select .dropdown-menu li.disabled.selected{display: none;}
+.dropdown.bootstrap-select.form-control .btn{border: 1px solid; padding: 16px 10px; border-radius: 0;}
+.bootstrap-select .dropdown-menu{max-width: 280px;}
+.bootstrap-select .dropdown-menu li.selected.active .dropdown-item.active.selected{margin-left: 0;padding: 0;}
+.no-resize{resize: none;}
+
+</style>
+<div class="main-content">
+    {% include 'header.html' %} {% load crispy_forms_tags %}
+    <main>
+        <div class="page-title-with-or-without-btn">
+            <span class="farm headingtop">Warehouse Contract Shipment Edit</span>
+            <!-- Create button for add-processor-->
+            {% if not shipment.invoice_approval %}
+            <div class="flex-header-btn">
+                <a href="{% url 'generate_invoice' shipment.id 'warehouse' %}" class="btn-close-cancel">Generate Invoice</a>
+            </div>
+            {% endif %}
+        </div>
+        <div class="card farm-fields-container">
+            {% include '_alerts.html' %}
+            <nav aria-label="breadcrumb m-5">
+                {% if error_messages %}
+                <div id="alertMessage" class="alert alert-warning alert-dismissible fade show" role="alert">
+                    <strong>{{error_messages}}</strong>  
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>                         
+                  </div> 
+                  <script>                            
+                    setTimeout(function() {
+                        document.getElementById('alertMessage').style.display = 'none';
+                    }, 5000);
+                </script>                          
+                  {% endif %}
+                  
+            </nav>
+            <div class="container-fluid">
+                <form method="post" class="farm-fields-form" enctype="multipart/form-data">
+                    {% csrf_token %}                   
+                    <div class="row mb-2">  
+                        <h2 style="background-color: #d7d5d5;color: #0b6c39;font-size: 22px;font-weight: 600;margin: 20px 0;padding: 12px 0;text-align: center">Contract Details</h2>                                            
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="selected_contract">Select Contract<span class="asteriskField">*</span></label>
+                                <select name="selected_contract" id="selected_contract" class="form-control selectpicker" required readonly>                                                                    
+                                    
+                                    <option value="{{contract.id}}" selected>{{contract.secret_key}}- {{contract.customer_name}}</option>
+                                 
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="customer_id">Customer<span class="asteriskField">*</span></label>
+                                <input type="text" name="customer_id" class="textinput textInput form-control" style="width: 100%;padding-left:10px ;" value="{{contract.customer_name}}" readonly>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="selected_contract">Select Warehouse<span class="asteriskField">*</span><span class="asteriskField">*</span></label>
+                                <select name="selected_warehouse" id="selected_warehouse" class="form-control" required readonly>                                                                    
+                                    {% for destination in destination_list%}
+                                    <option value="{{destination.id}}" {% if selected_warehouse_id == destination.id %} selected {% endif %}>{{destination.name}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>                    
+                                 
+                    <div class="row">  
+                        <h2 style="background-color: #d7d5d5;color: #0b6c39;font-size: 22px;font-weight: 600;margin: 20px 0;padding: 12px 0;text-align: center">Delivery details</h2>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="crop_id">Crop<span class="asteriskField">*</span></label>
+                                <select name="crop_id" id="crop_id" class="form-control" required>                                 
+                                    {% for crop in crops %}
+                                    <option value="{{crop.id}}"{% if selected_crop == crop.id %} selected {% endif %}>{{crop.crop}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="outbound_type">Outbound Type<span class="asteriskField">*</span></label>
+                                <select name="outbound_type" id="outbound_type" class="form-control" required >                                 
+                                    <option value="Domestic"{% if shipmet.outbound_type == 'Domestic'%} selected {% endif %}>Domestic</option>
+                                    <option value="International"{% if shipment.outbound_type == 'International'%} selected {% endif %}>International</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="carrier_type">Carrier type<span class="asteriskField">*</span></label>
+                                <select name="carrier_type" id="carrier_type" class="form-control" required>                                 
+                                    <option value="Rail Car"{% if shipment.carrier_type == 'Rail Car'%} selected {% endif %}>Rail Car</option>
+                                    <option value="Truck/Trailer"{% if shipment.carrier_type == 'Truck/Trailer'%} selected {% endif %}>Truck/Trailer</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="carrier_id">Carrier ID<span class="asteriskField">*</span></label>
+                                <input type="text" name="carrier_id" class="textinput textInput form-control" style="width: 100%;padding-left:10px ;" value="{{carrier_id}}">
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="purchase_order_name">Purchase Order Name<span class="asteriskField">*</span></label>
+                                <input type="text" name="purchase_order_name" class="textinput textInput form-control" style="width: 100%;padding-left:10px ;" value="{{shipment.purchase_order_name}}">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="purchase_order_number">Purchase Order Number<span class="asteriskField">*</span></label>
+                                <input type="number" name="purchase_order_number" class="textinput textInput form-control" style="width: 100%;padding-left:10px ;" value="{{shipment.purchase_order_number}}">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="lot_number">Lot Number<span class="asteriskField">*</span></label>
+                                <input type="text" name="lot_number" class="textinput textInput form-control" style="width: 100%;padding-left:10px ;" value="{{shipment.lot_number}}">
+                            </div>
+                        </div>
+                    
+                        <div class="col-md-4 rail">
+                            <div class="form-group">
+                                <label for="weight">Weight<span class="asteriskField">*</span></label>
+                                <div class="d-flex">
+                                <input type="number" step="0.01" name="weight" class="textinput textInput form-control" value="{{shipment.net_weight}}" style="margin-top:0; border-top-right-radius:0 !important; border-bottom-right-radius:0 !important" >
+                                <select name="amount_unit" id="unitSelction" class="form-select" style="border-top-left-radius:0 !important; border-bottom-left-radius:0 !important; border-left:0; width:90px;" required>                                   
+                                    <option value="LBS">LBS</option>
+                                    <option value="MT">MT</option>
+                                </select>
+                            </div>
+                            </div>
+                        </div>
+                                           
+                        <div class="col-md-4 truck">
+                            <div class="form-group">
+                                <label for="gross_weight">Gross Weight<span class="asteriskField">*</span></label>
+                                <div class="d-flex">
+                                <input type="number" step="0.01" name="gross_weight" class="textinput textInput form-control" value="{{shipment.gross_weight}}" style="margin-top:0; border-top-right-radius:0 !important; border-bottom-right-radius:0 !important">
+                                <select name="amount_unit" id="unitSelction" class="form-select" style="border-top-left-radius:0 !important; border-bottom-left-radius:0 !important; border-left:0; width:90px;" required>                                   
+                                    <option value="LBS"{% if shipment.weight_unit == "LBS" %} selected {% endif %}>LBS</option>
+                                    <option value="MT"{% if shipment.weight_unit == "MT" %} selected {% endif %}>MT</option>
+                                </select>
+                            </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 truck">
+                            <div class="form-group">
+                                <label for="ship_weight">Ship Weight<span class="asteriskField">*</span></label>
+                                <div class="d-flex">
+                                <input type="number" step="0.01" name="ship_weight" class="textinput textInput form-control" value="{{shipment.ship_weight}}" style="margin-top:0; border-top-right-radius:0 !important; border-bottom-right-radius:0 !important">
+                                <select name="amount_unit" id="unitSelction" class="form-select" style="border-top-left-radius:0 !important; border-bottom-left-radius:0 !important; border-left:0; width:90px;" required>                                   
+                                    <option value="LBS" {% if shipment.weight_unit == "LBS" %} selected {% endif %}>LBS</option>
+                                    <option value="MT" {% if shipment.weight_unit == "MT" %} selected {% endif %}>MT</option>
+                                </select>
+                            </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 truck">
+                            <div class="form-group">
+                                <label for="ship_quantity">Ship Quantity<span class="asteriskField">*</span></label>
+                                <input type="number" name="ship_quantity" class="textinput textInput form-control" style="width: 100%;padding-left:10px ;" value="{{shipment.ship_quantity}}">
+                            </div>
+                        </div>                       
+                                               
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="status">Status<span class="asteriskField">*</span></label>                                
+                                <select name="status" id="status" class="form-select" style="width: 100%;padding-left:10px ;" required>                                   
+                                    <option value="Released"{% if shipment.status == 'Released' %}selected {% endif %}>Released</option>
+                                    <option value="At Border"{% if shipment.status == 'At Border' %}selected {% endif %}>At Border</option>
+                                    <option value="Crossed Border"{% if shipment.status == 'Crossed Border' %}selected {% endif %}>Crossed Border</option>
+                                    <option value="Received"{% if shipment.status == 'Received' %}selected {% endif %}>Received</option>
+                                    <option value="Released/Received"{% if shipment.status == 'Released/Received' %}selected {% endif %}>Released/Received</option>
+                                </select>
+                            </div>
+                        </div>                    
+
+                        <div class="col-md-4 international">
+                            <div class="form-group">
+                                <label for="border_receive_date">Border Receive Date</label>
+                                <input type="date" name="border_receive_date" class="textinput textInput form-control" style="width: 100%;padding-left:10px ;" value="{{shipment.border_receive_date|date:'Y-m-d'}}">
+                            </div>
+                        </div>
+
+                        <div class="col-md-4 international">
+                            <div class="form-group">
+                                <label for="border_leaving_date">Border Leaving Date</label>
+                                <input type="date" name="border_leaving_date" class="textinput textInput form-control" style="width: 100%;padding-left:10px ;" value="{{shipment.border_leaving_date|date:'Y-m-d'}}">
+                            </div>
+                        </div>
+
+                        <div class="col-md-4 ">
+                            <div class="form-group">
+                                <label for="final_receive_date">Customer Receive Date</label>
+                                <input type="date" name="final_receive_date" class="textinput textInput form-control" style="width: 100%;padding-left:10px ;" value="{{shipment.customer_receive_date|date:'Y-m-d'}}">
+                            </div>
+                        </div>
+                        <div class="col-md-4 international">
+                            <div class="form-group">
+                                <label for="final_leaving_date">Customer Leaving Date</label>
+                                <input type="date" name="final_leaving_date" class="textinput textInput form-control" style="width: 100%;padding-left:10px ;" value="{{shipment.customer_leaving_date|date:'Y-m-d'}}">
+                            </div>
+                        </div>
+                        <div class="col-md-4 international">
+                            <div class="form-group">
+                                <label for="border_receive_date2">Border Receive Date Back</label>
+                                <input type="date" name="border_receive_date2" class="textinput textInput form-control" style="width: 100%;padding-left:10px ;" value="{{shipment.border_back_receive_date|date:'Y-m-d'}}">
+                            </div>
+                        </div>
+                        <div class="col-md-4 international">
+                            <div class="form-group">
+                                <label for="border_leaving_date2">Border Leaving Date Back</label>
+                                <input type="date" name="border_leaving_date2" class="textinput textInput form-control" style="width: 100%;padding-left:10px ;" value="{{shipment.border_back_leaving_date|date:'Y-m-d'}}">
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4 international">
+                            <div class="form-group">
+                                <label for="processor_receive_date">Warehouse Receive Date</label>
+                                <input type="date" name="processor_receive_date" class="textinput textInput form-control" style="width: 100%;padding-left:10px ;" value="{{shipment.warehouse_receive_date|date:'Y-m-d'}}">
+                            </div>
+                        </div>
+                        <div class="col-md-4 ">
+                            <div class="form-group">
+                                <label for="final_payment_date">Final Payment Date</label>
+                                <input type="date" name="final_payment_date" class="textinput textInput form-control" style="width: 100%;padding-left:10px ;" value="{{shipment.final_payment_date|date:'Y-m-d'}}">
+                            </div>
+                        </div> 
+                        <div class="col-md-6 mb-2">
+                            <div class="form-group">
+                                <label for="multi_file">Upload File</label>
+                                <input type="file" name="files" multiple accept=".jpg,.png,.xlsx,.csv,.pdf" id="multi_file" class="textinput textInput form-control" >
+                                <div class="col-md-8 mb-2"> 
+                                    <div id="file_names_container" style="margin-bottom: 10px;">
+                                        <!-- New files will be listed here -->
+                                    </div>
+                                    <div id="file_names_container2" style="margin-bottom: 10px;">
+                                        {% for file in files %}
+                                        <div class="file-item" style="margin-bottom: 10px;">
+                                            <div class="file-info">
+                                                <input type="hidden" name="existing_files" value="{{ file.id }}">
+                                                <span>{{file.name }}</span>
+                                            </div>
+                                            <button type="button" class="remove-file btn-danger" data-file-id="{{ file.id }}"><span style="width: 20px;height: 10px;padding: 0;display: inline-flex;justify-content: center;align-items: center;font-size: 10px;"><b>X</b></span></button>
+                                        </div>
+                                        {% endfor %}
+                                    </div>    
+                                    <p id="alert_msg8" style="color:red"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 mb-2">
+                            <div class="d-flex justify-content-between align-items-center" style="background-color: #d7d5d5; padding: 12px; width: 100%;">
+                                <h2 class="m-0" style="color: #0b6c39; font-size: 22px; font-weight: 600; flex-grow: 1; text-align: center;">
+                                    Lot Number Tracking
+                                </h2>
+                                <button type="button" class="btn btn-sm font-weight-bold btn-primary add-field" style="flex-shrink: 0;">
+                                    +
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="field_details_container" class="row">
+                        {% if additional_lots %}
+                        {% for entry in additional_lots %}
+                            <div class="col-md-12 mb-2" id="field_row_{{ forloop.counter }}">
+                                <div class="row align-items-center">
+                                    <div class="col-4">
+                                        <div class="form-group">
+                                            <label for="lot_number_{{ forloop.counter }}">Lot Number</label>
+                                            <input type="text" name="lot_number[]" class="form-control" placeholder="Lot Number" value="{{ entry.additional_lot_number }}" style="height: 52px !important;">
+                                        </div>
+                                    </div>
+                                    <div class="col-4">
+                                        <div class="form-group">
+                                            <label for="address_{{ forloop.counter }}">Address</label>
+                                            <textarea name="address[]" class="form-control address-input no-resize" id="address_{{ forloop.counter }}" rows="1" cols="25">{{ entry.address }}</textarea>
+                                        </div>
+                                    </div>
+                                    <div class="col-3">
+                                        <div class="form-group">
+                                            <label for="description_{{ forloop.counter }}">Description</label>
+                                            <textarea name="description[]" class="form-control no-resize" rows="1" cols="25">{{ entry.description }}</textarea>
+                                        </div>
+                                    </div>
+                                    <div class="col-1">
+                                        <button type="button" class="btn btn-sm font-weight-bold btn-danger remove-field mt-2">-</button>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                        {% endif %}
+                    </div>                   
+                    
+                    <script>
+                        let fieldIndex = {{ additional_lots|length }}; // Initialize field counter based on existing rows
+                    
+                        document.addEventListener('click', function(e) {
+                            if (e.target && e.target.classList.contains('add-field')) {
+                                fieldIndex++;
+                    
+                                // Create a new row div and add content
+                                const newFieldRow = document.createElement('div');
+                                newFieldRow.classList.add('col-md-12', 'mb-2');
+                                newFieldRow.id = `field_row_${fieldIndex}`;
+                    
+                                newFieldRow.innerHTML = `
+                                    <div class="row align-items-center">
+                                        <div class="col-4">
+                                            <div class="form-group">
+                                                <label for="lot_number_${fieldIndex}">Lot Number</label>
+                                                <input type="text" name="lot_number[]" class="form-control" placeholder="Lot Number">
+                                            </div>
+                                        </div>
+                                        <div class="col-4">
+                                            <div class="form-group">
+                                                <label for="address_${fieldIndex}">Address</label>
+                                                <textarea name="address[]" class="form-control address-input no-resize" id="address_${fieldIndex}" rows="1" cols="25"></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="col-3">
+                                            <div class="form-group">
+                                                <label for="description_${fieldIndex}">Description</label>
+                                                <textarea name="description[]" class="form-control no-resize" rows="1" cols="25"></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="col-1">
+                                            <button type="button" class="btn btn-sm font-weight-bold btn-danger remove-field mt-2">-</button>
+                                        </div>
+                                    </div>
+                                `;
+                    
+                                // Append the new row to the container
+                                document.querySelector('#field_details_container').appendChild(newFieldRow);
+                    
+                                // Initialize Google Maps Autocomplete on the new address field
+                                initAutocomplete(document.getElementById(`address_${fieldIndex}`));
+                            } else if (e.target && e.target.classList.contains('remove-field')) {
+                                // Remove the field row
+                                e.target.closest('.col-md-12').remove();
+                            }
+                        });
+                    
+                        // Initialize autocomplete for a specific input element
+                        function initAutocomplete(inputElement) {
+                            if (!inputElement) return;
+                    
+                            const autocomplete = new google.maps.places.Autocomplete(inputElement, {
+                                types: ["address"],       // Restrict results to addresses
+                               //componentRestrictions: { country: "us" } // Example restriction to US
+                            });
+                    
+                            autocomplete.addListener("place_changed", () => {
+                                const place = autocomplete.getPlace();
+                                if (place.geometry) {
+                                    console.log("Selected address:", place.formatted_address);
+                                    console.log("Location coordinates:", place.geometry.location.toString());
+                                } else {
+                                    console.log("No details available for the selected address.");
+                                }
+                            });
+                        }
+                    
+                        // Initialize autocomplete for any pre-existing address fields on page load
+                        document.querySelectorAll('.address-input').forEach(initAutocomplete);
+                    </script>    
+                    <div class="row">
+                        <h2 style="background-color: #d7d5d5; color: #0b6c39; font-size: 22px; font-weight: 600; margin: 20px 0; padding: 12px 0; text-align: center">Updated Details</h2>
+                        <div id="field_details_container" class="row">
+                            <!-- Initial field_name and description fields -->                            
+                            <div class="col-md-12 mb-2">
+                                <div class="form-group">
+                                    <label for="description_1">**NOTES:</label>
+                                    <textarea id="description_1" name="description" class="form-control" placeholder="Notes"></textarea>
+                                </div>
+                            </div>                            
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-btn-row">
+                            <a href="{% url 'list-warehouse-shipment' %}" class="btn-close-cancel btn-space">Cancel</a>
+                            <input style="display: none;" id="hide_btn1" type="submit" class="btn-save-submit"
+                                value="Save" name="save">
+                            <!-- <input type="button" id="hide_btn2" class="btn-save-submit" value="Save" onclick="btnClick()"> -->
+                            <input type="submit" name="save" class="btn-save-submit" value="Save" onclick="activityButton1()">
+                        </div>
+                    </div>
+                    
+                    <script>
+                        document.addEventListener("DOMContentLoaded", function() {
+                            function handleRemoveButtonClick(button) {
+                                let parent = button.parentElement;
+                                parent.style.display = 'none';
+                                let input = parent.querySelector('input[name="existing_files"]');
+                                input.setAttribute('name', 'remove_files'); // Change name to indicate removal
+                                parent.classList.add('removed');
+                            }
+                        
+                            document.querySelectorAll('.remove-file').forEach(button => {
+                                button.addEventListener('click', function() {
+                                    handleRemoveButtonClick(this);
+                                });
+                            });
+                        
+                            function updateFileList(files) {
+                                var fileNamesContainer = document.getElementById('file_names_container');
+                                fileNamesContainer.innerHTML = ''; // Clear previous list
+                                files.forEach(function(file) {
+                                    var fileItem = document.createElement('div');
+                                    fileItem.classList.add('file-item');
+                                    fileItem.innerHTML = `
+                                        <div class="file-info">
+                                            <input type="hidden" name="new_files" value="${file.name}">
+                                            <span>${file.name}</span>
+                                        </div>
+                                        <button type="button" class="remove-file btn-danger" data-file="${file.name}"><span style="width: 25px;height: 18px;padding: 0;display: inline-flex;justify-content: center;align-items: center;font-size: 10px;">x</span></button>
+                                    `;
+                                    fileNamesContainer.appendChild(fileItem);
+                        
+                                    fileItem.querySelector('.remove-file').addEventListener('click', function() {
+                                        handleRemoveButtonClick(this);
+                                    });
+                                });
+                            }
+                        
+                            var fileInput = document.getElementById('multi_file');
+                            fileInput.addEventListener('change', function() {
+                                var files = Array.from(fileInput.files); // Convert file list to array
+                                updateFileList(files);
+                            });
+                        
+                            function activityButton1() {
+                                var form = document.querySelector('form');
+                                form.querySelectorAll('.file-item.removed input').forEach(input => {
+                                    input.remove(); // Remove hidden inputs for removed files
+                                });
+                                form.submit(); // Submit the form
+                            }
+                        
+                            document.querySelector('.btn-save-submit').addEventListener('click', activityButton1);
+                        });
+                        
+                    </script>
+                </form>
+            </div>
+        </div>
+    </main>
+    {% include 'footer.html' %}
+</div>
+{% endblock %}
+
+{% block jquery %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var statusSelect = document.getElementById('outbound_type');
+        var approvedFields = document.querySelectorAll('.domestic');
+        var disapprovedFields = document.querySelectorAll('.international');
+    
+        function toggleFields() {
+            var status = statusSelect.value;
+            if (status === 'Domestic') {
+                approvedFields.forEach(function(field) {
+                    field.style.display = 'block';
+                });
+                disapprovedFields.forEach(function(field) {
+                    field.style.display = 'none';
+                });
+            } else if (status === 'International') {
+                approvedFields.forEach(function(field) {
+                    field.style.display = 'none';
+                });
+                disapprovedFields.forEach(function(field) {
+                    field.style.display = 'block';
+                });
+            } else {
+                approvedFields.forEach(function(field) {
+                    field.style.display = 'none';
+                });
+                disapprovedFields.forEach(function(field) {
+                    field.style.display = 'none';
+                });
+            }
+        }
+    
+        statusSelect.addEventListener('change', toggleFields);
+    
+        // Initial call to set the correct fields based on the current value
+        toggleFields();
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var statusSelect = document.getElementById('carrier_type');
+        var approvedFields = document.querySelectorAll('.rail');
+        var disapprovedFields = document.querySelectorAll('.truck');
+    
+        function toggleFields() {
+            var status = statusSelect.value;
+            if (status === 'Rail Car') {
+                approvedFields.forEach(function(field) {
+                    field.style.display = 'block';
+                });
+                disapprovedFields.forEach(function(field) {
+                    field.style.display = 'none';
+                });
+            } else if (status === 'Truck/Trailer') {
+                approvedFields.forEach(function(field) {
+                    field.style.display = 'none';
+                });
+                disapprovedFields.forEach(function(field) {
+                    field.style.display = 'block';
+                });
+            } else {
+                approvedFields.forEach(function(field) {
+                    field.style.display = 'none';
+                });
+                disapprovedFields.forEach(function(field) {
+                    field.style.display = 'none';
+                });
+            }
+        }
+    
+        statusSelect.addEventListener('change', toggleFields);
+    
+        // Initial call to set the correct fields based on the current value
+        toggleFields();
+    });
+</script>
+
+<script>
+    $('#Warehouse-active').addClass('activeLink');
+  
+    $('#Warehouse-down').addClass('down');
+    $('#Warehouse-sub_unic').show();
+  
+    $('#Warehouse-Shipment').addClass('activeLink active-nav');
+  
+</script>
+{% endblock jquery %}

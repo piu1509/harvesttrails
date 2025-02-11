@@ -1,0 +1,1888 @@
+{% extends "base.html" %}
+{% load static %}
+{% load custom_tags %}
+{% block title %} Trace Module {% endblock title %}
+
+{% block extrahead %}
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+<style>
+    .map-container {
+        height: 300px;
+        width: 100%;
+        margin-bottom: 20px;
+    }
+</style>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAQ_OGAb4yuL8g55IMufP3Dwd4yjrWxrdI&libraries=places"></script>
+<style>
+    .table-wrapper {
+        display: flex;
+        overflow-x: auto;
+        padding: 10px;
+    }
+
+    .table-responsive {
+        flex: 0 0 auto;
+    }
+
+    ::-webkit-scrollbar {
+        height: 8px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background-color: #888;
+        border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background-color: #555;
+    }
+   
+</style>
+{% endblock extrahead %}
+
+{% block content %}
+{% include 'navbar.html' %}
+<div class="main-content">
+    {% include 'header.html' %}
+    <main>
+        <form method="post" class="form-fields" id="toggleForm">
+            {% csrf_token %}            
+            <div class="page-title d-flex justify-content-between align-items-center">
+                <h2 class="mb-0">Trace Module in <span id="s_view">Table View</span></h2>             
+                <div class="action-buttons d-flex"> 
+                                   
+                    <input type="button" class="form-control" id="viewToggleButton" value="Map View">
+                </div>
+            </div>
+        
+            <div class="card form-container mt-4">
+                <div class="container-fluid">
+                    
+                    {% comment %} <div class="row mt-4 mb-4">
+                        <div class="row">
+                            {% if shipment_type == "processor_shipment" %}
+                            <div class="col-md-4">
+                                <label for="receiver"> Destination</label>
+                                <input name="customer_name" value="{{ shipment.processor2_name }}" type="text" class="form-control text-center" readonly>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="shipment_id"> Shipment Id</label>
+                                <input name="shipment_id" value="{{ shipment.shipment_id }}" type="text" class="form-control text-center" readonly>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="status"> Status</label>
+                                <input name="status" value="{{ shipment.status }}" type="text" class="form-control text-center" readonly>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="current_location">Current Location</label>
+                                <input name="customer_loc" value="{{ customer_loc }}" type="text" class="form-control text-center" readonly>
+                            </div>
+                            {% elif shipment_type == "grower_shipment" %}
+                            <div class="col-md-4">
+                                <label for="receiver"> Destination</label>
+                                <input name="customer_name" value="{{ shipment.processor_name }}" type="text" class="form-control text-center" readonly>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="shipment_id"> Shipment Id</label>
+                                <input name="shipment_id" value="{{ shipment.shipment_id }}" type="text" class="form-control text-center" readonly>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="status"> Status</label>
+                                <input name="status" value="{{ shipment.status }}" type="text" class="form-control text-center" readonly>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="current_location">Current Location</label>
+                                <input name="customer_loc" value="{{ customer_loc }}" type="text" class="form-control text-center" readonly>
+                            </div>
+                            {% elif shipment_type == "contract_shipment" %}
+                            <div class="col-md-3">  
+                                <label for="receiver"> Destination</label>                              
+                                <input name="customer_name" value="{% if shipment.customer_name %}{{ shipment.customer_name }}{%else%} {{shipment.warehouse_name}} {%endif %}" type="text" class="form-control text-center" readonly>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="contract_id"> Contract Id</label>
+                                <input name="contact_id" value="{{ shipment.contract__secret_key }}" type="text" class="form-control text-center" readonly>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="shipment_id"> Shipment Id</label>
+                                <input name="shipment_id" value="{{ shipment.shipment_id }}" type="text" class="form-control text-center" readonly>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="status"> Status</label>
+                                <input name="status" value="{{ shipment.status }}" type="text" class="form-control text-center" readonly>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="current_location">Current Location</label>
+                                <input name="customer_loc" value="{{ customer_loc }}" type="text" class="form-control text-center" readonly>
+                            </div>
+                            {%endif %}
+                            <div class="col-md-4">
+                             <div> 
+                                <input type="button" onclick="printDiv()" value="PDF Export" class="form-control text-center" style="width:400px;"/>
+                            </div>
+                            <div class="col-md-4">
+                                <div> 
+                                    <a href="{% url 'export_all_csv_for_shipmentID' shipment.shipment_id from_date to_date %}" class="form-control " >DOWNLOAD CSV</a>
+                                </div>
+                            </div>
+                        </div>       
+                        
+                    </div> {% endcomment %}
+                    <div class="row mt-4 mb-4">
+                        <div class="row">
+                            {% if shipment_type == "processor_shipment" %}
+                            <div class="col-md-4">
+                                <label for="receiver">Destination</label>
+                                <input name="customer_name" value="{{ shipment.processor2_name }}" type="text" class="form-control text-center" readonly>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="shipment_id">Shipment Id</label>
+                                <input name="shipment_id" value="{{ shipment.shipment_id }}" type="text" class="form-control text-center" readonly>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="status">Status</label>
+                                <input name="status" value="{{ shipment.status }}" type="text" class="form-control text-center" readonly>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="current_location">Current Location</label>
+                                <input name="customer_loc" value="{{ location }}" type="text" class="form-control text-center" readonly>
+                            </div>
+                    
+                            {% elif shipment_type == "grower_shipment" %}
+                            <div class="col-md-4">
+                                <label for="receiver">Destination</label>
+                                <input name="customer_name" value="{{ shipment.processor.entity_name }}" type="text" class="form-control text-center" readonly>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="shipment_id">Shipment Id</label>
+                                <input name="shipment_id" value="{{ shipment.shipment_id }}" type="text" class="form-control text-center" readonly>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="status">Status</label>
+                                <input name="status" value="{{ shipment.status }}" type="text" class="form-control text-center" readonly>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="current_location">Current Location</label>
+                                <input name="customer_loc" value="{{ location }}" type="text" class="form-control text-center" readonly>
+                            </div>
+                    
+                            {% elif shipment_type == "contract_shipment" %}
+                            <div class="col-md-3">
+                                <label for="receiver">Destination</label>
+                                <input name="customer_name" value="{% if shipment.customer_name %}{{ shipment.customer_name }}{% else %}{{ shipment.warehouse_name }}{% endif %}" type="text" class="form-control text-center" readonly>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="contract_id">Contract Id</label>
+                                <input name="contact_id" value="{{ shipment.contract__secret_key }}" type="text" class="form-control text-center" readonly>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="shipment_id">Shipment Id</label>
+                                <input name="shipment_id" value="{{ shipment.shipment_id }}" type="text" class="form-control text-center" readonly>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="status">Status</label>
+                                <input name="status" value="{{ shipment.status }}" type="text" class="form-control text-center" readonly>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="current_location">Current Location</label>
+                                <input name="customer_loc" value="{{ location }}" type="text" class="form-control text-center" readonly>
+                            </div>
+                            {% endif %}
+                    
+                            <!-- Buttons -->
+                            <div class="col-md-4 mt-4">
+                                <input type="button" onclick="printDiv()" value="PDF Export" class=" form-control w-100 font-weight-bold" style="height: 50px;">
+                            </div>
+                            {% comment %} <div class="col-md-4 mt-4 text-center">
+                                <a href="{% url 'export_all_csv_for_shipmentID' shipment.shipment_id from_date to_date %}" class=" form-control w-100 font-weight-bold" style="height: 50px;">DOWNLOAD CSV</a>
+                            </div> {% endcomment %}
+                        </div>
+                    </div>
+                    
+                    <div class="container-fluid mt-4 mb-4 table_view" style="border-top:10px solid green;" id="tableview" >
+                        {% comment %} <div class="container-fluid">
+                            <hr width="4000px;" color="green" size="10" >
+                        </div> {% endcomment %}
+                        <div class="table-wrapper d-flex overflow-auto pt-5" style="gap: 20px;">
+                            <!-- Table 1 -->
+                            {% if inbound6_wip %}
+                            <div class="table-responsive flex-shrink-0" style="min-width: 300px;">
+                                <h5 class="text-center">Received By Customer</h5>
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Customer Name</th>
+                                            <th>Customer Id</th>
+                                            <th>Crop</th>
+                                            <th>Weight</th>
+                                            <th>Received Date</th>
+                                            <th>Shipment Id</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for row in inbound6_wip|unique_by_shipment_id %}
+                                        <tr>
+                                            <td>{{ row.customer_name }}</td>
+                                            <td>{{ row.customer_id }}</td>
+                                            <td>{% for crop in row.crops %}{{crop.crop_name}}<br>{%endfor %}</td>
+                                            <td>{% for crop in row.crops %}{{crop.net_weight}} {{crop.weight_unit}}<br>{%endfor %}</td>
+                                            <td>{%if row.customer_receive_date %}{{row.customer_receive_date|date:"j" | ordinal_day }} {{ row.customer_receive_date|date:"M, Y" }}{%elif row.distributor_receive_date %} {{row.distributorr_receive_date|date:"j" | ordinal_day }} {{ row.distributor_receive_date|date:"M, Y" }}{%else%}N/A {%endif %}</td>
+                                            {% if row.processor_id %}
+                                            <td>{{ row.shipment_id }}</a></td>
+                                            {% else %}
+                                            <td>{{ row.shipment_id }}</a></td>
+                                            {% endif %}
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <div class="col text-center">
+                                <i class="fa fa-arrow-left" aria-hidden="true"></i>
+                            </div>
+                            {% endif %}
+                            <!-- Table 2 -->
+                            {% if inbound6_wip %}
+                            <div class="table-responsive flex-shrink-0" style="min-width: 300px;">
+                                <h5 class="text-center">Shipped to Customer</h5>
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Shipment Id</th>
+                                            <th>Transit ID</th>  
+                                            <th>Crop</th> 
+                                            <th>Weight</th>                                         
+                                            <th>New Lot Number</th>
+                                            <th>Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% if inbound6_wip and outbound6_wip %}
+                                        {% for row in outbound6_wip|unique_by_shipment_id %}
+                                        <tr>
+                                            {% if row.processor_id %}
+                                            <td>{{ row.shipment_id }}</a></td>
+                                            {% else %}
+                                            <td>{{ row.shipment_id }}</a></td>
+                                            {% endif %}
+                                            <td>{{ row.carrier_id }}</td> 
+                                            <td>{% for crop in row.crops %}{{crop.crop_name}}<br>{%endfor %}</td>   
+                                            <td>{% for crop in row.crops %}{{crop.net_weight}} {{crop.weight_unit}}<br>{%endfor %}</td>                                      
+                                            <td>{% for crop in row.crops %}{% if crop.additional_lot_number %}{{crop.additional_lot_number}}{%else %}N/A {%endif%}<br>{%endfor %}</td>
+                                            <td>{{row.date_pulled|date:"j" | ordinal_day }} {{ row.date_pulled|date:"M, Y" }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                        {% elif inbound6_wip and outbound5_wip %}
+                                        {% for row in outbound5_wip|unique_by_shipment_id %}
+                                        <tr>
+                                            {% if row.processor_id %}
+                                            <td>{{ row.shipment_id }}</a></td>
+                                            {% else %}
+                                            <td>{{ row.shipment_id }}</a></td>
+                                            {% endif %}
+                                            <td>{{ row.carrier_id }}</td>                                           
+                                            <td>{% for crop in row.crops %}{{crop.crop_name}}<br>{%endfor %}</td>  
+                                            <td>{% for crop in row.crops %}{{crop.net_weight}} {{crop.weight_unit}}<br>{%endfor %}</td>                                       
+                                            <td>{% for crop in row.crops %}{% if crop.additional_lot_number %}{{crop.additional_lot_number}}{%else %}N/A {%endif%}<br>{%endfor %}</td>
+                                            <td>{{row.date_pulled|date:"j" | ordinal_day }} {{ row.date_pulled|date:"M, Y" }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                        {%endif%}
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <div class="col text-center">
+                                <i class="fa fa-arrow-left" aria-hidden="true"></i>
+                            </div>
+                            {% endif %}
+                            {% if inbound5_wip %}
+                            <div class="table-responsive flex-shrink-0" style="min-width: 300px;">
+                                <h5 class="text-center">Received By Warehouse</h5>
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Warehouse Name</th>
+                                            <th>Warehouse Id</th>
+                                            <th>Crop</th>
+                                            <th>Weight</th>
+                                            <th>Received Date</th>
+                                            <th>Shipment Id</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for row in inbound5_wip|unique_by_shipment_id  %}
+                                        <tr>
+                                            <td>{{ row.warehouse_name}}</td>
+                                            <td>{{ row.warehouse_id }}</td>
+                                            <td>{% for crop in row.crops %}{{crop.crop_name}}<br>{%endfor %}</td>  
+                                            <td>{% for crop in row.crops %}{{crop.net_weight}} {{crop.weight_unit}}<br>{%endfor %}</td>
+                                            <td>{% if row.distributor_receive_date %}{{row.distributor_receive_date|date:"j" | ordinal_day }} {{ row.distributor_receive_date|date:"M, Y" }}{% else %}N/A {%endif %}</td>
+                                            {% if row.processor_id %}
+                                            <td>{{ row.shipment_id }}</a></td>
+                                            {% else %}
+                                            <td>{{ row.shipment_id }}</a></td>
+                                            {% endif %}
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="col text-center">
+                                <i class="fa fa-arrow-left" aria-hidden="true"></i>
+                            </div>
+                            <div class="table-responsive flex-shrink-0" style="min-width: 300px;">
+                                <h5 class="text-center">Shipped to Warehouse</h5>
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Shipment ID</th>
+                                            <th>Transit ID</th> 
+                                            <th>Crop</th>   
+                                            <th>Weight</th>                                        
+                                            <th>New Lot Number</th>
+                                            <th>Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        
+                                        {% for row in outbound5_wip|unique_by_shipment_id %}
+                                        <tr>
+                                            {% if row.processor_id %}
+                                            <td>{{ row.shipment_id }}</a></td>
+                                            {% else %}
+                                            <td>{{ row.shipment_id }}</a></td>
+                                            {% endif %}
+                                            <td>{{ row.carrier_id }}</td>                                           
+                                            <td>{% for crop in row.crops %}{{crop.crop_name}}<br>{%endfor %}</td>   
+                                            <td>{% for crop in row.crops %}{{crop.net_weight}} {{crop.weight_unit}}<br>{%endfor %}</td>                                      
+                                            <td>{% for crop in row.crops %}{% if crop.additional_lot_number %}{{crop.additional_lot_number}}{%else %}{{crop.lot_number}} {%endif%}<br>{%endfor %}</td>
+                                            <td>{{row.date_pulled|date:"j" | ordinal_day }} {{ row.date_pulled|date:"M, Y" }}</td>
+                                        </tr>
+                                        {% endfor %}                                      
+                                        
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <div class="col text-center">
+                                <i class="fa fa-arrow-left" aria-hidden="true"></i>
+                            </div>
+                            {% endif %}
+                            <!-- Table 3 -->
+                            {% if outbound5_wip %}
+                            <div class="table-responsive flex-shrink-0" style="min-width: 300px;">
+                                <h5 class="text-center">Assigned Lot Number</h5>
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Shipment ID</th>
+                                            <th>Mill</th>
+                                            <th>Crop</th>
+                                            <th>Weight</th>
+                                            <th>Lot Number</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for row in outbound5_wip|unique_by_shipment_id %}
+                                        <tr>
+                                            {% if row.processor_id %}
+                                            <td>{{ row.shipment_id }}</a></td>
+                                            {% else %}
+                                            <td>{{ row.shipment_id }}</a></td>
+                                            {% endif %}
+                                            <td>{{ row.processor_entity_name }}</td>
+                                            <td>{% for crop in row.crops %}{{crop.crop_name}}<br>{%endfor %}</td>  
+                                            <td>{% for crop in row.crops %}{{crop.net_weight}} {{crop.weight_unit}}<br>{%endfor %}</td>                                       
+                                            <td>{% for crop in row.crops %}{% if crop.additional_lot_number %}{{crop.additional_lot_number}}{%else %}{{crop.lot_number}} {%endif%}<br>{%endfor %}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+
+                            <div class="col text-center">
+                                <i class="fa fa-arrow-left" aria-hidden="true"></i>
+                            </div>
+                            {% endif %}
+
+                            {%if inbound3_wip and inbound4_wip%}
+                            <div class="table-responsive flex-shrink-0" style="min-width: 300px;">
+                                <h5 class="text-center">In Mill</h5>
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Mill</th>
+                                            <th>Shipment Id</th>
+                                            <th>Crop</th>
+                                            <th>Weight</th>
+                                            <th>Lot Number</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for row in inbound4_wip|unique_by_shipment_id %}
+                                        <tr>
+                                            <td>{{ row.processor2_name }}</td>
+                                            <td>{{ row.shipment_id }}</a></td>                                         
+                                            <td>{{row.crop}}</th>
+                                            <td>{% if row.received_weight %}{{row.received_weight}} {{row.weight_of_product_unit}} {%else %}{{row.weight_of_product}} {{row.weight_of_product_unit}} {% endif %}</th>
+                                            <td>{{row.lot_number}}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="col text-center">
+                                <i class="fa fa-arrow-left" aria-hidden="true"></i>
+                            </div>
+                            
+                            {%elif inbound4_wip and inbound2_wip%}
+                            <div class="table-responsive flex-shrink-0" style="min-width: 300px;">
+                                <h5 class="text-center">In Mill</h5>
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Mill</th>
+                                            <th>Shipment Id</th>
+                                            <th>Crop</th>
+                                            <th>Weight</th>
+                                            <th>Lot Number</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for row in inbound4_wip|unique_by_shipment_id %}
+                                        <tr>
+                                            <td>{{ row.processor2_name }}</td>
+                                            <td>{{ row.shipment_id }}</a></td>                                         
+                                            <td>{{row.crop}}</th>
+                                            <td>{% if row.received_weight %}{{row.received_weight}} {{row.weight_of_product_unit}} {%else %}{{row.weight_of_product}} {{row.weight_of_product_unit}} {% endif %}</th>
+                                            <td>{{row.lot_number}}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="col text-center">
+                                <i class="fa fa-arrow-left" aria-hidden="true"></i>
+                            </div>
+
+                            {%elif inbound2_wip and inbound3_wip%}
+
+                            <div class="table-responsive flex-shrink-0" style="min-width: 300px;">
+                                <h5 class="text-center">In Mill</h5>
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Mill</th>
+                                            <th>Shipment Id</th>
+                                            <th>Crop</th>
+                                            <th>Weight</th>
+                                            <th>Lot Number</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for row in inbound3_wip|unique_by_shipment_id %}
+                                        <tr>
+                                            <td>{{ row.processor2_name }}</td>
+                                            <td>{{ row.shipment_id }}</a></td>                                         
+                                            <td>{{row.crop}}</th>
+                                            <td>{% if row.received_weight %}{{row.received_weight}} {{row.weight_of_product_unit}} {%else %}{{row.weight_of_product}} {{row.weight_of_product_unit}} {% endif %}</th>
+                                            <td>{{row.lot_number}}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="col text-center">
+                                <i class="fa fa-arrow-left" aria-hidden="true"></i>
+                            </div>                            
+                            
+                            {%elif inbound4_wip %}
+
+                            <div class="table-responsive flex-shrink-0" style="min-width: 300px;">
+                                <h5 class="text-center">In Mill</h5>
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Mill</th>
+                                            <th>Shipment Id</th>
+                                            <th>Crop</th>
+                                            <th>Weight</th>
+                                            <th>Lot Number</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for row in inbound4_wip|unique_by_shipment_id %}
+                                        <tr>
+                                            <td>{{ row.processor2_name }}</td>
+                                            <td>{{ row.shipment_id }}</a></td>                                         
+                                            <td>{{row.crop}}</th>
+                                            <td>{% if row.received_weight %}{{row.received_weight}} {{row.weight_of_product_unit}} {%else %}{{row.weight_of_product}} {{row.weight_of_product_unit}} {% endif %}</th>
+                                            <td>{{row.lot_number}}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="col text-center">
+                                <i class="fa fa-arrow-left" aria-hidden="true"></i>
+                            </div>
+
+                            {%elif inbound3_wip %}
+
+                            <div class="table-responsive flex-shrink-0" style="min-width: 300px;">
+                                <h5 class="text-center">In Mill</h5>
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Mill</th>
+                                            <th>Shipment Id</th>
+                                            <th>Crop</th>
+                                            <th>Weight</th>
+                                            <th>Lot Number</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for row in inbound3_wip|unique_by_shipment_id %}
+                                        <tr>
+                                            <td>{{ row.processor2_name }}</td>
+                                            <td>{{ row.shipment_id }}</a></td>                                         
+                                            <td>{{row.crop}}</th>
+                                            <td>{% if row.received_weight %}{{row.received_weight}} {{row.weight_of_product_unit}} {%else %}{{row.weight_of_product}} {{row.weight_of_product_unit}} {% endif %}</th>
+                                            <td>{{row.lot_number}}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="col text-center">
+                                <i class="fa fa-arrow-left" aria-hidden="true"></i>
+                            </div>
+
+                            {%elif inbound2_wip %}
+
+                            <div class="table-responsive flex-shrink-0" style="min-width: 300px;">
+                                <h5 class="text-center">In Mill</h5>
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Mill</th>
+                                            <th>Shipment Id</th>
+                                            <th>Crop</th>
+                                            <th>Weight</th>
+                                            <th>Lot Number</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for row in inbound2_wip|unique_by_shipment_id %}
+                                        <tr>
+                                            <td>{{ row.processor2_name }}</td>
+                                            <td>{{ row.shipment_id }}</a></td>                                         
+                                            <td>{{row.crop}}</th>
+                                            <td>{% if row.received_weight %}{{row.received_weight}} {{row.weight_of_product_unit}} {%else %}{{row.weight_of_product}} {{row.weight_of_product_unit}} {% endif %}</th>
+                                            <td>{{row.lot_number}}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="col text-center">
+                                <i class="fa fa-arrow-left" aria-hidden="true"></i>
+                            </div>
+                            
+                            {% endif %}
+                            <!-- Table 4 -->
+                            {%if t1_processor %}
+                            <div class="table-responsive flex-shrink-0" style="min-width: 300px;">
+                                <h5 class="text-center">Inbound Mill</h5>
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Shipment Id</th>
+                                            <th>Crop</th>
+                                            <th>Weight</th>
+                                            <th>Date</th>
+                                            <th>Grower</th>
+                                        </tr>
+                                    </thead>
+                                 
+                                    <tbody>
+                                        {% for row in t1_processor %}
+                                        <tr>
+                                            <td>{{ row.shipment_id }}</a></td>
+                                            <td>{{row.crop}}</th>
+                                            <td>{% if row.pounds_received %}{{row.pounds_received}}{% else %} {{row.pounds_shipped}} {% endif %} {{row.unit}}</th>
+                                            <td>{{row.date|date:"j" | ordinal_day }} {{ row.date|date:"M, Y" }}</td>                                            
+                                            <td>{{ row.grower }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+        
+
+                            <div class="col text-center">
+                                <i class="fa fa-arrow-left" aria-hidden="true"></i>
+                            </div>
+                            {% endif %}
+                            <!-- Table 5 -->
+                            {%if origin_context %}
+                            <div class="table-responsive flex-shrink-0" style="min-width: 300px;">
+                                <h5 class="text-center">Origin</h5>
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Fields</th>
+                                            <th>Grower</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for org in origin_context|unique_by_field_name %}
+                                        <tr>
+                                            <td>{{ org.field_name }}</td>
+                                            <td>{{ org.grower_name }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="container-fluid mt-4 mb-4 map_view" style="border-top:10px solid green; display:none;" id="mapview">
+                        <section id="map_show" class="map_show main_section hidden" style="background-color: #fff; max-width: 100%; width: 100%; margin: auto; padding: 20px 0;">
+                            <div class="container-fluid">
+                                
+                            
+                                {% if origin_context %}
+                                <div class="row" style="padding-top: 15px; margin-top: 30px; border-top: 1px solid #dadada; display: flex;">
+                                    <div class="col-6 mb-3">
+                                        <div class="text_wapper">
+                                            <h3 style="font-size: 30px; margin-bottom: 20px;">Origin</h3>
+                                            
+                                            {% for gr in origin_context|unique_growers %}
+                                            <ul style="list-style: none; padding: 0; margin: 0;">
+                                                <li>
+                                                    <span style="display: block; font-size: 18px; font-weight: bold; margin-bottom: 10px;">{{gr.grower_name}}</span>
+                                                    <span>Farm:{{gr.farm_name}}, Field: {{gr.field_name}}, Variety: {{gr.variety}}</span>
+                                                </li>
+                                            </ul>
+                                            {% endfor %}
+                                            
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="img_wapper" id="grower_location" style="width: 100%; height: 250px;" >
+                                            {% comment %} <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d14736.291556014114!2d88.42368324144367!3d22.576377035307207!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a0275b020703c0d%3A0xece6f8e0fc2e1613!2sSector%20V%2C%20Bidhannagar%2C%20Kolkata%2C%20West%20Bengal!5e0!3m2!1sen!2sin!4v1713427063064!5m2!1sen!2sin"  style="border:0; width: 100%; height: 100%; max-height: 100% !important;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe> {% endcomment %}
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+                               
+                                {% if t1_processor %}
+                                <div class="row" style="padding-top: 15px; margin-top: 30px; border-top: 1px solid #dadada; display: flex;">
+                                    <div class="col-6 mb-3">
+                                        <div class="text_wapper">
+                                            <h3 style="font-size: 30px; margin-bottom: 20px;">Processor 1</h3>
+                                            {% if t1_processor %}
+                                            {% for pro in t1_processor|unique_processor %}                   
+                                                  
+                                            <ul style="list-style: none; padding: 0; margin: 0;margin-top:20px;">
+                                                <li style="font-weight: 500;">Entity Name: <em style="font-weight: 400; font-style: normal;">{{pro.processor_name}}</em></li>
+                                                <li style="font-weight: 500;">SKU Id: <em style="font-weight: 400; font-style: normal;">{% if pro.skuid %}{{pro.skuid}}{% else %} Not defined {% endif %}</em></li>
+                                            </ul>
+                                            <ul style="list-style: none; padding: 0; margin: 0; margin-top: 30px;">
+                                                <li style="font-weight: 500; margin-bottom: 5px;">Processing Date: <em style="font-weight: 400; font-style: normal;">{{pro.date|date:"j" | ordinal_day }} {{pro.date|date:"M, Y"}}</em></li>
+                                                <li style="font-weight: 500;">Resulting Lot Number: <em style="font-weight: 400; font-style: normal;"> {% if pro.lot_number %} {{pro.lot_number}} {% else %} Not defined {% endif %}</em></li>
+                                                
+                                            </ul>
+                                            {% endfor %}
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="img_wapper" id="t1_processor_location" style="width: 100%; height: 250px;" >
+                                            
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+                
+                                {% if outbound2_wip %}
+                                <!-- new implement-->
+                                <div class="row" style="padding-top: 15px; margin-top: 30px; border-top: 1px solid #dadada; flex-direction: row-reverse; display: flex;">
+                                    <div class="col-12">
+                                        <div class="text_wapper">
+                                            <h3 style="font-size: 30px; margin-bottom: 40px;">Transport to Processor 2</h3>
+                                            <ul style="list-style: none; padding: 0; margin: 0;">
+                                                <li style="margin-bottom: 30px;">
+                        
+                                                    {% for out2 in outbound2_wip|unique_by_shipment_id %}
+                                                    <div class="container-fluid">
+                                                        <div class="main_map_container">
+                                                            <div class="row">
+                                                                <div class="col-6">
+                                                                    <div class="map_holder">
+                                                                        <div id="map-{{ forloop.counter }}" class="map-container"></div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-6">
+                                                                   <span style="display: block; font-size: 18px; font-weight: bold; margin-bottom: 10px;">{{ out2.equipment_type }}</span>
+                                                                    <ul style="list-style: none; padding: 0; margin: 0; margin-top: 30px;">
+                                                                        <li style="font-weight: 500; margin-bottom: 5px;">Source: <em style="font-weight: 400; font-style: normal;">{{ out2.processor_e_name }}</em></li>
+                                                                        <li style="font-weight: 500; margin-bottom: 5px;">Destination: <em style="font-weight: 400; font-style: normal;">{{ out2.processor2_name }}</em></li>
+                                                                        <li style="font-weight: 500; margin-bottom: 5px;">Shipment ID: <em style="font-weight: 400; font-style: normal;">{{ out2.shipment_id }}</em></li>
+                                                                        <li style="font-weight: 500; margin-bottom: 5px;">Transport ID: <em style="font-weight: 400; font-style: normal;">{{ out2.equipment_id }}</em></li>
+                                                                        <li style="font-weight: 500; margin-bottom: 5px;">Sender SKU ID: <em style="font-weight: 400; font-style: normal;">{{ out2.storage_bin_send }}</em></li>
+                                                                        <li style="font-weight: 500;">Transport Date: <em style="font-weight: 400; font-style: normal;">{{out2.date_pulled|date:"j" | ordinal_day }} {{ out2.date_pulled|date:"M, Y" }}</em></li>                                                        
+                                                                    </ul>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    {% endfor %}        
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+                             
+                                {% if inbound2_wip %}
+                                <div class="row" style="padding-top: 15px; margin-top: 30px; border-top: 1px solid #dadada; display: flex;">
+                                    <div class="col-6 mb-3">
+                                        <div class="text_wapper">
+                                            <h3 style="font-size: 30px; margin-bottom: 20px;">Processor 2</h3>
+                                            
+                                            {% if inbound2_wip %}
+                                            {% for pro in inbound2_wip|unique1_processor %}                   
+                                                  
+                                            <ul style="list-style: none; padding: 0; margin: 0;">
+                                                <li style="font-weight: 500;">Entity Name: <em style="font-weight: 400; font-style: normal;">{{pro.processor2_name}}</em></li>
+                                                <li style="font-weight: 500;">SKU Id: <em style="font-weight: 400; font-style: normal;">{{pro.storage_bin_recive}}</em></li>
+                                            </ul>
+                                            <ul style="list-style: none; padding: 0; margin: 0; margin-top: 30px;">
+                                                <li style="font-weight: 500; margin-bottom: 5px;">Processing Date: <em style="font-weight: 400; font-style: normal;">{{pro.recive_delivery_date|date:"j" | ordinal_day }} {{pro.recive_delivery_date|date:"M, Y"}}</em></li>
+                                                <li style="font-weight: 500;">Resulting Lot Number: <em style="font-weight: 400; font-style: normal;">{{pro.lot_number}}</em></li>
+                                            </ul>
+                                            {% endfor %}
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="img_wapper" id="t2_processor_location" style="width: 100%; height: 250px;" >
+                                            
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                
+                                {% if outbound3_wip %}
+                                <!-- new implement-->
+                                <div class="row" style="padding-top: 15px; margin-top: 30px; border-top: 1px solid #dadada; flex-direction: row-reverse; display: flex;">
+                                    <div class="col-12">
+                                        <div class="text_wapper">
+                                            <h3 style="font-size: 30px; margin-bottom: 40px;">Transport to Processor 3</h3>
+                                            <ul style="list-style: none; padding: 0; margin: 0;">
+                                                <li style="margin-bottom: 30px;">
+                        
+                                                    {% for out3 in outbound3_wip|unique_by_shipment_id %}
+                                                    <div class="container-fluid">
+                                                        <div class="main_map_container">
+                                                            <div class="row">
+                                                                <div class="col-6">
+                                                                    <div class="map_holder">
+                                                                        <div id="map3-{{ forloop.counter }}" class="map-container"></div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-6">
+                                                                    <span style="display: block; font-size: 18px; font-weight: bold; margin-bottom: 10px;">{{ out3.equipment_type }}</span>
+                                                                    <ul style="list-style: none; padding: 0; margin: 0; margin-top: 30px;">
+                                                                        <li style="font-weight: 500; margin-bottom: 5px;">Source: <em style="font-weight: 400; font-style: normal;">{{ out3.processor_e_name }}</em></li>
+                                                                        <li style="font-weight: 500; margin-bottom: 5px;">Destination: <em style="font-weight: 400; font-style: normal;">{{ out3.processor2_name }}</em></li>
+                                                                        <li style="font-weight: 500; margin-bottom: 5px;">Shipment ID: <em style="font-weight: 400; font-style: normal;">{{ out3.shipment_id }}</em></li>
+                                                                        <li style="font-weight: 500; margin-bottom: 5px;">Transport ID: <em style="font-weight: 400; font-style: normal;">{{ out3.equipment_id }}</em></li>
+                                                                        <li style="font-weight: 500; margin-bottom: 5px;">Sender SKU ID: <em style="font-weight: 400; font-style: normal;">{{ out3.storage_bin_send }}</em></li>
+                                                                        <li style="font-weight: 500;">Transport Date: <em style="font-weight: 400; font-style: normal;">{{out3.date_pulled|date:"j" | ordinal_day }} {{ out3.date_pulled|date:"M, Y" }}</em></li>                                                        
+                                                                    </ul>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    {% endfor %}        
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                {% if inbound3_wip %}
+                                <div class="row" style="padding-top: 15px; margin-top: 30px; border-top: 1px solid #dadada; display: flex;">
+                                    <div class="col-6 mb-3">
+                                        <div class="text_wapper">
+                                            <h3 style="font-size: 30px; margin-bottom: 20px;">Processor 3</h3>
+                                            {% if inbound3_wip %}
+                                            {% for pro in inbound3_wip|unique1_processor %}                   
+                                                  
+                                            <ul style="list-style: none; padding: 0; margin: 0;">
+                                                <li style="font-weight: 500;">Entity Name: <em style="font-weight: 400; font-style: normal;">{{pro.processor2_name}}</em></li>
+                                                <li style="font-weight: 500;">SKU Id: <em style="font-weight: 400; font-style: normal;">{{pro.storage_bin_recive}}</em></li>
+                                            </ul>
+                                            <ul style="list-style: none; padding: 0; margin: 0; margin-top: 30px;">
+                                                <li style="font-weight: 500; margin-bottom: 5px;">Processing Date: <em style="font-weight: 400; font-style: normal;">{{pro.recive_delivery_date|date:"j" | ordinal_day }} {{pro.recive_delivery_date|date:"M, Y"}}</em></li>
+                                                <li style="font-weight: 500;">Resulting Lot Number: <em style="font-weight: 400; font-style: normal;">{{pro.lot_number}}</em></li>
+                                            </ul>
+                                            {% endfor %}
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="img_wapper" id="t3_processor_location" style="width: 100%; height: 250px;" >
+                                            
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+                
+                                {% if outbound4_wip %}
+                                <!-- new implement-->
+                                <div class="row" style="padding-top: 15px; margin-top: 30px; border-top: 1px solid #dadada; flex-direction: row-reverse; display: flex;">
+                                    <div class="col-12">
+                                        <div class="text_wapper">
+                                            <h3 style="font-size: 30px; margin-bottom: 40px;">Transport to Processor 4</h3>
+                                            <ul style="list-style: none; padding: 0; margin: 0;">
+                                                <li style="margin-bottom: 30px;">        
+                                                    {% for out4 in outbound4_wip|unique_by_shipment_id %}
+                                                    <div class="container-fluid">
+                                                        <div class="main_map_container">
+                                                            <div class="row">
+                                                                <div class="col-6">
+                                                                    <div class="map_holder">
+                                                                        <div id="map4-{{ forloop.counter }}" class="map-container"></div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-6">
+                                                                    <span style="display: block; font-size: 18px; font-weight: bold; margin-bottom: 10px;">{{ out4.equipment_type }}</span>
+                                                                    <ul style="list-style: none; padding: 0; margin: 0; margin-top: 30px;">
+                                                                        <li style="font-weight: 500; margin-bottom: 5px;">Source: <em style="font-weight: 400; font-style: normal;">{{ out4.processor_e_name }}</em></li>
+                                                                        <li style="font-weight: 500; margin-bottom: 5px;">Destination: <em style="font-weight: 400; font-style: normal;">{{ out4.processor2_name }}</em></li>
+                                                                        <li style="font-weight: 500; margin-bottom: 5px;">Shipment ID: <em style="font-weight: 400; font-style: normal;">{{ out4.shipment_id }}</em></li>
+                                                                        <li style="font-weight: 500; margin-bottom: 5px;">Transport ID: <em style="font-weight: 400; font-style: normal;">{{ out4.equipment_id }}</em></li>
+                                                                        <li style="font-weight: 500; margin-bottom: 5px;">Sender SKU ID: <em style="font-weight: 400; font-style: normal;">{{ out4.storage_bin_send }}</em></li>
+                                                                        <li style="font-weight: 500;">Transport Date: <em style="font-weight: 400; font-style: normal;">{{out4.date_pulled|date:"j" | ordinal_day }} {{ out4.date_pulled|date:"M, Y" }}</em></li>                                                        
+                                                                    </ul>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    {% endfor %}        
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                {% if inbound4_wip %}
+                                <div class="row" style="padding-top: 15px; margin-top: 30px; border-top: 1px solid #dadada; display: flex;">
+                                    <div class="col-6 mb-3">
+                                        <div class="text_wapper">
+                                            <h3 style="font-size: 30px; margin-bottom: 20px;">Processor 4</h3>
+                                            {% if inbound4_wip %}
+                                            {% for pro in inbound4_wip|unique1_processor %}                   
+                                                  
+                                            <ul style="list-style: none; padding: 0; margin: 0;">
+                                                <li style="font-weight: 500;">Enity Name: <em style="font-weight: 400; font-style: normal;">{{pro.processor2_name}}</em></li>
+                                                <li style="font-weight: 500;">SKU Id: <em style="font-weight: 400; font-style: normal;">{{pro.storage_bin_recive}}</em></li>
+                                            </ul>
+                                            <ul style="list-style: none; padding: 0; margin: 0; margin-top: 30px;">
+                                                <li style="font-weight: 500; margin-bottom: 5px;">Processing Date: <em style="font-weight: 400; font-style: normal;">{{pro.recive_delivery_date|date:"j" | ordinal_day }} {{pro.recive_delivery_date|date:"M, Y"}}</em></li>
+                                                <li style="font-weight: 500;">Resulting Lot Number: <em style="font-weight: 400; font-style: normal;">{{pro.lot_number}}</em></li>
+                                            </ul>
+                                            {% endfor %}
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="img_wapper" id="t4_processor_location" style="width: 100%; height: 250px;" >
+                                            
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                {% if outbound5_wip %}
+                                <!-- new implement-->
+                                <div class="row" style="padding-top: 15px; margin-top: 30px; border-top: 1px solid #dadada; flex-direction: row-reverse; display: flex;">
+                                    <div class="col-12">
+                                        <div class="text_wapper">
+                                            <h3 style="font-size: 30px; margin-bottom: 40px;">Transport to Warehouse/Customer</h3>
+                                            <ul style="list-style: none; padding: 0; margin: 0;">
+                                                <li style="margin-bottom: 30px;">        
+                                                    {% for out5 in outbound5_wip|unique_by_shipment_id %}
+                                                    <div class="container-fluid">
+                                                        <div class="main_map_container">
+                                                            <div class="row">
+                                                                <div class="col-6">
+                                                                    <div class="map_holder">
+                                                                        <div id="map5-{{ forloop.counter }}" class="map-container"></div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-6">
+                                                                    <span style="display: block; font-size: 18px; font-weight: bold; margin-bottom: 10px;">{{ out5.carrier_type }}</span>
+                                                                    
+                                                                    <ul style="list-style: none; padding: 0; margin: 0; margin-top: 30px;">
+                                                                        <li style="font-weight: 500; margin-bottom: 5px;">Source: <em style="font-weight: 400; font-style: normal;">{{ out5.processor_entity_name }}</em></li>
+                                                                        <li style="font-weight: 500; margin-bottom: 5px;">Destination: <em style="font-weight: 400; font-style: normal;">{% if out5.customer_name %}{{ out5.customer_name }}{% else %}{{out5.warehouse_name}}{% endif %}</em></li>
+                                                                        <li style="font-weight: 500; margin-bottom: 5px;">Shipment ID: <em style="font-weight: 400; font-style: normal;">{{ out5.shipment_id }}</em></li>
+                                                                        <li style="font-weight: 500; margin-bottom: 5px;">Transport ID: <em style="font-weight: 400; font-style: normal;">{{ out5.carrier_id }}</em></li>                                                                       
+                                                                        <li style="font-weight: 500;">Transport Date: <em style="font-weight: 400; font-style: normal;">{{out5.date_pulled|date:"j" | ordinal_day }} {{ out5.date_pulled|date:"M, Y" }}</em></li>                                                        
+                                                                    </ul>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    {% endfor %}        
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                {% if inbound5_wip %}
+                                <div class="row" style="padding-top: 15px; margin-top: 30px; border-top: 1px solid #dadada; display: flex;">
+                                    <div class="col-6 mb-3">
+                                        <div class="text_wapper">
+                                            <h3 style="font-size: 30px; margin-bottom: 20px;">Warehouse</h3>
+                                            {% if inbound5_wip %}
+                                            {% for pro in inbound5_wip|unique_warehouse %}                   
+                                                  
+                                            <ul style="list-style: none; padding: 0; margin: 0;">
+                                                <li style="font-weight: 500;">Name: <em style="font-weight: 400; font-style: normal;">{{pro.warehouse_name}}</em></li>                                
+                                            </ul>
+                                            <ul style="list-style: none; padding: 0; margin: 0; margin-top: 30px;">
+                                                <li style="font-weight: 500; margin-bottom: 5px;">Receive Date: <em style="font-weight: 400; font-style: normal;">{%if pro.distributor_receive_date %}{{pro.distributor_receive_date|date:"j" | ordinal_day }} {{pro.distributor_receive_date|date:"M, Y"}}{%else%}Not received yet.{%endif%}</em></li>
+                                               
+                                            </ul>
+                                            {% endfor %}
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="img_wapper" id="warehouse_location" style="width: 100%; height: 250px;" >
+                                            
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                {% if outbound6_wip %}
+                                <!-- new implement-->
+                                <div class="row" style="padding-top: 15px; margin-top: 30px; border-top: 1px solid #dadada; flex-direction: row-reverse; display: flex;">
+                                    <div class="col-12">
+                                        <div class="text_wapper">
+                                            <h3 style="font-size: 30px; margin-bottom: 40px;">Transport to Customer</h3>
+                                            <ul style="list-style: none; padding: 0; margin: 0;">
+                                                <li style="margin-bottom: 30px;">        
+                                                    {% for out6 in outbound6_wip|unique_by_shipment_id %}
+                                                    <div class="container-fluid">
+                                                        <div class="main_map_container">
+                                                            <div class="row">
+                                                                <div class="col-6">
+                                                                    <div class="map_holder">
+                                                                        <div id="map6-{{ forloop.counter }}" class="map-container"></div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-6">
+                                                                    <span style="display: block; font-size: 18px; font-weight: bold; margin-bottom: 10px;">{{ out6.carrier_type }}</span>
+                                                                    <ul style="list-style: none; padding: 0; margin: 0; margin-top: 30px;">
+                                                                        <li style="font-weight: 500; margin-bottom: 5px;">Source: <em style="font-weight: 400; font-style: normal;">{%if out6.processor_entity_name %}{{ out6.processor_entity_name }}{% else %}{{out6.warehouse_name}}{% endif %}</em></li>
+                                                                        <li style="font-weight: 500; margin-bottom: 5px;">Destination: <em style="font-weight: 400; font-style: normal;">{{ out6.customer_name }}</em></li>
+                                                                        <li style="font-weight: 500; margin-bottom: 5px;">Shipment ID: <em style="font-weight: 400; font-style: normal;">{{ out6.shipment_id }}</em></li>
+                                                                        <li style="font-weight: 500; margin-bottom: 5px;">Transport ID: <em style="font-weight: 400; font-style: normal;">{{ out6.carrier_id }}</em></li>                                                                        
+                                                                        <li style="font-weight: 500;">Transport Date: <em style="font-weight: 400; font-style: normal;">{{out6.date_pulled|date:"j" | ordinal_day }} {{ out6.date_pulled|date:"M, Y" }}</em></li>                                                        
+                                                                    </ul>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    {% endfor %}        
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                {% if inbound6_wip %}
+                                <div class="row" style="padding-top: 15px; margin-top: 30px; border-top: 1px solid #dadada; display: flex;">
+                                    <div class="col-6 mb-3">
+                                        <div class="text_wapper">
+                                            <h3 style="font-size: 30px; margin-bottom: 20px;">Customer</h3>
+                                            {% if inbound6_wip %}
+                                            {% for pro in inbound6_wip|unique_customer %}                   
+                                                  
+                                            <ul style="list-style: none; padding: 0; margin: 0;">
+                                                <li style="font-weight: 500;">Name: <em style="font-weight: 400; font-style: normal;">{{pro.customer_name}}</em></li>                                
+                                            </ul>
+                                            <ul style="list-style: none; padding: 0; margin: 0; margin-top: 30px;">
+                                                <li style="font-weight: 500; margin-bottom: 5px;">Receive Date: <em style="font-weight: 400; font-style: normal;">{% if pro.customer_receive_date %}{{pro.customer_receive_date|date:"j" | ordinal_day }} {{pro.customer_receive_date|date:"M, Y"}}{% elif pro.distributor_receive_date %} {{pro.distributor_receive_date|date:"j" | ordinal_day }} {{pro.distributor_receive_date|date:"M, Y"}}{% else %}Not received yet.{% endif %}</em></li>
+                                               
+                                            </ul>
+                                            {% endfor %}
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="img_wapper" id="customer_location" style="width: 100%; height: 250px;" >
+                                            
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            </div>
+        </form>     
+    </main>
+    {% include 'footer.html' %}
+</div>
+{% endblock %}
+
+{% block jquery %}
+<script>
+    function printDiv() {
+        var divToPrint = document.getElementById('tableview');
+        var htmlToPrint = '' +
+            '<style type="text/css">' +
+            'table th, table td {' +
+            'border:1px solid #333;' +
+            'font-family: Arial;' +
+            'font-size: 12px;' +
+            'padding: 2px;' +
+            '}' + 'table {' +
+            'width: 95%;' +
+            'margin: 0 auto;' +
+            '}' +
+            '</style>';
+        htmlToPrint += divToPrint.outerHTML;
+        newWin = window.open("");
+        newWin.document.write(htmlToPrint);
+        newWin.print();
+        newWin.close();
+    }
+    
+    {% if search_by %}
+    var get_search_by = document.getElementById('search_by').innerHTML;
+    {% endif %}
+    // var deliveryid = document.getElementById('deliveryid').innerHTML;
+    
+    function showTraceability(field_id){
+        $.ajax({
+            type: "GET",
+                    url: `/tracemodule/showsustainability_metrics/${get_search_by}/${field_id}`,
+                    data: {},
+                    contentType: false,
+                    cache: false,
+                    processData: false,
+                    success: function (response){
+                        document.getElementById('pf_sus').innerHTML = "";   
+                        document.getElementById('water_savings').innerHTML = "";   
+                        document.getElementById('land_use').innerHTML = "";
+                        document.getElementById('less_GHG').innerHTML = "";
+                        document.getElementById('premiums_to_growers').innerHTML = "";
+                        
+                        {% if select_crop == 'RICE' %}
+                        document.getElementById('co2_eQ_footprint').innerHTML = "";
+                        document.getElementById('water_per_pound_savings').innerHTML = "";
+    
+                        var co2_eQ_footprint = response.co2_eQ_footprint;
+                        var water_per_pound_savings = response.water_per_pound_savings;
+    
+                        document.getElementById('co2_eQ_footprint').innerHTML = co2_eQ_footprint;
+                        document.getElementById('water_per_pound_savings').innerHTML = water_per_pound_savings;
+                        {% endif %}
+    
+                        var water_savings = response.water_savings;
+                        var land_use = response.land_use;
+                        var less_GHG = response.less_GHG;
+                        var premiums_to_growers = response.premiums_to_growers;
+                        
+                        document.getElementById('water_savings').innerHTML = water_savings;
+                        document.getElementById('land_use').innerHTML = land_use;
+                        document.getElementById('less_GHG').innerHTML = less_GHG;
+                        document.getElementById('premiums_to_growers').innerHTML = premiums_to_growers;                  
+    
+                        var pf_sus = response.pf_sus;
+                        
+                        if(pf_sus == 'Pass'){
+                            document.getElementById('pf_sus').innerHTML = pf_sus;
+                            $("#pf_sus").css("background-color", "#257a3c");
+                        }
+                        else if(pf_sus == 'Fail'){
+                            document.getElementById('pf_sus').innerHTML = pf_sus;
+                            $("#pf_sus").css("background-color", "#991f14");
+                        }
+                        else{
+                            document.getElementById('pf_sus').innerHTML = pf_sus;
+                            $("#pf_sus").css("background-color", "#000");
+                        }
+    
+                    }
+    
+        })
+    }
+    
+    
+    function showQuality(get_deliveryid){
+        $.ajax({
+            type: "GET",
+                    url: `/tracemodule/showquality_metrics/${get_search_by}/${get_deliveryid}`,
+                    data: {},
+                    contentType: false,
+                    cache: false,
+                    processData: false,
+                    success: function (response){
+                        document.getElementById('level').innerHTML = ""; 
+                        document.getElementById('grade').innerHTML = ""; 
+                        document.getElementById('leaf').innerHTML = ""; 
+                        document.getElementById('staple').innerHTML = ""; 
+                        document.getElementById('length').innerHTML = ""; 
+                        document.getElementById('strength').innerHTML = ""; 
+                        document.getElementById('mic').innerHTML = "";
+    
+                        var grade = response.grade;
+                        var leaf = response.leaf;
+                        var staple = response.staple;
+                        var length = response.length;
+                        var strength = response.strength;
+                        var mic = response.mic;
+                        var level = response.level;
+    
+                        document.getElementById('grade').innerHTML = grade; 
+                        document.getElementById('leaf').innerHTML = leaf; 
+                        document.getElementById('staple').innerHTML = staple; 
+                        document.getElementById('length').innerHTML = length; 
+                        document.getElementById('strength').innerHTML = strength; 
+                        document.getElementById('mic').innerHTML = mic; 
+                        // background: {%if level == 'Llano Super' %}#03f4fc {% elif level == 'Gold' %}#FFD700 
+                        // {% elif level == 'Silver' %} #C0C0C0 {% elif level == 'Bronze' %} #CD7F32 {% else %} #ffffff {% endif %}"
+                        if (level == 'Llano Super'){
+                            document.getElementById('level').innerHTML = level;
+                            $("#level").css("background-color", "#03f4fc");
+                        }
+                        else if (level == 'Gold'){
+                            document.getElementById('level').innerHTML = level;
+                            $("#level").css("background-color", "#FFD700");
+                        }
+                        else if (level == 'Silver'){
+                            document.getElementById('level').innerHTML = level;
+                            $("#level").css("background-color", "#C0C0C0");
+                        }
+                        else if (level == 'Bronze'){
+                            document.getElementById('level').innerHTML = level;
+                            $("#level").css("background-color", "#CD7F32");
+                        }
+                        else{
+                            document.getElementById('level').innerHTML = level;
+                            $("#level").css("background-color", "#ffffff");
+                        }
+                        
+                    }
+    
+        })
+    }
+    
+    function getText(){
+        getTextid = $("#getTextid").val();
+        select_crop_id = $("#select_crop_id").val();
+    
+        if (getTextid != '' && select_crop_id != ''){
+            $.ajax({
+                type: "GET",
+                    url: `/tracemodule/autocomplete_suggestions/${getTextid}/${select_crop_id}/`,
+                    data: {},
+                    contentType: false,
+                    cache: false,
+                    processData: false,
+                    success: function (response){
+                        var availableTags  = response.select_search;
+                        $("#tags").autocomplete({
+                            source: availableTags
+                        });
+                    }
+            })
+        }
+    }
+    
+    
+    
+    </script>
+    <script>
+        function removeSelectedOption() {
+          var firstSelect = document.getElementById("getTextid");
+          var secondSelect = document.getElementById("tags");
+          secondSelect.value = "";
+          
+        }
+    </script>
+<script>
+    document.getElementById('viewToggleButton').addEventListener('click', function() {
+        // Toggle visibility of Table and Map views
+        const tableView = document.getElementById('tableview');
+        const mapView = document.getElementById('mapview');
+        const button = document.getElementById('viewToggleButton');
+        const spanView = document.getElementById('s_view');
+
+        if (tableView.style.display !== 'none') {
+            // Switch to Map View
+            tableView.style.display = 'none';
+            mapView.style.display = 'block';
+            button.value = 'Table View';
+            spanView.textContent = 'Map View';
+        } else {
+            // Switch to Table View
+            mapView.style.display = 'none';
+            tableView.style.display = 'block';
+            button.value = 'Map View';
+            spanView.textContent = 'Table View';
+        }
+    });
+</script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.js">
+</script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.js">
+</script>
+
+<link href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/ui-lightness/jquery-ui.css" rel="stylesheet"
+    type="text/css" />
+<script>
+    $('#Traceability-Report').addClass('activeLink');
+</script>
+
+
+<script>
+    // Initialize and display the map
+    function initMap2() {
+        // Define a default center
+        //alert("hello Riju")
+        var defaultCenter = { lat: 0, lng: 0 };
+
+        // Check if locations are available
+        var locations = {{ field_location_list|safe }};
+        var center;
+
+        // If locations are available and there is at least one location, set the center to the first location
+        if (locations && locations.length > 0) {
+            center = { lat: locations[0].lat, lng: locations[0].lng };
+        } else {
+            center = defaultCenter; // Set default center if no locations are available
+        }
+
+        // Create a new map object
+        var map = new google.maps.Map(document.getElementById('grower_location'), {
+            center: center,
+            zoom: 5 // Set the initial zoom level
+        });
+
+        // If locations are available, add markers to the map
+        if (locations) {
+            locations.forEach(function(location) {
+                var marker = new google.maps.Marker({
+                    position: { lat: location.lat, lng: location.lng },
+                    map: map,
+                    title: `${location.field} ${location.grower}`
+                });
+
+                // Create an info window for each marker
+                var infowindow = new google.maps.InfoWindow({
+                    content: `${location.field} -- ${location.grower}`
+                });
+
+                // Add click event listener to each marker to open the info window
+                marker.addListener('click', function() {
+                    infowindow.open(map, marker);
+                });
+            });
+        }
+    }
+
+    window.onload = initMap2();
+</script>
+
+<script>
+    // Initialize and display the map
+    function initMap3() {
+        // Define a default center
+        //alert("hello riju233")
+
+        var defaultCenter = { lat: 0, lng: 0 };
+
+        // Check if locations are available
+        var locations = {{ t1_location_list|safe }};
+        var center;
+
+        // If locations are available and there is at least one location, set the center to the first location
+        if (locations && locations.length > 0) {
+            center = { lat: locations[0].lat, lng: locations[0].lng };
+        } else {
+            center = defaultCenter; // Set default center if no locations are available
+        }
+
+        // Create a new map object
+        var map = new google.maps.Map(document.getElementById('t1_processor_location'), {
+            center: center,
+            zoom: 5 // Set the initial zoom level
+        });
+
+        // If locations are available, add markers to the map
+        if (locations) {
+            locations.forEach(function(location) {
+                var marker = new google.maps.Marker({
+                    position: { lat: location.lat, lng: location.lng },
+                    map: map,
+                    title: `${location.processor}`
+                });
+
+                // Create an info window for each marker
+                var infowindow = new google.maps.InfoWindow({
+                    content: `${location.processor}`
+                });
+
+                // Add click event listener to each marker to open the info window
+                marker.addListener('click', function() {
+                    infowindow.open(map, marker);
+                });
+            });
+        }
+    }
+
+    window.onload = initMap3();
+</script>
+
+<script>
+    
+    function initMap4() {
+        // Define a default center
+        //alert("hello pritam")
+        var defaultCenter = { lat: 0, lng: 0 };
+
+        // Check if locations are available
+        var locations = {{ t2_location_list|safe }};
+        var center;
+
+        // If locations are available and there is at least one location, set the center to the first location
+        if (locations && locations.length > 0) {
+            center = { lat: locations[0].lat, lng: locations[0].lng };
+        } else {
+            center = defaultCenter; // Set default center if no locations are available
+        }
+
+        // Create a new map object
+        var map = new google.maps.Map(document.getElementById('t2_processor_location'), {
+            center: center,
+            zoom: 5 // Set the initial zoom level
+        });
+
+        // If locations are available, add markers to the map
+        if (locations) {
+            locations.forEach(function(location) {
+                var marker = new google.maps.Marker({
+                    position: { lat: location.lat, lng: location.lng },
+                    map: map,
+                    title: `${location.processor}`
+                });
+
+                // Create an info window for each marker
+                var infowindow = new google.maps.InfoWindow({
+                    content: `${location.processor}`
+                });
+
+                // Add click event listener to each marker to open the info window
+                marker.addListener('click', function() {
+                    infowindow.open(map, marker);
+                });
+            });
+        }
+    }
+
+    window.onload = initMap4();
+</script>
+
+<script>    
+    function initMap5() {
+        // Define a default center
+        
+        var defaultCenter = { lat: 0, lng: 0 };
+
+        // Check if locations are available
+        var locations = {{ t3_location_list|safe }};
+        var center;
+
+        // If locations are available and there is at least one location, set the center to the first location
+        if (locations && locations.length > 0) {
+            center = { lat: locations[0].lat, lng: locations[0].lng };
+        } else {
+            center = defaultCenter; // Set default center if no locations are available
+        }
+
+        // Create a new map object
+        var map = new google.maps.Map(document.getElementById('t3_processor_location'), {
+            center: center,
+            zoom: 5 // Set the initial zoom level
+        });
+
+        // If locations are available, add markers to the map
+        if (locations) {
+            locations.forEach(function(location) {
+                var marker = new google.maps.Marker({
+                    position: { lat: location.lat, lng: location.lng },
+                    map: map,
+                    title: `${location.processor}`
+                });
+
+                // Create an info window for each marker
+                var infowindow = new google.maps.InfoWindow({
+                    content: `${location.processor}`
+                });
+
+                // Add click event listener to each marker to open the info window
+                marker.addListener('click', function() {
+                    infowindow.open(map, marker);
+                });
+            });
+        }
+    }
+
+    window.onload = initMap5();
+</script>
+
+<script>    
+    function initMap6() {
+        // Define a default center
+        
+        var defaultCenter = { lat: 0, lng: 0 };
+
+        // Check if locations are available
+        var locations = {{ t4_location_list|safe }};
+        var center;
+
+        // If locations are available and there is at least one location, set the center to the first location
+        if (locations && locations.length > 0) {
+            center = { lat: locations[0].lat, lng: locations[0].lng };
+        } else {
+            center = defaultCenter; // Set default center if no locations are available
+        }
+
+        // Create a new map object
+        var map = new google.maps.Map(document.getElementById('t4_processor_location'), {
+            center: center,
+            zoom: 5 // Set the initial zoom level
+        });
+
+        // If locations are available, add markers to the map
+        if (locations) {
+            locations.forEach(function(location) {
+                var marker = new google.maps.Marker({
+                    position: { lat: location.lat, lng: location.lng },
+                    map: map,
+                    title: `${location.processor}`
+                });
+
+                // Create an info window for each marker
+                var infowindow = new google.maps.InfoWindow({
+                    content: `${location.processor}`
+                });
+
+                // Add click event listener to each marker to open the info window
+                marker.addListener('click', function() {
+                    infowindow.open(map, marker);
+                });
+            });
+        }
+    }
+
+    window.onload = initMap6();
+</script>
+
+<script>
+    
+    function initMap7() {
+        // Define a default center
+        
+        var defaultCenter = { lat: 0, lng: 0 };
+
+        // Check if locations are available
+        var locations = {{ warehouse_location_list|safe }};
+        var center;
+
+        // If locations are available and there is at least one location, set the center to the first location
+        if (locations && locations.length > 0) {
+            center = { lat: locations[0].lat, lng: locations[0].lng };
+        } else {
+            center = defaultCenter; // Set default center if no locations are available
+        }
+
+        // Create a new map object
+        var map = new google.maps.Map(document.getElementById('warehouse_location'), {
+            center: center,
+            zoom: 5 // Set the initial zoom level
+        });
+
+        // If locations are available, add markers to the map
+        if (locations) {
+            locations.forEach(function(location) {
+                var marker = new google.maps.Marker({
+                    position: { lat: location.lat, lng: location.lng },
+                    map: map,
+                    title: `${location.warehouse}`
+                });
+
+                // Create an info window for each marker
+                var infowindow = new google.maps.InfoWindow({
+                    content: `${location.warehouse}`
+                });
+
+                // Add click event listener to each marker to open the info window
+                marker.addListener('click', function() {
+                    infowindow.open(map, marker);
+                });
+            });
+        }
+    }
+
+    window.onload = initMap7();
+</script>
+
+<script>
+    
+    function initMap8() {
+        // Define a default center
+        
+        var defaultCenter = { lat: 0, lng: 0 };
+
+        // Check if locations are available
+        var locations = {{ customer_location_list|safe }};
+        var center;
+
+        // If locations are available and there is at least one location, set the center to the first location
+        if (locations && locations.length > 0) {
+            center = { lat: locations[0].lat, lng: locations[0].lng };
+        } else {
+            center = defaultCenter; // Set default center if no locations are available
+        }
+
+        // Create a new map object
+        var map = new google.maps.Map(document.getElementById('customer_location'), {
+            center: center,
+            zoom: 5 // Set the initial zoom level
+        });
+
+        // If locations are available, add markers to the map
+        if (locations) {
+            locations.forEach(function(location) {
+                var marker = new google.maps.Marker({
+                    position: { lat: location.lat, lng: location.lng },
+                    map: map,
+                    title: `${location.customer}`
+                });
+
+                // Create an info window for each marker
+                var infowindow = new google.maps.InfoWindow({
+                    content: `${location.customer}`
+                });
+
+                // Add click event listener to each marker to open the info window
+                marker.addListener('click', function() {
+                    infowindow.open(map, marker);
+                });
+            });
+        }
+    }
+
+    window.onload = initMap8();
+</script>
+
+ {% comment %} <script>
+    function initMap() {
+        {% for out2 in outbound2_wip %}
+        generateMapAndDirections({{ out2.origin_lat }}, {{ out2.origin_lng }}, {{ out2.destination_lat }}, {{ out2.destination_lng }}, null, 'map-{{ forloop.counter }}', '{{ out2.origin_name }}', '{{ out2.destination_name }}');
+        {% endfor %}
+
+        {% for out3 in outbound3_wip %}
+        generateMapAndDirections({{ out3.origin_lat }}, {{ out3.origin_lng }}, {{ out3.destination_lat }}, {{ out3.destination_lng }}, null, 'map3-{{ forloop.counter }}', '{{ out3.origin_name }}', '{{ out3.destination_name }}');
+        {% endfor %}
+
+        {% for out4 in outbound4_wip %}
+        generateMapAndDirections({{ out4.origin_lat }}, {{ out4.origin_lng }}, {{ out4.destination_lat }}, {{ out4.destination_lng }}, null, 'map4-{{ forloop.counter }}', '{{ out4.origin_name }}', '{{ out4.destination_name }}');
+        {% endfor %}
+
+        {% for out5 in outbound5_wip %}
+        var waypoints{{ forloop.counter }} = [
+            {% for waypoint in out5.additional_lat_long %}
+                { lat: {{ waypoint.lat }}, lng: {{ waypoint.long }}, info: "{{ waypoint.info }}" },
+            {% endfor %}
+        ];
+        if (waypoints{{ forloop.counter }}.length === 0) waypoints{{ forloop.counter }} = null;
+        generateMapAndDirections({{ out5.origin_lat }}, {{ out5.origin_lng }}, {{ out5.destination_lat }}, {{ out5.destination_lng }}, waypoints{{ forloop.counter }}, 'map5-{{ forloop.counter }}', '{{ out5.origin_name }}', '{{ out5.destination_name }}');
+        {% endfor %}
+
+        {% for out6 in outbound6_wip %}
+        var waypoints{{ forloop.counter }} = [
+            {% for waypoint in out6.additional_lat_long %}
+                { lat: {{ waypoint.lat }}, lng: {{ waypoint.long }}, info: "{{ waypoint.info }}" },
+            {% endfor %}
+        ];
+        if (waypoints{{ forloop.counter }}.length === 0) waypoints{{ forloop.counter }} = null;
+        generateMapAndDirections({{ out6.origin_lat }}, {{ out6.origin_lng }}, {{ out6.destination_lat }}, {{ out6.destination_lng }}, waypoints{{ forloop.counter }}, 'map6-{{ forloop.counter }}', '{{ out6.origin_name }}', '{{ out6.destination_name }}');
+        {% endfor %}
+    }
+
+    function generateMapAndDirections(originLat, originLng, destLat, destLng, waypoints, mapId, originName, destName) {
+        console.log(originName, destName)
+        var map = new google.maps.Map(document.getElementById(mapId), {
+            zoom: 6,
+            center: { lat: originLat, lng: originLng }
+        });
+
+        var directionsService = new google.maps.DirectionsService();
+        var directionsRenderer = new google.maps.DirectionsRenderer({ map: map });
+
+        var request = {
+            origin: { lat: originLat, lng: originLng },
+            destination: { lat: destLat, lng: destLng },
+            travelMode: 'DRIVING'
+        };
+        var infoWindow = new google.maps.InfoWindow();
+
+        // Marker for origin
+        var originMarker = new google.maps.Marker({
+            position: { lat: originLat, lng: originLng },
+            map: map,
+            title: originName
+        });
+        google.maps.event.addListener(originMarker, 'click', function() {
+            infoWindow.setContent('Origin: ' + originName);
+            infoWindow.open(map, originMarker);
+        });
+
+        // Marker for destination
+        var destMarker = new google.maps.Marker({
+            position: { lat: destLat, lng: destLng },
+            map: map,
+            title: destName
+        });
+        google.maps.event.addListener(destMarker, 'click', function() {
+            infoWindow.setContent('Destination: ' + destName);
+            infoWindow.open(map, destMarker);
+        });
+
+        // Include waypoints only if they exist
+        if (waypoints && waypoints.length > 0) {
+            request.waypoints = waypoints.map(wp => ({
+                location: new google.maps.LatLng(wp.lat, wp.lng),
+                stopover: false
+            }));
+
+            // Add markers for each waypoint with info
+            waypoints.forEach(function(waypoint, index) {
+                var waypointMarker = new google.maps.Marker({
+                    position: { lat: waypoint.lat, lng: waypoint.lng },
+                    map: map,
+                    title: 'Waypoint ' + (index + 1)
+                });
+                google.maps.event.addListener(waypointMarker, 'click', function() {
+                    infoWindow.setContent(waypoint.info || 'No additional info available');
+                    infoWindow.open(map, waypointMarker);
+                });
+            });
+        }
+
+
+        directionsService.route(request, function (result, status) {
+            if (status == 'OK') {
+                directionsRenderer.setDirections(result);
+            } else {
+                console.error('Directions request failed due to ' + status);
+            }
+        });
+    }
+
+    window.onload = initMap;
+</script>  {% endcomment %}
+
+
+<script>
+    // Wait until the DOM content is fully loaded
+    window.addEventListener('DOMContentLoaded', function() {
+        initMap();
+    });
+
+    function initMap() {
+        {% for out2 in outbound2_wip %}
+        generateMapAndDirections(
+            {{ out2.origin_lat }},
+            {{ out2.origin_lng }},
+            {{ out2.destination_lat }},
+            {{ out2.destination_lng }},
+            null,
+            'map-{{ forloop.counter }}',
+            '{{ out2.origin_name|escapejs }}',
+            '{{ out2.destination_name|escapejs }}'
+        );
+        {% endfor %}
+
+        {% for out3 in outbound3_wip %}
+        generateMapAndDirections(
+            {{ out3.origin_lat }},
+            {{ out3.origin_lng }},
+            {{ out3.destination_lat }},
+            {{ out3.destination_lng }},
+            null,
+            'map3-{{ forloop.counter }}',
+            '{{ out3.origin_name|escapejs }}',
+            '{{ out3.destination_name|escapejs }}'
+        );
+        {% endfor %}
+
+        {% for out4 in outbound4_wip %}
+        generateMapAndDirections(
+            {{ out4.origin_lat }},
+            {{ out4.origin_lng }},
+            {{ out4.destination_lat }},
+            {{ out4.destination_lng }},
+            null,
+            'map4-{{ forloop.counter }}',
+            '{{ out4.origin_name|escapejs }}',
+            '{{ out4.destination_name|escapejs }}'
+        );
+        {% endfor %}
+
+        {% for out5 in outbound5_wip %}
+        var waypoints{{ forloop.counter }} = [
+            {% for waypoint in out5.additional_lat_long %}
+            { lat: {{ waypoint.lat }}, lng: {{ waypoint.long }}, info: "{{ waypoint.info }}", address: "{{waypoint.address}}" },
+            {% endfor %}
+        ];
+        if (waypoints{{ forloop.counter }}.length === 0) waypoints{{ forloop.counter }} = null;
+        generateMapAndDirections(
+            {{ out5.origin_lat }},
+            {{ out5.origin_lng }},
+            {{ out5.destination_lat }},
+            {{ out5.destination_lng }},
+            waypoints{{ forloop.counter }},
+            'map5-{{ forloop.counter }}',
+            '{{ out5.origin_name|escapejs }}',
+            '{{ out5.destination_name|escapejs }}'
+        );
+        {% endfor %}
+
+        {% for out6 in outbound6_wip %}
+        var waypoints{{ forloop.counter }} = [
+            {% for waypoint in out6.additional_lat_long %}
+            { lat: {{ waypoint.lat }}, lng: {{ waypoint.long }}, info: "{{ waypoint.info }}", address: "{{waypoint.address}}" },
+            {% endfor %}
+        ];
+        if (waypoints{{ forloop.counter }}.length === 0) waypoints{{ forloop.counter }} = null;
+        generateMapAndDirections(
+            {{ out6.origin_lat }},
+            {{ out6.origin_lng }},
+            {{ out6.destination_lat }},
+            {{ out6.destination_lng }},
+            waypoints{{ forloop.counter }},
+            'map6-{{ forloop.counter }}',
+            '{{ out6.origin_name|escapejs }}',
+            '{{ out6.destination_name|escapejs }}'
+        );
+        {% endfor %}
+    }
+
+    function generateMapAndDirections(originLat, originLng, destLat, destLng, waypoints, mapId, originName, destName) {
+        // Check if the map container exists
+        var mapElement = document.getElementById(mapId);
+        if (!mapElement) {
+            console.error(`Map container with id "${mapId}" not found. Skipping map generation.`);
+            return;
+        }
+
+        var map = new google.maps.Map(mapElement, {
+            zoom: 6,
+            center: { lat: originLat, lng: originLng }
+        });
+
+        var directionsService = new google.maps.DirectionsService();
+        var directionsRenderer = new google.maps.DirectionsRenderer({ map: map });
+
+        var request = {
+            origin: { lat: originLat, lng: originLng },
+            destination: { lat: destLat, lng: destLng },
+            travelMode: 'DRIVING',
+            waypoints: waypoints
+                ? waypoints.map(wp => ({
+                      location: new google.maps.LatLng(wp.lat, wp.lng),
+                      stopover: false
+                  }))
+                : []
+        };
+
+        directionsService.route(request, function (result, status) {
+            if (status === 'OK') {
+                directionsRenderer.setDirections(result);
+            } else {
+                console.error('Directions request failed due to ' + status);
+            }
+        });
+
+        // Mark the origin
+        var originMarker = new google.maps.Marker({
+            position: { lat: originLat, lng: originLng },
+            map: map,
+            title: originName
+        });
+
+        var infoWindow = new google.maps.InfoWindow();
+        google.maps.event.addListener(originMarker, 'click', function () {
+            infoWindow.setContent('Origin: ' + originName);
+            infoWindow.open(map, originMarker);
+        });
+
+        // Mark the destination
+        var destMarker = new google.maps.Marker({
+            position: { lat: destLat, lng: destLng },
+            map: map,
+            title: destName
+        });
+        google.maps.event.addListener(destMarker, 'click', function () {
+            infoWindow.setContent('Destination: ' + destName);
+            infoWindow.open(map, destMarker);
+        });
+
+        // Add waypoints if they exist
+        if (waypoints && waypoints.length > 0) {
+            waypoints.forEach(function (waypoint, index) {
+                var waypointMarker = new google.maps.Marker({
+                    position: { lat: waypoint.lat, lng: waypoint.lng },
+                    map: map,
+                    title: waypoint.address
+                });
+                google.maps.event.addListener(waypointMarker, 'click', function () {
+                    infoWindow.setContent(waypoint.info || 'No additional info available');
+                    infoWindow.open(map, waypointMarker);
+                });
+            });
+        }
+    }
+</script>
+
+
+{% endblock jquery %}

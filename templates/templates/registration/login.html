@@ -1,0 +1,28 @@
+{% extends "registration/auth_header.html" %} 
+{% load static %} 
+{% block title %} Login {% endblock title %} 
+
+{% block content %}
+{% load crispy_forms_tags %}
+<div class="bg">
+    <div class="box pt-5">
+        <img src="{% static 'img/logo.png' %}">
+        <h3 class="text-center1 mt-3 mb-3">Login</h3>
+        <form method='POST'>
+        {% csrf_token %} 
+        <div class="form-outline" style="border-radius:50px">
+            {{ form|crispy}}
+        </div>
+        <div class="mt-4">
+            <input type="checkbox">
+            <label class="con">Remember me
+      </label>
+            <label class="float-right"> <a class="forgot button" href="{% url 'password-reset' %}">Forgot password?</a></label>
+        </div>
+        <button class="btn1" type="submit">Login</button>
+        </form>
+        <h6 class="sign-up-head mt-3" style="font-size:15px;">Need an account? &nbsp;<a href="{% url 'signup' %}" class="sign">Sign Up Here!</a></h6>
+    </div>
+</div>
+
+{% endblock content %}

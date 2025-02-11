@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% load static %} {% block title %} Take Survey {% endblock title %} {% block content %}
+{% include 'navbar.html' %}
+<div class="main-content">
+    {% include 'header.html' %}
+    <style>
+        .nextclass {
+            border: 1px solid #333;
+            padding: 10px 5px;
+            color: green;
+            ;
+        }
+    </style>
+    <!-- MID CONTENT -->
+    <main>
+        <span class="farm headingtop">Sustainability result </span>
+        <div class="card farm-fields-container">
+            <div class="container-fluid">
+                <form method="post" class="farm-fields-form" style="padding:5px 15px;">
+                    <div class="row">
+                        <div class="col-md-12">
+
+                            {% if hasdata %}
+                            <div id="replacethis">
+                                <div class="container-fluid">
+                                    <div class="sustain" style="display: flex; flex-wrap: nowrap; width: 100%; gap: 12%; justify-content: center;">
+
+                                        <div class="block" style="text-align: center;">
+                                            <label for="grower-name">
+                                                <strong> Grower </strong> :
+                                            </label>
+                                            <div>{{grower_name}}</div>
+                                        </div>
+                                        <div class="block" style="text-align: center;">
+                                            <label for="grower-name">
+                                                <strong> Survey </strong> :
+                                            </label>
+                                            <div>{{survey_name}}</div>
+                                        </div>
+                                        <div class="block" style="text-align: center;">
+                                            <label for="grower-name">
+                                                <strong> Year </strong> :
+                                            </label>
+                                            <div>{{survey_year}}</div>
+                                        </div>
+                                        <div class="block" style="text-align: center;">
+                                            <label for="grower-name">
+                                                <strong> Farm </strong> :
+                                            </label>
+                                            <div id="">{{ growersurvey_farm_name.0.name }}</div>
+                                        </div>
+                                        <div class="block" style="text-align: center;">
+                                            <label for="grower-name">
+                                                <strong> Field </strong> :
+                                            </label>
+                                            <div id="">{{ growersurvey_field_name.0.name }}</div>
+                                        </div>
+                                       
+                                    </div>
+                                    <div class="block" style="padding-top: 60px; text-align: center; margin: 0 auto;">
+                                    <label for="grower-name">
+                                        <strong style="font-size: 30px;"> Sustainability Score </strong> :
+                                    </label>
+                                    <div
+                                        style="padding-top: 40px; text-align: center; width: 100%; margin: 0 auto;">
+                                        <div
+                                            style="border: 12px solid rgb(7, 93, 173) ; border-radius:50%; width: 400px; height: 400px; margin: 0 auto;">
+                                            <p
+                                                style="font-size: 160px; color:rgb(7, 93, 173); vertical-align: middle; text-align: center; align-items: center; justify-content: center; display: flex; height: 100%;">
+                                                {% if sustainabilityscorefinal > 100 %}
+                                                100%
+                                                {% else %}
+                                                {{sustainabilityscorefinal}}%
+                                                {% endif %}
+                                            </p>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                </div>
+                                {% else %}
+                                <div class="container-fluid">
+                                    <div class="row">
+                                        <div class="col-lg-12" style="text-align: center;">
+                                            <p>No result found!</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
+
+                        </div>
+                    </div>
+
+
+                    {% if not hasdata %}
+                    <div class="row">
+                        <div class="form-btn-row">
+                            <!-- <input type="submit" class="btn-save-submit" value="Start Survey"> -->
+                            <a href="/growersurvey/type" class="nextclass">Start Survey</a>
+                        </div>
+                    </div>
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+    </main>
+    <!-- MID CONTENT END-->
+    {% include 'footer.html' %}
+</div>
+{% endblock %}

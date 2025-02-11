@@ -1,0 +1,97 @@
+{% extends "base.html" %} {% load static %}
+{% block title %} Updated Versions {% endblock title %}
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+
+{% load crispy_forms_tags %}
+{% block content %}
+{% include 'navbar.html' %}
+<style>
+  .table>:not(caption)>*>*{
+    border-bottom-width:0px
+  }
+</style>
+<div class="main-content">
+    {% include 'header.html' %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.0/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.bootstrap4.min.css">
+
+    <main>
+        {% include '_alerts.html' %}
+        <div class="page-title-with-or-without-btn">
+            <span class="farm headingtop">Updated Versions</span>
+            <!-- Create button for add-processor-->
+            {% if request.user.is_superuser or 'SubAdmin' in request.user.get_role or 'SuperUser' in request.user.get_role or 'Version Update' in request.user.get_role_perm %}
+            <div class="flex-header-btn">
+                <a href="{% url 'version_update' %}" class="btn-close-cancel">Add update</a>
+            </div>
+            {% endif %}
+        </div>
+        <div class="card card-padding">
+          <div class="main-simple-table-with-search">
+            <div class="both-data-in" style="display: inherit;">
+                <div class="simple-responsive-table">
+                    
+                    <table id="processorList_tbl" class="table table-striped dt-responsive nowrap" style="width:100%">
+                        <thead>
+                            <tr style="border-bottom: 2px solid #e0e0e0;">
+                                <th width="40%">Version</th>
+                                <th width="10%">Release Date</th>
+                                <th width="10%">Description</th>
+                                <th width="10%">Created By</th>                                
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for version in version_updates %}
+                            <tr>
+                                <td>{{version.version}}</td>
+                                <td>{{version.release_date}}</td>
+                                <td>{{version.description}}</td>
+                                <td>{{version.created_by}}</td>
+                                
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <div class="col-md-12 col-sm-12 col-12 text-center mt-2" style="text-align:right">
+                      <span>Showing {{ version_updates.start_index }} - {{ version_updates.end_index }} of {{ version_updates.paginator.count }} entries</span>
+                    </div>
+                                        
+                </div>
+            </div>
+        </div>
+    </main>
+    {% include 'footer.html' %}
+</div>
+
+{% endblock content %}
+
+{% block scripts %}
+
+<script src="https://cdn.datatables.net/1.11.0/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.0/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/responsive.bootstrap4.min.js"></script>
+
+<script src="{% static 'js/farm/farm_list.js' %}"></script>
+
+<script>
+    $(document).ready(function () {
+        $('#processorList_tbl').DataTable();
+    });
+
+</script>
+
+{% endblock scripts %}

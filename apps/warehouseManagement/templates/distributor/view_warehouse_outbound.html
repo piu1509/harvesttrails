@@ -1,0 +1,481 @@
+{% extends "base.html" %} {% load static %}
+{% block title %} Warehouse Shipment View {% endblock title %}
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+{% load crispy_forms_tags %}
+{% block content %}
+{% include 'navbar.html' %}
+
+<div class="main-content">
+    {% include 'header.html' %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.0/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.bootstrap4.min.css">
+
+    <style>
+        .main_file .elements {
+            max-width: 100%;
+            height: 100px;
+            object-fit: contain;
+            border: 1px dotted rgba(105, 105, 105, 0.933);
+            display: inline-block;
+            position: relative;
+            margin-bottom: 40px;
+            width: 100%;
+            text-decoration: none;
+        }
+        .main_file .row{
+            margin-top: 20px;
+        }
+        .main_file .elements .img_wrapper{
+            display: block;
+            height: 100px;
+            text-align: center;
+        }
+
+        .main_file .elements img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: inline-block;
+        }
+        object{
+            width: 100%;
+            height: auto;
+            object-fit: contain;
+        }
+        .inner_wrapper{
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .for_object_main{
+            position: relative;
+            display: inline-block;
+            border: 1px dotted rgba(105, 105, 105, 0.933);
+            width: 100%;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            background: #d0cccb;
+        }
+        
+      
+        .main_file .inner_wrapper{
+            background-color: #fff;
+            border: 1px solid #e9e9e9;
+            box-shadow: 0 10px 20px #c7c7c78f;
+            margin-top: 15px;
+            border-radius: 0px;
+        }
+        .doc_name{
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: #000;
+            text-align: center;
+            margin-top: 5px;
+        }
+        .list-group{
+            position: relative;
+            padding-left: 20px;
+            padding-top: 25px
+        }
+        .list-group::after{
+            content: '';
+            position: absolute;
+            width: 5px;
+            height: 100%;
+            background: linear-gradient(180deg, rgb(48 48 48 / 64%) 0%, rgba(0, 212, 255, 0) 100%);
+            left: 0;
+            border-radius: 20px;
+        }
+        .list-group .list-group-item{
+            position: relative;
+        }
+        .list-group .list-group-item::after{
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: #0b6c39;
+            border-radius: 50%;
+            left: -29px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 1;
+        }
+        .accordion{
+            font-family: Arial, Helvetica, sans-serif;
+            width: 100%%;
+        }
+        .accordion-item {
+            margin-bottom: 10px;
+        }
+        .accordion-title {
+            color: #fff;
+            background-color: #549874;
+            cursor: pointer;
+            padding: 10px;
+            transition: background-color 1s;
+        }
+          
+        .accordion-title:hover {
+            background-color: #0b6c39;
+        }
+          
+        .accordion-content {
+            background: transparent;
+            display: none;
+            padding: 10px;
+        }
+        .accordion-content ul{
+            font-size: 15px;
+        }
+        .accordion-content ul li{
+            margin-bottom: 6px;
+        }
+        .accordion-content ul li:last-child{
+            margin-bottom: 0;
+        }
+          
+        .accordion-item.active .accordion-content{
+            display: block;
+        }
+    </style>
+
+    <main>
+        {% include '_alerts.html' %}
+        <div class="page-title-with-or-without-btn">
+            <span class="farm headingtop">Shipment Details</span>
+            <!-- Create button for Account-->
+            {% if lot_entries%}
+            <div class="flex-header-btn">
+                <button type="button" class=" btn-close-cancel" data-toggle="modal" data-target="#lotEntriesModal">
+                    View Lot Entries
+                </button>
+            </div>
+            {% endif %}
+            <!-- Lot Entries Modal -->
+            <div class="modal fade" id="lotEntriesModal" tabindex="-1" aria-labelledby="lotEntriesModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="lotEntriesModalLabel">Lot Entries</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            {% if lot_entries %}
+                                <ul class="list-group">
+                                    {% for entry in lot_entries %}
+                                        <li class="list-group-item">
+                                            <strong>Lot Number:</strong> {{ entry.additional_lot_number }} <br>
+                                            <strong>Address:</strong> {{ entry.address }} <br>
+                                            <strong>Description:</strong> {{ entry.description }} <br>                                            
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                <p>No lot entries available.</p>
+                            {% endif %}
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+
+        <div class="card farm-fields-container">
+            <div class="container-fluid">                
+                    <div class="row" style="margin-bottom: 20px;">
+                        <div class="col-md-4 " style="margin-bottom: 10px;">
+                            <label for="shipment" style="font-weight:bold;">Shipment Id</label>
+                            <p>{{shipment.shipment_id}}</p>                            
+                        </div>
+                        <div class="col-md-4 " style="margin-bottom: 10px;">
+                            <label for="shipment" style="font-weight:bold;">Contract Id</label>
+                            <p>{{shipment.contract.secret_key}}</p>                            
+                        </div>
+                        <div class="col-md-4" style="margin-bottom: 10px;">
+                            <label for="shipment" style="font-weight:bold;">Warehouse Id</label>
+                            <p>{{shipment.warehouse_id}}</p>                            
+                        </div>
+                        <div class="col-md-4 " style="margin-bottom: 10px;">
+                            <label for="shipment"style="font-weight:bold;">Warehouse Name</label>
+                            <p>{{shipment.warehouse_name}}</p>                            
+                        </div>                                               
+                        
+                        <div class="col-md-4 " style="margin-bottom: 10px;">
+                            <label for="shipment"style="font-weight:bold;">Carrier</label>
+                            <p>{{shipment.carrier_type}}</p>                            
+                        </div>
+                        <div class="col-md-4 " style="margin-bottom: 10px;">
+                            <label for="shipment"style="font-weight:bold;">Outbound type</label>
+                            <p>{{shipment.outbound_type}}</p>                            
+                        </div>
+                        <div class="col-md-4 " style="margin-bottom: 10px;">
+                            <label for="Balance"style="font-weight:bold;">Date pulled</label>
+                            <p>{{shipment.date_pulled}}</p>                            
+                        </div>
+                        <div class="col-md-4 " style="margin-bottom: 10px;">
+                            <label for="shipment"style="font-weight:bold;">Purchase Order Name</label>
+                            <p>{{shipment.purchase_order_name}}</p>                            
+                        </div>                        
+                        <div class="col-md-4" style="margin-bottom: 10px;">
+                            <label for="shipment"style="font-weight:bold;">Purchase Order Number</label>
+                            <p>{{shipment.purchase_order_number}}</p>                           
+                        </div>                         
+                                                
+                        {% if shipment.border_receive_date%}
+                        <div class="col-md-4 " style="margin-bottom: 10px;">
+                            <label for="shipment"style="font-weight:bold;">Border Receive Date</label>
+                            <p>{{shipment.border_receive_date}}</p>                            
+                        </div>
+                        {% endif %}
+                        {% if shipment.border_leaving_date%}
+                        <div class="col-md-4 " style="margin-bottom: 10px;">
+                            <label for="shipment"style="font-weight:bold;">Border Leaving Date</label>
+                            <p>{{shipment.border_leaving_date}}</p>                            
+                        </div>
+                        {% endif %}
+                        {% if shipment.customer_receive_date%}
+                        <div class="col-md-4 " style="margin-bottom: 10px;">
+                            <label for="shipment"style="font-weight:bold;">Customer Receive Date</label>
+                            <p>{{shipment.customer_receive_date}}</p>                            
+                        </div>
+                        {% endif %}
+                        {% if shipment.customer_leaving_date%}
+                        <div class="col-md-4 " style="margin-bottom: 10px;">
+                            <label for="shipment"style="font-weight:bold;">Customer Leaving Date</label>
+                            <p>{{shipment.customer_leaving_date}}</p>                            
+                        </div>
+                        {% endif %}
+                        {% if shipment.border_back_receive_date%}
+                        <div class="col-md-4 " style="margin-bottom: 10px;">
+                            <label for="shipment"style="font-weight:bold;">Border Receive Date Back</label>
+                            <p>{{shipment.border_back_receive_date}}</p>                            
+                        </div>
+                        {% endif %}
+                        {% if shipment.border_back_leaving_date%}
+                        <div class="col-md-4 " style="margin-bottom: 10px;">
+                            <label for="shipment"style="font-weight:bold;">Border Leaving Date Back</label>
+                            <p>{{shipment.border_back_leaving_date}}</p>                            
+                        </div>
+                        {% endif %}
+                        {% if shipment.warehouse_receive_date%}
+                        <div class="col-md-4 " style="margin-bottom: 10px;">
+                            <label for="shipment"style="font-weight:bold;">Warehouse Receive Date </label>
+                            <p>{{shipment.warehouse_receive_date}}</p>                            
+                        </div>
+                        {% endif %}
+                        <div class="col-md-4 " style="margin-bottom: 10px;">
+                            <label for="shipment"style="font-weight:bold;">Status</label>
+                            <p>{{shipment.status}}</p>                            
+                        </div>
+                        <div class="col-md-4 " style="margin-bottom: 10px;">
+                            <label for="shipment"style="font-weight:bold;">Customer Id</label>
+                            <p>{{shipment.customer_id}}</p>                            
+                        </div>
+                      
+                        <div class="col-md-4 " style="margin-bottom: 10px;">
+                            <label for="shipment"style="font-weight:bold;">Customer</label>
+                            <p>{{shipment.customer_name}}</p>                            
+                        </div>
+                      
+                        <div class="col-md-4 " >
+                            <label for="UploadedFiles" style="font-weight:bold;">Uploaded Documents</label>
+                            {%if documents %}
+                            {% for document in documents %}
+                            <div class="row mt-3">
+                            {%  if document.file %}                        
+                            <span> <a href="{{ document.document_file }}" class="" target="_blank">{{ document.name }}</a></span>
+                               
+                            {% else %}
+                            <span>Not uploaded yet.</span>
+                            {% endif %}
+                            </div>
+                            {% endfor %}
+                            {% else %}
+                            <p>No document available</p>
+                            {% endif %}
+                        </div> 
+                        <div class="col-md-4">                                
+                            <label for="qr_code" style="font-weight:bold;">QR CODE</label>
+                            <div>
+                                <img src="/media/{{img_name}}" alt="qr code" style="max-width: 350px;">
+                            </div>                                
+                        </div>                                           
+                    </div>
+                    <div class='row'>
+                        <h2 style="background-color: #d7d5d5;color: #0b6c39;font-size: 22px;font-weight: 600;margin: 20px 0;padding: 12px 0;text-align: center">Crops</h2>
+                        <div class="col-md-12">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Crop</th>
+                                        <th>Weight</th>                                        
+                                        <th>Lot Number</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for crop in shipment.warehouse_shipment_crop.all %}
+                                    <tr>
+                                        <td>{{ crop.crop }} - {{ crop.crop_type }}</td>
+                                        
+                                        <td>{{ crop.net_weight }} {{ crop.weight_unit }}</td>
+                                        <td>{{ crop.lot_number }}</td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr class='text-center'>
+                                        <td colspan="4">No crop details available.</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                    </div>
+                    <div class="row" style="margin-bottom: 20px;">
+                        <div class="col-md-12 p-5" >
+                            <h5 class="font-weight-bold">Shipment Tracking Logs</h5>
+                            {% if logs %}
+                            <div class="list-group">
+                                {% for log in logs %}
+                                    <div class="list-group-item">                                       
+                            
+                                        <div class="accordion">
+                                            <div class="accordion-item">
+                                              <div class="accordion-title d-flex justify-content-between px-4">{{ log.description }} <span><i class="fas fa-plus"></i></span></div>
+                                              <div class="accordion-content">
+                                                <ul style="list-style: dice">
+                                                    {% for change in log.changes.changes %}
+                                                    <li><span class="font-weight-bold">{{ change.field }}</span> changed from <span class="font-weight-bold">{{ change.old }}</span> to <span class="font-weight-bold">{{ change.new }}</span></li>
+                                                    {% endfor %}
+                                                </ul>
+                                              </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <small class="text-muted mt-2 d-inline-block">Updated at: {{ log.updated_at }}</small>
+                                            </div>
+                                            <div class="col-6">
+                                                <small class="text-muted mt-2 d-inline-block">Updated by: {{ log.updated_by.username }}</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            
+                            <script>
+                                // Optional: Toggle icon between plus and minus when clicked
+                                document.querySelectorAll('.btn-link').forEach(button => {
+                                    button.addEventListener('click', function () {
+                                        let icon = this.querySelector('i');
+                                        if (icon.classList.contains('fa-plus')) {
+                                            icon.classList.remove('fa-plus');
+                                            icon.classList.add('fa-minus');
+                                        } else {
+                                            icon.classList.remove('fa-minus');
+                                            icon.classList.add('fa-plus');
+                                        }
+                                    });
+                                });
+                            </script>
+                            
+                                </div>
+                            {% else %}
+                                <p>No logs available for this shipment.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                   
+                    <div class="row" style="margin-top: 10px;">
+                        <div class="form-btn-row">
+                            <a href="{% url 'list-warehouse-shipment' %}" class="btn-close-cancel btn-space">Back</a>
+                        </div>
+                    </div> 
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+{% include 'footer.html' %}
+</div>
+{% endblock content %}
+
+{% block scripts %}
+<script src="https://cdn.datatables.net/1.11.0/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.0/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/responsive.bootstrap4.min.js"></script>
+
+<script src="{% static 'js/farm/farm_list.js' %}"></script>
+
+<script>
+    $(document).ready(function () {
+        $('#processorList_tbl').DataTable();
+    });
+
+    const accordionItems = document.querySelectorAll(".accordion-item");
+
+accordionItems.forEach(item => {
+    const title = item.querySelector(".accordion-title");
+    const content = item.querySelector(".accordion-content");
+    const icon = title.querySelector("i");
+
+    title.addEventListener("click", () => {
+        accordionItems.forEach(accordion => {
+            const accordionIcon = accordion.querySelector(".accordion-title i");
+            if (accordion !== item) {
+                accordion.classList.remove("active");
+                // Reset icon to plus when collapsed
+                accordionIcon.classList.remove("fa-minus");
+                accordionIcon.classList.add("fa-plus");
+            }
+        });
+
+        // Toggle the active class for the clicked accordion
+        item.classList.toggle("active");
+
+        // Toggle icon between plus and minus based on active state
+        if (item.classList.contains("active")) {
+            icon.classList.remove("fa-plus");
+            icon.classList.add("fa-minus");
+        } else {
+            icon.classList.remove("fa-minus");
+            icon.classList.add("fa-plus");
+        }
+    });
+});
+    
+
+</script>
+<script>
+    $('#Warehouse-active').addClass('activeLink');
+  
+    $('#Warehouse-down').addClass('down');
+    $('#Warehouse-sub_unic').show();
+  
+    $('#Warehouse-Shipment').addClass('activeLink active-nav');
+  
+</script>
+{% endblock scripts %}

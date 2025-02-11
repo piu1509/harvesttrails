@@ -1,0 +1,213 @@
+{% extends "base.html" %} {% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}Admin Customer Contract List{% endblock title %}
+
+{% block content %}
+{% include 'navbar.html' %}
+<div class="main-content">
+    {% include 'header.html' %}
+    <main>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+        <!-- Include Select2 CSS -->
+        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+        <!-- Include Select2 JS -->
+        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+        <style>
+            .select2-container--default .select2-results__option--highlighted.select2-results__option--selectable {
+                background-color:#0b6c39;
+                
+            }
+        </style>
+        {% include '_alerts.html' %}
+        <div class="page-title-with-or-without-btn">
+        <span class="farm headingtop">Admin Customer Contract List</span>
+        {% if request.user.is_superuser or request.user.is_distributor or 'SubAdmin' in request.user.get_role or 'SuperUser' in request.user.get_role %}
+            <div class="flex-header-btn">
+                <a href="{% url 'add-admin-customer-contract' %}" class="btn-close-cancel me-2">Create Contract</a>
+                <div class="dropdown main-header-login">
+                    <a
+                        class="dropdown-toggle activebtn btn-close-cancel"
+                        href="javascript:void(0)"
+                        role="button"
+                        id="csv"
+                        data-mdb-toggle="dropdown"
+                        aria-expanded="false"
+                        >Export CSV
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="csv">
+                        <li><a class="dropdown-item" href="{% url 'export_admin_customer_contract' %}" target="_blank">All Contract CSV</a></li>
+                        <li><a class="dropdown-item" href="{% url 'export_open_admin_customer_contracts' %}" target="_blank">Open Contracts CSV</a></li>
+                        <li><a class="dropdown-item" href="{% url 'export_completed_admin_customer_contracts' %}" target="_blank">Completed Contracts CSV</a></li>
+                    </ul>
+                </div>
+            </div>
+        {% endif %}
+        </div>
+        <div class="card farm-fields-container">
+            <nav aria-label="breadcrumb m-5">
+                {% if error_messages %}
+                <div id="alertMessage" class="alert alert-warning alert-dismissible fade show" role="alert">
+                    <strong>{{error_messages}}</strong>  
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>                         
+                  </div> 
+                  <script>                            
+                    setTimeout(function() {
+                        document.getElementById('alertMessage').style.display = 'none';
+                    }, 5000);
+                </script>                          
+                  {% endif %}
+            </nav>
+            <form action="" method="get" class="">
+                <div class="">
+                    <div class="main-simple-table-with-search col-12">
+                        {% if request.user.is_superuser or 'SubAdmin' in request.user.get_role or 'SuperUser' in request.user.get_role or request.user.is_customer %}
+                        <div class="row d-flex">
+                            {% if request.user.is_superuser or 'SubAdmin' in request.user.get_role or 'SuperUser' in request.user.get_role %}
+                            <div class="col-3">                            
+                                <select name="selected_customer" id="processor_id" class="form-control" data-live-search="true" onchange="this.form.submit();" required>
+                                    <option value="All"selected disabled>Select Customer</option>
+                                    {% for customer in customers %}
+                                    <option value="{{customer.id}}"{% if selected_customer_id == customer.id %}selected{% endif %}>{{customer.name}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            {% endif %}
+                            <input style="display : none;" id="submitBtn" type="submit"
+                                class="apply-filter-btn primary-btn" value="Apply Filter" />
+                           <div class="col-6">                            
+                                <label for="start_date">From:</label>
+                                <input type="date" id="start_date" class="btn text-start px-2 shadow-none border border-dark" name="start_date" value="{{ start_date|date:'Y-m-d' }}" style="height: 35px">
+
+                                <label for="end_date">To:</label>
+                                <input type="date" id="end_date" class="btn text-start px-2 shadow-none border border-dark" name="end_date" value="{{ end_date|date:'Y-m-d' }}" style="height: 35px">
+
+                                <button type="submit" class="btn btn-outline-success">Filter</button>                              
+                            </div>
+    
+                            <!-- Search section on the right side -->
+                            <div class="col-3">
+                                <div class="row ">
+                                    <div class="col d-flex">
+                                        <div class="form_group me-2">
+                                            <input class="form-control" name="search_name" type="search" placeholder="ContractId/Crop" autocomplete="off" aria-label="Search" id="search_name" {% if search_name %}value="{{search_name}}"{% else %}{% endif %}>
+                                        </div>
+                                        <button type="submit" class="btn btn-outline-success ml-2">Search</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        <br>
+    
+                        <div class="both-data-in" style="display: inherit;">
+                            <div class="table-responsive">
+                                <table id="" class="table table-striped dt-responsive nowrap"
+                                    style="width:100%">
+                                    <thead>
+                                        <tr style="border-bottom: 2px solid #e0e0e0;">                                            
+                                            <th width="5%">Contract Id</th>
+                                            <th width="10%">Customer</th>                                           
+                                            <th width="25%">Crop / Amount / Per Unit Rate</th> 
+                                            <th width="10%">Contract Start Date</th>
+                                            <th width="10%">Contract Period</th>
+                                            <th width="10%">Contract End Date</th>
+                                            <th width="10%">Status</th>                                             
+                                            <th width="10%">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        
+                                        {% if contracts %}
+                                            {% for contract in contracts %}                                            
+                                            <tr>
+                                                <td>{{contract.secret_key}}</td>
+                                                <td>{{contract.customer_name}}</td>
+                                                <td><ul>
+                                                    {% for crop in contract.customerContractCrop.all %}
+                                                        <li>{{ crop.crop }} / {{ crop.contract_amount }} {{ crop.amount_unit }} / &#36;{{crop.per_unit_rate}}</li>
+                                                    {% endfor %}
+                                                </ul></td>
+                                                <td>{{contract.contract_start_date.date}}</td>
+                                                <td>{{contract.contract_period}} {{contract.contract_period_choice}}</td>
+                                                <td>{{contract.end_date.date}}</td>
+                                                <td>{{contract.status}}</td>
+                                                
+                                                <td class="backk action-td rmv-bd">
+                                                    <ul>
+                                                        <li><a href="{% url 'admin-customer-contract-view' contract.pk %}" class="update-btn-link" alt="view contract details" title="view contract details"> <span class="fas fa-eye"></span></a></li>
+                                                        <li><a href="{% url 'edit-admin-customer-contract' contract.pk %}" class="update-btn-link" alt="update contract details" title="{%  if request.user.is_superuser or 'SubAdmin' in request.user.get_role or 'SuperUser' in request.user.get_role %}update contract details {% endif %} {% if request.user.is_customer %} upload documents {% endif %}">{% if request.user.is_superuser or 'SubAdmin' in request.user.get_role or 'SuperUser' in request.user.get_role%}<span class="fas fa-edit">{% endif %}{% if request.user.is_customer %}<span class="fas fa-file-upload">{% endif %}</span></a></li>
+                                                    </ul>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        {% else %}
+                                            <tr>
+                                                <td colspan="12" style="text-align:center;">No Result Found</td>
+                                            </tr>
+                                        {% endif %} 
+                                    </tbody>
+                                </table>
+                            </div>
+    
+                            <div class="row align-items-center">
+                                    <div class="col-md-12 col-sm-12 col-12 text-center">
+                                        {% if contracts.has_other_pages %}
+                                            <ul class="pagination" id="nav_1">
+                                                {% if contracts.has_previous %}
+                                                    <li><a href="?selected_processor={{ selected_customer_id }}&search_name={{ search_name }}&page={{ contracts.previous_page_number }}">&laquo;</a></li>
+                                                {% else %}
+                                                    <li class="disabled"><span>&laquo;</span></li>
+                                                {% endif %}
+                                                {% for i in contracts.paginator.page_range %}
+                                                    {% if contracts.number == i %}
+                                                        <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+                                                    {% else %}
+                                                        <li><a href="?selected_processor={{ selected_customer_id }}&search_name={{ search_name }}&page={{ i }}">{{ i }}</a></li>
+                                                    {% endif %}
+                                                {% endfor %}
+                                                {% if contracts.has_next %}
+                                                    <li><a href="?select_processor={{ selected_customer_id }}&search_name={{ search_name }}&page={{ contracts.next_page_number }}">&raquo;</a></li>
+                                                {% else %}
+                                                    <li class="disabled"><span>&raquo;</span></li>
+                                                {% endif %}
+                                            </ul>
+                                        {% endif %}
+                                    </div>
+                                <div class="col-md-12 col-sm-12 col-12 text-center mt-2" style="text-align:right">
+                                    <span>Showing  {{ contracts.start_index }} - {{ contracts.end_index }} of {{ contracts.paginator.count }} entries
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </main>
+    {% include 'footer.html' %}
+</div>
+{% endblock %}
+{% block jquery %}
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('#processor_id').select2({
+            placeholder: "Select a Processor",
+            allowClear: true
+        });
+    });
+</script>
+<script>
+    $('#Contracts-active').addClass('activeLink');
+  
+    $('#Contracts-down').addClass('down');
+    $('#Contracts-sub').show();
+  
+    $('#Customer-Contract-List').addClass('activeLink active-nav');
+  
+</script>
+{% endblock jquery %}

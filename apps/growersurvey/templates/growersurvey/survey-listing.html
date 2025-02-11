@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+{% load static %} {% block title %} Survey List {% endblock title %} {% block content %}
+{% include 'navbar.html' %}
+<div class="main-content">
+    {% include 'header.html' %}
+    <main> 
+        <div class="page-title-with-or-without-btn">
+            <span class="farm headingtop">Survey Listing</span>
+            <!-- Create button for Account-->
+            <div class="">              
+              <a href="{% url 'create-survey' %}" class="btn-add-green">Create Survey</a>              
+            </div>
+        </div>
+        <div class="card card-padding">
+            <div class="main-simple-table-with-search">
+                <div class="simple-responsive-table">
+                    <div class="table-responsive">
+                        <table id="growerListtbl" class="table table-striped table-bordered dt-responsive nowrap" style="width: 100%">
+                            <thead>
+                                <tr style="border-bottom: 2px solid #e0e0e0">
+                                    <th>Survey Type</th>
+                                    <th>Year</th>
+                                    <th data-title="Phone Number" data-breakpoints="xs sm">
+                                      Start-End Date
+                                    </th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for survey in survey_data %}
+                                  <tr>
+                                      <td>{{survey.typesurvey}}</td>
+                                      <td>{{survey.surveyyear}}</td>
+                                      <td>{{survey.start_date}} - {{survey.end_date}}</td>
+                                      <td class="backk1">
+                                        <li>
+                                          <a href="{% url 'survey-update' survey.pk %}"
+                                            ><span class="fas fa-edit"> </span
+                                          ></a>
+                                        </li>
+                                        <a href="javascript:void(0)" onclick="deleteSurvey('{{survey.id}}');">
+                                          <span class="fas fa-trash"></span>
+                                        </a>
+                                        <li>
+                                          <a href="#"
+                                            ><span class="fas fa-eye"></span>
+                                          </a>
+                                        </li>
+                                      </td>
+                                  </tr>
+                                {% endfor %}                  
+                            </tbody>
+                        </table>
+                        <div class="row d-flex justify-content-center ">
+                            <div class="col-md-12 col-sm-12 col-12 text-center mt-2">                              
+                                <span>Showing {{ survey_data.start_index }} - {{ survey_data.end_index }} of {{ survey_data.paginator.count }} entries</span>                                                       
+                            </div>
+                        </div>
+                        <div class="row d-flex justify-content-center align-items-center">
+                            {% if survey_data.has_other_pages %}
+                            <nav aria-label="Page navigation">
+                                <ul class="pagination justify-content-center">
+                                    <!-- Previous Page -->
+                                    {% if survey_data.has_previous %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ survey_data.previous_page_number }}" aria-label="Previous">
+                                            <span aria-hidden="true">&laquo;</span>
+                                        </a>
+                                    </li>
+                                    {% else %}
+                                    <li class="page-item disabled">
+                                        <span class="page-link" aria-hidden="true">&laquo;</span>
+                                    </li>
+                                    {% endif %}
+                        
+                                    <!-- Page Numbers -->
+                                    {% for i in survey_data.paginator.page_range %}
+                                    {% if survey_data.number == i %}
+                                    <li class="page-item active">
+                                        <span class="page-link">{{ i }}</span>
+                                    </li>
+                                    {% else %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+                                    </li>
+                                    {% endif %}
+                                    {% endfor %}
+                        
+                                    <!-- Next Page -->
+                                    {% if survey_data.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ survey_data.next_page_number }}" aria-label="Next">
+                                            <span aria-hidden="true">&raquo;</span>
+                                        </a>
+                                    </li>
+                                    {% else %}
+                                    <li class="page-item disabled">
+                                        <span class="page-link" aria-hidden="true">&raquo;</span>
+                                    </li>
+                                    {% endif %}
+                                </ul>
+                            </nav>
+                            {% endif %}
+                        </div>  
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <div class="modal fade" id="deleteModal" aria-hidden="true" aria-labelledby="exampleModalToggleLabel22"  tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <button type="button" class="btn-close cust-close-ds-btn" data-mdb-dismiss="modal" aria-label="Close" onclick="cancelDelete()"></button>
+                    <div class="center-content-status">
+                        <img src="/static/img/trash.png" alt="right" id="rightImg" class="warning-icon"/>
+                        <p id="message" class="modal-title titlepad">
+                          Are you sure you want to delete?
+                        </p>
+                    </div>
+                    <div class="modal-center-btn-footer">
+                        <button onclick="cancelDelete()" id="closeBtnpopup" type="button" class="btn-close-cancel btn-space" data-mdb-dismiss="modal">Close</button>
+                        <a href="javascript:void(0);" id="surveyDelete">
+                          <button type="" class="btn-save-submit">Delete</button>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% include 'footer.html' %}
+</div>
+{% endblock %}
+{% block jquery %}
+<script>
+  function deleteSurvey(namesurvey_id)
+  {
+    $('#deleteModal').modal('show');
+    $('#surveyDelete').attr('onclick','confirmDelete('+namesurvey_id+')');
+  }
+
+  function cancelDelete()
+  {
+    $('#surveyDelete').attr('onclick','');
+    $('#deleteModal').modal('hide');
+  }
+
+  function confirmDelete(namesurvey_id)
+  {
+    $.ajax({ // create an AJAX call...
+        data: {namesurvey_id:namesurvey_id}, // get the form data
+        type: 'POST', // GET or POST
+        url: "{% url 'survey-delete' %}", // the file to call
+        beforeSend: function(xhr, settings){
+            xhr.setRequestHeader("X-CSRFToken", '{{csrf_token}}');
+        }, 
+        success: function(response) { // on success..
+            //console.log(response);
+            if(response > 0)
+            {
+              location.reload();
+            }
+        }
+    });
+  }
+</script>
+<script>
+  $('#Survey-Configuration-active').addClass('activeLink');
+                
+  $('#Survey-Configuration-down').addClass('down');
+  $('#Survey-Configuration-sub').show();
+  
+  $('#Survey-List').addClass('activeLink active-nav');
+</script>
+{% endblock jquery %}

@@ -1,0 +1,150 @@
+{% extends "base.html" %} {% load static %} {% block title %} Create Farm {% endblock title %} 
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+{% block content %} {% include 'navbar.html' %}
+<style>
+    .bootstrap-select .dropdown-menu li.disabled.selected{display: none;}
+    .dropdown.bootstrap-select.form-control .btn{border: 1px solid #B2BEB5; padding: 12px 8px; border-radius: 0;}
+    .bootstrap-select .dropdown-menu{max-width: 280px;}
+    .bootstrap-select .dropdown-menu li.selected.active .dropdown-item.active.selected{margin-left: 0;padding: 0;}
+</style>
+<div class="main-content">
+    {% include 'header.html' %} {% load crispy_forms_tags %}
+  <main>
+    <span class="farm headingtop">Create Farm</span>
+    <div class="card farm-fields-container">
+        <div class="container-fluid">
+            <form method="post" class="farm-fields-form">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-4">
+                        {{ form.name|as_crispy_field }}
+                    </div>
+                    <div class="col-md-4">
+                        {{ form.cultivation_year|as_crispy_field }}
+                    </div>
+                    <div class="col-md-4">
+                        {{ form.area|as_crispy_field }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                       <div id="div_id_land_type" class="form-group">
+                            <label>
+                                Crop
+                            </label>
+                            <div>
+                                <select name="land_type" class="select form-control" id="id_land_type">
+                                    <option value="">Select Crop</option>
+                                    {% for crop in crops %}
+                                    <option value="{{crop.name}}">{{crop.name}}</option>
+                                    {% endfor %}
+                                
+                                </select>
+                            </div>
+                        </div> 
+                    </div>
+                    <div class="col-md-4">
+                        {{ form.street|as_crispy_field }}
+                    </div>
+                    <div class="col-md-4">
+                        {{ form.village|as_crispy_field }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        {{ form.town|as_crispy_field }}
+                    </div>
+                    <div class="col-md-4">
+                       <div id="div_id_state" class="form-group">
+                            <label>
+                                State
+                            </label>
+                            <div>
+                                <select name="state" class="select form-control" id="id_state">
+                                    <option value="">Select State</option>
+                                    <option value="Alabama">Alabama</option>
+                                    <option value="Alaska">Alaska</option>
+                                    <option value="Arizona">Arizona</option><option value="Arkansas">Arkansas</option><option value="California">California</option><option value="Colorado">Colorado</option><option value="Connecticut">Connecticut</option><option value="Delaware">Delaware</option><option value="District of Columbia">District of Columbia</option><option value="Florida">Florida</option><option value="Georgia">Georgia</option><option value="Guam">Guam</option><option value="Hawaii">Hawaii</option><option value="Idaho">Idaho</option><option value="Illinois">Illinois</option><option value="Indiana">Indiana</option><option value="Iowa">Iowa</option><option value="Kansas">Kansas</option><option value="Kentucky">Kentucky</option><option value="Louisiana">Louisiana</option><option value="Maine">Maine</option><option value="Maryland">Maryland</option><option value="Massachusetts">Massachusetts</option><option value="Michigan">Michigan</option><option value="Minnesota">Minnesota</option><option value="Mississippi">Mississippi</option><option value="Missouri">Missouri</option><option value="Montana">Montana</option><option value="Nebraska">Nebraska</option><option value="Nevada">Nevada</option><option value="New Hampshire">New Hampshire</option><option value="New Jersey">New Jersey</option><option value="New Mexico">New Mexico</option><option value="New York">New York</option><option value="North Carolina">North Carolina</option><option value="North Dakota">North Dakota</option><option value="Northern Marianas Islands">Northern Marianas Islands</option><option value="Ohio">Ohio</option><option value="Oklahoma">Oklahoma</option><option value="Oregon">Oregon</option><option value="Pennsylvania">Pennsylvania</option><option value="Puerto Rico">Puerto Rico</option><option value="Rhode Island">Rhode Island</option><option value="South Carolina">South Carolina</option><option value="South Dakota">South Dakota</option><option value="Tennessee">Tennessee</option><option value="Texas">Texas</option><option value="Utah">Utah</option><option value="Vermont">Vermont</option><option value="Virginia">Virginia</option><option value="Virgin Islands">Virgin Islands</option><option value="Washington">Washington</option><option value="West Virginia">West Virginia</option><option value="Wisconsin">Wisconsin</option><option value="Wyoming">Wyoming</option>
+                                </select>
+                            </div>
+                        </div> 
+                    </div>
+                    <div class="col-md-4">
+                        {{ form.zipcode|as_crispy_field }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        {{ form.county|as_crispy_field }}
+                    </div>
+		    <div class="col-md-4">
+                        {{ form.nutrien_account_id|as_crispy_field }}
+                    </div> 
+                    <!-- <div class="col-md-4">
+                        {{ form.grower|as_crispy_field }}
+                    </div> -->
+                    <div class="col-md-4">
+                    <div id="div_id_grower" class="form-group">
+                        <label for="id_grower" class=" requiredField">
+                        Grower<span class="asteriskField">*</span>
+                        </label>
+                        <div>
+                        <select name="grower" class="select form-control selectpicker" required="" id="id_grower" data-live-search="true">
+                            {% for gwdp in growers_dpdwn %}
+                            <option value="{{gwdp.id}}">{{gwdp.name}}</option>
+                            {% endfor %}
+                        </select>
+                        </div>
+                    </div>
+                    </div>
+
+                </div>
+                <div class="row">
+                    <div class="form-btn-row">
+                        <a href="{% url 'farm-list' %}" class="btn-close-cancel btn-space">Cancel</a>
+                        <input type="submit" class="btn-save-submit" value="Save"> 
+                    </div>
+                </div>
+        </div>
+            </form>
+    
+  </main>
+  {% include 'footer.html' %}
+</div>
+{% endblock %}
+
+{% block jquery %}
+<!--<script>
+    var super_user = '{{user.is_superuser}}';
+    $('#id_grower').removeClass('disabled-consultants');
+
+    if(super_user!="True")
+    {
+        $('#id_grower').addClass('disabled-consultants');
+        $('#id_grower option').prop('disabled', true);
+        var logged_in_grower_id = "{{grower}}";
+        $('#id_grower').val(logged_in_grower_id);
+        $('#id_grower option[value="'+logged_in_grower_id+'"]').prop('disabled', false);
+    }
+</script>-->
+<script>
+    $('#Farm-Configuration-active').addClass('activeLink');
+          
+    $('#Farm-Configuration-down').addClass('down');
+    $('#Farm-Configuration-sub').show();
+    
+    $('#Farm-Management').addClass('activeLink active-nav');
+</script>
+{% endblock jquery %}

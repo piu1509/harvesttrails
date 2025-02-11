@@ -1,0 +1,348 @@
+{% extends "base.html" %} {% load static %}
+{% block title %} Shipment Management {% endblock title %}
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+{% load crispy_forms_tags %}
+{% block content %}
+{% include 'navbar.html' %}
+
+<style>
+    table.classing tbody tr td {
+        vertical-align: top;
+    }
+
+    ul.pagination {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+    }
+
+    ul.pagination li {
+        list-style: none;
+        line-height: 45px;
+        text-align: center;
+        font-size: 18px;
+        font-weight: 500;
+        cursor: pointer;
+        user-select: none;
+        transition: all 0.3s ease;
+    }
+
+    ul.pagination li {
+        display: none;
+        position: relative;
+    }
+
+
+    ul.pagination li:first-of-type,
+    ul.pagination li:nth-of-type(2),
+    ul.pagination li:last-of-type,
+    ul.pagination li:has( + li:last-of-type),
+    ul.pagination li.active,
+    ul.pagination li.active + li,
+    ul.pagination li.active + li + li,
+    ul.pagination li:has(+ li.active),
+    ul.pagination li:has(+ li + li.active){
+        display: block;
+    }
+
+    ul.pagination li:has(+ li + li.active){
+        padding-left: 35px;
+    }
+
+    ul.pagination li.active + li + li {
+        padding-right: 35px;
+    }
+
+    ul.pagination li:has( + li + li.active) a:before,
+    ul.pagination li.active + li + li a:after {
+        content: "...";
+        font-size: 16px;
+        display: inline-block;
+        width: 35px;
+        height: 40px;
+        position: absolute;
+        top: -1px;
+        background-color: #fff;
+        border: 1px solid #ddd;
+    }
+
+    ul.pagination li:has( + li + li.active) a:before {
+        left: -35px;
+    }
+
+    ul.pagination li.active + li + li a:after {
+        right: -35px;
+    }
+
+    ul.pagination li:nth-of-type(1) a:before,
+    ul.pagination li:nth-of-type(2) a:before,
+    ul.pagination li:nth-of-type(3) a:before {
+        display: none !important;
+    }
+
+    ul.pagination li:nth-of-type(1),
+    ul.pagination li:nth-of-type(2),
+    ul.pagination li:nth-of-type(3) {
+        padding-left: 0 !important;
+    }
+
+    ul.pagination li:nth-of-type(1) a:after,
+    ul.pagination li:nth-of-type(2) a:after,
+    ul.pagination li:nth-of-type(3) a:after {
+        display: none !important;
+    }
+
+    ul.pagination li:nth-of-type(1),
+    ul.pagination li:nth-of-type(2),
+    ul.pagination li:nth-of-type(3) {
+        padding-left: 0 !important;
+    }
+
+
+
+</style>
+<div class="main-content">
+    {% include 'header.html' %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.0/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.bootstrap4.min.css">
+
+    <main>
+        {% include '_alerts.html' %}
+        <div class="page-title-with-or-without-btn">
+            <span class="farm headingtop">Shipment Management</span>
+            <!-- Create button for add-processor-->
+            <div class="flex-header-btn">
+                
+              <a href="{% url 'add_outbound_shipment' %}" class="btn-close-cancel">Add Shipment</a>
+              &nbsp;
+              <a href="{% url 'outbound_shipment_mgmt_csv_download' %}" class="btn-close-cancel">Download CSV</a>
+            </div>
+        </div>
+        <div class="card card-padding">
+            <form method="get">
+                <div class="row">
+                    {% comment %} {% if request.user.is_processor %}
+                    {% else %} {% endcomment %}
+                    <div class="col-8">
+                        <div class="inline-apply-filter">
+                            <div class="three-fields-with-label">
+                                <select name="selectprocessor_id" id="mult_select"  class="form-control selectpicker" data-live-search="true">
+                                    <option value='All' selected> Select All Processors </option>
+                                    {% for i in processors %}
+                                    {% if i.pk == selectedProcessors %}
+                                    <option value="{{ i.pk }}" selected>{{i.entity_name}} - {{ i.pk }}
+                                    </option>
+                                    {% else %}
+                                    <option value="{{ i.pk }}">{{i.entity_name}} - {{ i.pk }}</option>
+                                    {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <input style="display : none;" id="submitBtn" type="submit"
+                                class="apply-filter-btn primary-btn" value="Apply Filter" />
+                        </div>
+                    </div>                    
+                    
+                    {% comment %} {% endif %} {% endcomment %}
+                    <div class="col-4">
+                        <div class="row">
+                            <div class="col-8">
+                                <input class="form-control" name="search_name" type="search" placeholder="Search" aria-label="Search" id="search_name" value="{{search_name}}" autocomplete="off">
+                            </div>
+                            <div class="col-4">
+                                <button class="btn btn-outline-success btn-block" type="submit">Search</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>                
+            </form>
+            <div class="main-simple-table-with-search">
+                <div class="both-data-in" style="display: inherit;">
+                    <div class="simple-responsive-table">
+                        <table id="processorList_tbl" class="table table-striped dt-responsive nowrap" style="width:100%">
+                            <thead>
+                                <tr style="border-bottom: 2px solid #e0e0e0;">
+                                    <th width="5%">Shipment ID</th>
+                                    <th width="5%">Shipment Date</th>
+                                    <th width="10%">STORAGE BIN</th>
+                                    <th width="10%">PROCESSOR (Sender)</th>                                    
+                                    <th width="10%">SENDER SKU ID</th>
+                                    <th width="10%">Weight</th>
+                                    <th width="10%">PROCESSOR (Receiver)</th>
+                                    <th width="10%">RECEIVER SKU ID</th>  
+                                    <th width="10%">RECEIVE Date</th>
+                                    <th width="10%">STATUS</th>
+                                    <th width="10%">ACTION</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for shipment in report %}
+
+                                <tr>
+                                    <td>{{shipment.shipment_id}}</td>
+                                    <td>{{shipment.date_pulled|date:"M d, Y"}}</td>
+                                    <td>{{shipment.bin_location}}</td>
+                                    <td>{% if shipment.processor_e_name %} {{shipment.processor_e_name}}-{{shipment.sender_processor_type}} {% endif %}</td>
+                                    <td>{{shipment.storage_bin_send}}</td>
+                                    <td>{{shipment.weight_of_product}} {{shipment.weight_of_product_unit}}</td> 
+                                    <td>{{shipment.processor2_name}} - {{shipment.receiver_processor_type}}</td>
+                                    <td>{% if shipment.storage_bin_recive %}
+                                        {{shipment.storage_bin_recive}}
+                                    {% else %}
+                                    -
+                                    {% endif %}</td>  
+                                    <td>{% if shipment.recive_delivery_date %}
+                                        {{shipment.recive_delivery_date.date}}
+                                    {% else %}
+                                    -
+                                    {% endif %}</td>
+                                    <td>{% if shipment.status %}
+                                        {{shipment.status}}
+                                    {% else %}
+                                    -
+                                    {% endif %}</td>
+                                    <td class="backk action-td rmv-bd">
+                                    <ul>
+                                        {% if request.user.is_superuser or 'SubAdmin' in request.user.get_role or 'SuperUser' in request.user.get_role or 'Processor' in request.user.get_role %}
+                                        <li>
+                                            <a href="{% url 'outbound_shipment_mgmt_view' shipment.id %}"
+                                                class="update-btn-link" alt="view inbound management" title="view inbound management"> <span class="fas fa-eye"></span> </a>
+                                        </li>
+                                        {% endif %}
+                                       
+                                        {% if request.user.is_superuser or 'SubAdmin' in request.user.get_role or 'SuperUser' in request.user.get_role %}
+                                        <li><a href="{% url 'view_trace' shipment.shipment_id from_date to_date  %}" class="update-btn-link" alt="view traceability" title="view traceability"> <span class="fas fa-arrow-circle-right"></span></a></li>
+                                        <li>
+                                            <a type="button"
+                                        data-mdb-toggle="modal" data-mdb-target="#deleteModal{{shipment.id}}" alt="delete outbound shipment" title="delete outbound shipment">
+                                        <span class="fas fa-trash"></span></a>
+                                        </li>
+
+                                        <div class="modal fade" id="deleteModal{{shipment.id}}" aria-hidden="true" aria-labelledby="exampleModalToggleLabel22" tabindex="-1">
+                                            <div class="modal-dialog">
+                                              <div class="modal-content">
+                                          
+                                                <div class="modal-body">
+                                                  <button type="button" class="btn-close cust-close-ds-btn" data-mdb-dismiss="modal" aria-label="Close"></button>
+                                                  <div class="center-content-status">
+                                                    <img src="{% static 'img/trash.png' %}" alt="right" id="rightImg" class="warning-icon">
+                                                    <p id="message" class="modal-title titlepad">Are you sure you want to delete?</p>
+                                                  </div>
+                                                  <div class="modal-center-btn-footer">
+                                                    <button onclick="reloadwindow()" id="closeBtnpopup" type="button" class="btn-close-cancel btn-space"
+                                                      data-mdb-dismiss="modal">
+                                                      Close
+                                                    </button>                                                   
+                                                    
+                                                    <a href="{% url 'delete_outbound_shipment' shipment.id %}" id="storageDelete"class="btn-save-submit" >Delete</a>
+                                                   
+                                                  </div>
+                                                </div>
+                                          
+                                              </div>
+                                            </div>
+                                          </div>
+                                        {% endif %}
+                                    </ul>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="row align-items-center mt-2">
+                        <div class="col-md-12 col-sm-12 col-12 text-center">
+                            {% if report.has_other_pages %}
+                                <ul class="pagination" id="nav_1">
+                                {% if report.has_previous %}
+                                    <li><a href="?selectprocessor_id={{selectedProcessors}}&search_name={{search_name}}&page={{ report.previous_page_number }}">&laquo;</a></li>
+                                    {% else %}
+                                    <li class="disabled"><span>&laquo;</span></li>
+                                    {% endif %}
+                                    {% for i in report.paginator.page_range %}
+                                    {% if report.number == i %}
+                                    <li class="active pagi" id="getactive"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+                                    {% else %}
+                                    <li><a href="?selectprocessor_id={{selectedProcessors}}&search_name={{search_name}}&page={{ i }}">{{ i }}</a></li>
+                                    {% endif %}
+                                    {% endfor %}
+                                    {% if report.has_next %}
+                                    <li><a href="?selectprocessor_id={{selectedProcessors}}&search_name={{search_name}}&page={{ report.next_page_number }}">&raquo;</a></li>
+                                    {% else %}
+                                    <li class="disabled"><span>&raquo;</span></li>
+                                {% endif %}
+                                </ul>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-12 col-sm-12 col-12 text-center mt-2" style="text-align:right">
+                            <span>Showing  {{ report.start_index }} - {{ report.end_index }} of {{ report.paginator.count }} entries</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+    </main>
+    {% include 'footer.html' %}
+</div>
+
+{% endblock content %}
+
+{% block scripts %}
+<script src="https://cdn.datatables.net/1.11.0/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.0/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/responsive.bootstrap4.min.js"></script>
+
+<script>
+    function delShipment(url) {
+            $('#shipmentDelete').show();
+            $('#shipmentDelete').attr('url', url);
+        }
+
+        function shipmentdeleteNow() {
+            url = $('#shipmentDelete').attr('url');
+            console.log(url)
+            $.ajax({
+                url: url,
+                data: {},
+                success: function (data) {
+                    if (data == 1) {
+                        location.reload();
+                    }
+                }
+            });
+        }
+</script>
+
+<script>
+    $(document).ready(function() {
+    $('#processorSelction').change( function () {
+    $('#submitBtn').click();
+    });
+    });
+</script>
+<script>
+    $('#Processor-active').addClass('activeLink');
+  
+    $('#Processor-down').addClass('down');
+    $('#Processor-sub').show();
+  
+    $('#Shipment-Management').addClass('activeLink active-nav');
+  
+  </script>
+{% endblock scripts %}

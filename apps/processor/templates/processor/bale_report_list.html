@@ -1,0 +1,460 @@
+{% extends "base.html" %} {% load static %}
+{% block title %} Bale List Report {% endblock title %}
+
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+{% load crispy_forms_tags %}
+{% block content %}
+{% include 'navbar.html' %}
+<style>
+    tfoot input {
+        width: 100%;
+        padding: 3px;
+        box-sizing: border-box;
+    }
+
+    .ui-menu{height: 20vh;overflow-y: auto;padding: 0px 10px;margin: 0px 15px;}
+    .ui-menu::-webkit-scrollbar{width:6px;max-height:20px;padding-right: 10px;}
+    .ui-menu::-webkit-scrollbar-track{background:#ccc}
+    .ui-menu:-webkit-scrollbar-thumb{background-color:#000;border-radius:20px;min-height:20px}
+
+  .dropdown-item {  
+      
+      display: block;
+      width: 100%;
+      padding: 0.25rem 0.4rem;
+      clear: both;
+      font-weight: 400;
+      color: #212529;
+      text-align: inherit;
+      white-space: nowrap;
+      background-color: transparent;
+      border: 0;
+  }
+    
+  .selected {
+      margin-top: 0;
+      margin-left: 0;
+      padding-left: 12px;
+      padding-right: 10px;
+      font-size: 16px;
+      padding: 5px 10px 5px 5px;
+      padding: 0.25rem 0.4rem;
+  }
+
+  .pagination {
+    display: flex;
+    padding-left: 0;
+    list-style: none;
+    justify-content: center;
+    border-radius: 0.25rem;
+}
+
+.form-control, select.form-select {
+    height: 36px;
+    padding: 1.375rem 0.75rem;
+    border-radius: 0.25rem !important;
+}
+.form-control {
+    padding-top: 12px;
+    padding-bottom: 7px;
+}
+.row {
+    --mdb-gutter-x: 1.5rem;
+    --mdb-gutter-y: 0;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    margin-top: calc(var(--mdb-gutter-y)*-1);
+    margin-right: calc(var(--mdb-gutter-x)/-2);
+    margin-left: calc(var(--mdb-gutter-x)/-2);
+}
+.btn-block {
+    display: block;
+    width: 100%;
+}
+[class*=btn-outline-] {
+    border-width: 0.125rem;
+    border-style: solid;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    padding: 10px 10px 6px 10px;
+} 
+.col-md-3,.col-sm-6, .col-md-2{
+    position: relative;
+    padding-right: 10px;
+    padding-left: 0px;
+}
+@media (min-width: 768px){
+.col-md-3 {
+    width: 20%;
+}
+}
+</style>
+
+<style>
+    table.classing tbody tr td {
+        vertical-align: top;
+    }
+
+    ul.pagination {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+    }
+
+    ul.pagination li {
+        list-style: none;
+        line-height: 45px;
+        text-align: center;
+        font-size: 18px;
+        font-weight: 500;
+        cursor: pointer;
+        user-select: none;
+        transition: all 0.3s ease;
+    }
+
+    ul.pagination li {
+        display: none;
+        position: relative;
+    }
+
+
+    ul.pagination li:first-of-type,
+    ul.pagination li:nth-of-type(2),
+    ul.pagination li:last-of-type,
+    ul.pagination li:has( + li:last-of-type),
+    ul.pagination li.active,
+    ul.pagination li.active + li,
+    ul.pagination li.active + li + li,
+    ul.pagination li:has(+ li.active),
+    ul.pagination li:has(+ li + li.active){
+        display: block;
+    }
+
+    ul.pagination li:has(+ li + li.active){
+        padding-left: 35px;
+    }
+
+    ul.pagination li.active + li + li {
+        padding-right: 35px;
+    }
+
+    ul.pagination li:has( + li + li.active) a:before,
+    ul.pagination li.active + li + li a:after {
+        content: "...";
+        font-size: 16px;
+        display: inline-block;
+        width: 35px;
+        height: 40px;
+        position: absolute;
+        top: -1px;
+        background-color: #fff;
+        border: 1px solid #ddd;
+    }
+
+    ul.pagination li:has( + li + li.active) a:before {
+        left: -35px;
+    }
+
+    ul.pagination li.active + li + li a:after {
+        right: -35px;
+    }
+
+    ul.pagination li:nth-of-type(1) a:before,
+    ul.pagination li:nth-of-type(2) a:before,
+    ul.pagination li:nth-of-type(3) a:before {
+        display: none !important;
+    }
+
+    ul.pagination li:nth-of-type(1),
+    ul.pagination li:nth-of-type(2),
+    ul.pagination li:nth-of-type(3) {
+        padding-left: 0 !important;
+    }
+
+    ul.pagination li:nth-of-type(1) a:after,
+    ul.pagination li:nth-of-type(2) a:after,
+    ul.pagination li:nth-of-type(3) a:after {
+        display: none !important;
+    }
+
+    ul.pagination li:nth-of-type(1),
+    ul.pagination li:nth-of-type(2),
+    ul.pagination li:nth-of-type(3) {
+        padding-left: 0 !important;
+    }
+
+    .ui-menu{height: 20vh;overflow-y: auto;padding: 0px 10px;margin: 0px 15px;}
+    .ui-menu::-webkit-scrollbar{width:6px;max-height:20px;padding-right: 10px;}
+    .ui-menu::-webkit-scrollbar-track{background:#ccc}
+    .ui-menu:-webkit-scrollbar-thumb{background-color:#000;border-radius:20px;min-height:20px}
+    
+    .dropdown.bootstrap-select.form-control .btn {
+        border-radius: 8px !important;
+        outline: 0px !important;
+        
+    }
+
+    .dropdown-item {  
+         
+        display: block;
+        width: 100%;
+        padding: 0.25rem 0.4rem;
+        clear: both;
+        font-weight: 400;
+        color: #212529;
+        text-align: inherit;
+        white-space: nowrap;
+        background-color: transparent;
+        border: 0;
+    }
+       
+    .selected {
+        margin-top: 0;
+        margin-left: 0;
+        padding-left: 12px;
+        padding-right: 10px;
+        font-size: 16px;
+        padding: 5px 10px 5px 5px;
+        padding: 0.25rem 0.4rem;
+    }
+        
+</style>
+
+<div class="main-content">
+    {% include 'header.html' %}
+    <main>
+        {% include '_alerts.html' %}
+        <div class="page-title-with-or-without-btn">
+            <span class="farm headingtop">Bale List Report</span>
+            <!-- Create button for add-location-->
+            <div class="flex-header-btn">
+                <a href="{% url 'production_report_csv_list' %}" class="btn-close-cancel">Back</a>
+            </div>
+        </div>
+        <div class="card card-padding">
+            <div class="row gy-2">
+                <form class="col-md-10" method="get" action="">
+                    <div class="flex-container">
+                        <div class="col-md-3 col-sm-6">
+                            <input name="gin_date" value="{{gin_date}}" class="datepicker form-control" type="text" id="id_gin_date" placeholder="Gin Date(mm/dd/yyyy)" autocomplete="off"/>
+                        </div>
+                        <div class="col-md-3 col-sm-6">
+                            <input class="form-control" name="load_id" value="{{load_id}}" type="search" placeholder="Load ID" aria-label="Search" id="id_load_id" autocomplete="off">
+                        </div>
+                        <div class="col-md-3 col-sm-6">
+                            <input class="form-control" name="bale_id" value="{{bale_id}}" type="search" placeholder="Bale Id" aria-label="Search" id="id_bale_id" autocomplete="off">
+                        </div>
+                        <div class="col-md-3 col-sm-6">
+                            <input class="form-control" name="net_wt" value="{{net_wt}}" type="search" placeholder="Net Wt" aria-label="Search" id="id_net_wt" autocomplete="off">
+                        </div>
+                        <div class="col-md-3 col-sm-6">
+                            <button class="btn btn-outline-success btn-block" id="search" type="submit">Search</button>
+                        </div>
+                    </div>
+                </form>
+
+                <form class="col-md-2 col-sm-6" method="get" action="">
+                    <input type="hidden" class="form-control" name="field_all" type="search" placeholder="Search"
+                      aria-label="Search">
+                    <button class="btn btn-outline-success btn-block" type="submit">All</button>
+                  </form>
+            </div>
+            </div>
+        
+            <div class="main-simple-table-with-search">                
+                <div class="both-data-in" style="display: inherit;">
+                    <div class="simple-responsive-table">
+                        <table id="" class="table table-striped dt-responsive nowrap" style="width:100%">
+                          
+                            <thead>
+                                <tr style="border-bottom: 2px solid #e0e0e0;">
+                                    <th width="10%">Gin Date</th>
+                                    <th width="10%">Load ID</th>
+                                    <th width="10%">Bale Id</th>
+                                    <th width="10%">Net Wt</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for i in report %}
+                                <tr>
+                                    <td>{{i.gin_date}}</td>
+                                    <td>{{i.load_id}}</td>
+                                    <td>{{i.bale_id}}</td>
+                                    <td>{{i.net_wt}}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+
+                        <div class="row align-items-center">
+
+                            <div class="col-md-12 col-sm-12 col-12 text-center">
+                                {% if report.has_other_pages %}
+                                <ul class="pagination"  id="nav_1">
+                                    {% if report.has_previous %}
+                                    <li><a href="?gin_date={{gin_date}}&load_id={{load_id}}&bale_id={{bale_id}}&net_wt={{net_wt}}&page={{ report.previous_page_number }}">&laquo;</a></li>
+                                    {% else %}
+                                    <li class="disabled"><span>&laquo;</span></li>
+                                    {% endif %}
+                                    {% for i in report.paginator.page_range %}
+                                    {% if report.number == i %}
+                                    <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+                                    {% else %}
+                                    <li><a href="?gin_date={{gin_date}}&load_id={{load_id}}&bale_id={{bale_id}}&net_wt={{net_wt}}&page={{ i }}">{{ i }}</a></li>
+                                    {% endif %}
+                                    {% endfor %}
+                                    {% if report.has_next %}
+                                    <li><a href="?gin_date={{gin_date}}&load_id={{load_id}}&bale_id={{bale_id}}&net_wt={{net_wt}}&page={{ report.next_page_number }}">&raquo;</a></li>
+                                    {% else %}
+                                    <li class="disabled"><span>&raquo;</span></li>
+                                    {% endif %}
+                                </ul>
+                                {% endif %}
+                            </div>
+                          <div class="col-md-12 col-sm-12 col-12 text-center mt-2" style="text-align:right">
+                            <span>Showing {{ report.start_index }} - {{ report.end_index }} of {{ report.paginator.count }}
+                              entries
+                            </span>
+                          </div>       
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    {% include 'footer.html' %}
+</div>
+
+<!-- Delete Popup -->
+<div class="modal fade" id="deleteModal" aria-hidden="true" aria-labelledby="exampleModalToggleLabel22" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+  
+        <div class="modal-body">
+          <button type="button" class="btn-close cust-close-ds-btn" data-mdb-dismiss="modal" aria-label="Close"></button>
+          <div class="center-content-status">
+            <img src="{% static 'img/trash.png' %}" alt="right" id="rightImg" class="warning-icon">
+            <p id="message" class="modal-title titlepad">Are you sure you want to delete?</p>
+          </div>
+          <div class="modal-center-btn-footer">
+            <button onclick="reloadwindow()" id="closeBtnpopup" type="button" class="btn-close-cancel btn-space"
+              data-mdb-dismiss="modal">
+              Close
+            </button>
+            <!-- <button type="submit" class="btn-save-submit">Delete</button> -->
+            
+            <a onclick="storagedeleteNow()" href="" id="storageDelete" ><button type=""
+                class="btn-save-submit">Delete</button></a>
+           
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+<!-- end -->
+{% endblock content %}
+
+{% block scripts %}
+
+<script src="{% static 'js/farm/farm_list.js' %}"></script>
+
+<script>
+
+//     $(document).ready(function () {
+//     // Setup - add a text input to each footer cell
+//     $('#processorList_tbl tfoot th').each(function () {
+//         var title = $(this).text();
+//         $(this).html('<input type="text" placeholder="Search ' + title + '" />');
+//     });
+ 
+//     // DataTable
+//     var table = $('#processorList_tbl').DataTable({
+//         "pageLength": 100,
+//         initComplete: function () {
+//             // Apply the search
+//             this.api()
+//                 .columns()
+//                 .every(function () {
+//                     var that = this;
+ 
+//                     $('input', this.footer()).on('keyup change clear', function () {
+//                         if (that.search() !== this.value) {
+//                             that.search(this.value).draw();
+//                         }
+//                     });
+//                 });
+//         },
+//     });
+// });
+
+</script>
+{% endblock scripts %}
+
+{% block jquery %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.js">
+</script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.js">
+</script>
+
+<link href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/ui-lightness/jquery-ui.css" rel="stylesheet"
+    type="text/css" />
+
+<script>
+    $(document).ready(function() {
+        $('#id_gin_date').datepicker({
+        language: "es",
+        autoclose: true,
+        format: "mm-dd-yyyy"
+    });
+    });
+</script>    
+<script>
+    $(document).ready(function () {
+ 
+        var availableTagsload_id  = {{ load_id_json|safe }};
+        
+        var availableTagsnet_wt  = {{ net_wt_json|safe }};
+
+        var availableTagsbale_id  = {{ bale_id_json|safe }};
+
+        $("#id_load_id").autocomplete({
+            source: availableTagsload_id
+        });
+
+        $("#id_bale_id").autocomplete({
+            source: availableTagsbale_id
+        });
+
+        $("#id_net_wt").autocomplete({
+            source: availableTagsnet_wt
+        });
+
+    });
+    
+</script>
+<script>
+    $('#Processor-active').addClass('activeLink');
+  
+    $('#Processor-down').addClass('down');
+    $('#Processor-sub').show();
+  
+    $('#Production-Report').addClass('activeLink active-nav');
+  
+</script>
+{% endblock jquery %}
+

@@ -1,0 +1,450 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %} Receive Delivery {% endblock title %}
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+{% block content %}
+{% include 'navbar.html' %}
+
+<style>
+    .bootstrap-select .btn {
+        box-shadow: none;
+        border: 1px solid #ddd;
+    }
+
+    .bootstrap-select:not([class*=col-]):not([class*=form-control]):not(.input-group-btn) {
+        width: 100%
+    }
+
+    .dropdown.bootstrap-select.form-control .btn {
+        border-radius: 4px !important;
+        outline: 1px solid #ddd;
+    }
+    
+    .selected.active{
+                margin-top: 0 !important;
+                margin-left: 0 !important;
+                padding-top: 4px !important;
+                padding-left: 8px !important;
+                padding-bottom: 4px !important;
+                padding-right: 8x !important;
+                font-size: 16px !important;
+                background: #00b258 !important;
+                border: 0 !important
+            }
+
+    .dropdown.bootstrap-select .btn {
+        border-radius: 0;
+        padding-top:0.933rem;
+        padding-bottom:0.933rem;
+      }
+
+      .textinput.form-control {
+        padding-top: 11px;
+        padding-bottom: 11px;
+      }
+</style>
+
+<div class="main-content">
+    {% include 'header.html' %} {% load crispy_forms_tags %}
+    <main>
+        <span class="farm headingtop">Receive Delivery</span>
+        <div class="card farm-fields-container">
+            <nav aria-label="breadcrumb m-5">
+                {% if error_messages %}
+                <div id="alertMessage" class="alert alert-warning alert-dismissible fade show" role="alert">
+                    <strong>{{error_messages}}</strong>  
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>                         
+                  </div> 
+                  <script>                            
+                    setTimeout(function() {
+                        document.getElementById('alertMessage').style.display = 'none';
+                    }, 5000);
+                </script>                          
+                  {% endif %}
+            </nav>
+            <div class="container-fluid">
+              
+                <form method="post" class="farm-fields-form" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row" style="margin-bottom:10px">
+                        <div class="col-md-6 mb-2">
+                            <label for="id_bin_location_pull">Bin Location Pulled from<span class="asteriskField">*</span></label>
+                            <select name="bin_pull" id="pull" class="textinput textInput form-control selectpicker" data-live-search="true" onchange="this.form.submit()">
+                                {% if select_processor_name %}
+                                <option value="{{select_processor_id}}" selected>{{select_processor_name}}</option>
+                                {% else %}
+                                <option value="all" disabled selected>Select Bin Location Pulled from</option>
+                                {% endif %}
+                                
+                                {% for pro in processor %}
+                                <option value="{{pro.id}}">{{pro.entity_name}}</option>
+                                {% endfor %}  
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <label for="">Select Destination<span class="asteriskField">*</span></label>
+                            <select  name="processor2_id" id="processor2_id" class="textinput textInput form-control selectpicker" data-live-search="true" onchange="this.form.submit()">
+                                <option value='All' selected disabled> {% if select_processor_name %} Select Destination {% else %} First select the bin pull {% endif %}</option>                                
+                                    
+                                    {% if selected_destination %}
+                                    <option value="{{selected_destination}} T2" selected>{{selected_destination_name}}</option>
+                                    {% else %}
+                                    <option value="all" disabled selected> {% if select_processor_name %} Select Destination {% else %} First select the bin pull {% endif %}</option>
+                                    {% endif %}
+                                    
+                                    {% for processor in processor2  %}
+                                    <option value="{{ processor.processor2__id }} T2">{{ processor.processor2__entity_name }} - {{ processor.processor2__id }}</option>
+                                    {% endfor %}                                 
+                            </select>                           
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-2 text-center" style="display:none;">
+                            <label for="id_storage"><strong>Milled Volume</strong></label>
+                            {% if milled_value == "None" %}
+                            <div style="padding: 10px 5px;font-size: 18px; ">Not Selected Pull From</div>
+                            {% else %}
+                            <div style="padding: 10px 5px;font-size: 18px;">{{milled_value}}</div>
+                            {% endif %}                        
+                            <input type="hidden" name="milled_value" id="sum_total_bin_location_milled_volume_java" value="{{milled_value}}">
+                        </div>
+                        
+                        <hr class="mt-2">                      
+
+                        <div class="col-md-4 mb-2">
+                           <div>
+                                <label for="storage_bin_id">Sender Storage Bin ID (SKU ID)<span class="asteriskField">*</span></label>
+                                <input id="storage_bin_id" name="storage_bin_id" class="textinput textInput form-control" list="suggestions1" autocomplete="off" value="{{selected_sku}}"onchange="this.form.submit()">
+                                    <datalist id="suggestions1">
+                                        {% for data in selected_processor_sku_id_list %}
+                                        <option value="{{data}}">                                        
+                                        {% endfor %}
+                                    </datalist>
+                                    {% if select_processor_name %} 
+                                    <p id="alert_msg3" style="color:red"></p>                               
+                                    {% else %}
+                                    <p id="warning" style="color:grey;"> <i>First select bin pull</i> </p> 
+                                    {% endif %}
+                            </div>                         
+                            
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <label for="id_crop">Crop<span class="asteriskField">*</span></label>
+                            <select name="id_crop" id="id_crop"  class="form-control " onchange="this.form.submit()">
+                                <option value="all" selected disabled>Select Crop</option>
+                                {% for crop in crops %}
+                                <option value="{{crop.code}}" {% if selected_crop == crop.code %}selected {% endif %}>{{crop.code}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <div id="div_id_variety" class="form-group">
+                                <label for="id_variety" class=" requiredField">
+                                    Variety<span class="asteriskField">*</span>
+                                </label>
+                                <div>
+                                    <select name="variety" class="select form-control" required id="id_variety">
+                                        <option value="all" selected disabled>Select Variety</option>
+                                        {% for variety in varieties %}
+                                        <option value="{{variety}}" {% if variety == variety %}selected {% endif %}>{{variety}}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-2">  
+                            <label for="">Receiver Storage Bin Id (SKU ID)<span class="asteriskField">*</span></label>
+                            {% comment %} <input type="text" name="receiver_sku_id" class="textinput textInput form-control" style="width: 100%;padding-left:10px ;"> {% endcomment %}
+                            <input name="receiver_sku_id" id="receiver_sku_id" class="textinput textInput form-control" list="suggestions2" autocomplete="off" value="{{receiver_sku_id}}">
+                            <datalist id="suggestions2">
+                                {% for data in selected_processor_sku_id_list_processor2 %}
+                                <option value="{{data}}">                                        
+                                {% endfor %}
+                            </datalist> 
+                            {% if selected_destination %} 
+                            <p id="alert_msg3" style="color:red"></p>                               
+                            {% else %}
+                            <p id="warning2" style="color:grey;"> <i>First select Destination</i> </p> 
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-4 mb-2">
+                            <div>
+                                <label for="equipment_type">Equipment Type<span class="asteriskField">*</span></label>
+                                <select name="equipment_type" id="equipment_type" class="textinput textInput form-control">
+                                    <option value="All" selected disabled>Select Equipment Type</option>
+                                    <option value="Truck" {% if equipment_type == "Truck" %}selected{% endif %}>Truck</option>
+                                    <option value="Hopper Car" {% if equipment_type == "Hopper Car" %}selected{% endif %}>Hopper Car</option>
+                                    <option value="Rail Car" {% if equipment_type == "Rail Car" %}selected{% endif %}>Rail Car</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4 mb-2">
+                            <div>
+                                <label for="equipment_id">Equipment ID<span class="asteriskField">*</span></label>
+                                <input type="text" id="equipment_id" name="equipment_id" class="textinput textInput form-control" value="{{equipment_id}}">
+                                <p id="alert_msg1" style="color:red"></p>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4 mb-2">
+                            <label for="weight_prod">Weight Of Product<span class="asteriskField">*</span></label>
+                            <div class="d-flex">
+                                <input type="text" id="weight_prod" name="weight_prod" class="textinput textInput form-control" autocomplete="off" style="margin-top:0; border-top-right-radius:0 !important; border-bottom-right-radius:0 !important">
+                                <select id="unitSelction" name="weight_prod_unit_id" class="form-select" style="border-top-left-radius:0 !important; border-bottom-left-radius:0 !important; border-left:0; width:90px;">
+                                    <option value="LBS" {% if weight_prod_unit_id == "LBS" %}selected{% endif %}>LBS</option>
+                                    <option value="BU" {% if weight_prod_unit_id == "BU" %}selected{% endif %}>BU</option>
+                                </select>
+                            </div>
+                            <p id="alert_msg4" style="color:red"></p>
+                        </div>
+
+                        <div class="col-md-4 mb-2">
+                            <label for="exp_yield">Expected Yield<span class="asteriskField">*</span></label>
+                            <div class="d-flex">
+                                <input type="text" id="exp_yield" name="exp_yield" value="{{exp_yield}}" class="textinput textInput form-control" autocomplete="off" style="margin-top:0; border-top-right-radius:0 !important; border-bottom-right-radius:0 !important">
+                                <select id="unitSelction" name="exp_yield_unit_id" class="form-select" style="border-top-left-radius:0 !important; border-bottom-left-radius:0 !important; border-left:0; width:90px;">
+                                    <option value="LBS" {% if exp_yield_unit_id == "LBS" %}selected{% endif %}>LBS</option>
+                                    <option value="BU" {% if exp_yield_unit_id == "BU" %}selected{% endif %}>BU</option>
+                                </select>
+                            </div>
+                            <p id="alert_msg5" style="color:red"></p>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <div>
+                                <label for="purchase_number">Purchase Order number</label>
+                                <input type="text" name="purchase_number" class="textinput textInput form-control" id="purchase_number" value="{{purchase_number}}">
+                            </div>
+                        </div>
+
+                        <div class="col-md-4 mb-2">
+                            <label for="lot_number">Lot Number<span class="asteriskField">*</span></label>
+                            <input type="text" name="lot_number" class="textinput textInput form-control" id="lot_number" value="{{lot_number}}">
+                            <p id="alert_msg2" style="color:red"></p>
+                        </div>
+
+                        <div class="col-md-4 mb-2">
+                            <label for="volume_shipped">Volume Shipped<span class="asteriskField">*</span></label>
+                            <input type="number" name="volume_shipped" value="{{volume_shipped}}" class="textinput textInput form-control" id="volume_shipped">
+                            <p id="alert_msg" style="color:red"></p>
+                        </div>
+
+                        <div class="col-md-4 mb-2">
+                            <div>
+                                <label for="status">Status<span class="asteriskField">*</span></label>
+                                <select name="status" id="status" class="textinput textInput form-control">
+                                    <option value="All" selected disabled>Select Status</option>
+                                    <option value="APPROVED"selected>APPROVED</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4 mb-2">
+                            <label for="">Recieved Weight<span class="asteriskField">*</span></label>
+                            <input type="number" name="received_weight" class="textinput textInput form-control" style="width: 100%;padding-left:10px ;">
+                        </div>
+
+                        <div class="col-md-4 mb-2">
+                            <label for="">Ticket Number<span class="asteriskField">*</span></label>
+                            <input type="text" name="ticket_number" class="textinput textInput form-control" style="width: 100%;padding-left:10px ;">
+                        </div>
+                        <div class="row" style="margin-top: 10px;">
+                            <div class="col-md-4 mb-2">
+                                <div>
+                                  <label for="">Approval Date<span class="asteriskField">*</span></label>
+                                  <input type="date"  name="approval_date" class="textinput textInput form-control" style="width: 100%;padding-left:10px ;">
+                                </div>  
+                              </div>
+      
+                              <div class="col-md-4 mb-2">
+                                  <div>
+                                      <label for="moist_percentage">Moisture Measurement (%)<span class="asteriskField">*</span></label>
+                                      <input type="number" class="textinput textInput form-control" id="moist_percentage" name="moist_percentage" value="{{moist_percentage}}">
+                                      <p id="alert_msg6" style="color:red"></p>
+                                  </div>
+                              </div>
+      
+                              <div class="col-md-4 mb-2">
+                                  <div>
+                                      <label for="multi_file">Upload File <span class="asteriskField">*</span></label>
+                                      <input type="file" name="files" multiple accept=".jpg,.png,.xlsx,.csv,.pdf" id="multi_file" class="textinput textInput form-control" >
+                                      <p id="file_name_show" style="color:gray"></p>
+                                  </div>
+                              </div>
+                        </div>
+                        
+                    </div>
+                     
+                    <div class="row">
+                        <div class="form-btn-row">
+                            <a href="{% url 'inbound_shipment_list' %}"
+                                class="btn-close-cancel btn-space">Cancel</a>
+                            <input style="display: none;" id="hide_btn1" type="submit" class="btn-save-submit"
+                                value="Save" name="save">
+                            <!-- <input type="button" id="hide_btn2" class="btn-save-submit" value="Save" onclick="btnClick()"> -->
+                            <input type="submit" name="save" class="btn-save-submit" value="Save" onclick="activityButton1()">
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+
+
+    </main>
+    {% include 'footer.html' %}
+</div>
+{% endblock %}
+
+{% block jquery %}
+
+<script>
+    function funcstatus(){
+        var val_status =  $('#id_status').val();
+        if (val_status == 'DISAPPROVED'){
+            $("#approve-show").css("display", "none");
+            $("#disapprove-show").css("display", "block");
+        }
+        if (val_status == 'APPROVED'){
+            $("#approve-show").css("display", "block");
+            $("#disapprove-show").css("display", "none");
+        }
+    }
+</script>
+
+<script>
+    function funcamount2() {
+    
+       var val_1 =  $('#id_amount1').val();
+       var val_2 =  $('#id_unit1').val();
+       var val_3 =  $('#id_amount2').val();
+       var val_4 =  $('#id_unit2').val();
+
+       
+
+       var a_1 = val_1*val_2;
+       var a_2 = val_3*val_4;
+       var a_final = a_1+a_2;
+
+       $('#output').html(a_final);
+       document.getElementById('get_output').value = a_final
+    }
+
+
+</script>
+<script>
+    function toggleInputField() {
+        var selectElement = document.getElementById('storage_bin_id');
+        var inputElement = document.getElementById('new_sku');
+        if (selectElement.value === 'new') {
+            inputElement.style.display = 'block';
+        } else {
+            inputElement.style.display = 'none';
+        }
+    }
+</script>
+<script>
+    function custom_option_deselect()
+    {
+        var tag_crop_id = $('#id_field').find(':selected').attr('data-crop');
+        if (tag_crop_id =='RICE') {
+            $("#id_unit1 option[value='38000']").attr("disabled","disabled");
+            $("#id_unit1 option[value='19000']").attr("disabled","disabled");
+            $("#id_unit1 option[value='4750']").attr("disabled","disabled");
+
+            $("#id_unit2 option[value='38000']").attr("disabled","disabled");
+            $("#id_unit2 option[value='19000']").attr("disabled","disabled");
+            $("#id_unit2 option[value='4750']").attr("disabled","disabled");
+        } else {
+
+            $("#id_unit1 option[value='38000']").removeAttr("disabled");
+            $("#id_unit1 option[value='19000']").removeAttr("disabled");
+            $("#id_unit1 option[value='4750']").removeAttr("disabled");
+
+            $("#id_unit2 option[value='38000']").removeAttr("disabled");
+            $("#id_unit2 option[value='19000']").removeAttr("disabled");
+            $("#id_unit2 option[value='4750']").removeAttr("disabled");
+        }
+    }
+    $('#id_grower').on('change', function (e) {
+        var value = $(this).val();
+        console.log(value)
+        $('#hide_btn1').click()
+    })
+    function activityButton1() {
+        var id_field = $('#id_field').val();
+        var module_number = $('#module_number').val();
+        var id_amount1 = $('#id_amount1').val();
+        if (id_field != 'select' && module_number != '' && id_amount1 != '') {
+            $('#hide_btn1').click();
+
+
+        } else {
+            if (id_field == 'select') {
+                // $('#id_field').css('border-color', 'red');
+                document.getElementById("disp0").innerHTML = "*Please Select a Field";
+            }
+            if (module_number == '') {
+                $('#module_number_id').css('border-color', 'red');
+                document.getElementById("disp1").innerHTML = "*Please Give a Module Number";
+
+            }
+            if (id_field != 'select') {
+                // $('#id_field').css('border-color', 'red');
+                document.getElementById("disp0").innerHTML = "";
+            }
+            if (module_number != '') {
+                $('#module_number_id').css('border-color', 'red');
+                document.getElementById("disp1").innerHTML = "";
+
+            }
+            if (id_amount1 == '') {
+                $('#module_number_id').css('border-color', 'red');
+                document.getElementById("disp2").innerHTML = "*Please Give a Weight";
+
+            }
+            if (id_amount1 != '') {
+                $('#module_number_id').css('border-color', 'red');
+                document.getElementById("disp2").innerHTML = "";
+
+            }
+        }
+    }
+</script>
+
+<script>
+    document.getElementById('multi_file').addEventListener('change', function(e) {
+        var files = e.target.files;
+        var filenames = "";
+        for (var i = 0; i < files.length; i++) {
+            filenames += files[i].name + "<br>";
+        }
+        document.getElementById('file_name_show').innerHTML = filenames;
+    });
+    </script>
+
+    <script>
+        $('#Tier2-Processor-active').addClass('activeLink');
+      
+        $('#Tier2-Processor-down').addClass('down');
+        $('#Tier2-Processor-sub').show();
+      
+        $('#Inbound-Management-Processor2').addClass('activeLink active-nav');
+      
+      </script>
+{% endblock jquery %}

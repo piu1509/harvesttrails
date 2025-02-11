@@ -1,0 +1,3 @@
+CROP,VARIETY,FIELD,GROWER,FARM,HARVEST DATE,PROJECTED YIELD,ACTUAL YIELD,YIELD  DELTA,Pass / Fail Sustainability,Water Savings %,Land Use Efficiency %,Less GHG % ,Premiums to Growers %,CO2 EQ Footprint #,Pounds of Water Per Pound Savings %
+RICE,DG-263L,Fdf log test,App Test Grower,Test farm 12a,,25.0,21.0,4.0,Fail,,,,,
+RICE,,T F 123,App Test Grower,Test 123,,2585833533.0,182.0,2585833351.0,Fail,0,0,nan,0,0

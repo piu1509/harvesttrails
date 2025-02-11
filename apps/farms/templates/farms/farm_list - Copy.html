@@ -1,0 +1,244 @@
+{% extends "base.html" %} {% load static %}
+{% block title %} Farm Management {% endblock title %}
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+{% load crispy_forms_tags %}
+{% block content %}
+{% include 'navbar.html' %}
+
+<div class="main-content">
+    {% include 'header.html' %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.0/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.bootstrap4.min.css">
+
+    <main>
+        {% include '_alerts.html' %}
+        <div class="page-title-with-or-without-btn">
+            <span class="farm headingtop">Farm Management</span>
+            <!-- Create button for Account-->
+            <div class="flex-header-btn">
+                {% if 'Farm Edit' in request.user.get_role_perm or request.user.is_superuser %}
+                <a href="{% url 'csv-farm-create' %}" class="btn-close-cancel btn-space mb-1">Create Farm via CSV</a>
+                <a href="{% url 'farm-create' %}" class="btn-close-cancel">Create Farm</a>
+                {% endif %}
+            </div>
+        </div>
+        <div class="card card-padding">
+            <div class="main-simple-table-with-search">
+                <div class="table-filter-row d-flex align-items-center" style="margin-bottom: 30px;">
+                    <div class="table-filter-col">
+                        <div class="flex-btn-filter-search">
+                            {% if 'Grower' in request.user.get_role and not request.user.is_superuser %}
+                            {% else %}
+                            <form action="{% url 'farm-list' %}" method="get" class="">
+                                <!-- <label for="grower_id"></label> -->
+                                <div class="inline-apply-filter">
+                                    <div class="three-fields-with-label">
+                                        <select id="growerSelction" name="grower_id">
+                                            <option value=0 selected> Select All Growers </option>
+                                            {% for grower in growers %}
+                                            {% if grower == selectedGrower %}
+                                            <option selected value="{{ grower.pk }}">{{grower.name}} - {{ grower.pk }}
+                                            </option>
+                                            {% else %}
+                                            <option value="{{ grower.pk }}">{{grower.name}} - {{ grower.pk }}</option>
+                                            {% endif %}
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <input style="display : none;" id="submitBtn" type="submit"
+                                        class="apply-filter-btn primary-btn" value="Apply Filter" />
+                                </div>
+                            </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                   
+                    <div class="table-filter-col ml-auto">
+                        <ul class="nav nav-tabs">
+                            <li class="nav-item">
+                                <a class="nav-link active" href="{% url 'farm-list' %}" alt="list view" title="list view">
+                                    <img src="/static/img/tbIcon-b-1.svg" class="tbIcon tbIcon-b">
+                                    <img src="/static/img/tbIcon-w-1.svg" class="tbIcon tbIcon-w">
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                {% if 'Grower' in request.user.get_role and not request.user.is_superuser %}
+                                <a class="nav-link"
+                                    href="{% url 'all-farm-location-map-view' request.user.grower_id %}" alt="map view" title="map view">
+                                    <img src="/static/img/tbIcon-b-2.svg" class="tbIcon tbIcon-b">
+                                    <img src="/static/img/tbIcon-w-2.svg" class="tbIcon tbIcon-w">
+                                </a>
+                                {% else %}
+                                {% if selectedGrower.id > 0 %}
+                                <a class="nav-link" href="{% url 'all-farm-location-map-view' selectedGrower.id %}" alt="map view" title="map view">
+                                    <img src="/static/img/tbIcon-b-2.svg" class="tbIcon tbIcon-b">
+                                    <img src="/static/img/tbIcon-w-2.svg" class="tbIcon tbIcon-w">
+                                </a>
+                                {% else %}
+                                <a class="nav-link" href="{% url 'all-farm-location-map-view' 0 %}" alt="map view" title="map view">
+                                    <img src="/static/img/tbIcon-b-2.svg" class="tbIcon tbIcon-b">
+                                    <img src="/static/img/tbIcon-w-2.svg" class="tbIcon tbIcon-w">
+                                </a>
+                                {% endif %}
+                                {% endif %}
+
+                            </li>
+                        </ul>
+                    </div>                   
+                </div>
+                <div class="search-group">
+                    {% if 'Grower' in request.user.get_role and not request.user.is_superuser %}
+                    {% else %}
+                    <form class="input-group" method="get" action="{% url 'farm-list' %}">
+                        <input class="form-control" name="farm_name" type="search" placeholder="Search"
+                            aria-label="Search">
+                        <button class="btn btn-outline-success" type="submit">Search</button>
+                    </form>
+
+                    <form class="all-btn" method="get" action="{% url 'farm-list' %}">
+                        <input type="hidden" class="form-control mr-sm-2" name="farm_name_all" type="search"
+                            placeholder="Search" aria-label="Search">
+                        <button class="btn btn-outline-success" type="submit">All</button>
+                    </form>
+                    {% endif %}
+                </div>
+                <div class="both-data-in" style="display: inherit;">
+                    <div class="simple-responsive-table">
+                        <div class="table-responsive">
+                            <table id="" class="table table-striped dt-responsive nowrap" style="width:100%">
+                                <thead>
+                                    <tr style="border-bottom: 2px solid #e0e0e0;">
+                                        <th width="40%">FARM</th>
+                                        <th width="40%">Grower</th>
+                                        <th width="20%" class="text-center">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for farm in farms %}
+                                    <tr>
+                                        <td>{{farm.name}}</td>
+                                        <td>{{farm.grower.name}}</td>
+                                        <td class="text-center">
+                                            {% if 'Farm View' in request.user.get_role_perm or request.user.is_superuser %}
+                                            <a href="{% url 'farm-location-map-view' farm.pk farm.grower.id %}"
+                                                class="map-icon-link" alt="view farm location map" title="view farm location map">
+                                                <span class="fas fa-map-marked-alt map-Icon"></span></a>
+                                            {% endif %}
+                                            {% if 'Farm Edit' in request.user.get_role_perm or request.user.is_superuser %}
+                                            <a href="{% url 'farm-update' farm.pk %}" class="update-btn-link" alt="edit farm" title="edit farm"> <span
+                                                    class="fas fa-edit"></span> </a>
+                                            {% endif %}
+                                            {% if 'Farm Delete' in request.user.get_role_perm or request.user.is_superuser %}
+
+                                            <a onclick="delFarm('{% url 'farm-delete' farm.pk %}')"
+                                                href="{% url 'farm-delete' farm.pk %}" data-mdb-toggle="modal"
+                                                data-mdb-target="#deleteModal" alt="delete farm" title="delete farm">
+                                                <span class="fas fa-trash"></span></a>
+                                            {% endif %}
+                                            {% if 'Farm View' in request.user.get_role_perm or request.user.is_superuser %}
+                                            <a href="{% url 'farm-detail' farm.pk %}" class="update-btn-link" alt="view farm" title="view farm"> <span
+                                                    class="fas fa-eye"></span> </a>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="row align-items-center">
+
+                        <div class="col-md-8 col-sm-12 col-12 text-md-left text-center">
+                            {% if farms.has_other_pages %}
+                            <ul class="pagination">
+                                {% if farms.has_previous %}
+                                <li><a href="?page={{ farms.previous_page_number }}">&laquo;</a></li>
+                                {% else %}
+                                <li class="disabled"><span>&laquo;</span></li>
+                                {% endif %}
+                                {% for i in farms.paginator.page_range %}
+                                {% if farms.number == i %}
+                                <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+                                {% else %}
+                                <li><a href="?page={{ i }}">{{ i }}</a></li>
+                                {% endif %}
+                                {% endfor %}
+                                {% if farms.has_next %}
+                                <li><a href="?page={{ farms.next_page_number }}">&raquo;</a></li>
+                                {% else %}
+                                <li class="disabled"><span>&raquo;</span></li>
+                                {% endif %}
+                            </ul>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-4 col-sm-12 col-12 text-md-right text-center">
+                            {% if user.is_superuser or 'SubAdmin' in request.user.get_role or 'SuperUser' in request.user.get_role %}
+                            <span>Showing {{ farms.start_index }} - {{ farms.end_index }} of {{ farms.paginator.count }} entries
+                            {% endif %}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+    </main>
+    {% include 'footer.html' %}
+</div>
+
+<!-- Delete Popup -->
+<div class="modal fade" id="deleteModal" aria-hidden="true" aria-labelledby="exampleModalToggleLabel22" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-body">
+                <button type="button" class="btn-close cust-close-ds-btn" data-mdb-dismiss="modal"
+                    aria-label="Close"></button>
+                <div class="center-content-status">
+                    <img src="{% static 'img/trash.png' %}" alt="right" id="rightImg" class="warning-icon">
+                    <p id="message" class="modal-title titlepad">Are you sure you want to delete?</p>
+                </div>
+                <div class="modal-center-btn-footer">
+                    <button onclick="reloadwindow()" id="closeBtnpopup" type="button" class="btn-close-cancel btn-space"
+                        data-mdb-dismiss="modal">
+                        Close
+                    </button>
+                    <!-- {% comment %} <button type="submit" class="btn-save-submit">Delete</button> {% endcomment %} -->
+                    <a onclick="farmdeleteNow()" id="farmDelete" pkidhref=""><button type=""
+                            class="btn-save-submit">Delete</button></a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<!-- end -->
+{% endblock content %}
+
+{% block scripts %}
+<script src="https://cdn.datatables.net/1.11.0/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.0/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/responsive.bootstrap4.min.js"></script>
+
+<script src="{% static 'js/farm/farm_list.js' %}"></script>
+
+<script>
+    $(document).ready(function () {
+        $('#farmList_tbl').DataTable();
+    });
+
+</script>
+{% endblock scripts %}

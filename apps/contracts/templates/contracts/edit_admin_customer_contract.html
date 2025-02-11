@@ -1,0 +1,485 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}Edit Admin Customer Contract{% endblock title %}
+
+{% block content %}
+{% include 'navbar.html' %}
+<div class="main-content">
+    {% include 'header.html' %}
+    <main>
+
+        <style>
+            .btn_remove_unic {
+                width: 41px;
+                height: 24px;
+                padding: 0;
+                display: inline-flex;
+                justify-content: center;
+                align-items: center;
+                font-size: 19px;
+            }
+            .remove-existing-crop-btn{
+                width: 41px;
+                height: 24px;
+                padding: 0;
+                display: inline-flex;
+                justify-content: center;
+                align-items: center;
+                font-size: 15px;
+            }
+            .bootstrap-select .dropdown-menu li.disabled.selected{display: none;}
+            .dropdown.bootstrap-select.form-control .btn{border: 1px solid; padding: 16px 10px; border-radius: 0;}
+            .bootstrap-select .dropdown-menu{max-width: 280px;}
+            .bootstrap-select .dropdown-menu li.selected.active .dropdown-item.active.selected{margin-left: 0;padding: 0;}
+        </style>
+
+        {% include '_alerts.html' %}
+        <span class="farm headingtop">Admin Customer Contract Edit</span>
+        <div class="card farm-fields-container">
+            <div class="container-fluid">                
+                <form id="contractForm" method="post" class="farm-fields-form" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="customer_id">Select Customer<span class="asteriskField">*</span></label>
+                                <select name="selected_customer" id="customer_id" class="form-control selectpicker" {% if request.user.is_customer %}disabled{% endif %} data-live-search="true" required>
+                                    <option value="All">Select Customer</option>
+                                    {% for customer in customers %}
+                                    <option value="{{customer.id}}"{% if customer.id|stringformat:"s" == selected_customer_id %}selected{% endif %}>{{customer.name}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">                        
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="contract_type">Contract Type<span class="asteriskField">*</span></label>
+                                <select name="contract_type" id="contract_type" class="form-control" {% if request.user.is_customer %} disabled {% endif %} required>
+                                    <option value="Single Crop" {% if selected_contract_type == 'Single Crop' %} selected {% endif %}>Single Crop Contract</option>
+                                    <option value="Multiple Crop" {% if selected_contract_type == 'Multiple Crop' %} selected {% endif %}>Multiple Crop Contract</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div id="crop-fields-container">                           
+                            {% if crops %}        
+                                {% for crop in crops %}
+                                <div class="crop-fields-row">
+                                    <div class="row">
+                                        <div class="col-md-12 text-end me-3">
+                                            {% if request.user.is_superuser or 'SuperUser' in request.user.get_role or 'SubAdmin' in request.user.get_role or request.user.is_warehouse_manager or request.user.is_distributor %}
+                                            <button type="button" class="btn btn-danger remove-existing-crop-btn" data-row-id="{{ crop.id }}">X</button>
+                                            {% endif %}
+                                        </div>                        
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="crop">Crop<span class="asteriskField">*</span></label>                                                   
+                                                <select name="crop[]" id="crop" class="form-control crop-select selectpicker" {% if request.user.is_customer %}disabled{% endif %} required data-live-search="true">                                                  
+                                                    {% for crop_name in crop_names %}                                                   
+                                                    <option value="{{crop_name.item}}"{% if crop.crop == crop_name.item_name and crop.crop_type == crop_name.item_type and crop.per_unit_rate == crop_name.per_unit_price %} selected {% endif %}>{{crop_name.item}}</option>
+                                                    {% endfor %}
+                                                </select>                                                   
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="crop_type">Crop Type<span class="asteriskField">*</span></label>
+                                                <select name="crop_type[]" class="form-control crop-type-select" required data-selected-type="{{ crop.crop_type }}" {% if request.user.is_customer %}disabled{% endif %}>
+                                                    <option value="">Select Crop Type</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="contract_amount">Contract Amount<span class="asteriskField">*</span></label>
+                                                <div class="d-flex">
+                                                    <input type="number" name="contract_amount[]" id="contract_amount" class="form-control" value="{{ crop.contract_amount }}" style="margin-top:0; border-top-right-radius:0 !important; border-bottom-right-radius:0 !important" required {% if request.user.is_customer %}readonly{% endif %}>
+                                                    <select name="amount_unit[]" class="form-select" style="border-top-left-radius:0 !important; border-bottom-left-radius:0 !important; border-left:0; width:100px;" required {% if request.user.is_customer %}disabled{% endif %}>
+                                                        <option value="LBS" {% if crop.amount_unit == 'LBS' %}selected{% endif %}>LBS</option>
+                                                        <option value="MT" {% if crop.amount_unit == 'MT' %}selected{% endif %}>MT</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="per_unit_rate">Per Unit Rate<span class="asteriskField">*</span></label>
+                                                <input type="number" step="0.01" name="per_unit_rate[]" id="per_unit_rate" class="form-control" value="{{ crop.per_unit_rate }}" required {% if request.user.is_customer %}readonly{% endif %}>
+                                            </div>
+                                        </div>
+                                        <input type="hidden" name="crop_id[]" value="{{ crop.id }}">
+                                        <input type="hidden" name="delete_flag[]" value="0" class="delete-flag">                                        
+                                    </div>
+                                </div>
+                                {% endfor %}
+                                {% else %}                                    
+                                <div class="crop-fields-row">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="crop">Crop<span class="asteriskField">*</span></label>
+                                                <select name="crop[]" id="crop" class="form-control crop-select selectpicker" required data-live-search="true">
+                                                    <option value="">Select Crop</option>
+                                                    {% for crop_name in crop_names %}
+                                                    <option value="{{crop_name.item}}">{{crop_name.item}}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="crop_type">Crop Type<span class="asteriskField">*</span></label>
+                                                <select name="crop_type[]" class="form-control crop-type-select" required>
+                                                    <option value="">Select Crop Type</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="contract_amount">Contract Amount<span class="asteriskField">*</span></label>
+                                                <div class="d-flex">
+                                                    <input type="number" name="contract_amount[]" id="contract_amount" class="form-control" style="margin-top:0; border-top-right-radius:0 !important; border-bottom-right-radius:0 !important" required>
+                                                    <select name="amount_unit[]" class="form-select" style="border-top-left-radius:0 !important; border-bottom-left-radius:0 !important; border-left:0; width:100px;" required>
+                                                        <option value="LBS">LBS</option>
+                                                        <option value="MT">MT</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="per_unit_rate">Per Unit Rate<span class="asteriskField">*</span></label>
+                                                <input type="number" step="0.01" name="per_unit_rate[]" id="per_unit_rate" class="form-control" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}                            
+                        </div>
+                            <div id="add-crop-btn-container" class="text-end" style="display: none;">
+                                {% if request.user.is_superuser or 'SuperUser' in request.user.get_role or 'SubAdmin' in request.user.get_role or request.user.is_warehouse_manager or request.user.is_distributor %}
+                                <button type="button" id="add-crop-btn" class="btn btn-primary" style="width: 41px; height: 24px; padding: 0; display: inline-flex; justify-content: center; align-items: center; font-size: 19px;">+</button>
+                                {% endif %}
+                            </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="contract_start_date">Contract Start Date<span class="asteriskField">*</span></label>
+                                <input type="date" name="contract_start_date" id="contract_start_date" class="form-control" value="{{ contract_start_date|date:'Y-m-d' }}" {% if request.user.is_customer %}readonly{% endif %} required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="contract_period">Contract Period<span class="asteriskField">*</span></label>
+                                <div class="d-flex">
+                                <input type="number" name="contract_period" id="contract_period" class="form-control" value="{{ contract_period }}" {% if request.user.is_customer %}readonly{% endif %} style="margin-top:0; border-top-right-radius:0 !important; border-bottom-right-radius:0 !important" required>
+                                <select name="contract_period_choice" id="contract_period_choice" class="form-control" {% if request.user.is_customer %}disabled{% endif %} style="border-top-left-radius:0 !important; border-bottom-left-radius:0 !important; border-left:0; width:100px;" required>
+                                    <option value="Days" {% if contract.contract_period_choice == "Days" %}selected{% endif %}>Days</option>
+                                    <option value="Months" {% if contract.contract_period_choice == "Months" %}selected{% endif %}>Months</option>
+                                    <option value="Year" {% if contract.contract_period_choice == "Year" %}selected{% endif %}>Year</option>
+                                </select>
+                                </div>
+                            </div>
+                        </div>                    
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="status">Status<span class="asteriskField">*</span></label>
+                                <select name="status" id="status" class="form-control" {% if request.user.is_customer %}disabled{% endif %} required>
+                                    <option value="Contract Initiated" {% if status == "Contract Initiated" %}selected{% endif %}>Contract Initiated</option>
+                                    <option value="Under Review" {% if status == "Under Review" %}selected{% endif %}>Under Review</option>
+                                    <option value="Active With Documentation Processing" {% if status == "Active With Documentation Processing" %}selected{% endif %}>Active With Documentation Processing</option>
+                                    <option value="Active With Documentation Completed" {% if status == "Active With Documentation Completed" %}selected{% endif %}>Active With Documentation Completed</option>
+                                    <option value="Completed" {% if status == "Completed" %}selected{% endif %}>Completed</option>
+                                    <option value="Terminated" {% if status == "Terminated" %}selected{% endif %}>Terminated</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group d-flex align-items-center justify-content-center">
+                                <label for="required_documents" class="mb-0">Required Documents:</label>
+                                
+                                {% if request.user.is_superuser or 'SubAdmin' in request.user.get_role or 'SuperUser' in request.user.get_role %}
+                                    <button type="button" class="btn btn-primary font-weight-bold btn-lg ms-2" id="add-document" style="width: 41px;height: 24px;padding: 0;display: inline-flex;justify-content: center;align-items: center;font-size: 19px;">+</button>
+                                {% endif %}
+                                <div class="flex-grow-1"></div>
+                            </div>
+                            <div id="document-container">
+                                {% for document in documents %}
+                                <div class="document-row d-flex align-items-center mb-3">
+                                    <input type="text" name="document_name[]" class="form-control me-3" value="{{ document.name }}" {% if request.user.is_customer %}readonly{% endif %}>
+                                    {% if document.document %}
+                                        <a href="{{ document.document.url }}" class="elements_for_object_docs me-3" target="_blank" download><span class="doc_name">{{ document.name }}</span></a>
+                                    {% else %}
+                                        <span class='me-3'>Not uploaded.</span>
+                                    {% endif %}
+                                    <input type="text" name="document_status_{{ document.id }}" class="form-control me-3 " value="{% if document.document_status %}{{ document.document_status }}{% endif %}" placeholder="Document status" {% if request.user.is_customer %}readonly{% endif %}>
+                                    <input type="hidden" name="document_ids" value="{{ document.id }}">
+                                    {% if request.user.is_customer %}
+                                        <input type="file" name="document_file_{{ document.id }}" class="form-control me-3" value="{{document.document.name}}">
+                                    {% endif %}
+                                    {% if request.user.is_superuser or 'SubAdmin' in request.user.get_role or 'SuperUser' in request.user.get_role%}
+                                        
+                                        <button type="button" class="btn btn-danger btn-remove-document" data-document-id="{{ document.id }}" style="width: 41px;height: 24px;padding: 0;display: inline-flex;justify-content: center;align-items: center;font-size: 10px;">x</button>
+                                    {% endif %}                                    
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <div id="delete-document-container">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-btn-row text-center text-md-end">
+                            <a href="{% url 'admin-customer-contract-list' %}" class="btn-close-cancel">Cancel</a>
+                            <button type="submit" class="btn-save-submit">{% if request.user.is_superuser or 'SubAdmin' in request.user.get_role or 'SuperUser' in request.user.get_role%}Save{%endif %}{% if request.user.is_customer %}Submit{% endif %}</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+    {% include 'footer.html' %}
+</div>
+{% endblock content %}
+{% block jquery %}
+<script>
+    
+    function toggleAddCropButton() {
+        const contractType = document.getElementById('contract_type').value;
+        const addCropBtnContainer = document.getElementById('add-crop-btn-container');
+        const cropRows = document.querySelectorAll('.crop-fields-row');
+        const removeExistingCropBtns = document.querySelectorAll('.remove-existing-crop-btn');
+
+        if (contractType === 'Multiple Crop') {
+            
+            addCropBtnContainer.style.display = 'block';
+
+            cropRows.forEach(row => {
+                if (!row.querySelector('.remove-existing-crop-btn')) {
+                    addRemoveButton(row);
+                }
+            });
+
+            removeExistingCropBtns.forEach(btn => {
+                btn.style.display = 'inline-block';
+            });
+        } else {
+            addCropBtnContainer.style.display = 'none';
+
+            cropRows.forEach(row => {
+                const removeBtn = row.querySelector('.remove-existing-crop-btn');
+                if (removeBtn) {
+                    removeBtn.remove();
+                }
+            });
+        }
+    }
+    document.addEventListener('change', function(event) {
+        if (event.target && event.target.classList.contains('crop-select')) {
+            const cropCode = event.target.value;
+            const cropFieldsRow = event.target.closest('.crop-fields-row');
+            const cropTypeSelect = cropFieldsRow.querySelector('.crop-type-select');
+            const perUnitRateInput = cropFieldsRow.querySelector('[name="per_unit_rate[]"]');
+    
+            if (cropCode) {
+                fetch(`/contracts/get-crop-types/?crop_code=${cropCode}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        cropTypeSelect.innerHTML = '<option value="">Select Crop Type</option>';
+    
+                        data.crop_types.forEach(type => {
+                            const option = document.createElement('option');
+                            option.value = type.item_type; 
+                            option.textContent = type.item_type;
+                            cropTypeSelect.appendChild(option);
+                        });
+    
+                        if (data.crop_types.length > 0) {
+                            perUnitRateInput.value = data.crop_types[0].per_unit_price || ''; 
+                        } else {
+                            perUnitRateInput.value = '';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching crop types:', error);
+                    });
+            } else {
+                cropTypeSelect.innerHTML = '<option value="">Select Crop Type</option>';
+                perUnitRateInput.value = '';
+            }
+        }
+    });
+    
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.crop-select').forEach(cropSelect => {
+            const cropTypeSelect = cropSelect.closest('.crop-fields-row').querySelector('.crop-type-select');
+            const cropCode = cropSelect.value;
+    
+            if (cropCode) {
+                fetch(`/contracts/get-crop-types/?crop_code=${cropCode}`)
+                    .then(response => response.json())
+                    .then(data => {                     
+                        cropTypeSelect.innerHTML = '<option value="">Select Crop Type</option>';
+    
+                        const selectedType = cropTypeSelect.getAttribute('data-selected-type');
+                        data.crop_types.forEach(type => {
+                            const option = document.createElement('option');
+                            option.value = type.item_type;
+                            option.textContent = type.item_type;
+    
+                            if (selectedType === type.item_type) {
+                                option.selected = true;
+                            }
+    
+                            cropTypeSelect.appendChild(option);
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error fetching crop types:', error);
+                    });
+            }
+        });
+    });
+
+    function addRemoveButton(row) {
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.className = 'btn btn-danger remove-existing-crop-btn';
+        removeBtn.textContent = 'X';
+
+        const buttonContainer = document.createElement('div');
+        buttonContainer.className = 'col-md-12 text-end me-3';
+        buttonContainer.appendChild(removeBtn);
+        row.appendChild(buttonContainer);
+
+        removeBtn.addEventListener('click', function () {
+     
+            row.querySelector('.delete-flag').value = '1';
+            row.style.display = 'none';
+        });
+    }
+
+    document.getElementById('contract_type').addEventListener('change', toggleAddCropButton);
+
+    document.getElementById('add-crop-btn').addEventListener('click', function () {
+
+        var newCropRow = document.createElement('div');
+        newCropRow.classList.add('crop-fields-row');
+        newCropRow.innerHTML = `
+            <div class="row">
+                <input type="hidden" name="delete_flag[]" value="0" class="delete-flag"> <!-- Hidden field to mark for deletion -->
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="crop">Crop<span class="asteriskField">*</span></label>
+                        <select name="crop[]" class="form-control crop-select selectpicker" required data-live-search="true">
+                            <option value="">Select Crop</option>
+                            {% for crop_name in crop_names %}
+                            <option value="{{crop_name.item}}">{{crop_name.item}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="crop_type">Crop Type<span class="asteriskField">*</span></label>
+                        <select name="crop_type[]" class="form-control crop-type-select" required>
+                            <option value="">Select Crop Type</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="contract_amount">Contract Amount<span class="asteriskField">*</span></label>
+                        <div class="d-flex">
+                            <input type="number" name="contract_amount[]" class="form-control" style="margin-top:0; border-top-right-radius:0 !important; border-bottom-right-radius:0 !important" required>
+                            <select name="amount_unit[]" class="form-select" style="border-top-left-radius:0 !important; border-bottom-left-radius:0 !important; border-left:0; width:100px;" required>
+                                <option value="LBS">LBS</option>
+                                <option value="MT">MT</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="per_unit_rate">Per Unit Rate<span class="asteriskField">*</span></label>
+                        <input type="number" step="0.01" name="per_unit_rate[]" class="form-control" required>
+                    </div>
+                </div>
+                <div class="col-md-12 text-end me-3">
+                    <!-- - button for newly added rows -->
+                    <button type="button" class="btn btn-danger remove-crop-btn" style="width: 41px; height: 24px; padding: 0; display: inline-flex; justify-content: center; align-items: center; font-size: 19px;">-</button>
+                </div>
+            </div>
+        `;
+
+        document.getElementById('crop-fields-container').appendChild(newCropRow);
+
+        newCropRow.querySelector('.remove-crop-btn').addEventListener('click', function () {
+            newCropRow.remove(); 
+        });
+    });
+
+    document.addEventListener('click', function(event) {
+        if (event.target.classList.contains('remove-existing-crop-btn')) {
+            const row = event.target.closest('.crop-fields-row');
+            row.querySelector('.delete-flag').value = '1'; 
+            row.style.display = 'none'; 
+        }
+    });
+
+    window.addEventListener('load', toggleAddCropButton);
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+       
+        document.getElementById('document-container').addEventListener('click', function (event) {
+            if (event.target.classList.contains('btn-remove-document')) {
+                var documentId = event.target.getAttribute('data-document-id');
+
+                var deleteInput = document.createElement('input');
+                deleteInput.type = 'hidden';
+                deleteInput.name = 'delete_document_ids[]';
+                deleteInput.value = documentId;
+                console.log(deleteInput);
+
+                document.querySelector('#delete-document-container').appendChild(deleteInput);
+ 
+                var documentRow = event.target.closest('.document-row');
+                documentRow.remove();
+            }
+        });
+    
+        document.getElementById('add-document').addEventListener('click', function () {
+            var documentContainer = document.getElementById('document-container');
+            var documentRow = document.createElement('div');
+            documentRow.className = 'document-row d-flex align-items-center mb-3';
+            documentRow.innerHTML = `
+                <input type="text" name="document_name[]" class="form-control me-3" placeholder="Enter document name">
+                <button type="button" class="btn btn-danger btn-remove-unic">-</button>
+            `;
+            documentContainer.appendChild(documentRow);
+        });
+    
+        document.getElementById('document-container').addEventListener('click', function (event) {
+            if (event.target.classList.contains('btn-remove-unic')) {
+                event.target.closest('.document-row').remove();
+            }
+        });
+    });
+    
+</script>
+
+<script>
+    $('#Contracts-active').addClass('activeLink');
+  
+    $('#Contracts-down').addClass('down');
+    $('#Contracts-sub').show();
+  
+    $('#Customer-Contract-List').addClass('activeLink active-nav');
+  
+</script>
+{% endblock jquery %}

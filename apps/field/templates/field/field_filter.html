@@ -1,0 +1,127 @@
+{% extends "base.html" %} {% load static %} {% block title %} Grouping {% endblock title %} 
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+{% block content %} {% include 'navbar.html' %} {% include 'header.html' %} {% load widget_tweaks %}
+
+<div class="main-content">
+    <main> <span class="farm headingtop">Field Grouping </span>
+
+        <div class="bs-example mt-4">
+            <form method="get">
+                <div class="well">
+                    <div class="row">
+                        <div class="form-group col-sm-4 col-md-3">
+                            {{ filter.form.crop.label_tag }} {% render_field filter.form.crop class="form-control" %}
+                        </div>
+                        <div class="form-group col-sm-4 col-md-3">
+                            {{ filter.form.variety.label_tag }} {% render_field filter.form.variety class="form-control" %}
+                        </div>
+                        <div class="form-group col-sm-4 col-md-3">
+                            {{ filter.form.crop_tech.label_tag }} {% render_field filter.form.crop_tech class="form-control" %}
+                        </div>
+                        <div class="form-group col-sm-4 col-md-3">
+                            {{ filter.form.stand_count.label_tag }} {% render_field filter.form.stand_count class="form-control" %}
+                        </div>
+                        <div class="form-group col-sm-4 col-md-3">
+                            {{ filter.form.previous_crop.label_tag }} {% render_field filter.form.previous_crop class="form-control" %}
+                        </div>
+
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-inffo btnsearch1">
+          <span class="glyphicon glyphicon-search"></span> Search
+        </button>
+
+            </form>
+            <!-- <form method="get">
+                {{ filter.form.as_ul }}
+                <button type="submit">Search</button>
+            </form> -->
+
+            <table class="table">
+                <thead>
+                    <tr style="border-bottom: 2px solid #e0e0e0;">
+                        <th class="clr2">Farm Name</th>
+                        <th class="clr2">Grower</th>
+                        <th class="clr2" data-title="Farmer Field Name" data-breakpoints="xs sm">Farmer Field Name</th>
+                        <th class="clr2" data-title="Batch ID" data-breakpoints="xs sm">Batch ID</th>
+                        <th class="clr2" data-title="Acreage" data-breakpoints="xs sm">Acreage</th>
+                        <!-- <th class="clr2">FSA Farm Number</th>
+                                <th class="clr2">FSA Tract Number</th>
+                                <th class="clr2">FSA Field Number</th> -->
+                        {% comment %}
+                        <th class="clr2" data-title="Field Center Coordinates" data-breakpoints="xs sm">Field Center Coordinates
+                        </th> {% endcomment %}
+                        <th class="clr2" data-title="Crop" data-breakpoints="xs sm">Crop</th>
+                        <th class="clr2" data-title="Variety" data-breakpoints="xs sm">Variety</th>
+                        <th class="clr2" data-title="Yield Bu. Per Acre" data-breakpoints="xs sm">Yield Bu. Per Acre</th>
+                        <th class="clr2">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for field in filter.qs %}
+                    <tr>
+                        <td>{{field.farm.name}}</td>
+                        <td>{{field.grower.name}}</td>
+                        <td>{{field.name}}</td>
+                        <td>{{field.batch_id}}</td>
+                        <td>{{field.acreage}}</td>
+                        <!-- <td>{{field.fsa_farm_number}}</td>
+                                <td>{{field.fsa_tract_number}}</td>
+                                <td>{{field.fsa_field_number}}</td> -->
+                        {% comment %}
+                        <td>{{field.field_center_coordinates}}</td> {% endcomment %}
+                        <td>{{field.crop}}</td>
+                        <td>{{field.variety}}</td>
+                        <td>{{field.yield_per_acre}}</td>
+                        <td class="backk1">
+                            <li> <a href="{% url 'field-update' field.pk %}"><span class="fas fa-edit"> </span></a></li>
+                            <li> <a href="{% url 'field-delete' field.pk %}"><span class="fas fa-trash" data-mdb-toggle="modal"
+                    data-mdb-target="#exampleModal-delete"></span></a></li>
+                            <li> <a href="{% url 'field-detail' field.pk %}"><span class="fas fa-eye"></span> </a></li>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <nav aria-label="Page navigation example" class="example-nav">
+                <ul class="pagination pg-blue justify-content-end">
+                    {% if is_paginated %} {% if page_obj.has_previous %}
+                    <a class="btn btn-outline-info mb-4" href="?page=1">First</a>
+                    <a class="btn btn-outline-info mb-4" href="?page={{ page_obj.previous_page_number }}">Previous</a> {% endif %} {% for num in page_obj.paginator.page_range %} {% if page_obj.number == num %}
+                    <a class="btn btn-info mb-4" href="?page={{ num }}">{{ num }}</a> {% elif num > page_obj.number|add:'-3' and num
+                    < page_obj.number|add: '3' %} <a class="btn btn-outline-info mb-4" href="?page={{ num }}">{{ num }}</a>
+                        {% endif %} {% endfor %} {% if page_obj.has_next %}
+                        <a class="btn btn-outline-info mb-4" href="?page={{ page_obj.next_page_number }}">Next</a>
+                        <a class="btn btn-outline-info mb-4" href="?page={{ page_obj.paginator.num_pages }}">Last</a> {% endif %} {% endif %}
+                </ul>
+            </nav>
+        </div>
+
+</div>
+</main>
+</div>
+{% endblock content %} {% comment %} {% extends 'base.html' %} {% block content %}
+<form method="get">
+    {{ filter.form.as_p }}
+    <button type="submit">Search</button>
+</form>
+<ul>
+    {% for user in filter.qs %}
+    <li>{{ user.username }} - {{ user.get_full_name }}</li>
+    {% endfor %}
+</ul>
+{% endblock %} {% endcomment %}

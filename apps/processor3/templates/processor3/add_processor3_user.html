@@ -1,0 +1,198 @@
+{% extends "base.html" %} {% load static %} {% block title %} Add Tier 2 Processor {% endblock title %} 
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+{% block content %} {% include 'navbar.html' %}
+<div class="main-content">
+    {% include 'header.html' %} {% load crispy_forms_tags %}
+  <main>
+    {% include '_alerts.html' %}
+    <span class="farm headingtop">Add Tier 2 Processor</span>
+    <div class="card farm-fields-container">
+        <div class="container-fluid">
+            <form method="post" class="farm-fields-form">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <div>
+                            <label for="">FEIN<span class="asteriskField">*</span></label>
+                            <input type="text" value="{{processor.fein}}" id="" class="textinput textInput form-control" readonly>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div>
+                            <label for="">Entity Name<span class="asteriskField">*</span></label>
+                            <input type="text" value="{{processor.entity_name}}" id="" class="textinput textInput form-control" readonly>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div>
+                            <label for="">Billing Address<span class="asteriskField">*</span></label>
+                            <input type="text" value="{{processor.billing_address}}" id="" class="textinput textInput form-control" readonly>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div>
+                            <label for="">Shipping Address</label>
+                            <input type="text" value="{{processor.shipping_address}}" id="" class="textinput textInput form-control" readonly>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div>
+                            <label for="">Main Email<span class="asteriskField">*</span></label>
+                            <input type="text" value="{{processor.main_email}}" id="" class="textinput textInput form-control" readonly>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div>
+                            <label for="">Main number<span class="asteriskField">*</span></label>
+                            <input type="text" value="{{processor.main_number}}" id="" class="textinput textInput form-control" readonly>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div>
+                            <label for="">Main fax<span class="asteriskField">*</span></label>
+                            <input type="text" value="{{processor.main_fax}}" id="" class="textinput textInput form-control" readonly>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div>
+                            <label for="">Website</label>
+                            <input type="text" value="{{processor.website}}" id="" class="textinput textInput form-control" readonly>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <!-- Processor User -->
+                {% for processor_user in processor_user %}
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <div>
+                            <label for="">Name<span class="asteriskField">*</span></label>
+                            <input type="text" value="{{processor_user.contact_name}}" id="" class="textinput textInput form-control" readonly>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div>
+                            <label for="">Email<span class="asteriskField">*</span></label>
+                            <input type="text" value="{{processor_user.contact_email}}" id="" class="textinput textInput form-control" readonly>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div>
+                            <label for="">Phone<span class="asteriskField">*</span></label>
+                            <input type="text" value="{{processor_user.contact_phone}}" id="" class="textinput textInput form-control" readonly>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div>
+                            <label for="">Fax<span class="asteriskField">*</span></label>
+                            <input type="text" value="{{processor_user.contact_fax}}" id="" class="textinput textInput form-control" readonly>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+                <!-- <div class="row">
+                    <div class="col-md-3">
+                        <div>
+                            <label for="contact_name">Contact Name<span class="asteriskField">*</span></label>
+                            <input type="text" name="contact_name1" id="contact_name1" class="textinput textInput form-control" required>
+                        </div>
+                        
+                    </div>
+                    <div class="col-md-3">
+                        <div>
+                            <label for="contact_email">Contact Email<span class="asteriskField">*</span></label>
+                            <input type="email" name="contact_email1" id="contact_email1" class="textinput textInput form-control" required>
+                        </div>
+                        
+                    </div>
+                    <div class="col-md-3">
+                        <div>
+                            <label for="contact_phone">Contact Phone</label>
+                            <input type="number" name="contact_phone1" id="contact_phone1" class="textinput textInput form-control">
+                        </div>
+                       
+                    </div>
+                    <div class="col-md-3">
+                        <div>
+                            <label for="ccontact_fax">Contact Fax</label>
+                            <input type="number" name="contact_fax1" id="contact_fax1" class="textinput textInput form-control">
+                        </div>
+                    </div>
+                </div> -->
+                <div class="row">
+                    <div class="form-btn-row" style="text-align:left">
+                    <input type="button" class="btn-close-cancel btn-space" value="+ Add Contact" onclick="createSelect()">
+                </div>
+                <div id="root"></div>
+                
+                <div class="row">
+                    <div class="form-btn-row">
+                        <a href="{% url 'list_processor3' %}" class="btn-close-cancel btn-space">Cancel</a>
+                        <input type="submit" class="btn-save-submit" value="Save"> 
+                    </div>
+                </div>
+        </div>
+        <input style="display: none;" type="text" id="product_counter" value="0" name="counter">
+        </form>
+  </main>
+  {% include 'footer.html' %}
+</div>
+{% endblock %}
+
+{% block jquery %}
+<script>
+function createSelect(){
+    var counter = $('#product_counter').val();
+    var counter = eval(counter)+1;
+    $('#product_counter').val(counter);
+
+    document.querySelector('#root').insertAdjacentHTML("afterend",
+        `<div class="row">
+        <div class="col-md-3">
+            <div>
+                <label for="contact_name${counter}">Contact Name<span class="asteriskField">*</span></label>
+                <input type="text" name="contact_name${counter}" id="contact_name${counter}" class="textinput textInput form-control" required>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div>
+                <label for="contact_email${counter}">Contact Email<span class="asteriskField">*</span></label>
+                <input type="email" name="contact_email${counter}" id="contact_email${counter}" class="textinput textInput form-control" required>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div>
+                <label for="contact_phone${counter}">Contact Phone</label>
+                <input type="number" name="contact_phone${counter}" id="contact_phone${counter}" class="textinput textInput form-control" required>
+            </div>
+        </div>
+        <div class="col-md-3" style="margin-bottom: 15px;">
+            <div>
+                <label for="contact_fax${counter}">Contact Fax</label>
+                <input type="number" name="contact_fax${counter}" id="contact_fax${counter}" class="textinput textInput form-control" required>
+            </div>
+        </div>
+    </div>`);
+}
+</script>
+<script>
+  $('#Tier3-Processor-active').addClass('activeLink');
+  
+  $('#Tier3-Processor-down').addClass('down');
+  $('#Tier3-Processor-sub').show();
+
+  $('#Processor3-List').addClass('activeLink active-nav');
+  </script>
+{% endblock jquery %}

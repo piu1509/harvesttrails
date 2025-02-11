@@ -1,0 +1,706 @@
+{% extends "base.html" %} {% load static %} {% block title %} Home {% endblock%}
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+{% block content %} {% include 'navbar.html' %}
+<div class="main-content">
+  {% include 'header.html' %}
+  
+  <style type="text/css">
+    
+  .inner-popup{font-family: Arial, Helvetica, sans-serif;height: 100vh;display: flex;align-items: center; position:absolute; width:100%; z-index: 999; left:0; right:0}
+  .inner-popup-content{background-color:#fff;max-width: 800px;border: 2px solid #fff; border:2px solid #00b258; border-radius: 15px;box-shadow: 0 20px 40px rgba(0,0,0,0.6);margin: 0 auto;padding: 45px;text-align: center;}
+  .inner-popup-content .popup-head{position: relative;margin-bottom: 22px;}
+  .inner-popup-content .popup-head h2{font-size: 30px;font-weight: 600;color: #0d6efd;text-transform: uppercase;}
+  .inner-popup-content .popup-head .close {position: absolute; right: -20px; top: -33px; width: 24px; height: 24px; opacity: 0.3; display: flex; justify-content: center; align-items: center;}
+  .inner-popup-content h3, h4 {color: #444;margin-top: 0;margin-bottom: 10px;font-weight: 400;}
+  .inner-popup-content .popup-head .close:hover {opacity: 1;}
+  .inner-popup-content .popup-head .close:before, .close:after {position: absolute;left: 0; right: 0; content: ' '; height: 2px; background-color: #333;}
+  .inner-popup-content .popup-head .close:before {transform: rotate(45deg);}
+  .inner-popup-content .popup-head .close:after {transform: rotate(-45deg);}
+  .inner-popup-content .c-name{text-align: center;font-size: 22px;font-weight: 400;line-height: 25px; margin-top: 30px;}
+  .inner-popup-content .c-name strong{font-size: 18px; }
+
+
+
+.cards-2columns {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-gap: 8px;
+    margin-top: 1rem;
+    margin-left: 10px;
+}
+
+.cards-2columns a, .cards-2columns a:hover {
+  color: #fff !important;
+}
+
+  .min5{
+    background: #87e0fd;
+background: -moz-linear-gradient(top,  #87e0fd 0%, #53cbf1 40%, #05abe0 100%);
+background: -webkit-linear-gradient(top,  #87e0fd 0%,#53cbf1 40%,#05abe0 100%);
+background: linear-gradient(to bottom,  #87e0fd 0%,#53cbf1 40%,#05abe0 100%);
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#87e0fd', endColorstr='#05abe0',GradientType=0 );
+border-radius: 0;
+    color: white;
+    padding: 15px;
+
+  }
+  .min6{
+    background: #d5cea6;
+background: -moz-linear-gradient(top,  #d5cea6 0%, #c9c190 40%, #b7ad70 100%);
+background: -webkit-linear-gradient(top,  #d5cea6 0%,#c9c190 40%,#b7ad70 100%);
+background: linear-gradient(to bottom,  #d5cea6 0%,#c9c190 40%,#b7ad70 100%);
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#d5cea6', endColorstr='#b7ad70',GradientType=0 );
+border-radius: 0;
+    color: white;
+    padding: 15px;
+
+  }
+
+  .border-end {
+    border-right: 1px solid #fff;
+  }
+  .showansModalclass {
+    position: fixed;
+    right: 3%;
+    z-index: 999;
+    bottom: 5%;
+    background-color: #00b258;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .showansModalclass a{display: inline-flex;}
+  .showansModalclass a span{
+    color: #fff;
+    font-size: 22px;}
+
+    #showansModal .modal-content{padding-top: 0;border-radius: 15px;padding-bottom: 0;}
+    #showansModal .modal-content .modal-header{background-color: #00b258;border-top-right-radius: 15px;border-top-left-radius: 15px;align-items: center;}
+    #showansModal .modal-content .modal-header h2{font-size: 24px;font-weight: 500;color: #fff;}
+    #showansModal .modal-content .modal-header button{top: unset;color: #fff;filter: brightness(0) invert(1);}
+  
+    #showansModal .modal-content .modal-body #showans{min-height: 200px;border: 2px solid #00b258;margin-bottom: 15px;border-radius: 10px;overflow: auto;text-align: left;
+    padding: 10px;}
+    #showansModal .modal-content .modal-body form textarea{width: 100%;height: 40px;border-radius: 10px;padding-left: 10px;padding-right: 16px;}
+    #showansModal .modal-content .modal-body form input[type="button"]{background-color: #00b258;color: #fff;border: none;padding: 5px 23px;border-radius: 10px;font-size: 18px;width: 16%;}
+    #showansModal .sendclass{ display: flex;align-items: flex-start;gap: 10px;}
+    .resetclass{position: relative;width: 82%;}
+    .resetclass .btn{position: absolute;right: 6px;top: 4px;padding: 0;box-shadow: none;}
+    .resetclass .btn i{color: red;}
+      </style>
+  <main>
+    
+    <!-- {% if pop == True %}
+      <div class="inner-popup" id="showOrHide">
+        <div class="inner-popup-content">
+            <div class="popup-head">
+                <h2>Attention!!</h2>
+                <a href="#" class="close" onclick="showOrHideDiv()"></a>
+            </div>
+        <h3>An email has been sent to your email address.</h3>
+        <h4>You need to sign the documents digitally.</h4>
+        <p class="c-name"><strong>Regards</strong><br> Agreeta solutions private limited</p>
+        </div>
+      </div>
+    {% endif %} -->
+
+    <h3 class="headingtop">Hi, {{user.username}}</h3>
+    <p class="dashboard-subtitle">Welcome to your dashboard</p>
+    {% if request.user.is_processor or request.user.is_processor2 %}
+      <!-- showing progress with grower payments on the main dashboard. By crop.  -->
+      <!-- {% if request.user.is_processor %}
+        <div class="cards-2columns">
+            <div class="min1">
+              <a href="#" target="_blank">
+                <h3>Cotton - 2022 Crop Year</h3>
+                <div class="row">
+                  <div class="col-6 pe-4 border-end">
+                    <p>{{pp_grower_payment_paid_cotton}}</p>
+                    <p>Grower Payments Paid</p>
+                  </div>
+                  <div class="col-6">
+                    <p>{{pp_premium_paid_cotton}}</p>
+                    <p>Premium Paid</p>
+                  </div>
+                </div>
+              </a>
+            </div>
+            <div class="min2">
+              <a href="#" target="_blank">
+                <h3>Rice - 2022 Crop Year</h3>
+                <div class="row">
+                  <div class="col-6 pe-4 border-end">
+                    <p>{{pp_grower_payment_paid_rice}}</p>
+                    <p>Grower Payments Paid</p>
+                  </div>
+                  <div class="col-6">
+                    <p>{{pp_premium_paid_rice}}</p>
+                    <p>Premium Paid</p>
+                  </div>
+                </div>
+              </a>
+            </div>
+        </div>  
+      {% endif %} -->
+
+    {% else %}
+    <div>
+      <div class="cards">
+            <div class="min1">
+              <a href="{% url 'user-list' %}" target="_blank">
+                <div class="for-card-use1">
+                  <h4 class="digitt">Total User</h4>
+                </div>
+                <div class="for-card-use">
+                  <div class="iccon">
+                    <span class="img1"><img src="{% static 'img/icons/plus.png' %}" /></span>
+                  </div>
+                  <div class="for-card-use1">
+                    {% if 'Grower' in request.user.get_role and not request.user.is_superuser %} 
+                      <h1>1</h1>
+                    {% else %}
+                    
+                      {% if request.user.is_consultant %}
+                      <h1>{{con_grow_count}}</h1>
+                      {% else %}
+                      <h1>{{user_count}}</h1>
+                      {% endif %}
+                    {% endif %}
+                  </div>
+                </div>
+              </a>
+            </div>
+            <div class="min2">
+              {% if request.user.is_superuser or 'SubAdmin' in request.user.get_role or 'SuperUser' in request.user.get_role %}
+              <a href="{% url 'survey-listing' %}" target="_blank">
+              {% endif %}
+              {% if 'Grower' in request.user.get_role and not request.user.is_superuser %}
+              <a href="{% url 'type-survey' %}" target="_blank">
+              {% endif %}
+                <div class="for-card-use1">
+                  <h4 class="digitt">Total Survey</h4>
+                </div>
+                <div class="for-card-use">
+                  <div class="iccon">
+                    <span class="img1"><img src="{% static 'img/icons/group.png' %}" /></span>
+                  </div>
+                  <div class="for-card-use1">
+                    <h1>{{survey_count}}</h1>
+                  </div>
+                </div>
+              </a>
+
+            </div>
+            <div class="min3">
+              <a href="{% url 'grower-sustain-comparison' %}" target="_blank">
+              <div class="for-card-use1">
+                <h4 class="digitt">Avg. Percentage Score</h4>
+              </div>
+              <div class="for-card-use">
+                <div class="iccon">
+                  <span class="img1"><img src="{% static 'img/icons/comma.png' %}" /></span>
+                </div>
+                <div class="for-card-use1">
+                  <h1>{{Avg_Percentage_Score}}</h1>
+                </div>
+              </div>
+              </a>
+            </div>
+            <div class="min4">
+              <a href="{% url 'grower-sustain-comparison' %}" target="_blank">
+              <div class="for-card-use1">
+                <h4 class="digitt">Latest Percentage Score</h4>
+              </div>
+              <div class="for-card-use">
+                <div class="iccon">
+                  <span class="img1"><img src="{% static 'img/icons/speed.png' %}" /></span>
+                </div>
+                <div class="for-card-use1">
+                  <h1>{{SustainabilitySurvey_data_latest}}</h1>
+                </div>
+              </div>
+              </a>
+            </div>
+      </div>
+      <!-- {% if request.user.is_superuser or 'SubAdmin' in request.user.get_role or 'SuperUser' in request.user.get_role %}
+      <div class="cards-2columns">
+        <div class="min5">
+          <a href="#" target="_blank">
+          <div class="for-card-use1">
+            <h4 class="digitt">Cotton - 2022 Crop Year</h4>
+          </div>
+          <div class="for-card-use">
+            <div class="iccon">
+              <span class="img1"><img src="{% static 'img/icons/speed.png' %}" /></span>
+            </div>
+            <div class="for-card-use1">
+              <div class="row">
+                <div class="col-6 pe-4 border-end">
+                  <p>{{ad_grower_payment_paid_cotton}}</p>
+                  <p>Grower Payments Paid</p>
+                </div>
+                <div class="col-6">
+                  <p>{{ad_premium_paid_cotton}}</p>
+                  <p>Premium Paid</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          </a>
+        </div>
+        <div class="min6">
+          <a href="#" target="_blank">
+          <div class="for-card-use1">
+            <h4 class="digitt">Rice - 2022 Crop Year</h4>
+          </div>
+          <div class="for-card-use">
+            <div class="iccon">
+              <span class="img1"><img src="{% static 'img/icons/speed.png' %}" /></span>
+            </div>
+            <div class="for-card-use1">
+              <div class="row">
+                <div class="col-6 pe-4 border-end">
+                  <p>{{ad_grower_payment_paid_rice}}</p>
+                  <p>Grower Payments Paid</p>
+                </div>
+                <div class="col-6">
+                  <p>{{ad_premium_paid_rice}}</p>
+                  <p>Premium Paid</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          </a>
+        </div>
+      </div>
+      {% endif %} -->
+    </div>
+    {% endif %}
+    <div class="container-fluid dashboard-container">
+      <div class="row">
+        {% if request.user.is_processor or request.user.is_processor2 %}
+        {% if request.user.is_processor %}
+        <div class="col-md-9 col-12">
+          <div class="card card-padding">
+            <h2 class="user-detls">Your Details</h2>
+              <div class="row">
+                <div class="col-4"><strong>FEIN : </strong>
+                  <div>{{processor.fein}}</div>
+                </div>
+                <div class="col-4"><strong>Entity Name : </strong>
+                  <div>{{processor.entity_name}}</div>
+                </div>
+                <div class="col-4"><strong>Billing Address : </strong>
+                  <div>{{processor.billing_address}}</div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-4"><strong>Shipping Address : </strong>
+                  <div>{{processor.shipping_address}}</div>
+                </div>
+                <div class="col-4"><strong>Main number : </strong>
+                  <div>{{processor.main_number}}</div>
+                </div>
+                <div class="col-4"><strong>Main fax : </strong>
+                  <div>{{processor.main_fax}}</div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-4"><strong>Website : </strong>
+                  <div>{{processor.website}}</div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-3"><strong>Contact Name : </strong>
+                  <div>{{p_user.contact_name}}</div>
+                </div>
+                <div class="col-3"><strong>Contact Email : </strong>
+                  <div>{{p_user.contact_email}}</div>
+                </div>
+                <div class="col-3"><strong>Contact Phone : </strong>
+                  <div>{{p_user.contact_phone}}</div>
+                </div>
+                <div class="col-3"><strong>Contact Fax : </strong>
+                  <div>{{p_user.contact_fax}}</div>
+                </div>
+              </div>
+          </div>
+        </div>
+        {% elif request.user.is_processor2 %}
+        <div class="col-md-9 col-12">
+          <div class="card card-padding">
+            <h2 class="user-detls">Your Details</h2>
+              <div class="row">
+                <div class="col-4"><strong>FEIN : </strong>
+                  <div>{{processor2.fein}}</div>
+                </div>
+                <div class="col-4"><strong>Entity Name : </strong>
+                  <div>{{processor2.entity_name}}</div>
+                </div>
+                <div class="col-4"><strong>Billing Address : </strong>
+                  <div>{{processor2.billing_address}}</div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-4"><strong>Shipping Address : </strong>
+                  <div>{{processor2.shipping_address}}</div>
+                </div>
+                <div class="col-4"><strong>Main number : </strong>
+                  <div>{{processor2.main_number}}</div>
+                </div>
+                <div class="col-4"><strong>Main fax : </strong>
+                  <div>{{processor2.main_fax}}</div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-4"><strong>Website : </strong>
+                  <div>{{processor2.website}}</div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-3"><strong>Contact Name : </strong>
+                  <div>{{p2_user.contact_name}}</div>
+                </div>
+                <div class="col-3"><strong>Contact Email : </strong>
+                  <div>{{p2_user.contact_email}}</div>
+                </div>
+                <div class="col-3"><strong>Contact Phone : </strong>
+                  <div>{{p2_user.contact_phone}}</div>
+                </div>
+                <div class="col-3"><strong>Contact Fax : </strong>
+                  <div>{{p2_user.contact_fax}}</div>
+                </div>
+              </div>
+          </div>
+        </div>
+        {% endif %}
+        {% else %}
+        <div class="col-md-9 col-12">
+
+          <div class="card card-padding">
+            <h2 class="user-detls">User Details</h2>
+            <div class="table-responsive tblborder">
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Survey</th>
+                    <th>Field</th>
+                    <th>Farm</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                    <!-- <th>Created Date</th> -->
+                    <!-- <th>Completed Date</th> -->
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for srvy_tkn_user in survey_taken_user %}
+                  <tr>
+                    <td>{{srvy_tkn_user.grower.name}}</td>
+                    <td class="complatedcolor">{{srvy_tkn_user.namesurvey.typesurvey}} {{srvy_tkn_user.namesurvey.surveyyear}}</td>
+                    <td>{{srvy_tkn_user.field.name}}</td>
+                    <td>{{srvy_tkn_user.farm.name}}</td>
+                    <td style="text-transform: uppercase;">{{srvy_tkn_user.status}}</td>
+                    <td>{{srvy_tkn_user.created_date|date:"M d, Y" }}</td>
+                    <!-- <td>{{srvy_tkn_user.modified_date|date:"M d, Y" }}</td> -->
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          
+        </div>
+        {% endif %}
+        <div class="col-md-3 col-12">
+
+          <div class="customers">
+
+            <div class="card card-padding">
+              
+              <h2 class="user-detls">Resource</h2>
+                <div>
+                  <video controls width="100%">
+
+                    <source src="../../media/videos/ResourceVideo1.webm"
+                            type="video/webm">
+                
+                    <source src="../../media/videos/ResourceVideo1.mp4"
+                            type="video/mp4">
+                
+                    Sorry, your browser doesn't support embedded videos.
+                  </video>
+                </div> 
+              {% if request.user.is_processor or request.user.is_processor2 %}
+              {% else %}
+              <h2 class="user-detls">Recent Added Users</h2>
+              {% for recentUser in recent_users %}
+              <a href="{% url 'user-detail' recentUser.pk %}" target="_blank" style="color: black;">
+              <p>{{recentUser.first_name}} {{recentUser.last_name}}</p>
+              </a>
+              {% endfor %}
+              {% endif %}
+
+            </div>
+          </div>
+          
+          <div>&nbsp;</div>
+          <div class="customers">
+            <div class="card card-padding">
+              <h2 class="user-detls">Upcoming Dates</h2>
+              {% for updat in upcoming_dates %}
+              <div class="customer">
+                <div class="info">
+                  <div class="c1 clrr">
+                    <span>#{{forloop.counter}}</span><span class="trightt"></span>
+                  </div>
+                  <div class="latest-info-area">
+                    <div class="name-and-time">
+                      <span class="recent-time">{{updat.show_date}}</span>
+                    </div>
+                    <p class="for-pera">
+                      {{updat.description}}
+                    </p>
+                  </div>
+                </div>
+              </div>
+              {% endfor %}
+              
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-9 col-12">
+          {% comment %} {% if 'SuperAdmin' in request.user.get_role%} {% endcomment %}
+          {% comment %} {% if  not 'SuperUser' in request.user.get_role and 'Grower' in request.user.get_role and 'Consultant' in request.user.get_role and 'Processor' in request.user.get_role and 'Processor2' in request.user.get_role and 'Farm Operator' in request.user.get_role %}  {% endcomment %}
+          <div class="card card-padding">
+            {% comment %} {% if request.user.is_superuser  and 'SuperUser' in request.user.get_role and 'Grower' in request.user.get_role and 'Consultant' in request.user.get_role and 'Processor' in request.user.get_role and 'Processor2' in request.user.get_role and 'Farm Operator' in request.user.get_role %} {% endcomment %}
+           
+            <h2 class="user-detls">LOG DETAILS</h2>
+            <div class="table-responsive tblborder">
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th>Log Type</th>
+                    <th>Log Status</th>
+                    <th>Name</th>
+                    <th>Action By</th>
+                    <th>Action By Role</th>
+                    <th>Action Date Time</th>
+                  </tr>
+                </thead>
+                <tbody>
+                 
+                  {% for object in all_log %}
+                      <tr>
+                      <td>{{object.log_type}}</td>
+                      <td>{{object.log_status}}</td>
+                      <td>{{object.log_name}}</td>
+                      <td>{{object.action_by_username}}</td>
+                      <td>{{object.action_by_role}}</td>
+                      <td>{{object.action_datetime}}</td>
+                      </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            
+          </div>
+          {% comment %} {%endif%} {% endcomment %}
+        </div>
+        </div>
+        
+        {% comment %} {% else %} {% endcomment %}
+        <div class="col-md-9 col-12">
+          <div class="card card-padding">
+            {% if not 'SuperAdmin' in request.user.get_role %}
+            <h2 class="user-detls">Release Notes</h2>
+            <ol class="orderlist">
+              {% for relnotes in release_notes %}
+              <li>
+                {% autoescape off %}
+                {{relnotes.description}}
+                {% endautoescape %}
+              </li>
+              {% endfor %}
+            </ol>
+            {%endif %}
+          </div>
+        </div>  
+        {% comment %} {%endif%} {% endcomment %}
+        <div class="col-md-3 col-12">
+          <div class="customers">
+            {% comment %} <div class="card card-padding"> {% endcomment %}
+              {% if 'Grower' in request.user.get_role and not request.user.is_superuser %}
+              <h2 class="user-detls">Check List</h2>
+
+              <h3 style="font-size: 14px; font-weight: bold;">Onboarding {% if flag == 'True' %}<img src="{% static 'img/completed.png' %}" alt="">{% endif %}
+              </h3>
+              <p style="font-size: 14px; line-height: 14px;">
+                {% if onboarding_Grower_contract.checkstatus == True %}
+                <i class="fas fa-check-square"></i>&nbsp;Grower Contract
+                {% else %}
+                <i class="far fa-square"></i>&nbsp;Grower Contract
+                {% endif %}
+              </p>
+
+              <p style="font-size: 14px; line-height: 14px;">
+                {% if onboarding_Grower_Onboarding_Survey_1.checkstatus == True %}
+                <i class="fas fa-check-square"></i>&nbsp;Onboarding Survey
+                {% else %}
+                <i class="far fa-square"></i>&nbsp;Onboarding Survey
+                {% endif %}
+              </p>
+
+              <p style="font-size: 14px; line-height: 14px;">
+                {% if onboarding_Grower_FSA_ID_information.checkstatus == True %}
+                <i class="fas fa-check-square"></i>&nbsp;FSA ID information
+                {% else %}
+                <i class="far fa-square"></i>&nbsp;FSA ID information
+                {% endif %}
+              </p>
+
+
+              <p style="font-size: 14px; line-height: 14px;"><i class="far fa-square"></i>&nbsp;Account information</p>
+
+
+              <p style="font-size: 14px; line-height: 14px;">
+                {% if onboarding_Grower_Farm_fully_set_up.checkstatus == True %}
+                <i class="fas fa-check-square"></i>&nbsp;Farm fully set up
+                {% else %}
+                <i class="far fa-square"></i>&nbsp;Farm fully set up
+                {% endif %}
+              </p>
+
+              <p style="font-size: 14px; line-height: 14px;">
+                {% if onboarding_Grower_Field_fully_set_up.checkstatus == True %}
+                <i class="fas fa-check-square"></i>&nbsp;Field fully set up
+                {% else %}
+                <i class="far fa-square"></i>&nbsp;Field fully set up
+                {% endif %}
+              </p>
+
+              <p style="font-size: 14px; line-height: 14px;">
+                {% if onboarding_Grower_Shapefile_upload_for_all_fields.checkstatus == True %}
+                <i class="fas fa-check-square"></i>&nbsp;Shapefile upload for all fields
+                {% else %}
+                <i class="far fa-square"></i>&nbsp;Shapefile upload for all fields
+                {% endif %}
+              </p>
+
+              {% else %}
+              {% comment %} {% if request.user.is_processor or request.user.is_processor2 %}
+              {% else %}
+              <h2 class="user-detls">Recent Added Users</h2>
+              {% for recentUser in recent_users %}
+              <a href="{% url 'user-detail' recentUser.pk %}" target="_blank" style="color: black;">
+              <p>{{recentUser.first_name}} {{recentUser.last_name}}</p>
+              </a>
+              {% endfor %}
+              {% endif %} {% endcomment %}
+              {% endif %}
+            {% comment %} </div> {% endcomment %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+<!-- sdp -->
+{% if 'Grower' in request.user.get_role and not request.user.is_superuser %}
+<div class="showansModalclass">
+  <a onclick="showans('')" href="javascript:void(0)"
+                data-mdb-toggle="modal" data-mdb-target="#showansModal" alt="Assistant Help" title="Assistant Help">
+                <span class="fas fa-question-circle"></span></a>
+                <!-- <i class="fas fa-question-circle"></i> -->
+</div>
+
+
+<!-- showansModal Popup -->
+<div class="modal fade" id="showansModal" aria-hidden="true" aria-labelledby="exampleModalToggleLabel22" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Ask your query</h2>
+        <button type="button" class="btn-close cust-close-ds-btn" data-mdb-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="center-content-status">
+          
+              <form action="" method="post" id="helpapi">
+                {% csrf_token %}
+                <div id="showans"></div>
+                <div class="sendclass">
+                  <div class="resetclass">
+                    <button type="button" class="btn" data-toggle="tooltip" data-placement="top" title="Reset" onclick="resetfunc()">
+                     <i class="fas fa-times"></i>
+                    </button>
+                    
+                    <textarea name="qes" id="qes" cols="30" rows="10" placeholder="Type your message..."></textarea>
+                  </div>
+                  <input type="button" value="ask" onclick="helpapi_call()">
+                </div>
+              </form>
+          
+        </div>
+      </div>
+      </div>
+    </div>
+</div>
+<!-- end -->
+{% endif %}
+    
+    {% if 'Grower' in request.user.get_role and not request.user.is_superuser  %}
+    {% block scripts %}
+    <script>
+      function resetfunc(){
+        document.getElementById('qes').value = "";
+      }
+
+      function helpapi_call(){
+        var frm = $('#helpapi');
+        // document.getElementById('showans').innerHTML ="";
+        $.ajax({
+            type: 'POST',
+            url: '/assistantapp/helpapi/',
+            data: frm.serialize(),
+            success: function (response){
+              // console.log('response',response);
+              document.getElementById('showans').innerHTML ="";
+              document.getElementById('showans').innerHTML = response.ans;
+            }
+          });
+      }
+    </script>
+    {% endblock scripts %}
+    {% endif %}
+
+    <script>
+      // function showOrHideDiv() {
+      //    var v = document.getElementById("showOrHide");
+      //    if (v.style.display === "none") {
+      //       v.style.display = "block";
+      //    } else {
+      //       v.style.display = "none";
+      //    }
+      // }
+    </script>
+  </main>
+  {% include 'footer.html' %}
+</div>
+{% endblock content %}

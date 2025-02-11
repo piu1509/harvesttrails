@@ -1,0 +1,2 @@
+Shipment ID,Lot Number #,Shipment Date,Sender Processor,Receiver Processor,Purchase Order Number,Lot Number,Sender SKU Id,Receiver SKU Id,Volume Shipped,Weight Of Product,Expected Yield,Receiver Processor Type,Status,Received Weight,Ticket Number,Approval/Disapproval Date,Reason For Disapproval,Moisture Level
+wvO3P8ZEXxbj,234,06-11-2024,App Test Processor,Tier2 test processor,1234,234,215457,12345,20,20.0,19.0,T2,APPROVED,20,510,2024-06-06 22:00:00+00:00,,3

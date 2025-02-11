@@ -1,0 +1,356 @@
+{% extends "base.html" %} {% load static %}
+{% block title %} Tier 2 Processor EWR Report {% endblock title %}
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+{% load crispy_forms_tags %}
+{% block content %}
+{% include 'navbar.html' %}
+<style>
+    tfoot input {
+        width: 100%;
+        padding: 3px;
+        box-sizing: border-box;
+    }
+
+    @media(max-width:575px) {
+        .inline-apply-filter.ewr-report {
+            display: block;
+        }
+    }
+</style>
+<style>
+    table.classing tbody tr td {
+        vertical-align: top;
+    }
+
+    ul.pagination {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+    }
+
+    ul.pagination li {
+        list-style: none;
+        line-height: 45px;
+        text-align: center;
+        font-size: 18px;
+        font-weight: 500;
+        cursor: pointer;
+        user-select: none;
+        transition: all 0.3s ease;
+    }
+
+    ul.pagination li {
+        display: none;
+        position: relative;
+    }
+
+
+    ul.pagination li:first-of-type,
+    ul.pagination li:nth-of-type(2),
+    ul.pagination li:last-of-type,
+    ul.pagination li:has( + li:last-of-type),
+    ul.pagination li.active,
+    ul.pagination li.active + li,
+    ul.pagination li.active + li + li,
+    ul.pagination li:has(+ li.active),
+    ul.pagination li:has(+ li + li.active){
+        display: block;
+    }
+
+    ul.pagination li:has(+ li + li.active){
+        padding-left: 35px;
+    }
+
+    ul.pagination li.active + li + li {
+        padding-right: 35px;
+    }
+
+    ul.pagination li:has( + li + li.active) a:before,
+    ul.pagination li.active + li + li a:after {
+        content: "...";
+        font-size: 16px;
+        display: inline-block;
+        width: 35px;
+        height: 40px;
+        position: absolute;
+        top: -1px;
+        background-color: #fff;
+        border: 1px solid #ddd;
+    }
+
+    ul.pagination li:has( + li + li.active) a:before {
+        left: -35px;
+    }
+
+    ul.pagination li.active + li + li a:after {
+        right: -35px;
+    }
+
+    ul.pagination li:nth-of-type(1) a:before,
+    ul.pagination li:nth-of-type(2) a:before,
+    ul.pagination li:nth-of-type(3) a:before {
+        display: none !important;
+    }
+
+    ul.pagination li:nth-of-type(1),
+    ul.pagination li:nth-of-type(2),
+    ul.pagination li:nth-of-type(3) {
+        padding-left: 0 !important;
+    }
+
+    ul.pagination li:nth-of-type(1) a:after,
+    ul.pagination li:nth-of-type(2) a:after,
+    ul.pagination li:nth-of-type(3) a:after {
+        display: none !important;
+    }
+
+    ul.pagination li:nth-of-type(1),
+    ul.pagination li:nth-of-type(2),
+    ul.pagination li:nth-of-type(3) {
+        padding-left: 0 !important;
+    }
+
+
+
+</style>
+<div class="main-content">
+    {% include 'header.html' %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.0/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.bootstrap4.min.css">
+
+    <main>
+        {% include '_alerts.html' %}
+        <div class="page-title-with-or-without-btn">
+            <span class="farm headingtop">Tier 2 Processor EWR Report</span>
+            <div class="inline-apply-filter justify-content-center justify-content-md-end ewr-report">
+                <!-- <form action="" method="post" class="">
+                    {% csrf_token %}
+                    <div class="inline-apply-filter ewr-report">
+                        <div class="three-fields-with-label">
+                            
+                        </div>
+                        &nbsp;
+                        
+                        <input style="display : none;" id="submitBtn" type="submit"
+                            class="apply-filter-btn primary-btn" value="Apply Filter" />
+                    </div>
+                </form>
+                &nbsp; -->
+                <div>
+                    
+                    <a href="{% url 't2_classing_ewr_report_all_downlaod' p2_id level  %}" class="btn-close-cancel btn-space no-wrap me-2"><span>Download EWR Report</span></a>
+                    
+                </div>
+            </div>
+        </div>
+        <div class="card card-padding">
+            <div class="three-fields-with-label">
+                <form action="" method="get" class="row align-items-center">
+                    
+                    {% if request.user.is_superuser or 'SubAdmin' in request.user.get_role or 'SuperUser' in request.user.get_role %}
+                    <div class="col-lg-5 col-md-4 mb-2">
+                        <select id="get_processor" name="get_processor2" style="padding: 6px 15px !important;">
+                            <option value='all' selected> Select Tier 2 Processor </option>
+                            {% for i in processor2 %}
+                            {% if i == selectedprocessor %}
+                            <option value="{{ i.pk }}" selected>{{i.entity_name}} - {{ i.pk }}
+                            </option>
+                            {% else %}
+                            <option value="{{ i.pk }}">{{i.entity_name}} - {{ i.pk }}</option>
+                            {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                    {% endif %}
+                    <div class="col-lg-5 col-md-4 mb-2">
+                        <select id="levels" name="levels" style="padding: 6px 15px !important;">
+                            <option value='all' selected> Select Cotton Levels </option>
+                            {% if selected_level == "Bronze" %}
+                            <option value="Bronze" selected>Bronze</option>
+                            <option value="Silver">Silver</option>
+                            <option value="Gold">Gold</option>
+                            <option value="Llano Super">Llano</option>
+                            {% elif selected_level == "Silver" %}
+                            <option value="Bronze">Bronze</option>
+                            <option value="Silver" selected>Silver</option>
+                            <option value="Gold">Gold</option>
+                            <option value="Llano Super">Llano</option>
+                            {% elif selected_level == "Gold" %}
+                            <option value="Bronze">Bronze</option>
+                            <option value="Silver">Silver</option>
+                            <option value="Gold" selected>Gold</option>
+                            <option value="Llano Super">Llano</option>
+                            {% elif selected_level == "Llano Super" %}
+                            <option value="Bronze">Bronze</option>
+                            <option value="Silver">Silver</option>
+                            <option value="Gold">Gold</option>
+                            <option value="Llano Super" selected>Llano</option>s
+                            {% else %}
+                            <option value="Bronze">Bronze</option>
+                            <option value="Silver">Silver</option>
+                            <option value="Gold">Gold</option>
+                            <option value="Llano Super">Llano</option>
+                            {% endif %}
+                            
+                        </select>
+                    </div>
+                    <div class="col-lg-2 col-md-4 mb-2">
+                        <input  id="" type="submit" class="apply-filter-btn primary-btn" value="Apply Filter" />
+                    </div>
+                </form>
+            </div>
+          
+            <div class="main-simple-table-with-search">                
+                <div class="both-data-in" style="display: inherit;">
+                    <div class="simple-responsive-table">
+                        <table id="" class="table table-striped dt-responsive nowrap" style="width:100%">
+                            <thead>
+                                <tr style="border-bottom: 2px solid #e0e0e0;">
+                                    <th width="10%">Warehouse ID</th>
+                                    <th width="10%">Receipt</th>
+                                    <th width="10%">Crop Year</th>
+                                    <th width="10%">Format</th>
+                                    <!-- <th width="10%">Total</th> -->
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for i in report %}
+                                <tr>
+                                    <td>{{i.warehouse_wh_id}}</td>
+                                    <td>{{i.assigned_bale}}</td>
+                                    <td>2023</td>
+                                    <td>{{i.warehouse_wh_id}}{{i.assigned_bale}}2023</td>
+                                    <!-- <td></td> -->
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <!-- <tfoot>
+                                <tr>
+                                    <th width="10%">Warehouse ID</th>
+                                    <th width="10%">Receipt</th>
+                                    <th width="10%">Crop Year</th>
+                                    <th width="10%">Format</th>
+                                </tr>
+                            </tfoot> -->
+                        </table>
+                    </div>
+                    <div class="row align-items-center">
+                        <div class="col-md-12 col-sm-12 col-12 text-center">
+                            {% if report.has_other_pages %}
+                                <ul class="pagination" id="nav_1">
+                                {% if report.has_previous %}
+                                    <li><a href="?get_processor={%if selectedprocessor.id %}{{selectedprocessor.id}}{% else %}{{selectedprocessor}}{% endif %}&levels={%if selected_level %}{{selected_level}}{% else %}{{selected_level}}{% endif %}&page={{ report.previous_page_number }}">&laquo;</a></li>
+                                    {% else %}
+                                    <li class="disabled"><span>&laquo;</span></li>
+                                    {% endif %}
+                                    {% for i in report.paginator.page_range %}
+                                    {% if report.number == i %}
+                                    <li class="active pagi" id="getactive"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+                                    {% else %}
+                                    <li><a href="?get_processor={%if selectedprocessor.id %}{{selectedprocessor.id}}{% else %}{{selectedprocessor}}{% endif %}&levels={%if selected_level %}{{selected_level}}{% else %}{{selected_level}}{% endif %}&page={{ i }}">{{ i }}</a></li>
+                                    {% endif %}
+                                    {% endfor %}
+                                    {% if report.has_next %}
+                                    <li><a href="?get_processor={%if selectedprocessor.id %}{{selectedprocessor.id}}{% else %}{{selectedprocessor}}{% endif %}&levels={%if selected_level %}{{selected_level}}{% else %}{{selected_level}}{% endif %}&page={{ report.next_page_number }}">&raquo;</a></li>
+                                    {% else %}
+                                    <li class="disabled"><span>&raquo;</span></li>
+                                {% endif %}
+                                </ul>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-12 col-sm-12 col-12 text-center mt-2" style="text-align:right">
+                            <span>Showing  {{ report.start_index }} - {{ report.end_index }} of {{ report.paginator.count }} entries
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </main>
+    {% include 'footer.html' %}
+</div>
+{% endblock content %}
+
+{% block scripts %}
+<script src="https://cdn.datatables.net/1.11.0/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.0/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/responsive.bootstrap4.min.js"></script>
+
+<script src="{% static 'js/farm/farm_list.js' %}"></script>
+
+<script>
+    $(document).ready(function() {
+
+    $('#levels').change( function () {
+    //var id = $('#growerSelction').val();
+    //document.location.href = '/farms/farms_list/?grower_id=' + id;
+    $('#submitBtn2').click();
+    });
+
+    });
+    // $(document).ready(function() {
+
+    // $('#get_processor').change( function () {
+    // //var id = $('#growerSelction').val();
+    // //document.location.href = '/farms/farms_list/?grower_id=' + id;
+    // $('#submitBtn2').click();
+    // });
+
+    // });
+
+    // $(document).ready(function () {
+    //     $('#processorList_tbl').DataTable({
+    // "pageLength": 50
+    // });
+    // });
+    $(document).ready(function () {
+    // Setup - add a text input to each footer cell
+    $('#processorList_tbl tfoot th').each(function () {
+        var title = $(this).text();
+        $(this).html('<input type="text" placeholder="Search ' + title + '" />');
+    });
+ 
+    // DataTable
+    var table = $('#processorList_tbl').DataTable({
+        "pageLength": 100,
+        initComplete: function () {
+            // Apply the search
+            this.api()
+                .columns()
+                .every(function () {
+                    var that = this;
+ 
+                    $('input', this.footer()).on('keyup change clear', function () {
+                        if (that.search() !== this.value) {
+                            that.search(this.value).draw();
+                        }
+                    });
+                });
+        },
+    });
+});
+</script>
+<script>
+    $('#Tier2-Processor-active').addClass('activeLink');
+  
+    $('#Tier2-Processor-down').addClass('down');
+    $('#Tier2-Processor-sub').show();
+  
+    $('#EWR-Report-Tier2').addClass('activeLink active-nav');
+  
+  </script>
+{% endblock scripts %}

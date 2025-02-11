@@ -1,0 +1,71 @@
+{% extends "base.html" %} 
+{% load static %} 
+{% block title %} Add New Account {% endblock title %} 
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+{% load crispy_forms_tags %} 
+{% block content %} 
+{% include 'navbar.html' %}
+<div class="main-content">
+    {% include 'header.html' %}
+    <main>
+        <form id="mainForm" method="POST">
+            {% csrf_token %}
+            <label for="dropdown">Select Option:</label>
+            <select id="dropdown" name="dropdown">
+                <option value="None">Select</option>
+                <option value="con">con</option>
+                <option value="oth">oth</option>
+            </select>
+            <button type="submit">go</button>
+        </form>
+    
+        <div id="formOption1" style="display: none;">
+            <!-- Form fields for Option 1 -->
+            <label for="field1">Field 1:</label>
+            <input type="text" id="field1" name="field1">
+        </div>
+    
+        <div id="formOption2" style="display: none;">
+            <!-- Form fields for Option 2 -->
+            <label for="field2">Field 2:</label>
+            <input type="text" id="field2" name="field2">
+        </div>
+    
+        <script>
+            document.getElementById("dropdown").addEventListener("change", function () {
+                var selectedOption = this.value;
+                document.getElementById("formOption1").style.display = "none";
+                document.getElementById("formOption2").style.display = "none";
+    
+                if (selectedOption === "option1") {
+                    document.getElementById("formOption1").style.display = "block";
+                } else if (selectedOption === "option2") {
+                    document.getElementById("formOption2").style.display = "block";
+                }
+            });
+        </script>
+    </main>
+    {% include 'footer.html' %}
+</div>
+{% endblock %}
+{% block jquery %}
+
+<script>
+    $('#User-Management-active').addClass('activeLink');
+    $('#User-Management-down').addClass('down');
+    $('#User-Management-sub').show();
+    $('#user-list').addClass('activeLink active-nav');
+</script>
+{% endblock %}

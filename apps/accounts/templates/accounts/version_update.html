@@ -1,0 +1,61 @@
+{% extends "base.html" %} {% load static %} {% block title %} Add version {% endblock title %} 
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+{% block content %} {% include 'navbar.html' %}
+<div class="main-content">
+    {% include 'header.html' %} {% load crispy_forms_tags %}
+  <main>
+    {% include '_alerts.html' %}
+    <span class="farm headingtop">Add version update</span>
+    <div class="card farm-fields-container">
+        <div class="container-fluid">
+            <form method="post" class="farm-fields-form">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <div>
+                            <label for="version">Version</label>
+                            <input type="text" name="version" id="version" class="textinput textInput form-control">
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div>
+                            <label for="release_date">Release Date</label>
+                            <input type="date" name="release_date" id="release_date" class="textinput textInput form-control" >
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div>
+                            <label for="description">Description</label>
+                            <input type="text" name="description" id="description" class="textinput textInput form-control" >
+                        </div>
+                    </div>
+                    
+                </div>
+                <div class="row">
+                    <div class="form-btn-row">
+                        <input style="display: none;" id="subbtn" type="submit" class="btn-save-submit" value="Save"> 
+                        <input type="submit" class="btn-save-submit" value="Save"> 
+                    </div>
+                </div>
+        </div>
+        </form>
+  </main>
+  {% include 'footer.html' %}
+</div>
+{% endblock %}
+
+{% block jquery %}
+
+{% endblock jquery %}

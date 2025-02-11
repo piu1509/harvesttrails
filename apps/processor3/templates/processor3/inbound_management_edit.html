@@ -1,0 +1,497 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %} Add Shipment {% endblock title %}
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+<link href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/ui-lightness/jquery-ui.css" rel="stylesheet"
+    type="text/css" />
+{% endblock extrahead %}
+
+{% block content %}
+{% include 'navbar.html' %}
+
+<style>
+    .shipment-custom-btn {
+        height: 100%;
+        display: flex;
+        align-items: flex-end;
+    }
+
+    .shipment-custom-btn .btn-save-submit {
+        padding-top: 11px;
+        padding-bottom: 11px;
+        border-radius: 4px;
+    }
+
+.ui-menu{height: 20vh;overflow-y: auto;padding: 0px 10px;margin: 0px 15px;}
+.ui-menu::-webkit-scrollbar{width:6px;max-height:20px;padding-right: 10px;}
+.ui-menu::-webkit-scrollbar-track{background:#ccc}
+.ui-menu:-webkit-scrollbar-thumb{background-color:#000;border-radius:20px;min-height:20px}
+
+</style>
+
+
+<div class="main-content">
+    {% include 'header.html' %} {% load crispy_forms_tags %}
+    <main>
+        <span class="farm headingtop">Edit Shipment (Outbound 2 WIP)</span>
+        <div class="card farm-fields-container">
+            {% include '_alerts.html' %}
+            <div class="container-fluid">
+                <form method="post" class="farm-fields-form" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row" style="margin-bottom:10px">
+                        <div class="col-md-5 mb-2">
+                            <label for="id_bin_location_pull">Bin Location Pulled from<span class="asteriskField">*</span></label>
+                            <select name="bin_pull" id="pull" class="textinput textInput form-control" >                                
+                                <option value="{{shipment.processor_idd}}" selected>{{shipment.processor_e_name}}</option> 
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-6 mb-2 text-center">
+                            <label for="id_storage"><strong>Milled Volume</strong></label>
+                           
+                            <div style="padding: 10px 5px;font-size: 18px;">{{shipment.milled_volume}}</div>                           
+                        
+                            <input type="hidden" name="milled_value" id="sum_total_bin_location_milled_volume_java" value="{{shipment.milled_volume}}">
+                        </div>
+                        
+                        <hr class="mt-2">
+                        <div class="col-md-4 mb-2">
+                            <label for="id_date">Date Pulled<span class="asteriskField">*</span></label>
+                            <input type="date" name="id_date" id="id_date" class="textinput textInput form-control" value="{{ shipment.date_pulled|date:"Y-m-d" }}">
+                            <p id="alert_msg0" style="color:red"></p>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <div>
+                                <label for="equipment_type">Equipment Type<span class="asteriskField">*</span></label>
+                                <select name="equipment_type" id="equipment_type" class="textinput textInput form-control">
+                                    <option value="All" selected disabled>Select Equipment Type</option>
+                                    <option value="Truck" {% if shipment.equipment_type == "Truck" %}selected{% endif %}>Truck</option>
+                                    <option value="Hopper Car" {% if shipment.equipment_type == "Hopper Car" %}selected{% endif %}>Hopper Car</option>
+                                    <option value="Rail Car" {% if shipment.equipment_type == "Rail Car" %}selected{% endif %}>Rail Car</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <div>
+                                <label for="equipment_id">Equipment ID<span class="asteriskField">*</span></label>
+                                <input type="text" id="equipment_id" name="equipment_id" class="textinput textInput form-control" value="{{shipment.equipment_id}}">
+                                <p id="alert_msg1" style="color:red"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <div>
+                                <label for="storage_bin_id">Storage Bin ID (SKU ID)<span class="asteriskField">*</span></label>
+                                <input type="text" id="storage_bin_id" name="storage_bin_id" value="{{shipment.storage_bin_send}}" class="textinput textInput form-control" autocomplete="off">
+                                <p id="alert_msg3" style="color:red"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <label for="weight_prod">Weight Of Product<span class="asteriskField">*</span></label>
+                            <div class="d-flex">
+                                <input type="text" id="weight_prod" name="weight_prod"  value="{{shipment.weight_of_product}}" class="textinput textInput form-control" autocomplete="off" style="margin-top:0; border-top-right-radius:0 !important; border-bottom-right-radius:0 !important">
+                                <select id="unitSelction" name="weight_prod_unit_id" class="form-select" style="border-top-left-radius:0 !important; border-bottom-left-radius:0 !important; border-left:0; width:90px;">
+                                    <option value="LBS" {% if shipment.weight_of_product_unit == "LBS" %}selected{% endif %}>LBS</option>
+                                    <option value="BU" {% if shipment.weight_of_product_unit == "BU" %}selected{% endif %}>BU</option>
+                                </select>
+                            </div>
+                            <p id="alert_msg4" style="color:red"></p>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <label for="exp_yield">Expected Yield<span class="asteriskField">*</span></label>
+                            <div class="d-flex">
+                                <input type="text" id="exp_yield" name="exp_yield" value="{{shipment.excepted_yield}}" class="textinput textInput form-control" autocomplete="off" style="margin-top:0; border-top-right-radius:0 !important; border-bottom-right-radius:0 !important">
+                                <select id="unitSelction" name="exp_yield_unit_id" class="form-select" style="border-top-left-radius:0 !important; border-bottom-left-radius:0 !important; border-left:0; width:90px;">
+                                    <option value="LBS" {% if shipment.excepted_yield_unit == "LBS" %}selected{% endif %}>LBS</option>
+                                    <option value="BU" {% if shipment.excepted_yield_unit == "BU" %}selected{% endif %}>BU</option>
+                                </select>
+                            </div>
+                            <p id="alert_msg5" style="color:red"></p>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <label for="moist_percentage">Moisture Measurement (%)<span class="asteriskField">*</span></label>
+                            <input type="text" class="textinput textInput form-control" id="moist_percentage" name="moist_percentage" value="{{shipment.moisture_percent}}" value="{{moist_percentage}}">
+                            <p id="alert_msg6" style="color:red"></p>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <div>
+                                <label for="purchase_number">Purchase Order number</label>
+                                <input type="text" name="purchase_number" class="textinput textInput form-control" id="purchase_number" value="{{shipment.purchase_order_number}}">
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <label for="lot_number">Lot Number<span class="asteriskField">*</span></label>
+                            <input type="text" name="lot_number" class="textinput textInput form-control" id="lot_number" value="{{shipment.lot_number}}">
+                            <p id="alert_msg2" style="color:red"></p>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <label for="volume_shipped">Volume Shipped<span class="asteriskField">*</span></label>
+                            <input type="number" name="volume_shipped" value="{{shipment.volume_shipped}}" class="textinput textInput form-control" id="volume_shipped">
+                            <p id="alert_msg" style="color:red"></p>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <label for="approval_date">Approval/Disapproval Date<span class="asteriskField">*</span></label>
+                            <input type="date" name="approval_date" id="approval_date" class="textinput textInput form-control" value="{% if shipment.recive_delivery_date %}{{shipment.recive_delivery_date}}{% endif %}">
+                            <p id="alert_msg0" style="color:red"></p>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <div>
+                                <label for="status">Status<span class="asteriskField">*</span></label>
+                                <select name="status" id="status" class="textinput textInput form-control">
+                                    <option value="All" selected disabled>Select Status</option>
+                                    <option value="APPROVED" {% if shipment.status == "APPROVED" %}selected{% endif %}>APPROVED</option>
+                                    <option value="DISAPPROVED" {% if shipment.status == "DISAPPROVED" %}selected{% endif %}>DISAPPROVED</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-2 approved-fields">
+                            <label for="received_weight">Received Weight<span class="asteriskField">*</span></label>
+                            <input type="number" name="received_weight" value="{% if shipment.received_weight %}{{shipment.received_weight}}{% else %}{% endif %}" class="textinput textInput form-control" id="received_weight">
+                            <p id="alert_msg" style="color:red"></p>
+                        </div>
+                        <div class="col-md-4 mb-2 approved-fields">
+                            <label for="ticket_number">Ticket Number<span class="asteriskField">*</span></label>
+                            <input type="number" name="ticket_number" value="{% if shipment.ticket_number %}{{shipment.ticket_number}}{% else %}{% endif %}" class="textinput textInput form-control" id="ticket_number">
+                            <p id="alert_msg" style="color:red"></p>
+                        </div>
+                        <div class="col-md-4 mb-2 approved-fields">
+                            <label for="storage_bin_recive">Receiver Storage Bin Id (SKU Id)<span class="asteriskField">*</span></label>
+                            <input type="text" id="storage_bin_recive" name="storage_bin_recive" value="{% if shipment.storage_bin_recive %}{{shipment.storage_bin_recive}}{% else %}{% endif %}" class="textinput textInput form-control" list="suggestions" autocomplete="off">
+                            <datalist id="suggestions">
+                                {% for data in receiver_sku_id_list %}
+                                <option value="{{data}}">                                        
+                                {% endfor %}
+                            </datalist>
+                            <p id="alert_msg" style="color:red"></p>
+                        </div>
+                        <div class="col-md-4 mb-2 disapproved-fields">
+                            <label for="reason_for_disapproval">Reason for disapproval<span class="asteriskField">*</span></label>
+                            <input type="text" name="reason_for_disapproval" value="{% if shipment.reason_for_disapproval %}{{shipment.reason_for_disapproval}}{% else %}{% endif %}" class="textinput textInput form-control" id="reason_for_disapproval">
+                            <p id="alert_msg" style="color:red"></p>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-8 mb-2">
+                                <label for="multi_file">Upload File <span class="asteriskField">*</span></label>
+                                <input type="file" name="new_files" multiple accept=".jpg,.png,.xlsx,.csv,.pdf" id="multi_file" class="textinput textInput form-control">
+                            </div>  
+                            <div class="col-md-8 mb-2"> 
+                                <div id="file_names_container" style="margin-bottom: 10px;">
+                                    <!-- New files will be listed here -->
+                                </div>
+                                <div id="file_names_container2" style="margin-bottom: 10px;">
+                                    {% for file in files %}
+                                    <div class="file-item" style="margin-bottom: 10px;">
+                                        <div class="file-info">
+                                            <input type="hidden" name="existing_files" value="{{ file.id }}">
+                                            <span>{{ file.name }}</span>
+                                        </div>
+                                        <button type="button" class="remove-file" data-file-id="{{ file.id }}"><span style="color:black;"><b>X</b></span></button>
+                                    </div>
+                                    {% endfor %}
+                                </div>    
+                                <p id="alert_msg8" style="color:red"></p>
+                            </div>
+                        </div>
+                    <div class="row">
+                        <div class="form-btn-row">
+                            <a href="{% url 'inbound_shipment_list3' %}" class="btn-close-cancel btn-space">Cancel</a>
+                            <input onclick="cal_total_pulled()" type="submit" class="btn-save-submit" value="Save">
+                            <input style="display: none;" id="hide_btn1" type="submit" class="btn-save-submit" name="save" value="Save">
+                        </div>
+                    </div>
+                    <script>
+                        document.addEventListener("DOMContentLoaded", function() {
+                            function handleRemoveButtonClick(button) {
+                                let parent = button.parentElement;
+                                parent.style.display = 'none';
+                                let input = parent.querySelector('input[name="existing_files"]');
+                                input.setAttribute('name', 'remove_files'); // Change name to indicate removal
+                                parent.classList.add('removed');
+                            }
+
+                            document.querySelectorAll('.remove-file').forEach(button => {
+                                button.addEventListener('click', function() {
+                                    handleRemoveButtonClick(this);
+                                });
+                            });
+
+                            function updateFileList(files) {
+                                var fileNamesContainer = document.getElementById('file_names_container');
+                                fileNamesContainer.innerHTML = '';
+                                files.forEach(function(file) {
+                                    var fileItem = document.createElement('div');
+                                    fileItem.classList.add('file-item');
+                                    fileItem.innerHTML = `
+                                        <div class="file-info">
+                                            <input type="hidden" name="new_files" value="${file.name}">
+                                            <span>${file.name}</span>
+                                        </div>
+                                        <button type="button" class="remove-file" data-file="${file.name}"><span style="color:red;">&#10060;</span></button>
+                                    `;
+                                    fileNamesContainer.appendChild(fileItem);
+
+                                    fileItem.querySelector('.remove-file').addEventListener('click', function() {
+                                        handleRemoveButtonClick(this);
+                                    });
+                                });
+                            }
+
+                            var fileInput = document.getElementById('multi_file');
+                            fileInput.addEventListener('change', function() {
+                                var files = Array.from(fileInput.files);
+                                updateFileList(files);
+                            });
+
+                            function activityButton1() {
+                                var form = document.querySelector('form');
+                                form.querySelectorAll('.file-item.removed input').forEach(input => {
+                                    input.remove();
+                                });
+                                form.submit();
+                            }
+
+                            document.querySelector('.btn-save-submit').addEventListener('click', activityButton1);
+                        });
+                    </script>
+                </form>
+            </div>
+        </div>
+    </main>
+    {% include 'footer.html' %}
+</div>
+{% endblock %}
+
+{% block jquery %}
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.js">
+</script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.js">
+</script>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var statusSelect = document.getElementById('status');
+            var approvedFields = document.querySelectorAll('.approved-fields');
+            var disapprovedFields = document.querySelectorAll('.disapproved-fields');
+        
+            function toggleFields() {
+                var status = statusSelect.value;
+                if (status === 'APPROVED') {
+                    approvedFields.forEach(function(field) {
+                        field.style.display = 'block';
+                    });
+                    disapprovedFields.forEach(function(field) {
+                        field.style.display = 'none';
+                    });
+                } else if (status === 'DISAPPROVED') {
+                    approvedFields.forEach(function(field) {
+                        field.style.display = 'none';
+                    });
+                    disapprovedFields.forEach(function(field) {
+                        field.style.display = 'block';
+                    });
+                } else {
+                    approvedFields.forEach(function(field) {
+                        field.style.display = 'none';
+                    });
+                    disapprovedFields.forEach(function(field) {
+                        field.style.display = 'none';
+                    });
+                }
+            }
+        
+            statusSelect.addEventListener('change', toggleFields);
+        
+            // Initial call to set the correct fields based on the current value
+            toggleFields();
+        });
+        </script>
+        
+<script>
+
+    $(function() {
+        $('#id_bin_location_pull').on('input', function() {
+            var availableTags  = {{ select_search_json|safe }};
+            //console.log("availableTags==================================",availableTags)
+            $("#id_bin_location_pull").autocomplete({
+                source: availableTags
+            })
+        });
+    }); 
+   
+</script>
+
+<script>
+    $(function() {
+        $('#storage_bin_id').on('input', function() {
+            var availableTags  = {{ select_search_sku_json|safe }};
+           // console.log("availableTags==================================",availableTags)
+            $("#storage_bin_id").autocomplete({
+                source: availableTags
+            })
+        });
+    }); 
+    
+</script>
+ 
+<script>
+    
+    $(document).ready(function() {
+    $('#id_processor').change( function () {
+    $('#submitBtn2').click();
+    });
+    });
+
+    
+</script>
+<script>
+    // onkeyup="blankShip()"
+
+    // function blankShip()
+    // {
+    //     var volume_pulled = $("#volume_shipped").val();
+
+    //     if(volume_pulled==''){
+    //         document.getElementById('alert_msg').innerHTML = "Volume Shipped can't be blank";
+    //     }  
+    //     else
+    //     {
+    //         document.getElementById('alert_msg').innerHTML = "";
+    //     }
+      
+
+    // }
+
+    function cal_total_pulled(){
+        var final_total_volume = $("#sum_total_bin_location_milled_volume_java").val();
+        var volume_pulled = $("#volume_shipped").val();
+        var id_date = $("#id_date").val();
+        //var purchase_number = $("#purchase_number").val();
+        var lot_number = $("#lot_number").val();
+        var equipment_id = $("#equipment_id").val();
+        var storage_bin_id = $("#storage_bin_id").val();
+        var weight_prod = $("#weight_prod").val();
+        var exp_yield = $("#exp_yield").val();
+        var moist_percentage = $("#moist_percentage").val();
+        //var multi_file = $("#multi_file").val();
+
+        if(id_date!='' && lot_number!='' && volume_pulled!='' && equipment_id!=''  && storage_bin_id!=''  && weight_prod!=''  && exp_yield!=''  && moist_percentage!='')
+        {
+            if (parseFloat(final_total_volume) >= parseFloat(volume_pulled) )
+            {
+            document.getElementById('alert_msg').innerHTML = "";
+            $('#hide_btn1').click();
+            }
+            else{
+                document.getElementById('alert_msg').innerHTML = "Volume Shipped can't more than total Milled Volume";   
+            }
+        }
+        else{
+            if(id_date==''){
+            document.getElementById('alert_msg0').innerHTML = "Date can't be blank";
+        }
+        else{
+            document.getElementById('alert_msg0').innerHTML = "";  
+        }
+        if(equipment_id==''){
+            document.getElementById('alert_msg1').innerHTML = "Equipment ID is Mandatory";
+        }
+        else{
+            document.getElementById('alert_msg1').innerHTML = "";  
+        }
+        if(storage_bin_id==''){
+            document.getElementById('alert_msg3').innerHTML = "Storage Bin ID is Mandatory";
+        }
+        else{
+            document.getElementById('alert_msg3').innerHTML = "";  
+        }
+        if(weight_prod==''){
+            document.getElementById('alert_msg4').innerHTML = "Weight Of Product is Mandatory";
+        }
+        else{
+            document.getElementById('alert_msg4').innerHTML = "";  
+        }
+        if(exp_yield==''){
+            document.getElementById('alert_msg5').innerHTML = "Expected Yield is Mandatory";
+        }
+        else{
+            document.getElementById('alert_msg5').innerHTML = "";  
+        }
+        if(moist_percentage==''){
+            document.getElementById('alert_msg6').innerHTML = "Moisture Measurement is Mandatory";
+        }
+        else{
+           document.getElementById('alert_msg6').innerHTML = "";  
+        }
+        //if(purchase_number==''){
+            //document.getElementById('alert_msg7').innerHTML = "Purchase Order number is Mandatory";
+        //}
+        //else{
+           //document.getElementById('alert_msg7').innerHTML = "";  
+        //}
+
+        if(lot_number==''){
+            document.getElementById('alert_msg2').innerHTML = "Lot Number is Mandatory";
+        }
+        else{
+            document.getElementById('alert_msg2').innerHTML = "";  
+        }
+        //if(multi_file==''){
+            //document.getElementById('alert_msg8').innerHTML = "Upload File is Mandatory";
+        //}
+        //else
+        //{
+           // document.getElementById('alert_msg8').innerHTML = ""; 
+        //}
+        if(volume_pulled==''){
+            document.getElementById('alert_msg').innerHTML = "Volume Shipped can't be blank";
+        }  
+        else
+        {
+            if (parseFloat(final_total_volume) >= parseFloat(volume_pulled)){
+                document.getElementById('alert_msg').innerHTML = "Volume Shipped can't more than total Milled Volume";
+            }
+            else{
+                document.getElementById('alert_msg').innerHTML = "";
+            }
+            
+        }
+        }
+
+    }
+
+</script>
+
+<script>
+    document.getElementById('multi_file').addEventListener('change', function(e) {
+        var files = e.target.files;
+        var filenames = "";
+        for (var i = 0; i < files.length; i++) {
+            filenames += files[i].name + "<br>";
+        }
+        document.getElementById('file_name_show').innerHTML = filenames;
+    });
+    </script>
+
+    <script>
+        $('#Tier3-Processor-active').addClass('activeLink');
+  
+        $('#Tier3-Processor-down').addClass('down');
+        $('#Tier3-Processor-sub').show();
+      
+        $('#Inbound-Management-Processor3').addClass('activeLink active-nav');
+      
+      </script>
+{% endblock jquery %}

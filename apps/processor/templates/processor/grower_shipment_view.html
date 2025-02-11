@@ -1,0 +1,154 @@
+{% extends "base.html" %} {% load static %}
+{% block title %} Shipment View {% endblock title %}
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+{% load crispy_forms_tags %}
+{% block content %}
+{% include 'navbar.html' %}
+
+<div class="main-content">
+    {% include 'header.html' %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.0/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.bootstrap4.min.css">
+
+    <main>
+        {% include '_alerts.html' %}
+        <div class="page-title-with-or-without-btn">
+            <span class="farm headingtop">Shipment View</span>
+            <!-- Create button for Account-->
+        </div>
+
+        <div class="card farm-fields-container">
+            <div class="container-fluid">
+                {% for grower_shipment in grower_shipment %}
+                    <div class="row" style="margin-bottom: 20px;">
+                        <div class="col-md-3" style="margin-bottom: 10px;">
+                            <label for="shipment" style="font-weight:bold;">SHIPMENT ID</label>
+                            <p>{{grower_shipment.shipment_id}}</p>
+                            
+                        </div>
+                        <div class="col-md-3" style="margin-bottom: 10px;">
+                            <label for="shipment" style="font-weight:bold;">MODULE TAG #</label>
+                            <p>{{grower_shipment.module_number}}</p>
+                        </div>
+                        <div class="col-md-3" style="margin-bottom: 10px;">
+                            <label for="shipment" style="font-weight:bold;">FIELD</label>
+                            <p>{{grower_shipment.field.name}}</p>
+                        </div>
+                        <div class="col-md-3" style="margin-bottom: 10px;">
+                            <label for="shipment" style="font-weight:bold;">GROWER</label>
+                            <p>{{grower_shipment.grower.name}}</p>
+                        </div>
+                    
+                        <!-- <div class="col-md-4" style="margin-bottom: 10px;">
+                            <label for="shipment"># OF ROLLS</label>
+                            <input type="text" value="{{grower_shipment.amount}}"
+                                class="textinput textInput form-control" readonly>
+                        </div>
+                        <div class="col-md-4" style="margin-bottom: 10px;">
+                            <label for="shipment">TYPE OF UNITS</label>
+                            <input type="text" value="{{grower_shipment.unit_type}}"
+                                class="textinput textInput form-control" readonly>
+                        </div> -->
+                        <div class="col-md-3" style="margin-bottom: 10px;">
+                            <label for="shipment" style="font-weight:bold;">CROP</label>
+                            <p>{{grower_shipment.crop}}</p>
+                        </div>
+                        <div class="col-md-3" style="margin-bottom: 10px;">
+                            <label for="shipment style="font-weight:bold;"">VARIETY</label>
+                            <p>{{grower_shipment.variety}}</p>
+                        </div>
+                    
+                        <div class="col-md-3" style="margin-bottom: 10px;">
+                            <label for="shipment" style="font-weight:bold;">SUSTAINABILITY SCORE </label>
+                            <p>{{grower_shipment.sustainability_score}}</p>
+                        </div>
+                        <div class="col-md-3" style="margin-bottom: 10px;">
+                            <label for="shipment" style="font-weight:bold;">DATE AND TIME</label>
+                            <p>{{grower_shipment.date_time}}</p>
+                        </div>
+                        <div class="col-md-3" style="margin-bottom: 10px;">
+                            <label for="shipment" style="font-weight:bold;"> ECHELON ID </label>
+                            <p>{{grower_shipment.echelon_id}}</p>
+                        </div>
+                        <div class="col-md-3" style="margin-bottom: 10px;">
+                            <label for="shipment" style="font-weight:bold;"> STORAGE  </label>
+                            <p>{{grower_shipment.storage.storage_name}}</p>
+                        </div>
+                        
+                        <div class="col-md-6" style="margin-bottom: 10px;">
+                            <label for="shipment" style="font-weight:bold;"><b>Weight</b></label>
+                            <div style="font-size: 25px">
+                                    <span style="font-size: 25px">{{grower_shipment.amount}}</span>  {{grower_shipment.unit_type}}
+                                    {% if grower_shipment.amount2|length > 0 %}
+                                    + <span style="font-size: 25px">{{grower_shipment.amount2}}</span> {{grower_shipment.unit_type2}}
+                                    =
+                                    <span style="font-size: 25px">{{grower_shipment.total_amount}}</span> LBS
+                                    {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6" style="margin-bottom: 10px;">
+                            <label for="UploadedFiles" style="font-weight:bold;">Uploaded files</label>
+                            <div>
+                                {% if file_data %}
+                                    {% for file in file_data %}
+                                        {% if file.file %}
+                                            <p><a href="{{ file.file }}" download style="cursor: pointer;">{{ file.name }}</a></p>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% else %}
+                                    <p>No files available</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6" style="margin-bottom: 10px;">
+                            <label for="shipment" style="font-weight:bold;">QR CODE</label>
+                            <div>
+                                <img src="/media/{{img_name}}" alt="qr code" style="max-width: 350px;">
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %} 
+                    <div class="row" style="margin-top: 10px;">
+                        <div class="form-btn-row">
+                            <a href="{% url 'grower_shipment_list' %}" class="btn-close-cancel btn-space">Back</a>
+                        </div>
+                    </div> 
+            </div>
+        </div>
+</div>
+</main>
+{% include 'footer.html' %}
+</div>
+
+
+{% endblock content %}
+
+{% block scripts %}
+<script src="https://cdn.datatables.net/1.11.0/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.0/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/responsive.bootstrap4.min.js"></script>
+
+<script src="{% static 'js/farm/farm_list.js' %}"></script>
+
+<script>
+    $(document).ready(function () {
+        $('#processorList_tbl').DataTable();
+    });
+
+
+</script>
+{% endblock scripts %}

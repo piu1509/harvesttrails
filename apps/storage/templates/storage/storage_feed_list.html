@@ -1,0 +1,417 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %} Storage Qnt List {% endblock title %}
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<style>
+    table.classing tbody tr td {
+        vertical-align: top;
+    }
+
+    ul.pagination {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+    }
+
+    ul.pagination li {
+        list-style: none;
+        line-height: 45px;
+        text-align: center;
+        font-size: 18px;
+        font-weight: 500;
+        cursor: pointer;
+        user-select: none;
+        transition: all 0.3s ease;
+    }
+
+    ul.pagination li {
+        display: none;
+        position: relative;
+    }
+
+
+    ul.pagination li:first-of-type,
+    ul.pagination li:nth-of-type(2),
+    ul.pagination li:last-of-type,
+    ul.pagination li:has( + li:last-of-type),
+    ul.pagination li.active,
+    ul.pagination li.active + li,
+    ul.pagination li.active + li + li,
+    ul.pagination li:has(+ li.active),
+    ul.pagination li:has(+ li + li.active){
+        display: block;
+    }
+
+    ul.pagination li:has(+ li + li.active){
+        padding-left: 35px;
+    }
+
+    ul.pagination li.active + li + li {
+        padding-right: 35px;
+    }
+
+    ul.pagination li:has( + li + li.active) a:before,
+    ul.pagination li.active + li + li a:after {
+        content: "...";
+        font-size: 16px;
+        display: inline-block;
+        width: 35px;
+        height: 40px;
+        position: absolute;
+        top: -1px;
+        background-color: #fff;
+        border: 1px solid #ddd;
+    }
+
+    ul.pagination li:has( + li + li.active) a:before {
+        left: -35px;
+    }
+
+    ul.pagination li.active + li + li a:after {
+        right: -35px;
+    }
+
+    ul.pagination li:nth-of-type(1) a:before,
+    ul.pagination li:nth-of-type(2) a:before,
+    ul.pagination li:nth-of-type(3) a:before {
+        display: none !important;
+    }
+
+    ul.pagination li:nth-of-type(1),
+    ul.pagination li:nth-of-type(2),
+    ul.pagination li:nth-of-type(3) {
+        padding-left: 0 !important;
+    }
+
+    ul.pagination li:nth-of-type(1) a:after,
+    ul.pagination li:nth-of-type(2) a:after,
+    ul.pagination li:nth-of-type(3) a:after {
+        display: none !important;
+    }
+
+    ul.pagination li:nth-of-type(1),
+    ul.pagination li:nth-of-type(2),
+    ul.pagination li:nth-of-type(3) {
+        padding-left: 0 !important;
+    }
+
+
+
+</style>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+{% block content %}
+{% include 'navbar.html' %}
+<div class="main-content">
+    {% include 'header.html' %}
+    {% load crispy_forms_tags %}
+    {% include '_alerts.html' %}
+    <style>
+        .dropdown.bootstrap-select.form-control .btn {
+            border-radius: 4px !important;
+            outline: 1px solid #ddd;
+        }
+        .selected.active{
+                    margin-top: 0 !important;
+                    margin-left: 0 !important;
+                    padding-top: 4px !important;
+                    padding-left: 8px !important;
+                    padding-bottom: 4px !important;
+                    padding-right: 8x !important;
+                    font-size: 16px !important;                    
+                    border: 0 !important
+                }
+
+    .dropdown.bootstrap-select.form-control .btn {
+        border-radius: 6px;
+        }
+    .bootstrap-select .dropdown-menu li.disabled.selected{display: none;}
+    .dropdown.bootstrap-select.form-control .btn{border: 1px solid; padding: 8px 8px;}
+    .bootstrap-select .dropdown-menu{max-width: 280px;}
+    .bootstrap-select .dropdown-menu li.selected.active .dropdown-item.active.selected{margin-left: 0;padding: 0;}
+    </style>
+    <main>
+        <div class="page-title-with-or-without-btn">
+            <span class="farm headingtop">Storage qnt management</span>
+            <!-- Create button for Account-->
+            <div class="flex-header-btn ms-auto">
+                {% if request.user.is_superuser or 'Grower' in request.user.get_role or request.user.is_consultant%}
+                <a href="{% url 'storage_feed_add' %}" class="btn-close-cancel">Add Quantity</a>
+                {% endif %}
+            </div>
+            <div class="flex-header-btn ms-1">
+                {% if request.user.is_superuser or 'Grower' in request.user.get_role or request.user.is_consultant %}
+                <a href="{% url 'assign_feed_csv' %}" class="btn-close-cancel">Upload CSV</a>
+                {% endif %}
+            </div>
+            <div class="flex-header-btn ms-1">
+                {% if request.user.is_superuser or 'Grower' in request.user.get_role  or request.user.is_consultant%}
+                <a href="{% url 'storage_feed_update' %}" class="btn-close-cancel">Edit Quantity</a>
+                {% endif %}
+            </div>
+           
+        </div>
+
+        <div class="card card-padding">
+            {% if not request.user.grower %}
+            <form class="" action="{% url 'storage_feed_list' %}" method="get" class="">
+                <div class="row d-flex gy-2">
+                    <div class="col-lg-2 col-md-2 col-sm-6 col-12">
+                        <select id="growerSelction" name="grower_id" class="form-control selectpicker" data-live-search="true">
+                            <option value='all' > Select All Growers </option>
+                                {% for grower in growers %}
+                                {% if grower == selectedGrower %}
+                                <option selected value="{{ grower.pk }}">{{grower.name}} - {{grower.id}}</option>
+                                {% else %}
+                                <option value="{{ grower.pk }}">{{grower.name}} - {{grower.id}}</option>
+                                {% endif %}
+                                {% endfor %}
+                        </select>
+                    </div>
+                
+                    <div class="col-lg-2 col-md-2 col-sm-6 col-12">
+                        <select onchange="checkcotton()" id="grower_crop" name="grower_crop"  class="form-control selectpicker" data-live-search="true">
+                            <option value='all' > Select Crop </option>
+                            {% for crop in crops %}
+                            <option value="{{crop.code}}" {% if selectedCrop == crop.code %} selected {% endif %}> {{crop.code}} </option>
+                            {% endfor %}                           
+                            
+                        </select>
+                    </div>
+
+                    <div class="col-lg-3 col-md-3 col-sm-6 col-12">
+                        <select id="storageSelction" name="storage_id" class="form-control selectpicker" data-live-search="true">
+                            <option value="all"> Select All Storage </option>
+                                {% for storage in storage_name %}
+                                {% if selectedStorage == storage %}
+                                <option value="{{ storage.pk }}" selected>{{storage.storage_name}} - {{ storage.pk }}</option>
+                                {% else %}
+                                <option value="{{ storage.pk }}">{{storage.storage_name}} - {{ storage.pk }}</option>
+                                {% endif %}
+                                {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="col-lg-3 col-md-3 col-sm-6 col-12">
+                        <select id="fieldSelction" name="field_id"  class="form-control selectpicker" data-live-search="true">
+                            <option value='all'> FIELD NAME SEARCH</option>
+                                    {% for field in field_name %}
+                                    {% if selectedField == field %}
+                                    <option value="{{ field.pk }}" selected>{{field.name}} - {{ field.pk }}</option>
+                                    {% else %}
+                                    <option value="{{ field.pk }}">{{field.name}} - {{ field.pk }}</option>
+                                    {% endif %}
+                                    {% endfor %}
+                                </select>
+                        </select>
+                    </div>
+
+                    <div class="col-lg-2 col-md-2 col-sm-12 col-12">
+                        <div class="row gy-2">
+                            <div class="col-12">
+                                <button class="btn btn-outline-success btn-block" type="submit">Search</button>
+                                <div id="autocomplete-results"></div>
+                            </div>
+                           
+                        </div>
+                    </div>
+                </div>
+            </form>
+            {% endif %}
+            <div class="main-simple-table-with-search">
+                <div class="simple-responsive-table">
+                    <div class="table-responsive">
+                        <table id="" class="table table-striped table-bordered dt-responsive nowrap">
+                            <thead>
+                                <tr style="border-bottom: 2px solid #e0e0e0;">
+                                    {% comment %} <th data-title="Storage Name" data-breakpoints="xs sm" width="10%">STORAGE NAME</th> {% endcomment %}
+                                    <th width="10%">STORAGE NAME</th>
+                                    <th width="10%">DATE</th>
+                                    <th width="10%">FIELD NAME / SHP ID</th>
+                                    <th width="10%">ADDED</th>
+                                    <th width="10%">REMOVE</th>
+                                    <th width="10%">FINAL</th>
+                                    {% comment %} <th width="10%">ACTION</th> {% endcomment %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for storage in storage_feed_data %}
+                                <tr>
+                                    <td>{{storage.storage}}</td>
+                                    <td>{{storage.storage_feed_date}}</td>
+                                    <td>{% if storage.field %}{{storage.field}}{% else %}{{storage.shipment_id}}{% endif %}</td>
+                                    <td>{% if storage.status == "quantity_in" %}{{storage.quantity_raw}} {{storage.unit}}{% else %} {% endif %}</td>
+                                    <td>{% if storage.status == "quantity_out" %}{{storage.quantity}} {{storage.unit}}{% else %} {% endif %}</td>
+                                    <td>{{storage.final_quantity}}</td>
+                                    {% comment %} <td>{{storage.storage_uniqueid}}</td>
+                                    <td>{{storage.grower.name}}</td> {% endcomment %}
+                                    {% comment %} <td class="backk action-td">
+                                        {% if 'Grower' in request.user.get_role and not request.user.is_superuser or request.user.is_consultant%}
+                                        {% else %}
+                                        <li>
+                                            <a href="{% url 'all-farm-location-map-view' storage.grower.id %}" onclick="" alt="view farm location map" title="view farm location map"><span id="storage_{{storage.pk}}"
+                                                    class="fas fa-draw-polygon" style="color: green;"></span> </a>
+                                        </li>
+                                        {% endif %}
+                                        {% if 'Storage edit' in request.user.get_role_perm or request.user.is_superuser %}
+                                        <li> <a href="{% url 'storage-update' storage.id %}" alt="edit storage" title="edit storage"><span class="fas fa-edit"></span></a></li>
+                                        {% endif %}
+                                        {% if 'Storage delete' in request.user.get_role_perm or request.user.is_superuser %}
+                                        <li>
+                                            
+                                            <a onclick="delStorage('{% url 'storage-delete' storage.pk %}')" href="{% url 'storage-delete' storage.pk %}"
+                                              data-mdb-toggle="modal" data-mdb-target="#deleteModal" alt="delete storage" title="delete storage">
+                                              <span class="fas fa-trash"></span></a>
+                                        </li>
+                                        {% endif %}
+                                    </td> {% endcomment %}
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        <div class="row align-items-center">
+
+                            <div class="col-md-12 col-sm-12 col-12 text-center">
+                                {% if storage_feed_data.has_other_pages %}
+                                <ul class="pagination"  id="nav_1">
+                                    {% if storage_feed_data.has_previous %}
+                                    <li><a href="?page={{ storage_feed_data.previous_page_number }}">&laquo;</a></li>
+                                    {% else %}
+                                    <li class="disabled"><span>&laquo;</span></li>
+                                    {% endif %}
+                                    {% for i in storage_feed_data.paginator.page_range %}
+                                    {% if storage_feed_data.number == i %}
+                                    <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+                                    {% else %}
+                                    <li><a href="?page={{ i }}">{{ i }}</a></li>
+                                    {% endif %}
+                                    {% endfor %}
+                                    {% if storage_feed_data.has_next %}
+                                    <li><a href="?page={{ storage_feed_data.next_page_number }}">&raquo;</a></li>
+                                    {% else %}
+                                    <li class="disabled"><span>&raquo;</span></li>
+                                    {% endif %}
+                                </ul>
+                                {% endif %}
+                            </div>
+                          <div class="col-md-12 col-sm-12 col-12 text-center mt-2" style="text-align:right">
+                            {% if not request.user.grower and not request.user.is_consultant %}
+                            <span>Showing {{ storage_feed_data.start_index }} - {{ storage_feed_data.end_index }} of {{ storage_feed_data.paginator.count }}entries</span>
+                            {% endif %}
+                          </div>       
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    {% include 'footer.html' %}
+</div>
+<!-- Delete Popup -->
+<div class="modal fade" id="deleteModal" aria-hidden="true" aria-labelledby="exampleModalToggleLabel22" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+  
+        <div class="modal-body">
+          <button type="button" class="btn-close cust-close-ds-btn" data-mdb-dismiss="modal" aria-label="Close"></button>
+          <div class="center-content-status">
+            <img src="{% static 'img/trash.png' %}" alt="right" id="rightImg" class="warning-icon">
+            <p id="message" class="modal-title titlepad">Are you sure you want to delete?</p>
+          </div>
+          <div class="modal-center-btn-footer">
+            <button onclick="reloadwindow()" id="closeBtnpopup" type="button" class="btn-close-cancel btn-space"
+              data-mdb-dismiss="modal">
+              Close
+            </button>
+            <!-- <button type="submit" class="btn-save-submit">Delete</button> -->
+            
+            <a onclick="storagedeleteNow()" href="" id="storageDelete" ><button type=""
+                class="btn-save-submit">Delete</button></a>
+           
+          </div>
+        </div>
+  
+      </div>
+    </div>
+  </div>
+{% endblock content %}
+{% block scripts %}
+{% endblock scripts %}
+{% block jquery %}
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.js">
+</script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.js">
+</script>
+
+<link href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/ui-lightness/jquery-ui.css" rel="stylesheet"
+    type="text/css" />
+<script>
+    // $(document).ready(function () {
+    //     $('#growerSelction').change(function () {
+    //         $('#submitBtn').click();
+    //     });
+    // });
+
+// delete storage
+function delStorage(url){
+    $('#storageDelete').show();
+    $('#storageDelete').attr('url',url);
+}
+
+function storagedeleteNow(){
+  url = $('#storageDelete').attr('url');
+  console.log(url)
+  $.ajax({
+  url: url,
+  data: { },
+  success: function (data) {
+    if (data==1){
+      location.reload();
+    }
+  }
+});
+}
+
+// $(function() {
+//     $('#search').on('input', function() {
+//         var query = $(this).val().trim();
+//         if (query !== '') {
+//             $.ajax({
+//                 url: '/storage/list/autocomplete_suggestions/',
+//                 data: {},
+//                 dataType: 'json',
+//                 success: function(response) {
+// 					var availableTags  = response.select_search;
+//                     $("#search").autocomplete({
+//                         source: availableTags
+//                     });
+// 				}
+//             });
+//         } else {
+//             $('#autocomplete-results').empty();
+//         }});});
+
+</script>
+<script>
+    $('#Storage-Management-active').addClass('activeLink');
+                    
+    $('#Storage-Management-down').addClass('down');
+    $('#Storage-Management-sub').show();
+    
+    $('#Storage-Feed-List').addClass('activeLink active-nav'); 
+</script>
+{% endblock jquery %}
+

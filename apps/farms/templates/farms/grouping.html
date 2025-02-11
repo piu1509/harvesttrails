@@ -1,0 +1,133 @@
+{% extends "base.html" %} 
+{% load static %} 
+{% block title %} Farm Grouping {% endblock title %} 
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+{% load crispy_forms_tags %} 
+{% block content %} 
+{% include 'navbar.html' %}
+
+<div class="main-content">
+    {% include 'header.html' %}
+    <main>
+    {% include '_alerts.html' %}
+      <div class="page-title-with-or-without-btn">
+            <span class="farm headingtop">Farm Grouping</span>
+        <!-- Create button for Account-->
+        <div class="flex-header-btn">
+          {% if 'Farm Group Edit' in request.user.get_role_perm or request.user.is_superuser %}
+            <a href="{% url 'grouping-create' %}" class="btn-close-cancel">Create Group</a>
+            {% endif %}
+        </div>
+        </div>
+
+<div class="main-simple-table-with-search">
+        <div class="simple-responsive-table">
+            <table class="table">
+                        <thead>
+                            <tr style="border-bottom: 2px solid #e0e0e0;">
+                                <th>Grouping Criteria</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for grouping in object_list %}
+                            <tr>
+                                <td>{{grouping.grouping_criteria}}</td>
+                                
+                                <td class="backk">
+                                  {% if 'Farm Group Edit' in request.user.get_role_perm or request.user.is_superuser %}
+                                    <li>
+                                        <a href="{% url 'grouping-update' grouping.pk %}" alt="edit grouping" title="edit grouping"> <span class="fas fa-edit"></span> </a>
+                                    </li>
+                                    {% endif %}
+                                    <!-- <li> <a href="javascript:void(0)" data-mdb-toggle="modal" data-mdb-target="#deleteModal"> 
+                                        <span class="fas fa-trash"></span></a>
+                                        </li> -->
+                                        {% if 'Farm Group Delete' in request.user.get_role_perm or request.user.is_superuser  %}
+                                        <li><a onclick="delFarmgrouping('{% url 'grouping-delete' grouping.pk %}')" href="javascript:void(0)" data-mdb-toggle="modal" data-mdb-target="#deleteModal" alt="delete grouping" title="delete grouping">
+                                          <span class="fas fa-trash" ></span></a></li>
+                                          {% endif %}
+                                    <!-- <li> <a href="{% url 'grouping-delete' grouping.pk %}"> 
+																		<span class="fas fa-trash" data-mdb-toggle="modal" data-mdb-target="#exampleModal-delete"></span></a>
+																		</li> -->
+                                    
+                                </td>
+                                
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+        </div>
+</div>
+     
+    </main>
+    {% include 'footer.html' %}
+</div>
+
+
+
+<!-- Delete Popup -->
+
+<div
+  class="modal fade"
+  id="deleteModal"
+  aria-hidden="true"
+  aria-labelledby="exampleModalToggleLabel22"
+  tabindex="-1"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+	  <div class="modal-body">
+		<button 
+		type="button"
+		class="btn-close cust-close-ds-btn"
+		data-mdb-dismiss="modal"
+		aria-label="Close"
+	  ></button>
+	  <div class="center-content-status">
+		<img src="{% static 'img/trash.png' %}" alt="right" id="rightImg" class="warning-icon">
+		<p id="message" class="modal-title titlepad">Are you sure you want to delete?</p>
+	  </div>
+	  <div class="modal-center-btn-footer">
+		<button onclick="reloadwindow()" id="closeBtnpopup" type="button" class="btn-close-cancel btn-space" data-mdb-dismiss="modal">
+			Close
+		  </button>
+		  {% comment %} <button  type="submit" class="btn-save-submit">Delete</button> {% endcomment %}
+          <a onclick="farmgroupingdeleteNow()" id="farmgroupingDelete" pkidhref="">
+            <button  type="" class="btn-save-submit">Delete</button></a>
+	</div>
+	  </div>
+
+    </div>
+  </div>
+</div>
+<!-- end -->
+
+{% endblock content %}
+
+{% block scripts %}
+<script type="text/javascript" src="{% static 'js/farm/farm_list.js' %}"></script>
+{% endblock scripts %}
+{% block jquery %}
+    <script>
+        $('#Farm-Configuration-active').addClass('activeLink');
+              
+        $('#Farm-Configuration-down').addClass('down');
+        $('#Farm-Configuration-sub').show();
+        
+        $('#Farm-Grouping').addClass('activeLink active-nav');
+    </script>
+{% endblock jquery %}

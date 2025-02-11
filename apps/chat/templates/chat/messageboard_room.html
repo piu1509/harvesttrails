@@ -1,0 +1,651 @@
+{% extends "base.html" %} {% load static %} 
+{% block title %} Chat {% endblock title %} 
+{% block content %} {% include 'navbar.html' %}
+<style>
+
+.to_messageboard {
+			display: flex;
+			flex-wrap: wrap;
+		}
+
+		.messageboard_left_panel,
+		.messageboard_right_panel {
+			position: relative;
+			width: 100%;
+		}
+
+		.messageboard_searchbar {
+            border-bottom: 1px solid #ddd;
+        }
+
+		.messageboard_searchbar,
+		.messageboard_main_user {
+			padding: 8px 15px;
+			height: 75px;
+		}
+
+		.messageboard_searchbar .message_serach {
+			padding: 6px 16px;
+			display: block;
+			width: 100%;
+			border: 1px solid #ddd;
+		}
+
+		.messageboard_list {
+			height: calc(40vh - 70px);
+			overflow-y: auto;
+		}
+
+		.messageboard_list ul {
+			margin: 0;
+			padding: 0;
+            display: flex;
+            flex-direction: column;
+		}
+
+		.messageboard_list ul li {
+			list-style: none;
+			padding: 8px 15px;
+			border-bottom: 1px solid #ddd;
+			transition: all ease-in-out 0.3s;
+            position: relative;
+		}
+
+        .messageboard_list ul li.current-msg {
+            order: -1;
+        }
+        
+		.messageboard_list ul li.active,
+		.messageboard_list ul li:hover {
+			background-color: #f1f1f1;
+			cursor: pointer;
+		}
+
+		.messageboard_list ul li h6,
+		.messageboard_main_user h6 {
+			margin-top: 0;
+			margin-bottom: 0;
+			font-size: 16px;
+		}
+
+		.messageboard_list ul li span,
+		.messageboard_main_user span,
+		.messageboard_chat ul li .message_status {
+			font-size: 12px;
+			color: #aaa;
+		}
+        
+        .messageboard_list ul li a {
+            color: inherit;
+        }
+        
+		.messageboard_main_user {
+			border-bottom: 1px solid #ddd;
+		}
+
+		.messageboard_chat {
+			padding: 8px 15px;
+			display: flex;
+		    flex-wrap: wrap;
+		    align-items: flex-end;
+			height: calc(60vh - 130px);
+    		overflow-y: auto;
+    		{% comment %} overflow-x: hidden; {% endcomment %}
+            flex-direction: column-reverse;
+		}
+
+		.messageboard_chat ul {
+			margin: 0;
+			padding: 0;
+			/* flex: 0 0 100%; */
+            width: 100%;
+		}
+
+		.messageboard_chat ul li {
+			list-style: none;
+			display: flex;
+		}
+
+		.messageboard_chat ul li:not(:last-of-type) {
+			margin-bottom: 15px;
+		}
+
+		.messageboard_chat ul li.my_message {
+			justify-content: flex-end;
+		}
+
+		.messageboard_chat ul li .messageboard_box {
+			width: 70%;
+		}
+
+		.messageboard_chat ul li p {
+			margin: 0;
+		}
+
+		.messageboard_chat ul li p span {
+			display: inline-block;
+			margin-top: 0;
+			margin-bottom: 4px;
+			padding: 6px 12px;
+		}
+
+		.messageboard_chat ul li.client_message p span {
+			border-radius: 2px;
+			background-color: #f9f0c7;
+		}
+
+		.messageboard_chat ul li.my_message p span {
+			border-radius: 2px;
+			background-color: #dbf0f2;
+		}
+
+		.messageboard_chat ul li.my_message .message_text {
+		    display: flex;
+		    flex-wrap: wrap;
+		    flex-direction: column;
+		    align-items: flex-end;
+		}
+
+		.messageboard_chat ul li.my_message .message_status {
+		    text-align: right;
+		}
+
+		.messageboard_send {
+		    padding: 8px 15px;
+		    border-top: 1px solid #ddd;
+		}
+
+		.message_input-group {
+		    position: relative;
+		    display: flex;
+		    flex-wrap: wrap;
+		    align-items: stretch;
+		    width: 100%;
+		}
+
+		.message_input-group>.message_form-control {
+		    position: relative;
+		    flex: 1 1 auto;
+		    width: 1%;
+		    min-width: 0;
+		}
+
+		.message_form-control {
+		    display: block;
+		    width: 100%;
+		    padding: 0.375rem 0.75rem;
+		    font-size: 1rem;
+		    font-weight: 400;
+		    line-height: 1.5;
+		    color: #212529;
+		    background-color: #fff;
+		    background-clip: padding-box;
+		    border: 1px solid #ced4da;
+		    -webkit-appearance: none;
+		    -moz-appearance: none;
+		    appearance: none;
+		    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+		}
+
+		.message_input-group>:not(:first-child):not(.dropdown-menu):not(.valid-tooltip):not(.valid-feedback):not(.invalid-tooltip):not(.invalid-feedback) {
+		    margin-left: -1px;
+		}
+
+		.message_input-group-text {
+		    display: flex;
+		    align-items: center;
+		    padding: 0.375rem 0.75rem;
+		    font-size: 1rem;
+		    font-weight: 400;
+		    line-height: 1.5;
+		    color: #212529;
+		    text-align: center;
+		    white-space: nowrap;
+		    background-color: #e9ecef;
+		    border: 1px solid #ced4da;
+		}
+
+        .unread_msg {
+        position: absolute;
+        top: 50%;
+        right: 15px;
+        width: 16px;
+        height: 16px;
+        color: #fff !important;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 50%;
+        background-color: #f00;
+        transform: translateY(-50%);
+    }
+
+    textarea.message_form-control {
+        height: 50px;
+        resize: none;
+    }
+
+    .message_form-control:focus-visible {
+        outline: 0;
+    }
+
+        .messageboard_right_panel.grower-chat-box {
+            flex: 0 0 100%;
+        }
+
+		@media(min-width: 768px) {
+			.messageboard_left_panel {
+				flex: 0 0 30%;
+			}
+			.messageboard_right_panel {
+				flex: 0 0 70%;
+			}
+			.messageboard_left_panel:before {
+				content: "";
+				position: absolute;
+				top: 0;
+				bottom: 0;
+				right: 0;
+				border-right: 1px solid #ddd;
+			}
+
+			.messageboard_list {
+				height: calc(100vh - 256px);
+			}
+			.messageboard_chat {
+				height: calc(100vh - 330px);
+			}
+		}
+
+		@media(max-width: 767px) {
+			.messageboard_main_user {
+				border-top: 1px solid #ddd;
+				background-color: #f1f1f1;
+			}
+
+			.messageboard_chat ul li .messageboard_box {
+				width: 90%;
+			}
+		}
+
+        .bootstrap-select:not([class*=col-]):not([class*=form-control]):not(.input-group-btn) {
+            width: 100%;
+        }
+    
+        .messageboard_searchbar .message_serach {
+            padding: 0;
+        }
+    
+        .messageboard_searchbar .dropdown-menu {
+            max-height: 200px !important;
+        }
+    
+        li.selected.active {
+            padding: 0;
+            margin-left:0;
+        }
+    
+        li.selected.active a.selected {
+            padding-left: 0;
+            padding-right: 10px;
+        }
+</style>
+<div class="main-content">
+    {% include 'header.html' %} {% load crispy_forms_tags %}
+    <main>
+        <span class="farm headingtop">Message Board</span>
+        <div class="card farm-fields-container">
+            <div class="to_messageboard">
+                <div class="messageboard_left_panel">
+                    <div class="messageboard_searchbar">
+                        <form action="{% url 'chat_ag' %}" method="post">
+                            {% csrf_token %}
+                            <select name="get_reciver" id="reciverSelction" class="message_serach selectpicker" data-live-search="true">
+                                <option value="all" disabled>Select</option>
+                                {% for i in receiver %}
+                                {% if i == selected_reciver %}
+                                <option value="{{i.id}}" selected>{{i.name}}</option>
+                                {% else %}
+                                <option value="{{i.id}}">{{i.name}}</option>
+                                {% endif %}
+                                {% endfor %}
+                            </select>
+                            <input style="display : none;" id="submitBtn" type="submit" class="apply-filter-btn primary-btn"
+                                value="Apply Filter" />
+                        </form>
+                    </div>
+                    <div class="messageboard_list">
+                        <ul>
+                            {% for i in receiver %}
+                            {% if i.last_msg != "" %}
+                            <li onclick="clickfuncatag('{{i.id}}')" id="{{i.id}}">
+                                <!-- <a href="{% url 'chatroom_ag' i.id %}"> -->
+                                <h6>{{i.name}}</h6>
+                                <span id="g_{{i.id}}">{% if i.last_msg != "" %}{{i.last_msg}}{% else %}<br/>{% endif %}</span>
+                                <span id="g_unread_count_{{i.id|join:''}}" class=""></span>
+                                <!-- </a> -->
+                            </li>
+                            {% else %}
+                            <li onclick="clickfuncatag('{{i.id}}')" id="{{i.id}}" style="visibility: hidden;">
+                                <!-- <a href="{% url 'chatroom_ag' i.id %}"> -->
+                                <h6>{{i.name|join:""}}</h6>
+                                <span id="g_{{i.id|join:''}}">{% if i.last_msg != "" %}{{i.last_msg}}{% else %}<br/>{% endif %}</span>
+                                <span id="g_unread_count_{{i.id|join:''}}" class=""></span>
+                            </li>
+                            {% endif %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="messageboard_right_panel">
+                    <div class="messageboard_main_user">
+                        <input style="display: none;" type="text" name="" id="get_username" value="{{user.username}}">
+                        <input style="display: none;" type="text" name="" id="get_board_id" value="{{board_id}}">
+                        <input style="display: none;" type="text" name="" id="sender_id" value="{{sender_id}}">
+                        <input style="display: none;" type="text" name="" id="sender_name" value="{{sender_name}}">
+                        <input style="display: none;" type="text" name="" id="receiver_id" value="{{receiver_id}}">
+                        <input style="display: none;" type="text" name="" id="receiver_name" value="{{receiver_name}}">
+                        <input style="display: none;" type="text" name="" id="sender_is" value="{{sender_is}}">
+                        <input style="display: none;" type="text" name="" id="receiver_is" value="{{receiver_is}}">
+                        
+                        <h6 id="get_pk">{{selected_reciver.name}}</h6>
+                        <input type ="hidden" id="selected_receiver_id" value="{{selected_reciver.id}}"/>
+                        <input type ="hidden" id="selected_grower_email" value="{{user.email}}"/>
+                        <span>{% if last_seen_date %}Last seen {{last_seen_date}} at {{last_seen_time}}{% else %}{% endif %}</span>
+
+                        <!-- <input type ="hidden" id="selected_grower_id" value="{{selected_grower.id}}"/>
+                        <input type ="hidden" id="selected_grower_name" value="{{selected_grower.name}}"/>
+                        <input type ="hidden" id="selected_grower_email" value="{{user.email}}"/>
+                        <span>Last seen 7 days ago</span> -->
+                    </div>
+                    <div id="msgboard_chat" class="messageboard_chat">
+                        <ul id="show-chat">
+                            {% if all_db_message %}
+                            
+                            {% for i in all_db_message %}
+                            {% if i.classs == 'client_message' %}
+                            <li class="client_message">
+                                <div class="messageboard_box">
+                                    <div class="message_text"><p><span>{{i.msg}}</span></p></div>
+                                    <div class="message_status"><span class="date" style="text-transform: capitalize;">{{i.msg_date|date:"b d, Y"}}</span> | <span class="time" style="text-transform: uppercase;">{{i.msg_time}} </span></div>
+                                </div>
+                            </li>
+                            {% elif i.classs == 'my_message' %}
+                            <li class="my_message">
+                                <div class="messageboard_box">
+                                    <div class="message_text"><p><span>{{i.msg}}</span></p></div>
+                                    <div class="message_status"><span class="date" style="text-transform: capitalize;">{{i.msg_date|date:"b d, Y"}}</span> | <span class="time" style="text-transform: uppercase;">{{i.msg_time}}</span></div>
+                                </div>
+                            </li>
+                            {% endif %}
+                            {% endfor %}
+
+                            {% endif %}
+                            
+                        </ul>
+                    </div>
+                    <div class="messageboard_send">
+                        <div class="message_input-group mb-3">
+                              <textarea id="chat-message-input" class="message_form-control" placeholder="Type message here"></textarea>
+                              <button type="button" class="message_input-group-text" id="chat-message-submit">Send</button>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </main>
+
+</div>
+{% endblock content %}
+{% block scripts %}
+
+<script>
+    function clickfuncatag(id){
+        window.location.href = "/chat/chat_ag/" + id + "/";
+    }
+
+
+    $(document).ready(function () {
+			$('#reciverSelction').change(function () {
+				$('#submitBtn').click();
+			});
+		});
+</script>
+
+<script>
+    //{% comment %} SAVE MSG {% endcomment %}//
+    const roomName = $('#selected_grower_id').val();
+    const userName = $('#get_username').val();
+    const get_useremail = $('#selected_grower_email').val();
+    const get_board_id = $('#get_board_id').val();
+    const sender_id = $('#sender_id').val();
+    const sender_name = $('#sender_name').val();
+    const receiver_id = $('#receiver_id').val();
+    const receiver_name = $('#receiver_name').val();
+    const sender_is = $('#sender_is').val();
+    const receiver_is = $('#receiver_is').val();
+
+    var user_id = {{request.user.id}};
+    {% if 'Grower' in request.user.get_role and not request.user.is_superuser %}
+    var sender = 'Grower';
+    var get_msg_reciver = "Grower"
+    {% elif request.user.is_processor %}
+    var sender = 'Processor';
+    var get_msg_reciver = "Processor"
+    {% elif request.user.is_consultant %}
+    var sender = 'Consultant';
+    var get_msg_reciver = "Consultant"
+    {% elif request.user.is_superuser or 'SubAdmin' in request.user.get_role or 'SuperUser' in request.user.get_role %}
+    var sender = 'Admin';
+    var get_msg_reciver = "Admin"
+    {% endif %}
+    var chat_with = '{{chat_with}}';
+    var main_id = {{selected_reciver.id}};
+
+
+    var win_path = window.location.href;
+    var win_split = win_path.split('chat_ag/');
+    var final_path = win_split[1].replace("/", "");
+
+    document.querySelector('#chat-message-input').focus();
+    document.querySelector('#chat-message-input').onkeyup = function (e) {
+        if (e.keyCode === 13) {
+            document.querySelector('#chat-message-submit').click();
+        }
+    };
+
+    document.querySelector('#chat-message-submit').onclick = function (e) {
+
+        var dt = new Date(); 
+        
+        var datestamp_1 = dt.toDateString();  
+        var datestamp = datestamp_1.substring(3);
+        var timestamp = dt.getHours() + ":" + dt.getMinutes() + ":" + dt.getSeconds();         
+        
+        var hours = dt.getHours();
+        var minutes = dt.getMinutes();
+        var ampm = hours >= 12 ? 'p.m.' : 'a.m.';
+        hours = hours % 12;
+        hours = hours ? hours : 12; // the hour '0' should be '12'
+        minutes = minutes < 10 ? '0'+minutes : minutes;
+        var strTime = hours + ':' + minutes + ' ' + ampm;
+        
+
+        const messageInputDom = document.querySelector('#chat-message-input');
+        const message = messageInputDom.value;
+        
+        document.querySelector('#show-chat').innerHTML += `<li class="my_message">
+                                                                <div class="messageboard_box">
+                                                                    <div class="message_text">
+                                                                        <p><span>${message}</span></p>
+                                                                    </div>
+                                                                <div class="message_status"><span class="name">${datestamp}</span> | <span class="date" style="text-transform: uppercase;">${strTime}</span></div>
+                                                                </div>
+                                                            </li>`;
+        document.querySelector('#g_'+main_id).innerHTML = `${message}`
+        
+        $.ajax({
+        type: "GET",
+        url: `/chat/save_msg/${user_id}/${main_id}/${chat_with}/${sender}/${roomName}/${message}`,
+        data: {},
+        contentType: false,
+        cache: false,
+        processData: false,
+        success: function (data) {
+            //console.log('data.msg_date');
+        }})
+        messageInputDom.value = '';
+    };
+    
+    //{% comment %} GET MSG {% endcomment %}//
+    if (final_path == main_id){
+        $(document).ready(function(){
+        new get_msg(); 
+        });
+
+        setInterval(function(){ get_msg()},3000);
+        function get_msg() {
+            //console.log("LLL")
+            $.ajax({
+                type: "GET",
+                url: `/chat/get_msg/${user_id}/${main_id}/${chat_with}/${get_msg_reciver}/`,
+                data: {},
+                contentType: false,
+                cache: false,
+                processData: false,
+                success: function (data) {
+                    //console.log('sss',data.msg);
+                    if (data.msg === "" && data.msg_time === "" ){}
+                    else{
+                            
+                        // var datestamp = dt.toDateString();  
+
+                        // var timestamp = dt.getHours() + ":" + dt.getMinutes() + ":" + dt.getSeconds();
+                        document.querySelector('#show-chat').innerHTML += `<li class="client_message">
+                                                                        <div class="messageboard_box">
+                                                                            <div class="message_text">
+                                                                                <p><span>${data.msg}</span></p>
+                                                                            </div>
+                                                                            <div class="message_status"><span class="name">${data.msg_date}</span> | <span class="date">${data.msg_time}</span></div>
+                                                                        </div>
+                                                                    </li>`;
+                        document.querySelector('#g_'+main_id).innerHTML = `${data.msg}`
+                    }
+                }})
+            
+        }
+        ;}
+</script>
+
+<!-- <script>
+    function read_msg_status(username) {
+        
+            $.ajax({
+                type: "GET",
+                url: 'https://www.google.co.in/',
+                // url: `/chat/read_msg_status/${username}`,
+                data: {},
+                contentType: false,
+                cache: false,
+                processData: false,
+                success: function (data) {
+                    
+                }})
+                }
+</script> -->
+{% comment %} <script>
+
+    if (final_path == roomName){
+        $(document).ready(function(){
+        new get_msg(); 
+        });
+        setInterval(function(){ get_msg()},3000);
+        function get_msg() {
+                $.ajax({
+                    type: "GET",
+                    //url: 'https://www.google.co.in/',
+                    url: `/chat/get_msg/${user_id}/${roomName}/${chat_with}/${get_msg_reciver}`,
+                    data: {},
+                    contentType: false,
+                    cache: false,
+                    processData: false,
+                    success: function (data) {
+                        // console.log('data.msg_date',data.msg_date);
+                        //console.log('data.msg_time','msg_time');
+                        if (data.msg === undefined && data.msg_time === undefined ){
+                            console.log('data.msg_time');
+                        }else{
+                            
+                            // var datestamp = dt.toDateString();  
+
+                            // var timestamp = dt.getHours() + ":" + dt.getMinutes() + ":" + dt.getSeconds();
+                            document.querySelector('#show-chat').innerHTML += `<li class="client_message">
+                                                                            <div class="messageboard_box">
+                                                                                <div class="message_text">
+                                                                                    <p><span>${data.msg}</span></p>
+                                                                                </div>
+                                                                                <div class="message_status"><span class="name">${data.msg_date}</span> | <span class="date">${data.msg_time}</span></div>
+                                                                            </div>
+                                                                        </li>`;
+                        }
+                        
+                    }})
+                    }
+    }
+    
+
+</script> {% endcomment %}
+
+<script>
+    var user_id = {{request.user.id}};
+    $(document).ready(function(){
+    new ajax_msg_board(); 
+    });
+    setInterval(function(){ ajax_msg_board()},3000);
+
+    function ajax_msg_board() {
+            $.ajax({
+                type: "GET",
+                url: `/chat/ajax_msg_board/${user_id}`,
+                data: {},
+                contentType: false,
+                cache: false,
+                processData: false,
+                success: function (data) {
+                    data.data?.forEach(element => {
+                        var receiver_id = element.receiver_id;
+                        var lastmsg = element.lst_msg_obj;
+                        var unread_count = element.unread_count;
+                        //alert(receiver_id,lastmsg,unread_count)
+                        if (lastmsg==0){
+                            $('#g_unread_count_'+receiver_id).removeClass( "unread_msg" );
+                            $('#g_'+receiver_id).html("No Message yet");
+                        }
+                        else{
+                            $('#g_'+receiver_id).html(lastmsg);
+                            //
+                            $('#' + receiver_id).css('visibility', 'visible');
+                            $('#'+receiver_id).addClass( "current-msg" );
+                            //
+                            if (unread_count==0){
+                                $('#g_unread_count_'+receiver_id).removeClass( "unread_msg" );
+                                $('#g_unread_count_'+receiver_id).html('');
+                            }
+                            else{
+                                $('#g_unread_count_'+receiver_id).addClass( "unread_msg" );
+                                $('#g_unread_count_'+receiver_id).html(unread_count);
+                            }
+                        }
+                        
+                    });
+                }})
+                }
+    
+</script> 
+<script>
+    $('.messageboard_chat').scrollTop($('.messageboard_chat')[0].scrollHeight);
+</script>
+
+{% endblock scripts %}

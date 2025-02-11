@@ -1,0 +1,670 @@
+{% extends "base.html" %} {% load static %}
+{% block title %} Field level sustainability info {% endblock title %}
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+{% load crispy_forms_tags %}
+{% block content %}
+{% include 'navbar.html' %}
+
+
+
+<!-- datepicker styles -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker3.min.css">
+
+<!-- <style>
+    tfoot input {
+        width: 100%;
+        padding: 3px;
+        box-sizing: border-box;
+    }
+
+    @media(max-width:575px) {
+        .inline-apply-filter.ewr-report {
+            display: block;
+        }
+    }
+</style>
+<style>
+    table.classing tbody tr td {
+        vertical-align: top;
+    }
+
+    ul.pagination {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+    }
+
+    ul.pagination li {
+        list-style: none;
+        line-height: 45px;
+        text-align: center;
+        font-size: 18px;
+        font-weight: 500;
+        cursor: pointer;
+        user-select: none;
+        transition: all 0.3s ease;
+    }
+
+    ul.pagination li {
+        display: none;
+        position: relative;
+    }
+
+
+    ul.pagination li:first-of-type,
+    ul.pagination li:nth-of-type(2),
+    ul.pagination li:last-of-type,
+    ul.pagination li:has( + li:last-of-type),
+    ul.pagination li.active,
+    ul.pagination li.active + li,
+    ul.pagination li.active + li + li,
+    ul.pagination li:has(+ li.active),
+    ul.pagination li:has(+ li + li.active){
+        display: block;
+    }
+
+    ul.pagination li:has(+ li + li.active){
+        padding-left: 35px;
+    }
+
+    ul.pagination li.active + li + li {
+        padding-right: 35px;
+    }
+
+    ul.pagination li:has( + li + li.active) a:before,
+    ul.pagination li.active + li + li a:after {
+        content: "...";
+        font-size: 16px;
+        display: inline-block;
+        width: 35px;
+        height: 40px;
+        position: absolute;
+        top: -1px;
+        background-color: #fff;
+        border: 1px solid #ddd;
+    }
+
+    ul.pagination li:has( + li + li.active) a:before {
+        left: -35px;
+    }
+
+    ul.pagination li.active + li + li a:after {
+        right: -35px;
+    }
+
+    ul.pagination li:nth-of-type(1) a:before,
+    ul.pagination li:nth-of-type(2) a:before,
+    ul.pagination li:nth-of-type(3) a:before {
+        display: none !important;
+    }
+
+    ul.pagination li:nth-of-type(1),
+    ul.pagination li:nth-of-type(2),
+    ul.pagination li:nth-of-type(3) {
+        padding-left: 0 !important;
+    }
+
+    ul.pagination li:nth-of-type(1) a:after,
+    ul.pagination li:nth-of-type(2) a:after,
+    ul.pagination li:nth-of-type(3) a:after {
+        display: none !important;
+    }
+
+    ul.pagination li:nth-of-type(1),
+    ul.pagination li:nth-of-type(2),
+    ul.pagination li:nth-of-type(3) {
+        padding-left: 0 !important;
+    }
+
+
+
+</style>
+<style>
+    .canvasjs-chart-credit{
+        display: none;
+    }
+</style> -->
+
+<style>
+    .table-info tr th {
+        font-size: 14px;
+        color: #000e5a;
+        background-color: #ceecfd;
+    }
+    .searchclassari .btn{
+        border: 1px solid #ababab;
+    }
+    .bootstrap-select .dropdown-menu li.disabled.selected{display: none;}
+        .dropdown.bootstrap-select.form-control .btn{border: 1px solid #ddd; padding: 10px 8px; border-radius: 6px;}
+        .bootstrap-select .dropdown-menu{max-width: 280px;}
+        .bootstrap-select .dropdown-menu li.selected.active .dropdown-item.active.selected{margin-left: 0;padding: 0;}
+</style>
+
+<div class="main-content">
+    {% include 'header.html' %}
+    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css"> -->
+    <!-- <link rel="stylesheet" href="https://cdn.datatables.net/1.11.0/css/dataTables.bootstrap4.min.css"> -->
+    <!-- <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.bootstrap4.min.css"> -->
+    
+
+    <main>
+        <div class="page-title-with-or-without-btn">
+            <span class="farm headingtop">Field level sustainability info</span>
+            <div class="inline-apply-filter justify-content-center justify-content-md-end ewr-report">
+                <div></div>
+            </div>
+        </div>
+        <div class="card card-padding">
+            <div class="three-fields-with-label" style="margin-top: 15px;">
+                {% include '_alerts.html' %}
+                <form action="" method="post" class="row align-items-center">
+                    {% csrf_token %}
+                    <div class="col-lg-2 col-md-4 mb-2 d-flex searchclassari">
+                        <select id="growerid" name="growerid" class="form-control selectpicker rounded-pill" data-live-search="true"  style="left: 0;">
+                            <option value='all'> Select Grower *</option>
+                            {% for i in growers %}
+                            {% if i == selectedGrower %}
+                            <option value="{{ i.pk }}" selected>{{i.name}} - {{ i.pk }}
+                            </option>
+                            {% else %}
+                            <option value="{{ i.pk }}">{{i.name}} - {{ i.pk }}</option>
+                            {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-lg-3 col-md-4 mb-2 d-flex searchclassari">
+                        <!-- <input name="fieldid" id="fieldid" onkeyup="getText()" id="tags" value="{{selectedField}}" type="search" class="form-select rounded-pill" placeholder="Search Field" style="height: 40px;" required> -->
+                        
+                        <select id="fieldid" name="fieldid" class="form-control selectpicker rounded-pill" data-live-search="true"  style="left: 0;">
+                            <option value='all'> Select Field *</option>
+                            {% for i in fields %}
+                            {% if i == selectedField %}
+                            <option value="{{ i.pk }}" selected>{{i.name}} - {{ i.pk }}
+                            </option>
+                            {% else %}
+                            <option value="{{ i.pk }}">{{i.name}} - {{ i.pk }}</option>
+                            {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-lg-2 col-md-4 mb-2 d-flex">
+                        <select id="yearid" name="yearid" class="form-select rounded-pill" required>
+                            <option value='all' selected> Select Crop Year *</option>
+                            {% if selectedYear == '2022' %}
+                            <option value="2022" selected>2022</option>
+                            <option value="2023">2023</option>
+                            {% elif selectedYear == '2023' %}
+                            <option value="2022">2022</option>
+                            <option value="2023" selected>2023</option>
+                            {% else %}
+                            <option value="2022">2022</option>
+                            <option value="2023">2023</option>
+                            {% endif %}
+                        </select>
+                    </div>
+                    <div class="col-lg-5 col-md-4 text-lg-end">
+                        <div class="d-flex align-items-center justify-content-end">
+                            <input  id="submitBtn1" type="submit" class="apply-filter-btn primary-btn" value="Apply Filter" style="margin-bottom: 10px;" />
+                            <button  onclick="funcReset()" class="btn-close-cancel ms-2" style="padding: 7px 25px; background: #333;margin-bottom: 10px">Reset</button>
+                            {% if selectedField and selectedYear %}
+                                <a id="csvbtn" target="_blank" href="{% url 'field_level_sustainability_csv' selectedField.id selectedYear %}" class="btn-close-cancel ms-2" style="padding: 7px 25px; background: #4858af;margin-bottom: 10px">Download CSV</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </form>
+            </div>
+            {% if selectedField and selectedYear %}
+            <div id="maintable" class="main-simple-table-with-search">                
+                <div class="both-data-in" style="display: inherit;">
+                    <div class="mt-3">
+                        <h4>Field Info</h4>
+                    </div>
+                    <div class="simple-responsive-table">
+                        <table class="table table-striped table-bordered dt-responsive nowrap text-center" style="width:100%">
+                            <thead class="table-info">
+                                <tr style="border-bottom: 2px solid #e0e0e0;">
+                                    <th width="10%">Field</th>
+                                    <th width="10%">Crop Year</th>
+                                    <th width="10%">Crop</th>
+                                    <th width="10%">Variety</th>
+                                    <th width="10%">Farm</th>
+                                    <th width="10%">Grower</th>
+                                    <th width="10%">Acreage</th>
+                                    <th width="10%">Yield Per Acre</th>
+                                    <th width="10%">Total Yield</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for i in report %}
+                                <tr>
+                                    <td>{{i.field_name}}</td>
+                                    <td>{{i.year}}</td>
+                                    <td>{{i.crop}}</td>
+                                    <td>{{i.variety}}</td>
+                                    <td>{{i.farm}}</td>
+                                    <td>{{i.grower}}</td>
+                                    <td>{{i.acreage}}</td>
+                                    <td>{{i.yield_per_acre}}</td>
+                                    <td>{{i.total_yield}}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="nutrients mt-4">
+                        <!-- Burndown Chemical  -->
+                        {% if field_activity_Burndown_Chemical|length > 0 %}
+                        <div id="pre_fert_table_1" class="pre-table mb-4">
+                            <h4 id="root">Burndown Chemical</h4>
+                            <table class="table table-striped table-bordered dt-responsive nowrap">
+                                <thead class="table-info">
+                                    <tr>
+                                        <th>Date of Activity</th>
+                                        <th>Mode of Application</th>
+                                        <th>Label Name</th>
+                                        <th>Amount Per Acre</th>
+                                        <th>UoM</th>
+                                        <th>Special Notes</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for i in field_activity_Burndown_Chemical %}
+                                    <tr>
+                                        <td>{{ i.date_of_activity }}</td>
+                                        <td>{{ i.mode_of_application }}</td>
+                                        <td>{{ i.label_name }}</td>
+                                        <td>{{ i.amount_per_acre }}</td>
+                                        <td>{{ i.unit_of_acre }}</td>
+                                        <td>{{ i.special_notes }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% endif %}
+                        <!-- Preemergence Chemical  -->
+                        {% if field_activity_Preemergence_Chemical|length > 0 %}
+                        <div id="pre_fert_table_1" class="pre-table mb-4">
+                            <h4 id="root">Preemergence Chemical</h4>
+                            <table class="table table-striped table-bordered dt-responsive nowrap">
+                                <thead class="table-info">
+                                    <tr>
+                                        <th>Date of Activity</th>
+                                        <th>Mode of Application</th>
+                                        <th>Label Name</th>
+                                        <th>Amount Per Acre</th>
+                                        <th>UoM</th>
+                                        <th>Special Notes</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for i in field_activity_Preemergence_Chemical %}
+                                    <tr>
+                                        <td>{{ i.date_of_activity }}</td>
+                                        <td>{{ i.mode_of_application }}</td>
+                                        <td>{{ i.label_name }}</td>
+                                        <td>{{ i.amount_per_acre }}</td>
+                                        <td>{{ i.unit_of_acre }}</td>
+                                        <td>{{ i.special_notes }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% endif %}
+                        <!-- Post Emergence Chemical  -->
+                        {% if field_activity_Post_Emergence_Chemical|length > 0 %}
+                        <div id="pre_fert_table_1" class="pre-table mb-4">
+                            <h4 id="root">Post Emergence Chemical</h4>
+                            <table class="table table-striped table-bordered dt-responsive nowrap">
+                                <thead class="table-info">
+                                    <tr>
+                                        <th>Date of Activity</th>
+                                        <th>Mode of Application</th>
+                                        <th>Label Name</th>
+                                        <th>Amount Per Acre</th>
+                                        <th>UoM</th>
+                                        <th>Special Notes</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for i in field_activity_Post_Emergence_Chemical %}
+                                    <tr>
+                                        <td>{{ i.date_of_activity }}</td>
+                                        <td>{{ i.mode_of_application }}</td>
+                                        <td>{{ i.label_name }}</td>
+                                        <td>{{ i.amount_per_acre }}</td>
+                                        <td>{{ i.unit_of_acre }}</td>
+                                        <td>{{ i.special_notes }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% endif %}
+                        <!-- Emergence Chemical  -->
+                        {% if field_activity_Emergence_Chemical|length > 0 %}
+                        <div id="pre_fert_table_1" class="pre-table mb-4">
+                            <h4 id="root">Emergence Chemical</h4>
+                            <table class="table table-striped table-bordered dt-responsive nowrap">
+                                <thead class="table-info">
+                                    <tr>
+                                        <th>Date of Activity</th>
+                                        <th>Mode of Application</th>
+                                        <th>Label Name</th>
+                                        <th>Amount Per Acre</th>
+                                        <th>UoM</th>
+                                        <th>Special Notes</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for i in field_activity_Emergence_Chemical %}
+                                    <tr>
+                                        <td>{{ i.date_of_activity }}</td>
+                                        <td>{{ i.mode_of_application }}</td>
+                                        <td>{{ i.label_name }}</td>
+                                        <td>{{ i.amount_per_acre }}</td>
+                                        <td>{{ i.unit_of_acre }}</td>
+                                        <td>{{ i.special_notes }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% endif %}
+                        <!-- Fungicide / Micro Nutrients  -->
+                        {% if field_activity_Fungicide_Micro_Nutrients|length > 0 %}
+                        <div id="pre_fert_table_1" class="pre-table mb-4">
+                            <h4 id="root">Fungicide / Micro Nutrients</h4>
+                            <table class="table table-striped table-bordered dt-responsive nowrap">
+                                <thead class="table-info">
+                                    <tr>
+                                        <th>Date of Activity</th>
+                                        <th>Mode of Application</th>
+                                        <th>Label Name</th>
+                                        <th>Amount Per Acre</th>
+                                        <th>UoM</th>
+                                        <th>Special Notes</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for i in field_activity_Fungicide_Micro_Nutrients %}
+                                    <tr>
+                                        <td>{{ i.date_of_activity }}</td>
+                                        <td>{{ i.mode_of_application }}</td>
+                                        <td>{{ i.label_name }}</td>
+                                        <td>{{ i.amount_per_acre }}</td>
+                                        <td>{{ i.unit_of_acre }}</td>
+                                        <td>{{ i.special_notes }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% endif %}
+                        <!-- Insecticide Application  -->
+                        {% if field_activity_Insecticide_Application|length > 0 %}
+                        <div id="pre_fert_table_1" class="pre-table mb-4">
+                            <h4 id="root">Insecticide Application</h4>
+                            <table class="table table-striped table-bordered dt-responsive nowrap">
+                                <thead class="table-info">
+                                    <tr>
+                                        <th>Date of Activity</th>
+                                        <th>Mode of Application</th>
+                                        <th>Label Name</th>
+                                        <th>Amount Per Acre</th>
+                                        <th>UoM</th>
+                                        <th>Special Notes</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for i in field_activity_Insecticide_Application %}
+                                    <tr>
+                                        <td>{{ i.date_of_activity }}</td>
+                                        <td>{{ i.mode_of_application }}</td>
+                                        <td>{{ i.label_name }}</td>
+                                        <td>{{ i.amount_per_acre }}</td>
+                                        <td>{{ i.unit_of_acre }}</td>
+                                        <td>{{ i.special_notes }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% endif %}
+                        <!-- Litter  -->
+                        {% if field_activity_Litter|length > 0 %}
+                        <div id="pre_fert_table_1" class="pre-table mb-4">
+                            <h4 id="root">Litter </h4>
+                            <table class="table table-striped table-bordered dt-responsive nowrap">
+                                <thead class="table-info">
+                                    <tr>
+                                        <th>Date of Activity</th>
+                                        <th>Mode of Application</th>
+                                        <th>Label Name</th>
+                                        <th>Amount Per Acre</th>
+                                        <th>UoM</th>
+                                        <th>Special Notes</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for i in field_activity_Litter %}
+                                    <tr>
+                                        <td>{{ i.date_of_activity }}</td>
+                                        <td>{{ i.mode_of_application }}</td>
+                                        <td>{{ i.label_name }}</td>
+                                        <td>{{ i.amount_per_acre }}</td>
+                                        <td></td>
+                                        <td>{{ i.special_notes }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% endif %}
+                        <!-- Sodium Chlorate  -->
+                        {% if field_activity_Sodium_Chlorate|length > 0 %}
+                        <div id="pre_fert_table_1" class="pre-table mb-4">
+                            <h4 id="root">Sodium Chlorate</h4>
+                            <table class="table table-striped table-bordered dt-responsive nowrap">
+                                <thead class="table-info">
+                                    <tr>
+                                        <th>Date of Activity</th>
+                                        <th>Mode of Application</th>
+                                        <th>Label Name</th>
+                                        <th>Amount Per Acre</th>
+                                        <th>UoM</th>
+                                        <th>Special Notes</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for i in field_activity_Sodium_Chlorate %}
+                                    <tr>
+                                        <td>{{ i.date_of_activity }}</td>
+                                        <td>{{ i.mode_of_application }}</td>
+                                        <td>{{ i.label_name }}</td>
+                                        <td>{{ i.amount_per_acre }}</td>
+                                        <td></td>
+                                        <td>{{ i.special_notes }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% endif %}
+                        <!-- Measure Water  -->
+                        {% if field_activity_Measure_Water|length > 0 %}
+                        <div id="pre_fert_table_1" class="pre-table mb-4">
+                            <h4 id="root">Measured Water Use</h4>
+                            <table class="table table-striped table-bordered dt-responsive nowrap">
+                                <thead class="table-info">
+                                    <tr>
+                                        <th>Date of Activity</th>
+                                        <th>Mode of Application</th>
+                                        <th>Label Name</th>
+                                        <th>Amount Per Acre</th>
+                                        <th>UoM</th>
+                                        <th>Special Notes</th>
+                                        <th>ACTION</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for i in field_activity_Measure_Water %}
+                                    <tr>
+                                        <td>{{ i.date_of_activity }}</td>
+                                        <td>{{ i.mode_of_application }}</td>
+                                        <td>{{ i.label_name }}</td>
+                                        <td>{{ i.amount_per_acre }}</td>
+                                        <td>{{ i.unit_of_acre }}</td>
+                                        <td>{{ i.special_notes }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% endif %}
+                        <!-- include NPK -->
+                        {% if field_activity_npk|length > 0 %}
+                        <div id="pre_fert_table_2" class="pre-table">
+                            <h4>NPK Application</h4>
+                            <table class="table table-striped table-bordered dt-responsive nowrap">
+                                <thead class="table-info">
+                                    <tr>
+                                        <th style="width:10%">Date of Activity</th>
+                                        <th style="width:10%">Activity Type</th>
+                                        <th style="width:10%">Mode</th>
+                                        <th style="width:10%">N-Nitrogen</th>
+                                        <th style="width:10%">P-Phosporus</th>
+                                        <th style="width:10%">K-Potassium</th>
+                                        <th style="width:10%">UoM</th>
+                                        <th style="width:20%">Special Notes</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                
+                                    {% for i in field_activity_npk %}
+                                    <tr>  
+                                        <td>{{ i.date_of_activity }}</td>
+                                        <td>{{ i.type_of_application }}</td>
+                                        <td>{{ i.mode_of_application }}</td>
+                                        <td>{{ i.n_nitrogen }}</td>
+                                        <td>{{ i.p_phosporus }}</td>
+                                        <td>{{ i.k_potassium }}</td>
+                                        <td>LBS / acre</td>
+                                        <td>{{ i.special_notes }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                    <tr>
+                                        <td>Total</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td>{{sum_nitrogen}}</td>
+                                        <td>{{sum_phosporus}}</td>
+                                        <td>{{sum_potassium}}</td>
+                                        <td>LBS / acre</td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+    </main>
+    {% include 'footer.html' %}
+</div>
+{% endblock content %}
+
+{% block jquery %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.js"></script>
+<!-- <script>
+    function getText(){
+        getTextid = $("#getTextid").val();
+        select_crop_id = $("#select_crop_id").val();
+        $.ajax({
+                type: "GET",
+                    url: `/growersurvey/field_autocomplete_suggestions/`,
+                    data: {},
+                    contentType: false,
+                    cache: false,
+                    processData: false,
+                    success: function (response){
+                        console.log(response);
+                        var availableTags  = response.select_search;
+                        $("#fieldid").autocomplete({
+                            source: availableTags
+                        });
+                    }
+            })
+    }
+</script> -->
+{% endblock jquery %}
+
+{% block scripts %}
+<script>
+    // $(document).ready(function() {
+    // $('#fieldid').change( function () {
+    // $('#submitBtn1').click();
+    // });
+    // });
+    $(document).ready(function() {
+    $('#growerid').change( function () {
+    $('#submitBtn1').click();
+    });
+    });
+    function funcReset(){
+        var path = `${window.location.protocol + "//" + window.location.host}/growersurvey/field_level_sustainability`
+        $('#fieldid').val("all");
+        $('#yearid').val("all");
+        $('#maintable').css("display", "none");
+        $('#csvbtn').css("display", "none");
+        path.click();
+    } 
+</script>
+
+<script src="{% static 'js/farm/farm_list.js' %}"></script>
+
+
+<!-- Datepicker -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+
+<!-- Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.js">
+</script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.js">
+</script>
+<link href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/ui-lightness/jquery-ui.css" rel="stylesheet"
+    type="text/css" />
+
+<script>
+    $('#Sustainability-active').addClass('activeLink');
+                    
+    $('#Sustainability-down').addClass('down');
+    $('#Sustainability-sub').show();
+    
+    $('#Field-level-sustainability').addClass('activeLink active-nav');
+    </script>
+{% endblock scripts %}

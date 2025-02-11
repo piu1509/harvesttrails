@@ -1,0 +1,598 @@
+{% extends "base.html" %}
+{% load static %} {% block title %} Create Survey {% endblock title %} {% block content %}
+{% include 'navbar.html' %}
+<div class="main-content">
+    {% include 'header.html' %}
+
+<!-- MID CONTENT -->
+
+<main> 
+    <span class="farm headingtop">Create Survey</span>
+    <div class="card farm-fields-container">
+        <div class="container-fluid">
+            <form method="post" class="farm-fields-form" name="createSurvey" id="createSurvey" style="padding:5px 15px;">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-6">
+                        <div id="div_id_type_survey" class="form-group">
+                            <label for="type_survey">
+                                Survey Type
+                            </label>
+                            <div class="">
+                                <select name="type_survey" class="select form-select" id="type_survey" required onchange="checkSurveyDb()">
+                                  <option value="">Select</option>
+                                  {% for type in type_survey %}
+                                  <option value="{{type.id}}" {% if name_survey_data.typesurvey.id == type.id %}selected{% endif %} >{{type.name}}</option>
+                                  {% endfor %}
+                                </select>
+                                <!-- <small id="hint_id_name" class="form-text text-muted">ex: Fred Farmer</small> -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div id="div_id_survey_year" class="form-group">
+                            <label for="survey_year">
+                                Survey Year 
+                            </label>
+                            <div class="">
+                                <select name="survey_year" class="select form-select" id="survey_year" required onchange="checkSurveyDb()">
+                                  <option value="">Select</option>
+                                  {% for year in year_dropdown %}
+                                  <option value="{{year}}" {% if name_survey_data.surveyyear == year|slugify %}selected{% endif %} >{{year}}</option>
+                                  {% endfor %}
+                                </select>
+                                <!-- <small id="hint_id_name" class="form-text text-muted">ex: Fred Farmer</small> -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div id="div_id_survey_start_date" class="form-group">
+                            <label for="survey_start_date">
+                                Start Date
+                            </label>
+                            <div class="">
+                    
+                                <input type="date" name="survey_start_date" class="numberinput form-control" id="survey_start_date" placeholder="Select" required value="{{name_survey_data.start_date|date:"Y-m-d"}}"> 
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div id="div_id_survey_end_date" class="form-group">
+                            <label for="id_survey_end_date">
+                                End Date
+                            </label>
+                            <div class="">
+                                <input type="date" name="survey_end_date" class="numberinput form-control" id="survey_end_date" placeholder="Select" required value="{{name_survey_data.end_date|date:"Y-m-d"}}"> 
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-12">
+                        <div class="form-btn-row text-center text-md-end">
+                            <input type="submit" name="create_survey" id="create_survey" class="btn-save-submit" value="Edit Survey">
+                        </div>
+                    </div>
+                    <div class="col-lg-12 mt-2" id="db_chk_alert" style="display: none;">
+                        <div class="alert alert-warning" role="alert">
+                            Selected Survey Type and Year combination already exists in the database. Click on cancel to go to list for edit option.
+                          </div>
+                    </div>
+                    <div class="col-lg-12 mt-2" id="success_edit" style="display: none;">
+                        <div class="alert alert-success" role="alert">
+                            Successfully edited.
+                          </div>
+                    </div>
+                </div>
+              
+            </form>   
+        </div>
+    </div>
+
+    <div class="card card-padding mt-4" id="question_area">
+        <h2 class="user-detls text-center text-md-start">Questions</h2>
+        <div class="row">
+            <div class="col-lg-12">
+                <div id="set_question"></div>
+            </div>
+            <div class="col-lg-12 mt-4" id="add_question" style="display: none;">
+                <div class="add-block-gn" data-mdb-toggle="modal"
+                    data-mdb-target="#addqueModal">
+                    <span class="mr-2"><i class='fas fa-plus-circle'></i></span> Add Question
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="form-btn-row text-center text-md-end">
+                <a href="{% url 'survey-listing' %}" class="btn-close-cancel btn-space">Cancel</a>
+                <a href="{% url 'survey-listing' %}" class="btn-save-submit" id="save_survey">Save Survey</a>
+            </div>
+        </div>
+      </div>
+</main>
+<!-- MID CONTENT END-->
+<div class="modal fade" id="deleteModal" aria-hidden="true" aria-labelledby="exampleModalToggleLabel22"  tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-body">
+          <button
+            type="button"
+            class="btn-close cust-close-ds-btn"
+            data-mdb-dismiss="modal"
+            aria-label="Close"
+            onclick="cancelDelete()"
+          ></button>
+          <div class="center-content-status">
+            <img
+              src="/static/img/trash.png"
+              alt="right"
+              id="rightImg"
+              class="warning-icon"
+            />
+            <p id="message" class="modal-title titlepad">
+              Are you sure you want to delete?
+            </p>
+          </div>
+          <div class="modal-center-btn-footer">
+            <button
+              onclick="cancelDelete()"
+              id="closeBtnpopup"
+              type="button"
+              class="btn-close-cancel btn-space"
+              data-mdb-dismiss="modal"
+            >
+              Close
+            </button>
+            <a href="javascript:void(0);" id="questionDelete">
+              <button type="" class="btn-save-submit">Delete</button>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- end -->
+  
+  <!-- Add Que Popup -->
+  
+  <div class="modal fade" id="addqueModal" aria-hidden="true" aria-labelledby="exampleModalToggleLabel22"  tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+          <div class="modal-header">
+              <span class="farm headingtop">Add Question</span>
+              <button
+                type="button"
+                class="btn-close cust-close-ds-btn close_modal_addqueModal"
+                data-mdb-dismiss="modal"
+                aria-label="Close"
+                onclick="closeAddModal();"
+              ></button>
+          </div>
+        <div class="modal-body">
+            <form method="post" name="createSurveyQuestion" id="createSurveyQuestion">
+                {% csrf_token %}
+              <div class="farm-fields-form">
+                 <div class="row">
+                      <div class="col-md-12">
+                          <div id="div_question" class="form-group">
+                              <label for="question">
+                                  Question
+                              </label>
+                              <div class="">
+                                  <textarea name="question" id="question" class="form-control" placeholder="Enter here" style="min-height: 88px;"></textarea>
+                              </div>
+                          </div>
+                      </div>
+                      <div class="col-md-8">
+                        <div id="div_selction_type" class="form-group">
+                            <label for="selction_type">
+                                Selection Type
+                            </label>
+                            <div class="">
+                                <select name="selction_type" class="select form-select" id="selction_type">
+                                    <option value="radio">Single Select</option>
+                                    <option value="checkbox">Multi Select</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div id="div_max_score" class="form-group">
+                            <label for="max_score">
+                                Max Score
+                            </label>
+                            <div class="">
+                                <input type="text" name="max_score" id="max_score" value="" class="textinput textInput form-control max_score" placeholder="Enter here" onkeypress="return onlyNumberKey(event)" >
+                            </div>
+                        </div>
+                    </div>
+                  </div>
+                  
+                <div class="field_wrapper">
+                    <div class="inner_elem">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div id="div_id_option_name_1" class="form-group">
+                                    <label for="option_name_1">
+                                        Option
+                                    </label>
+                                    <div class="">
+                                        <input type="text" name="option_name" id="" value="" class="option_name textinput textInput form-control" placeholder="Enter here">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div id="div_id_points_1" class="form-group">
+                                    <label for="id_points_1">
+                                        Points
+                                    </label>
+                                    <div class="">
+                                        <input type="text" name="points" id="" value="" class="textinput textInput form-control points" placeholder="Enter here" onkeypress="return onlyNumberKey(event)">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-1 inc-dec-icon-col">
+                                <a href="javascript:void(0);" class="add_button"><img src="/static/img/plus.svg"></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                  <div class="row">
+                      <div class="col-md-12">
+                          <div class="form-group">
+                              <div class="form-check">
+                              <input type="checkbox" class="form-check-input" name="evidence_requird" id="evidence_requird"
+                          >
+                              <label class="form-check-label" for="evidence_requird">
+                                  Evidence Required
+                              </label>
+                          </div>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="row">
+                      <div class="col-md-12">
+                          <div id="div_id_evidence_descr" class="form-group" style="display: none;">
+                              <label for="evidence_descr">
+                                  Evidence Description
+                              </label>
+                              <div class="">
+                                  <textarea name="evidence_descr" id="evidence_descr" class="form-control" placeholder="Enter here" style="min-height: 88px;"></textarea>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+             </div> 
+  
+              <div class="modal-center-btn-footer">
+                
+                  <div class="row">
+                      <div class="col-lg-12">
+                          <div class="form-btn-row text-center text-md-end">
+                              <a href="javascript:void(0);" class="btn-close-cancel btn-space close_modal_addqueModal" data-mdb-dismiss="modal" aria-label="Close" onclick="closeAddModal();">Cancel</a>
+                              <input type="hidden" name="namesurvey_id" id="namesurvey_id" value={{name_survey_data.id}}>
+                              <input type="submit" name="createSurveyQuestion_save" id="createSurveyQuestion_save" class="btn-save-submit" value="Save Question">
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="editqueModal" aria-hidden="true" aria-labelledby="exampleModalToggleLabel22"  tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+          <div class="modal-header">
+              <span class="farm headingtop">Edit Question</span>
+              <button
+                type="button"
+                class="btn-close cust-close-ds-btn close_modal_addqueModal"
+                data-mdb-dismiss="modal"
+                aria-label="Close"
+                onclick="closeEditModal();"
+              ></button>
+          </div>
+        <div class="modal-body">
+            <form method="post" name="editSurveyQuestion" id="editSurveyQuestion">
+                {% csrf_token %}
+                <div id="set_question_answer_edit"></div>
+              <div class="modal-center-btn-footer">
+                
+                  <div class="row">
+                      <div class="col-lg-12">
+                          <div class="form-btn-row text-center text-md-end">
+                              <a href="javascript:void(0);" class="btn-close-cancel btn-space close_modal_addqueModal" data-mdb-dismiss="modal" aria-label="Close" onclick="closeEditModal();">Cancel</a>
+                              <input type="hidden" name="namesurvey_id_edit" id="namesurvey_id_edit" value={{name_survey_data.id}}>
+                              <input type="submit" name="editSurveyQuestion_save" id="editSurveyQuestion_save" class="btn-save-submit" value="Save Question">
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+{% include 'footer.html' %}
+</div>
+{% endblock %}
+{% block jquery %}
+<script>
+$('#createSurvey').on('submit', function(e){
+    e.preventDefault();
+    var nmsurv_id = $('#namesurvey_id').val();
+    var type_survey = $('#type_survey').val().trim();
+    var survey_year = $('#survey_year').val().trim();
+    var survey_start_date = $('#survey_start_date').val().trim();
+    var survey_end_date = $('#survey_end_date').val().trim();
+
+    var surveydata = {
+        nmsurv_id: nmsurv_id,
+        type_survey: type_survey,
+        survey_year: survey_year,
+        survey_start_date: survey_start_date,
+        survey_end_date:survey_end_date
+        }
+
+
+    $.ajax({
+            type: 'POST',
+            url: "{% url 'edit-survey' %}",
+            data: JSON.stringify(surveydata),
+            dataType: 'json',
+            contentType: 'application/json',
+            cache: false,
+            processData:false,
+            beforeSend: function(xhr, settings){
+                xhr.setRequestHeader("X-CSRFToken", '{{csrf_token}}');
+            },
+            success: function(response){
+				//console.log(response);
+                if(response.id > 0)
+                {
+                    $('#namesurvey_id').val(response.id);
+                    $('#namesurvey_id_edit').val(response.id);
+                    $('#add_question').show();
+                    $("#success_edit").fadeTo(2000, 500).slideUp(500, function(){
+                        $("#success_edit").slideUp(500);
+                    });
+                }
+
+				
+            }
+        });
+
+});
+
+
+
+$('#createSurveyQuestion').on('submit', function(e){
+    e.preventDefault();
+    //console.log($(this).serializeArray());
+    $('#createSurveyQuestion_save').val("Please wait...");
+
+    $.ajax({ // create an AJAX call...
+        data: $(this).serialize(), // get the form data
+        type: 'POST', // GET or POST
+        url: "{% url 'save-question-option' %}", // the file to call 
+        success: function(response) { // on success..
+            //console.log(response);
+            if(response > 0)
+            {
+                
+                $('#question').val("");
+                $('#selction_type').val("radio");
+                $('#max_score').val("");
+                $('.option_name').val("");
+                $('.points').val("");
+                $('#evidence_descr').val("");
+                $('#createSurveyQuestion_save').val("Save Another Question");
+                set_questions(response);
+            }
+        }
+    });
+
+});
+
+$('#editSurveyQuestion').on('submit', function(e){
+
+    e.preventDefault();
+    //console.log($(this).serializeArray());
+    $('#editSurveyQuestion_save').val("Please wait...");
+
+    $.ajax({ // create an AJAX call...
+        data: $(this).serialize(), // get the form data
+        type: 'POST', // GET or POST
+        url: "{% url 'save-question-option-edit' %}", // the file to call 
+        success: function(response) { // on success..
+            console.log(response);
+            if(response > 0)
+            {
+                $('#editSurveyQuestion_save').val("Save Question");
+                $('#editqueModal').modal('hide');
+                set_questions(response);
+            }
+        }
+    });
+
+});
+
+function set_questions(namesurvey_id)
+{
+    $.ajax({ // create an AJAX call...
+        data: {namesurvey_id:namesurvey_id}, // get the form data
+        type: 'GET', // GET or POST
+        url: "{% url 'get-question' %}", // the file to call 
+        success: function(response) { // on success..
+            //console.log(response);
+            $('#set_question').html(response);
+        }
+    });
+
+}
+
+$("#evidence_requird").on('click', function(e){
+    var is_evidence_requird = $(this).is(':checked');
+    if(is_evidence_requird)
+    {
+        $("#div_id_evidence_descr").slideDown();
+    }
+    else
+    {
+        $("#div_id_evidence_descr").slideUp();
+    }
+});
+
+$(document).ready(function(){
+    var maxField = 30; //Input fields increment limitation
+    var addButton = $('.add_button'); //Add button selector
+    var wrapper = $('.field_wrapper'); //Input field wrapper
+    var fieldHTML = '<div class="inner_elem"> <div class="row"> <div class="col-md-8"> <div id="div_id_option_name_1" class="form-group"> <label for="option_name_1"> Option </label> <div class=""> <input type="text" name="option_name" id="" value="" class="option_name textinput textInput form-control" placeholder="Enter here"> </div></div></div><div class="col-md-3"> <div id="div_id_points_1" class="form-group"> <label for="id_points_1"> Points </label> <div class=""> <input type="text" name="points" id="" value="" class="textinput textInput form-control points" placeholder="Enter here" onkeypress="return onlyNumberKey(event)"> </div></div></div><div class="col-md-1 inc-dec-icon-col"> <a href="javascript:void(0);" class="remove_button"><img src="/static/img/minus.svg"></a> </div></div></div>'; //New input field html 
+    var x = 1; //Initial field counter is 1
+    
+    //Once add button is clicked
+    $(addButton).click(function(){
+        //Check maximum number of input fields
+        if(x < maxField){ 
+            x++; //Increment field counter
+            $(wrapper).append(fieldHTML); //Add field html
+        }
+    });
+    
+    //Once remove button is clicked
+    $(wrapper).on('click', '.remove_button', function(e){
+        e.preventDefault();
+        $(this).parent().parent().parent('.inner_elem').remove(); //Remove field html
+        x--; //Decrement field counter
+    });
+});
+
+function onlyNumberKey(evt) { 
+      // Only ASCII charactar in that range allowed 
+      var ASCIICode = (evt.which) ? evt.which : evt.keyCode 
+      if (ASCIICode > 31 && (ASCIICode < 48 || ASCIICode > 57)) 
+          return false; 
+      return true; 
+} 
+
+function closeAddModal()
+{
+    $('#addqueModal').modal('hide');
+}
+
+function closeEditModal()
+{
+    $('#editqueModal').modal('hide');
+}
+
+function checkSurveyDb()
+{
+    var nmsurv_id = $('#namesurvey_id').val();
+    var type_survey = $('#type_survey').val().trim();
+    var survey_year = $('#survey_year').val().trim();
+
+    if(type_survey !="" && survey_year !="" && nmsurv_id !="")
+    {
+        //alert(nmsurv_id);
+        //alert(survey_year);
+        $.ajax({ // create an AJAX call...
+            data: {nmsurv_id:nmsurv_id, type_survey:type_survey, survey_year:survey_year}, // get the form data
+            type: 'GET', // GET or POST
+            url: "{% url 'check-survey-db' %}", // the file to call 
+            success: function(response) { // on success..
+                //console.log(response);
+                if(response > 0)
+                {
+                    $('#create_survey').hide();
+                    $('#save_survey').hide();
+                    $('#db_chk_alert').show();
+                }
+                else
+                {
+                    $('#create_survey').show();
+                    $('#save_survey').show();
+                    $('#db_chk_alert').hide();
+                }
+                
+            }
+        });
+
+    }
+    else
+    {
+        //alert("Select Survey Type and Year.");
+        $('#create_survey').show();
+        $('#save_survey').show();
+        $('#db_chk_alert').hide();
+    }
+    
+}
+
+function deleteQuestion(question_id)
+{
+    //alert(question_id);
+    $('#deleteModal').modal('show');
+    $('#questionDelete').attr('onclick','confirmDelete('+question_id+')');
+
+}
+
+function cancelDelete()
+{
+    $('#questionDelete').attr('onclick','');
+    $('#deleteModal').modal('hide');
+}
+
+function confirmDelete(question_id)
+{
+    var namesurvey_id = $('#namesurvey_id').val().trim();
+    //alert(namesurvey_id);
+    $.ajax({ // create an AJAX call...
+        data: {question_id:question_id}, // get the form data
+        type: 'POST', // GET or POST
+        url: "{% url 'question-delete' %}", // the file to call
+        beforeSend: function(xhr, settings){
+            xhr.setRequestHeader("X-CSRFToken", '{{csrf_token}}');
+        }, 
+        success: function(response) { // on success..
+            //console.log(response);
+            set_questions(namesurvey_id);
+            $('#questionDelete').attr('onclick','');
+            $('#deleteModal').modal('hide');
+        }
+    });
+}
+
+function editViewQuestionOptions(question_id)
+{
+    
+    $.ajax({ // create an AJAX call...
+        data: {question_id:question_id}, // get the form data
+        type: 'GET', // GET or POST
+        url: "{% url 'edit-view-question-options' %}", // the file to call
+        success: function(response) { // on success..
+            //console.log(response);
+            $('#set_question_answer_edit').html(response);
+            $('#editqueModal').modal('show');
+        }
+    });
+
+}
+$(document).ready(function(){
+    var nameserv_id = document.getElementById('namesurvey_id').value
+    set_questions(nameserv_id);
+    
+});
+</script>
+
+<script>
+    $('#Survey-Configuration-active').addClass('activeLink');
+                  
+    $('#Survey-Configuration-down').addClass('down');
+    $('#Survey-Configuration-sub').show();
+    
+    $('#Survey-List').addClass('activeLink active-nav');
+</script>
+{% endblock jquery %}

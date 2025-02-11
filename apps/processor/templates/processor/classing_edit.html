@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %} Classing Report Update {% endblock title %}
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+{% block content %}
+{% include 'navbar.html' %}
+<style>
+    .gro_dd {
+        border-color: #ccc;
+        margin-top: 0px;
+        height: 50px;
+    }
+    .storagetextbox{width: 300px; height: 45px; border:1px solid #ccc; padding: 5px 10px;}
+    .mystyle {
+        display: none;
+    }
+</style>
+<div class="main-content">
+    {% include 'header.html' %}
+    {% load crispy_forms_tags %}
+    {% include '_alerts.html' %}
+    <main>
+        {% include '_alerts.html' %}
+        <div class="page-title-with-or-without-btn">
+            <span class="farm headingtop">Classing Report Update</span>
+        </div>
+        <form action="" method="post" class="farm-fields-form"
+        enctype="multipart/form-data">
+        {% csrf_token %}
+
+
+        <div class="row">
+            <div class="col-md-4">
+                <lable>Processor</lable>
+                <input type="text" value="{{classing.processor.entity_name}}" class="textinput textInput form-control" readonly>
+            </div>
+            <div class="col-md-4">
+                <lable>Grower</lable>
+                <input type="text" value="{{classing.grower.name}}" class="textinput textInput form-control" readonly>
+            </div>
+            <div class="col-md-4">
+                <lable>Select All Fields<span class="asteriskField">*</span></lable>
+                <select id="id_field" name="id_field" class="textinput textInput form-control">
+                    <option value="">Select All Fields</option>
+                    {% for field in field %}
+                    {% if field == selectedfield %}
+                    <option value="{{field.id}}" selected>{{field.name}} - {{field.pk}}</option>
+                    {% else %}
+                    <option value="{{field.id}}">{{field.name}} - {{field.pk}}</option>
+                    {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="row">
+                <div class="form-btn-row">
+                    <a href="{% url 'classing_list' %}" class="btn-close-cancel btn-space">Cancel</a>
+                    <input type="submit" class="btn-save-submit" value="Save">
+                </div>
+            </div>
+            
+        </div>
+ 
+        </form>
+    </main>
+    {% include 'footer.html' %}
+</div>
+{% endblock content %}
+{% block scripts %}
+<script>
+
+</script>
+<script>
+    $('#Processor-active').addClass('activeLink');
+  
+    $('#Processor-down').addClass('down');
+    $('#Processor-sub').show();
+  
+    $('#Classing-All-Reports').addClass('activeLink active-nav');
+  
+  </script>
+{% endblock scripts %}
+{% block jquery %}
+{% endblock jquery %}

@@ -1,0 +1,626 @@
+{% load static %}
+<input type="checkbox" id="nav-toggle">
+<div class="sidebar">
+   <div class="sidebar-brand text-center"> <img src="{% static 'img/fs-logo.png' %} " alt="logo" class="logoimmg"> <img src="{% static 'img/showlogo.png' %}" alt="logo" id="logoshow"> </div>
+   <div class="sidebar-menu" style="overflow: auto; height:calc(100vh - 150px); padding-bottom: 20px;">
+      <ul id="navMenus">
+         <li>
+            <span class="mainn minenaviga">Main Navigation</span>
+         </li>
+         {% if request.user.is_distributor or request.user.is_customer or request.user.is_warehouse_manager or request.user.is_processor2 or request.user.is_processor or request.user.is_consultant or request.user.is_superuser or 'SubAdmin' in request.user.get_role or 'SuperUser' in request.user.get_role %}
+         <li>
+            <a class="" href="{% url 'dashboard' %}"> <span class="rightimg"><i
+               class="fa fa-home"></i></span> <span>Home</span> </a>
+         </li>
+         {% endif %}
+         <!-- 03-06-23 Grower Individual Dashboard -->
+         {% if 'Grower' in request.user.get_role and not request.user.is_superuser %}
+         <li>
+            <a class="" href="{% url 'grower_dashboard_com' 'all' %}"> <span class="rightimg"><i
+               {% comment %} class="fas fa-user"></i></span> <span>My Dashboard</span> </a> {% endcomment %}
+               class="fa fa-home"></i></span> <span>Home</span> </a>
+         </li>
+         {% endif %}
+         <!-- 03-06-23 -->
+         {% if request.user.is_authenticated %}
+         {% if 'Grower Management' in request.user.get_role_perm or request.user.is_superuser or 'SubAdmin' in request.user.get_role or 'SuperUser' in request.user.get_role %}
+         <li class="for-drop">
+            <a id="User-Management-active" href="javascript:void(0)" class="parent-nav19"><span class="rightimg"><i class="fa fa-user"></i></span>
+            <span class="forn-none19">Users   <!-- User Management -->
+            <span id="User-Management-down" class="fas fa-chevron-right pull-right rotate19"></span></span> </a>
+            
+            <ul id ="User-Management-sub" class="dropdown-19" style="display: none;">
+               {% if 'User Management' in request.user.get_role_perm or request.user.is_superuser or 'SubAdmin' in request.user.get_role or 'SuperUser' in request.user.get_role%}
+               <li><a id="user-list" href="{% url 'user-list' %}">User Management</a></li>
+               {% endif %}
+               {% if 'Role Management' in request.user.get_role_perm or request.user.is_superuser or 'SubAdmin' in request.user.get_role or 'SuperUser' in request.user.get_role %}
+               <li><a id="role-list" href="{% url 'role-list' %}">Role Management</a></li>
+               {% endif %}
+               {% comment %} {% if 'Permissions Management' in request.user.get_role_perm or request.user.is_superuser %}
+               <li><a href="{% url 'permissions' %}">Permissions Management</a></li>
+               {% endif %}  {% endcomment %}
+            </ul>
+         </li>
+         {% endif %}
+         {% endif %}
+
+
+         {% if request.user.is_authenticated %}
+         {% if 'Grower Management' in request.user.get_role_perm or request.user.is_superuser or 'SubAdmin' in request.user.get_role or 'SuperUser' in request.user.get_role %}
+         <li class="for-drop">
+            <a id="Grower-Configuration-active" href="javascript:void(0)" class="parent-nav2"><span class="rightimg"><i class="fa fa-users"></i></span>
+            <span class="forn-none1">Growers       <!-- Grower Configuration  -->
+            <span id="Grower-Configuration-down" class="fas fa-chevron-right pull-right pull_right_new"></span></span> </a>
+            
+            <ul id="Grower-Configuration-sub" class="dropdown-2">
+               {% if 'Grower Management' in request.user.get_role_perm or request.user.is_superuser or 'SubAdmin' in request.user.get_role or 'SuperUser' in request.user.get_role %}
+               <li><a id="Grower-Management" href="{% url 'account-list' %}">Grower Management</a></li>
+               {% endif %}
+               <!-- 03-06-23 -->
+               {% if request.user.is_superuser or 'SubAdmin' in request.user.get_role or 'SuperUser' in request.user.get_role or request.user.is_consultant %}
+               <li><a id="Grower-Dashboard" href="{% url 'grower_dashboard_com' 'all' %}">Grower Dashboard</a></li>
+               {% endif %}
+               <!-- 03-06-23 -->
+               {% if 'Checklist Comparison' in request.user.get_role_perm or request.user.is_superuser or 'SubAdmin' in request.user.get_role or 'SuperUser' in request.user.get_role%}
+               <li><a id="Checklist-Comparison" href="{% url 'checklist_comparison' %}">Checklist Comparison</a></li>
+               {% endif %}
+               {% if 'Report Management' in request.user.get_role_perm or request.user.is_superuser or 'SubAdmin' in request.user.get_role or 'SuperUser' in request.user.get_role %}
+               <li><a id="Report-Management" href="{% url 'reports' %}">Report Management</a></li>
+               {% endif %}
+            </ul>
+         </li>
+         {% endif %}
+         {% endif %}
+
+
+         {% if request.user.is_authenticated %}
+         {% if 'Farm Management' in request.user.get_role_perm or request.user.is_superuser or 'SubAdmin' in request.user.get_role or 'SuperUser' in request.user.get_role %}
+         <li class="for-drop">
+            <a id="Farm-Configuration-active" href="javascript:void(0)" class="parent-nav22"> <span class="rightimg"><i class="fas fa-tractor"></i></span>
+            <span class="forn-none2">Farms     <!--Farm Configuration-->
+            <span id="Farm-Configuration-down" class="fas fa-chevron-right pull-right rotate2"></span></span> </a>
+            
+            <ul id="Farm-Configuration-sub" class="dropdown-22">
+               {% if 'Farm Management' in request.user.get_role_perm or request.user.is_superuser or 'SubAdmin' in request.user.get_role or 'SuperUser' in request.user.get_role %}
+               <li><a id="Farm-Management" href="{% url 'farm-list' %}">Farm Management</a></li>
+               {% endif %}
+               {% if 'Farm Grouping' in request.user.get_role_perm or request.user.is_superuser or 'SubAdmin' in request.user.get_role or 'SuperUser' in request.user.get_role %}
+               <li><a id="Farm-Grouping" href="{% url 'grouping' %}">Farm Grouping</a></li>
+               {% endif %}
+               {% if 'Field Management' in request.user.get_role_perm or request.user.is_superuser or 'SubAdmin' in request.user.get_role or 'SuperUser' in request.user.get_role %}
+               <li><a id="Field-Management" href="{% url 'field-list' %}">Field Management</a></li>
+               {% endif %}
+            </ul>
+         </li>
+         {% endif %}
+         {% endif %}
+
+         {% if request.user.is_authenticated %}
+         {% if 'Storage management' in request.user.get_role_perm or request.user.is_superuser or 'SubAdmin' in request.user.get_role or 'SuperUser' in request.user.get_role or request.user.is_consultant %}
+         <li class="for-drop">
+            <a id="Storage-Management-active" href="javascript:void(0)" class="parent-nav88"><span class="rightimg"><i class="fas fa-box"></i></span>
+            <span class="forn-none8">Storage    <!-- Storage Management -->
+            <span id="Storage-Management-down" class="fas fa-chevron-right pull-right rotate8"></span></span> </a>
+            
+            <ul id="Storage-Management-sub" class="dropdown-88" style="display: none;">
+               {% if 'Storage list' in request.user.get_role_perm or request.user.is_superuser or 'SubAdmin' in request.user.get_role or 'SuperUser' in request.user.get_role or request.user.is_consultant %}
+               <li><a id="Storage-List" href="{% url 'storage-list' %}">Storage List</a></li>
+               {% endif %}
+               {% if 'Storage add' in request.user.get_role_perm or request.user.is_superuser or 'SubAdmin' in request.user.get_role or 'SuperUser' in request.user.get_role or request.user.is_consultant %}
+               <li><a id="Storage-Add" href="{% url 'storage-create' %}">Storage Add</a></li>
+               {% endif %}
+               
+               {% if 'Storage feed list' in request.user.get_role_perm or request.user.is_superuser or 'SubAdmin' in request.user.get_role or 'SuperUser' in request.user.get_role or 'Grower' in request.user.get_role or request.user.is_consultant %}
+               <li><a id="Storage-Feed-List" href="{% url 'storage_feed_list' %}">Storage Feed List</a></li>
+               {% endif %}
+               {% if 'Storage Feed CSV' in request.user.get_role_perm or request.user.is_superuser or 'SubAdmin' in request.user.get_role or 'SuperUser' in request.user.get_role or 'Grower' in request.user.get_role or request.user.is_consultant %}
+               <li><a id="Storage-Feed-Csv" href="{% url 'assign_feed_csv' %}">Storage Feed CSV</a></li>
+               {% endif %}
+               
+            </ul>
+         </li>
+         {% endif %}
+         {% endif %}
+
+         {% if request.user.is_authenticated %}
+         {% if not request.user.is_superuser %}
+         {% if 'Growerpayments management' in request.user.get_role_perm %}
+         <li><a><span class="rightimg"><i class="fas fa-file-invoice-dollar"></i></span>
+            <span>Payments</span></a>      <!-- Grower Payment -->
+         </li>
+         {% comment %} <li><a href="{% url 'grower_payments_list' %}"> <span class="rightimg"><i class="fas fa-file-invoice-dollar"></i></span>
+            <span>Payments</span></a>      <!-- Grower Payment -->
+         </li> {% endcomment %}
+         {% endif %}
+         {% endif %}
+         {% endif %}
+
+         {% if request.user.is_authenticated %}
+         {% if 'Grower Payments' in request.user.get_role_perm or request.user.is_superuser or 'SubAdmin' in request.user.get_role or 'SuperUser' in request.user.get_role %}
+         <li class="for-drop">
+            <a id="Growers-Payments-active" href="javascript:void(0)" class="parent-nav18"><span class="rightimg"><i class="fas fa-file-invoice-dollar"></i></span>
+            <span class="forn-none18">Payments    <!-- Grower Payment -->
+            <span id="Growers-Payments-down" class="fas fa-chevron-right pull-right rotate18"></span></span> </a>
+            
+            <ul id="Growers-Payments-sub" class="dropdown-18" style="display: none;">
+               
+            <li><a id="Grower-Entry-Feeds" href="{% url 'entry_feeds_list' %}">Grower Entry Feeds</a></li>
+            <!-- <li><a href="{% url 'grower_payments_table' %}">Grower Delivery Details</a></li> -->
+            <li><a id="Grower-Delivery-Details" href="{% url 'grower_payments_table' %}?get_page_no_temp=1">Grower Delivery Details</a></li>
+            <li><a id="Grower-Payment-Details" href="{% url 'grower_payments_list' %}?get_page_no_temp=1">Grower Payment Details</a></li>
+            <li><a id="Payment-CSV-Upload" href="{% url 'grower_payments_bulk_add' %}">Payment CSV Upload</a></li>
+            <li><a id="Grower-Payee-List" href="{% url 'grower_payment_split_list' %}">Grower Payee List</a></li>
+            <li><a id="Payment-Statement" href="{% url 'grower_split_payee_list' %}">Payment Statement</a></li>
+            <li><a id="Bale-Csv-Download" href="{% url 'processor_grower_certificate_level_status' %}">Bale Csv Download</a></li>
+            {% if request.user.is_superuser or 'SubAdmin' in request.user.get_role or 'SuperUser' in request.user.get_role %}
+            <li><a id="Nasdaq-Historical-Data" href="{% url 'nasdaq_list_data' %}">Nasdaq Historical Data</a></li>
+            {% endif %}
+            </ul>
+         {% endif %}
+         {% endif %}
+
+         {% if request.user.is_authenticated %}
+         {% if request.user.is_superuser or 'SubAdmin' in request.user.get_role or 'SuperUser' in request.user.get_role or request.user.is_consultant %}  
+         <!-- <li>
+            <a href="{% url 'grower_dashboard' %}"> <span class="rightimg"><i class="fa fa-file"></i></span> <span class="forn-none3">Grower Dashboard</span>
+            </a>
+         </li> -->
+         {% endif %}
+         {% endif %}
+
+
+         {% if request.user.is_authenticated %} 
+         {% if 'Survey Configuration' in request.user.get_role_perm or request.user.is_superuser or 'SubAdmin' in request.user.get_role or 'SuperUser' in request.user.get_role %}
+            <!-- {% comment %}
+            <li><a href="{% url 'survey' %}"> <span class="rightimg"><i class="fas fa-poll"></i></span>
+               <span>Survey Configuration</span></a>
+            </li>
+            {% endcomment %} -->
+            <li class="for-drop">
+               <a id="Survey-Configuration-active" href="javascript:void(0)" class="parent-nav33"> <span class="rightimg"><i class="fas fa-poll"></i></span>
+               <span class="forn-none3">Surveys   <!-- Survey Configuration -->
+               <span id="Survey-Configuration-down" class="fas fa-chevron-right pull-right rotate3"></span></span> </a>
+               
+               <ul id="Survey-Configuration-sub" class="dropdown-33" style="display: none;">
+                  <li><a id="Survey-List" href="{% url 'survey-listing' %}">Survey List</a></li>
+                  <li><a id="Create-Survey" href="{% url 'create-survey' %}">Create Survey</a></li>
+               </ul>
+            </li>
+         {% endif %}
+         {% endif %}
+
+         {% if request.user.is_authenticated %} 
+         {% if 'Sustainbility' in request.user.get_role_perm or request.user.is_superuser or 'SubAdmin' in request.user.get_role or 'SuperUser' in request.user.get_role%}
+         <li class="for-drop">
+            <a id="Sustainability-active" href="javascript:void(0)" class="parent-nav44"> <span class="rightimg"><i class="fas fa-chart-line"></i></span>
+            <span class="forn-none4">Sustainability
+            <span id="Sustainability-down" class="fas fa-chevron-right pull-right rotate6"></span></span> </a>
+            
+            <ul id="Sustainability-sub" class="dropdown-44" style="display: none;">
+               <li><a id="Sustainability-Dashboard" href="{% url 'grower-sustainability' %}">Dashboard</a></li>
+               <li><a id="Grower-Comparison" href="{% url 'grower-sustain-comparison' %}">Grower Comparison</a></li>
+               {% if request.user.is_superuser or 'SubAdmin' in request.user.get_role or 'SuperUser' in request.user.get_role %}
+               <li><a id="Field-level-sustainability" href="{% url 'field_level_sustainability' %}">Field level sustainability</a></li>
+               <li><a id="sustainable-product-claims" href="{% url 'sustainable_product_claims' %}">Sustainable Claims</a></li>
+               {% endif %}
+            </ul>
+         </li>
+         {% endif %}
+         {% endif %}
+         
+
+         {% if request.user.is_authenticated %} 
+         {% if request.user.is_processor or request.user.is_processor2 %}
+         {% else %}
+         <li class="for-drop">
+         <a id="Documents-and-Photos-active" href="javascript:void(0)" class="parent-nav55"> <span class="rightimg"><i class="fa fa-file-alt"></i></span>
+            <span class="forn-none5">Documents  <!-- Documents and Photos -->
+            <span id="Documents-and-Photos-down" class="fas fa-chevron-right pull-right rotate6"></span></span> </a>
+
+            <ul id="Documents-and-Photos-sub" class="dropdown-55" style="display: none;">
+               {% if 'Folder List' in request.user.get_role_perm  or request.user.is_superuser or 'SubAdmin' in request.user.get_role or 'SuperUser' in request.user.get_role %}
+               <li><a id="Folder-List" href="{% url 'folder-list' %}">Folder List</a></li>
+               {% endif %}
+               {% if 'Document List' in request.user.get_role_perm or request.user.is_superuser or 'SubAdmin' in request.user.get_role or 'SuperUser' in request.user.get_role %}
+               <li><a id="Document-List" href="{% url 'document-list' %}">Document List</a></li>
+               {% endif %}
+               <li><a id="Contracts-List" href="{% url 'contract-list' %}">Contracts List</a></li>
+                  {% if 'Contracts' in request.user.get_role_perm or request.user.is_superuser or 'SubAdmin' in request.user.get_role or 'SuperUser' in request.user.get_role %}
+                     <li><a id="Add-Contracts" href="{% url 'contract-add' %}">Add Contracts</a></li>
+                  {% endif %}
+                <li><a id="Signed-Contracts" href="{% url 'signed-contract-list' %}">Signed Contracts</a></li>
+            </ul>
+
+         </li>
+         {% comment %} <li><a id="Documents-and-Photos" href="{% url 'folder-list' %}"><span class="rightimg"><i class="fa fa-file-alt"></i></span> 
+            <span>Documents and Photos</span></a>
+            
+         </li> {% endcomment %}
+         {% endif %}
+         {% endif %}
+
+         {% if request.user.is_authenticated %}
+         {% if request.user.is_superuser or 'SubAdmin' in request.user.get_role or 'SuperUser' in request.user.get_role or request.user.is_processor or request.user.is_processor2 or request.user.is_customer %}
+         <li class="for-drop">
+            <a id="Contracts-active" href="javascript:void(0)" class="parent-nav66"> <span class="rightimg"><i class="fas fa-file-signature"></i></span>
+               <span class="forn-none6">Contracts
+               <span id="Contracts-down" class="fas fa-chevron-right pull-right rotate7"></span></span> </a>
+               <ul id="Contracts-sub" class="dropdown-66" style="display: none;">
+                  {% if request.user.is_superuser or 'SubAdmin' in request.user.get_role or 'SuperUser' in request.user.get_role or request.user.is_processor or request.user.is_processor2 %}
+                    <li><a id="Contract-List" href="{% url 'list-contract' %}">Admin-Processor Contracts</a></li>
+                  {% endif %}
+
+                  {% if request.user.is_superuser or 'SubAdmin' in request.user.get_role or 'SuperUser' in request.user.get_role or request.user.is_customer %}
+                     <li><a id="Customer-Contract-List" href="{% url 'admin-customer-contract-list' %}">Admin-Customer Contracts</a></li>
+                  {% endif %}
+                  {% if 'Contracts' in request.user.get_role_perm or request.user.is_superuser or 'SubAdmin' in request.user.get_role or 'SuperUser' in request.user.get_role %}
+                     <li><a id="Add-Contracts" href="{% url 'add-contract' %}">Add Admin-Processor Contract</a></li>
+                     <li><a id="Add-Customer-Contract" href="{% url 'add-admin-customer-contract' %}">Add Admin-Customer Contract</a></li>
+                  {% endif %}
+                  {% comment %} <li><a id="Signed-Contracts" href="{% url 'contract-view' %}">View Contract Details</a></li> {% endcomment %}
+               </ul>
+         </li>
+         {% endif %}
+         {% endif %}
+
+
+
+        <!--{% if request.user.is_authenticated %}
+            {% if request.user.is_processor or request.user.is_processor2 %}
+            {% else %}
+            {% comment %}
+            <li><a href="{% url 'contracts' %}"> <span class="rightimg"><i class="fas fa-file-signature"></i></span>
+               <span>Contracts</span></a>
+            </li>
+            {% endcomment %}
+            <li class="for-drop">
+               <a id="Contracts-active" href="javascript:void(0)" class="parent-nav66"> <span class="rightimg"><i class="fas fa-file-signature"></i></span>
+               <span class="forn-none6">Contracts
+               <span id="Contracts-down" class="fas fa-chevron-right pull-right rotate7"></span></span> </a>
+
+               <ul id="Contracts-sub" class="dropdown-66" style="display: none;">
+                  <li><a id="Contracts-List" href="{% url 'contract-list' %}">Contracts List</a></li>
+                  {% if 'Contracts' in request.user.get_role_perm or request.user.is_superuser %}
+                     <li><a id="Add-Contracts" href="{% url 'contract-add' %}">Add Contracts</a></li>
+                  {% endif %}
+                  <li><a id="Signed-Contracts" href="{% url 'signed-contract-list' %}">Signed Contracts</a></li>
+               </ul>
+            </li>
+            {% endif %}
+         {% endif %} -->
+
+         {% if request.user.is_authenticated %}
+         {% if request.user.is_superuser or 'SubAdmin' in request.user.get_role or 'SuperUser' in request.user.get_role %}
+         <li class="for-drop">            
+            <a id="Processor-active" href="javascript:void(0)" class="parent-nav99"> <span class="rightimg"><i class="fas fa-warehouse"></i></span>
+            <span class="forn-none9">T1 Processor<!--Processor -->               
+            <span id="Processor-down" class="fas fa-chevron-right pull-right rotate9"></span></span></a>           
+            
+            <ul id="Processor-sub" class="dropdown-99" style="display: none;">
+              
+                  <li><a id="Processor-Management" href="{% url 'list-processor' %}">T1 Processor Management</a></li>  
+               <li><a id="Location-Management" href="{% url 'list-location' %}">Location Management</a></li>
+               
+               <li><a id="Grower-to-Processor" href="{% url 'grower_processor_management' %}">                  
+                  Grower to Processor                
+               </a>
+               </li>               
+               <li><a id="Processor1-Processor-Management" href="{% url 'Processor1ToProcessorManagement' %}">Processor To Processor Management</a></li>              
+               <li><a id="Inbound-Management" href="{% url 'processor_inbound_management' %}">Inbound Management</a></li>
+               
+               {% comment %} <li><a id="Production-Management" href="{% url 'inbound_production_mgmt' %}">Production Management</a></li> {% endcomment %}
+              
+               
+               <li><a id="Shipment-Management" href="{% url 'outbound_shipment_mgmt' %}">Shipment Management</a></li>
+               
+               <li><a id="Classing-All-Reports" href="{% url 'classing_list' %}">Classing All Reports</a></li>
+               
+               <li><a id="Production-Report" href="{% url 'production_report_list' %}">Production Report</a></li>
+               
+               <li><a id="EWR-Report" href="{% url 'classing_ewr_report_list' %}">EWR Report</a></li>
+               
+            </ul>
+         </li>
+        
+     
+         <li class="for-drop">
+            <a id="Tier2-Processor-active" href="javascript:void(0)" class="parent-nav1010"> <span class="rightimg"><i class="fas fa-warehouse"></i></span>
+               <span class="forn-none10">T2 Processor   <!--Tier 2 Processor -->
+                  <span id="Tier2-Processor-down" class="fas fa-chevron-right pull-right rotate10"></span>
+               </span>
+            </a>
+               <ul id="Tier2-Processor-sub" class="dropdown-1010" style="display: none;">
+                  
+                     <li><a id="Tier2-Processor-Management" href="{% url 'list_processor2' %}">T2 Processor Management</a></li>  <!-- Tier 2 Processor Management-->
+                      <li><a id="Assign-Bale-To-Tier2" href="{% url 'add_bale_processor2' %}">Assign Bale To T2 </a></li>  <!--Assign Bale To T2 Tier 2-->
+                     <li><a id="Classing-List-Tier2" href="{% url 'list_bale_processor2' %}">Classing List T2 </a></li>   <!--Classing List T2 Tier 2-->
+                     <li><a id="EWR-Report-Tier2" href="{% url 't2_classing_ewr_report_list' %}">EWR Report T2 </a></li>  <!--EWR Report T2 Tier 2--> 
+                    
+                     <li><a id="Processor2-Processor-Management" href="{% url 'processor2_processor_management' %}">Processor To Processor Management</a></li>
+                     
+                     <li><a id="Location-Management-Processor2" href="{% url 'location_list_processor2' %}">Location Management</a></li>
+                     
+                     <li><a id="Inbound-Management-Processor2" href="{% url 'inbound_shipment_list' %}">Inbound Management</a></li>
+                     
+                     {% comment %} <li><a id="Production-Management-Processor2" href="{% url 'inbound_production_management' %}">Production Management</a></li> {% endcomment %}
+                     
+                     <li><a id="Shipment-Management-Processor2" href="{% url 'outbound_shipment_list' %}">Shipment Management</a></li>  
+                      
+               </ul>
+         </li> 
+         
+         <li class="for-drop">
+            <a id="Tier3-Processor-active" href="javascript:void(0)" class="parent-nav1011">
+                  <span class="rightimg"><i class="fas fa-warehouse"></i></span>
+                  <span class="forn-none11">T3 Processor
+                     <span id="Tier3-Processor-down" class="fas fa-chevron-right pull-right rotate11 pull_right_new1"></span>
+                  </span>
+            </a>
+            <ul id="Tier3-Processor-sub" class="dropdown-1011" style="display: none;">
+                  <li class="ms-2"><a id="Processor3-List" href="{% url 'list_processor3' %}">T3 Processor Management</a></li>
+                  <li class="ms-2"><a id="location-Management-Processor3" href="{% url 'location_list_processor3' %}">Location Management</a></li>
+                  <li class="ms-2"><a id="Processor3-Processor-Management" href="{% url 'processor3_processor_management' %}">Processor To Processor Management</a></li>
+                  <li class="ms-2"><a id="Inbound-Management-Processor3" href="{% url 'inbound_shipment_list3' %}">Inbound Management</a></li>
+                  {% comment %} <li class="ms-2"><a id="Production-Management-Processor3" href="{% url 'inbound_production_management_processor3' %}">Production Management</a></li> {% endcomment %}
+                  <li class="ms-2"><a id="Shipment-Management-Processor3" href="{% url 'outbound_shipment_list_processor3' %}">Shipment Management</a></li>
+            </ul>
+         </li>
+         
+         <li class="for-drop">
+            <a id="Tier4-Processor-active" href="javascript:void(0)" class="parent-nav1012">
+                  <span class="rightimg"><i class="fas fa-warehouse"></i></span>
+                  <span class="forn-none12">T4 Processor
+                     <span id="Tier4-Processor-down" class="fas fa-chevron-right pull-right rotate12 pull_right_new2"></span>
+                  </span>
+            </a>
+            <ul id="Tier4-Processor-sub" class="dropdown-1013" style="display: none;">
+                  <li class="ms-2"><a id="User-Management-Processor4" href="{% url 'list_processor4' %}">T4 Processor Management</a></li>
+                  <li class="ms-2"><a id="location-Management-Processor4" href="{% url 'location_list_processor4' %}">Location Management</a></li>
+                  <li class="ms-2"><a id="Inbound-Management-Processor4" href="{% url 'inbound_shipment_list4' %}">Inbound Management</a></li>
+                  {% comment %} <li class="ms-2"><a id="Production-Management-Processor4" href="{% url 'inbound_production_management_processor4' %}">Production Management</a></li> {% endcomment %}
+            </ul>
+         </li>
+         {% endif %}
+         {% endif %}
+    {% if request.user.is_authenticated %}
+    {% if request.user.is_processor or request.user.is_processor2 %}
+    <li class="for-drop">            
+      <a id="Processor-active" href="javascript:void(0)" class="parent-nav99"> <span class="rightimg"><i class="fas fa-warehouse"></i></span>
+      <span class="forn-none9"> Processor Management<!--Processor -->               
+      <span id="Processor-down" class="fas fa-chevron-right pull-right rotate9"></span></span></a>           
+      
+      <ul id="Processor-sub" class="dropdown-99" style="display: none;">
+        
+            <li><a id="Processor-Management" href="{% url 'list-processor' %}">User Management</a></li>  
+         <li><a id="Location-Management" href="{% url 'list-location' %}">Location Management</a></li>
+         {% if request.user.is_processor %}
+         <li><a id="Grower-to-Processor" href="{% url 'grower_processor_management' %}">                  
+            Assigned Grower               
+         </a>
+         </li>
+         {% endif %}               
+         <li><a id="Processor1-Processor-Management" href="{% url 'Processor1ToProcessorManagement' %}">Processor To Processor Management</a></li> 
+         {% comment %} <li><a id="Production-Management" href="{% url 'inbound_production_mgmt' %}">Production Management</a></li>        {% endcomment %}
+                      
+         <li><a id="Inbound-Management" href="{% url 'processor_inbound_management' %}">Inbound Management</a></li>         
+        
+         <li><a id="Shipment-Management" href="{% url 'outbound_shipment_mgmt' %}">Shipment Management</a></li>
+         {% if request.user.is_processor %}
+         <li><a id="Classing-All-Reports" href="{% url 'classing_list' %}">Classing All Reports</a></li>
+         
+         <li><a id="Production-Report" href="{% url 'production_report_list' %}">Production Report</a></li>
+         
+         <li><a id="EWR-Report" href="{% url 'classing_ewr_report_list' %}">EWR Report</a></li>
+         {% endif %}
+      </ul>
+   </li>
+    {% else %}
+    {% endif %}
+    {% endif %}
+
+      {% if request.user.is_authenticated %}
+      {% if request.user.is_superuser or 'SubAdmin' in request.user.get_role or 'SuperUser' in request.user.get_role or request.user.is_processor or request.user.is_processor2 or request.user.is_distributor or request.user.is_warehouse_manager or request.user.is_customer %}
+      <li class="for-drop">            
+         <a id="Warehouse-active" href="javascript:void(0)" class="parent-nav1014">
+             <span class="rightimg"><i class="fas fa-warehouse"></i></span>
+             <span class="forn-none14">Contract Shipment
+                 <span id="Warehouse-down" class="fas fa-chevron-right pull-right rotate14"></span>
+             </span>
+         </a>           
+         <ul id="Warehouse-sub_unic" class="dropdown-1014" style="display: none;">
+
+             <li><a id="customer-management" href="{% url 'list-customer' %}">Customer Management</a></li>
+             <li><a id="distibutor-management" href="{% url 'list-distributor' %}">Distibutor Management</a></li>
+             <li><a id="warehouse-management" href="{% url 'list-warehouse' %}">Warehouse Management</a></li>
+
+             <li><a id="Processor-Shipment" href="{% url 'list-processor-shipment' %}">Processor Shipment</a></li>
+             {% if request.user.is_superuser or 'SubAdmin' in request.user.get_role or 'SuperUser' in request.user.get_role or request.user.is_processor or request.user.is_processor2 %}
+             <li><a id="Processor-Shipment-Add" href="{% url 'add-processor-shipment' %}">Add Processor Shipment</a></li>
+             {% endif %}
+         </ul>
+     </li>
+      {% endif %}
+      {% endif %}
+         
+         {% if request.user.is_authenticated %}
+            {% if not request.user.is_superuser %}
+               {% if 'Take Survey' in request.user.get_role_perm %}
+               <li>
+                  <a href="/growersurvey/type/"> <span class="rightimg"><i class="fas fa-poll"></i></span>
+                  <span>Take Survey</span> </a>
+               </li>
+               
+               {% endif %}
+               {% if 'Send Shipment' in request.user.get_role_perm %}
+               <li>
+                  <a href="{% url 'grower_shipment_list' %}"> <span class="rightimg"><i class="fas fa-truck"></i></span>
+                  <span>Send Shipment</span> </a>
+               </li>
+               {% endif %}
+            {% endif %}
+         {% endif %}
+
+         {% if request.user.is_authenticated %} 
+            {% if 'Settings Configuration' in request.user.get_role_perm or request.user.is_superuser or 'SubAdmin' in request.user.get_role or 'SuperUser' in request.user.get_role %}
+               <li class="for-drop">
+                  <a id="Setting-Configuration-active" href="javascript:void(0)" class="parent-nav77"> <span class="rightimg"><i class="fa fa-cog"></i></span>
+                  <span class="forn-none7">Admin  <!--Setting Configuration-->
+                  <span id="Setting-Configuration-down" class="fas fa-chevron-right pull-right rotate4 pull_right_new3"></span></span> </a>
+                  
+                  <ul id="Setting-Configuration-sub" class="dropdown-77" style="display: none;">
+                     <li><a id="Release-Notes" href="{% url 'release-notes-list' %}">Release Notes</a></li>
+                     <li><a id="Upcoming-Dates" href="{% url 'upcoming-date-list' %}">Upcoming Dates</a></li>
+                     <li><a id="Help-and-Guide" href="{% url 'HelpAndGuideList' %}">Help and Guide </a></li>
+                     <li><a id="Activity-Log" href="{% url 'show_log' %}">Activity Log</a></li>
+                  </ul>
+               </li>
+            {% endif %}
+         {% endif %}
+
+         <!-- 16-02-23 -->
+         {% if request.user.is_authenticated %}
+         {% if request.user.grower or request.user.is_consultant or request.user.is_superuser or 'SubAdmin' in request.user.get_role or 'SuperUser' in request.user.get_role %}
+            <!--<li>
+               <a id="Chat-Section" href="{% url 'chat_ag' %}">
+                     <span class="rightimg">
+                        <i class="fas fa-comment-dots"></i>
+                     </span>
+                     <&nbsp;>Chat&nbsp;( 
+                     <span >0</span> )
+               </a>
+            </li>-->
+            <li><a id="Chat-Section" href="{% url 'chat_ag' %}"> <span class="rightimg"><i class="fas fa-comment-dots"></i></span>
+               <span>Chat(0)</span></a>
+            </li>
+         {% endif %}
+
+         {% endif %}
+         <!-- 16-02-23 -->
+
+         <!-- 17-03-23 -->
+         {% if request.user.is_authenticated %}
+         {% if request.user.is_superuser or 'SubAdmin' in request.user.get_role or 'SuperUser' in request.user.get_role %}
+         <li><a id="Traceability-Report" href="{% url 'traceability_report_list' %}"> <span class="rightimg"><i class="fas fa-arrow-circle-right"></i></span>
+            <span>Traceability Report</span></a>
+         </li>
+         {% endif %}
+         {% endif %}
+         <!-- 17-03-23 -->
+         {% if request.user.is_authenticated %}
+         <li><a id="Updated-versions" href="{% url 'version_update_list' %}"> <span class="rightimg"><i class="fas fa-arrow-circle-right"></i></span>
+         <span>Updated versions</span></a>
+         {% endif %}
+      <!-- 29/02/2024 -->  <!-- new add feature -->
+
+         {% if request.user.is_authenticated %}
+            {% if  request.user.is_processor2 or request.user.is_processor or request.user.grower or request.user.is_consultant or request.user.is_superuser or 'SubAdmin' in request.user.get_role or 'SuperUser' in request.user.get_role %}
+               <li>
+                  <a href="#" onclick="document.getElementById('logout-form').submit();" class="d-flex">
+                     <span class="rightimg"><i class="fas fa-sign-out-alt"></i></span>
+                     <span style="margin-left: 4px;">Logout</span>
+                  </a>
+                        {% comment %} <span>Logout</span></a> {% endcomment %}
+                     <form id="logout-form" method="post" action="{% url 'logout' %}" style="display: none;">
+                        {% csrf_token %}
+                     </form>
+               </li>
+            {% endif %}
+         {% endif %}
+
+      <!-- 29/02/2024 -->   
+
+      {% comment %} <!--01/03/2024 -->
+            {% if request.user.is_authenticated %} 
+               {% if request.user.is_processor or request.user.grower or request.user.is_consultant or request.user.is_superuser or 'SubAdmin' in request.user.get_role or 'SuperUser' in request.user.get_role %}
+               <li class="for-drop">
+                  <a id="Contracts-active" href="javascript:void(0)" class="parent-nav66"> <span class="rightimg"><i class="fas fa-user-cog"></i></span>
+                  <span class="forn-none6">Settings
+                  <span id="Contracts-down" class="fas fa-chevron-right pull-right rotate7"></span></span> </a>
+   
+                  <ul id="Contracts-sub" class="dropdown-66" style="display: none;">
+                     {% if request.user.is_superuser %}
+                     <li><a href="{% url 'admin:index' %}" target="_blank"><span class="rightimg"></span><span> Admin Console </span></a></li>
+                     {% else %}
+                     <li><a href="{% url 'HelpAndGuideView' %}"><span class="rightimg"></span><span> Help And Guide </span></a></li>
+                     <li><a href="{% url 'change_password' %}"><span class="rightimg"></span><span> Change Password </span></a></li>
+                     {% endif %}
+                  </ul>
+               </li>
+               {% endif %}
+            {% endif %}
+      <!--01/03/2024 --> {% endcomment %}
+      </ul>
+   </div>
+</div>
+
+{% block scripts %}
+{% if request.user.is_authenticated %}
+{% if request.user.is_processor or request.user.is_processor2 or request.user.grower or request.user.is_consultant or request.user.is_superuser or 'SubAdmin' in request.user.get_role or 'SuperUser' in request.user.get_role or request.user.is_distributor or request.user.is_customer or request.user.is_warehouse_manager %}
+<script
+  src="https://code.jquery.com/jquery-3.6.3.min.js"
+  integrity="sha256-pvPw+upLPUjgMXY0G+8O0xUf+/Im1MZjXxxgOcBQBXU="
+  crossorigin="anonymous"></script>
+<script>
+   var user_id = {{request.user.id}};
+
+   $(document).ready(function(){
+      new notification_chat_msg(); 
+      });
+
+   setInterval(function(){ notification_chat_msg()},3000);
+
+   function notification_chat_msg() {
+        
+        $.ajax({
+            type: "GET",
+            url: `/chat/notification_chat_msg/${user_id}/`,
+            data: {},
+            contentType: false,
+            cache: false,
+            processData: false,
+            success: function (data) {
+                if (data != 0){
+                  document.querySelector('#show-chat-noti').innerHTML = data;
+                }else{
+                  document.querySelector('#show-chat-noti').innerHTML = "0";
+                }
+            }})
+            };
+</script>
+<script>
+   document.addEventListener('DOMContentLoaded', function () {
+      var toggleDropdown = function(parentNavId, subMenuId) {
+            var parentNav = document.getElementById(parentNavId);
+            var subMenu = document.getElementById(subMenuId);
+            
+            parentNav.addEventListener('click', function () {
+               if (subMenu.style.display === 'block') {
+                  subMenu.style.display = 'none';
+               } else {
+                  subMenu.style.display = 'block';
+               }
+            });
+      };
+   
+      toggleDropdown('Tier3-Processor-active', 'Tier3-Processor-sub');
+      toggleDropdown('Tier4-Processor-active', 'Tier4-Processor-sub');
+      toggleDropdown('Warehouse-active', 'Warehouse-sub');
+
+      
+   });
+   let warehouseShipment = document.querySelector('.parent-nav1014');
+   warehouseShipment.addEventListener('click', () => {
+    let warehouseSubUnic = document.querySelector('#Warehouse-sub_unic');
+    if (warehouseSubUnic.style.display === 'block') {
+      warehouseSubUnic.style.display = 'none';
+   } else {
+      warehouseSubUnic.style.display = 'block';
+   }
+});
+
+
+</script>
+
+{% endif %}
+{% endif %}
+{% endblock scripts %}

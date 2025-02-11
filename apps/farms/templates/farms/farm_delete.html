@@ -1,0 +1,34 @@
+{% extends "base.html" %} 
+{% load static %} 
+{% block title %} Delete Farm 
+{% endblock title %} 
+{% block content %} 
+{% include 'navbar.html' %}
+
+<div class="main-content">
+    {% include 'header.html' %}
+    <div class="modal-dialog">
+        <div class="modal-content deletepopup">
+            <div class="modal-body">
+                <div class="container">
+                    <div class="col-md-12" style="text-align: center;">
+                        <form method="post" action="{% url 'farm-delete' object.pk %}">
+                            <img src="{% static 'img/warning.png' %}" alt="warning" class="warning-icon">
+                                {% csrf_token %}
+                                <p class="delete-msg">Are you sure you want to delete "{{object}}"?</p>
+                                <div class="modal-footer delete-footer-btn">
+                                    <a href="{% url 'farm-list' %}" class="btn-close-cancel btn-space" data-mdb-dismiss="modal" aria-label="Close">Cancel</a>
+                                    <button class="btn-save-submit">Delete</button>
+                                </div> 
+                                </form>
+                    </div>  
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer"> </div>
+</div>
+</div>
+
+{% endblock content %} 
+

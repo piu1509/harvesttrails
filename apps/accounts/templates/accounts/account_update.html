@@ -1,0 +1,132 @@
+{% extends "base.html" %} {% load static %} {% block title %} Account Update {% endblock title %} 
+{% load crispy_forms_tags %}
+{% block content %} {% include 'navbar.html' %}
+<div class="main-content">
+{% include 'header.html' %}
+
+     <main> 
+    <span class="farm headingtop">Update Account</span>
+
+    <div class="card farm-fields-container">
+        <div class="container-fluid">
+            <form method="post" class="farm-fields-form" style="padding:5px 15px;">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-4">
+                        {{ form.name|as_crispy_field }}
+                    </div>
+                    <div class="col-md-4">
+                        {{ form.phone|as_crispy_field }}
+                    </div>
+                    <div class="col-md-4">
+                        {{ form.email|as_crispy_field }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        {{ form.physical_address1|as_crispy_field }}
+                    </div>
+                    <div class="col-md-4">
+                        {{ form.physical_address2|as_crispy_field }}
+                    </div>
+                    <div class="col-md-4">
+                        {{ form.city1|as_crispy_field }}
+                    </div>
+
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4">
+                        {{ form.state1|as_crispy_field }}
+                    </div>
+                    <div class="col-md-4">
+                        {{ form.zip_code1|as_crispy_field }}
+                    </div>
+                    <div class="col-md-4">
+                        {{ form.mailing_address1|as_crispy_field }}
+                    </div>
+
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4">
+                        {{ form.mailing_address2|as_crispy_field }}
+                    </div>
+                    <div class="col-md-4">
+                        {{ form.city2|as_crispy_field }}
+                    </div>
+                    <div class="col-md-4">
+                        {{ form.state2|as_crispy_field }}
+                    </div>
+
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        {{ form.zip_code2|as_crispy_field }}
+                    </div>
+                    <div class="col-md-4 text-resize">
+                            {{ form.consultant|as_crispy_field }}
+                            {% if user.is_superuser %}
+                            <li> <a href="{% url 'add-consultant' %}" class="add-consultant-btn">Add Consultant</a> 
+                            {% endif %}   
+                        </div>
+                    <div class="col-md-4">
+                        {{ form.notes|as_crispy_field }}
+                    </div>
+                    {% comment %} <div class="col-md-4">
+                        {{ form.cca_name|as_crispy_field }}
+                    </div>
+                    <div class="col-md-4">
+                        {{ form.cca_number|as_crispy_field }}
+                    </div> {% endcomment %}
+
+                </div>
+                <div class="row">
+                    {% comment %} <div class="col-md-4">
+                        {{ form.cca_phone|as_crispy_field }}
+                    </div>
+                    <div class="col-md-4">
+                        {{ form.cca_email|as_crispy_field }}
+                    </div> {% endcomment %}
+                    
+                </div>
+
+                
+
+                <div class="row">
+                    <div class="form-btn-row">
+                        <a href="{% url 'account-list' %}" class="btn-close-cancel btn-space">Cancel</a>
+                        <input type="submit" class="btn-save-submit" value="Update"> 
+                    </div>
+                </div>
+              
+                </form>
+               
+        </div>
+    </div>
+    </main>
+{% include 'footer.html' %}
+    {% endblock %}
+    {% block jquery %}
+    <script>
+        var super_user = '{{consults}}';
+        $('#id_consultant').removeClass('disabled-consultants');
+        if(super_user!="super")
+        {
+            $('#id_consultant').addClass('disabled-consultants');
+            $('#id_consultant option').prop('disabled', true);
+            var logged_in_consult_id = "{{consults}}";
+            $('#id_consultant').val(logged_in_consult_id);
+            $('#id_consultant option[value="'+logged_in_consult_id+'"]').prop('disabled', false);
+        }
+    </script>
+    <script>
+        $('#Grower-Configuration-active').addClass('activeLink');
+      
+        $('#Grower-Configuration-down').addClass('down');
+        $('#Grower-Configuration-sub').show();
+      
+        $('#Grower-Management').addClass('activeLink active-nav');
+      
+      </script>
+    {% endblock jquery %}

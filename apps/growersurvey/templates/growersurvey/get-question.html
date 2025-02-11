@@ -1,0 +1,70 @@
+<div class="table-responsive tblborder">
+    <table class="table table-striped">
+      <tbody>
+        {% for quest in question_data %}
+        <tr>
+            <td style="width: 70px;">Q {{quest.questionorder}}.</td>
+            <td>{{quest.questionname}}</td>
+            <td class="backk1 ctrl-dwn-up" width="208">
+                <ul>
+                    <li class="inline-block">
+                        {% if question_data|length > 1 %}
+                        {% if quest.questionorder == 1 %}
+                        <!-- Down Arrow first -->
+                        <form action="{% url 'change_qoestion_order' %}" method="POST" class="mr-5">
+                          {% csrf_token %}
+            
+                          <input type="hidden" name="down_arrow_1" id="" value="{{quest.id}}">
+                          <input type="hidden" name="namesurvey_id" id="" value="{{quest.namesurvey_id}}">
+                          <button type="submit" class="btn btn-primary btn-sm"><i class="bi bi-arrow-down"></i></button>
+                        </form>
+    
+                        {% elif forloop.last %}
+                        <!-- up Arrow last -->
+                        <form action="{% url 'change_qoestion_order' %}" method="POST" class="mr-5">
+                          {% csrf_token %}
+                          <input type="hidden" name="up_arrow_1" id="" value="{{quest.id}}">
+                          <input type="hidden" name="namesurvey_id" id="" value="{{quest.namesurvey_id}}">
+                          <button type="submit" class="btn btn-primary btn-sm"><i class="bi bi-arrow-up"></i></button>
+                        </form>
+                        {% else %}
+                        <!-- Down Arrow Middle -->
+                
+                        <form action="{% url 'change_qoestion_order' %}" method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" name="down_arrow_2" id="" value="{{quest.id}}">
+                            <input type="hidden" name="namesurvey_id" id="" value="{{quest.namesurvey_id}}">
+                            <button type="submit" class="btn btn-primary btn-sm"><i class="bi bi-arrow-down"></i></button>
+                        </form>
+                        <!-- Up Arrow Middle -->
+                        <form action="{% url 'change_qoestion_order' %}" method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" name="up_arrow_2" id="" value="{{quest.id}}">
+                            <input type="hidden" name="namesurvey_id" id="" value="{{quest.namesurvey_id}}">
+                            <button type="submit" class="btn btn-primary btn-sm"><i class="bi bi-arrow-up"></i></i></button>
+                        </form>
+                        {% endif %}
+                        {% else %}
+                        <p>Can't be changed</p>
+                        {% endif %}
+                    </li>
+                    <li>
+                        <a href="javascript:void(0)" onclick="editViewQuestionOptions('{{quest.id}}')">
+                          <span class="fas fa-edit"> </span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="javascript:void(0)" onclick="deleteQuestion('{{quest.id}}');">
+                          <span class="fas fa-trash"></span>
+                        </a>
+                    </li>
+                </ul>
+            </td>
+        </tr>
+        {% endfor %}
+
+        
+
+      </tbody>
+    </table>
+  </div>

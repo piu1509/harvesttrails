@@ -1,0 +1,49 @@
+{% extends "base.html" %} {% load static %} {% block title %} Create Production Report {% endblock title %} {% block content %} {% include 'navbar.html' %}
+<div class="main-content">
+    {% include 'header.html' %} {% load crispy_forms_tags %}
+  <main>
+      <style>
+          div#message {
+    display: none;
+}
+      </style>
+       <div class="page-title-with-or-without-btn">
+        <span class="farm headingtop">Create Production Report VIA CSV</span>
+    <!-- Create button for Account-->
+    <div class="flex-header-btn">
+        {% if messages %}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>{% for message in messages %}{{ message }}{% endfor %}</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endif %}
+    </div>
+    </div>
+    
+   
+    <div class="card card-padding">
+            <form method="post" class="farm-fields-form" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="upload-file-main">
+                            <label for="for-upload-file">Upload File</label>
+                            <div class="file-upload-wrapper" data-text="example.csv">
+                        <input type="file" name="csv_file" accept=".csv" class="clearablefileinput file-upload-field" required id="id_csv_file">
+                              </div>
+                    
+                </div>
+                    </div>
+
+                <div class="col-md-12">
+                    <div class="form-btn-row">
+                        <a href="" class="btn-close-cancel btn-space">Cancel</a>
+                        <input type="submit" class="btn-save-submit" value="Upload"> 
+                    </div>
+                </div>
+        </div>
+            </form>
+    
+  </main>
+</div>
+{% endblock %}

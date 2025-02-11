@@ -1,0 +1,104 @@
+{% extends "base.html" %} {% load static %}
+{% block title %} Production Report Upload {% endblock title %}
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+
+{% load crispy_forms_tags %}
+{% block content %}
+{% include 'navbar.html' %}
+
+<div class="main-content">
+    {% include 'header.html' %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.0/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.bootstrap4.min.css">
+
+    <main>
+        {% include '_alerts.html' %}
+        <div class="page-title-with-or-without-btn">
+            <span class="farm headingtop">Production Report Upload</span>
+            <!-- Create button for add-location-->
+            
+        </div>
+        <div class="card card-padding">
+            <div class="main-simple-table-with-search">                
+                <div class="both-data-in" style="display: inherit;">
+                    <form action="" method="post" class="farm-fields-form"
+                    enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row">
+                        {% if request.user.is_processor %}
+                        {% else %}
+                        <div class="col-md-4">
+                            <lable for="">Select Processor</lable>
+                            <select id="processorSelction" name="processor_id" class="textinput textInput form-control" style="margin-top: 9px;height:49px;">
+                                <option value=0 selected disabled> Select A Processor</option>
+                                {% for processor in processor %}
+                                <option value="{{ processor.pk }}">{{processor.entity_name}} - {{ processor.pk }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        {% endif %}
+                        <div class="col-md-4" id="div1">
+                            <div class="">
+                                <label for="">Upload File</label>
+                                <div class="file-upload-wrapper" data-text="dailyreport.csv">
+                                    <input type="file" name="csv_file" accept=".csv"
+                                        class="clearablefileinput file-upload-field" id="id_csv_file" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="">Date</label>
+                            <input name="date" type="date" class="textinput textInput form-control">
+                        </div>
+                        <div class="row">
+                            <div class="form-btn-row">
+                                <a href="{% url 'production_report_list' %}" class="btn-close-cancel btn-space">Cancel</a>
+                                <input type="submit" class="btn-save-submit" value="Save">
+                            </div>
+                        </div>
+                </form>
+                </div>
+            </div>
+    </main>
+    {% include 'footer.html' %}
+</div>
+
+{% endblock content %}
+
+{% block scripts %}
+<script src="https://cdn.datatables.net/1.11.0/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.0/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/responsive.bootstrap4.min.js"></script>
+
+<script src="{% static 'js/farm/farm_list.js' %}"></script>
+
+<script>
+    $(document).ready(function () {
+        $('#processorList_tbl').DataTable();
+    });
+    
+</script>
+<script>
+    $('#Processor-active').addClass('activeLink');
+  
+    $('#Processor-down').addClass('down');
+    $('#Processor-sub').show();
+  
+    $('#Production-Report').addClass('activeLink active-nav');
+  
+  </script>
+{% endblock scripts %}

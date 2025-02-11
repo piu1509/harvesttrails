@@ -1,0 +1,289 @@
+{% extends "base.html" %} {% load static %} {% block title %} Entry Feeds Add {% endblock title %} 
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+{% block content %}
+ {% include 'navbar.html' %}
+ <style>
+    .bootstrap-select .dropdown-menu li.disabled.selected{display: none;}
+    .dropdown.bootstrap-select.form-control .btn{border: 1px solid; padding: 16px 8px; border-radius: 0;}
+    .bootstrap-select .dropdown-menu{max-width: 280px;}
+    .bootstrap-select .dropdown-menu li.selected.active .dropdown-item.active.selected{margin-left: 0;padding: 0;}
+ </style>
+<div class="main-content">
+    {% include 'header.html' %} {% load crispy_forms_tags %}
+  <main>
+    {% include '_alerts.html' %}
+    <span class="farm headingtop"> Entry Feeds Add</span>
+    <div class="card farm-fields-container">
+        <div class="container-fluid">
+            <form method="post" class="farm-fields-form">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <div>
+                            <label for="">Grower<span class="asteriskField">*</span></label>
+                            <!-- <input type="text" name="" id="" class="textinput textInput form-control">style="border-radius:0px !important" -->
+                            <select id="growerSelction" name="grower_id" class="textinput textInput form-control selectpicker" required data-live-search="true">
+                                <option value='all' selected disabled> Select All Growers </option>
+                                {% for grower in growers %}
+                                {% if grower == selectedGrower %}
+                                <option selected value="{{ grower.pk }}">{{grower.name}} - {{grower.id}}</option>
+                                {% else %}
+                                <option value="{{ grower.pk }}">{{grower.name}} - {{grower.id}}</option>
+                                {% endif %}
+                                {% endfor %}
+                            </select>
+                            <p id="p1" style="color: red;"></p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div>
+                            <label for="grower_crop">Crop<span class="asteriskField">*</span></label>
+                            <select onchange="checkcotton()" id="grower_crop" name="grower_crop" class="textinput textInput form-control">
+                                <option value='all' selected disabled> Select Crop </option>
+                                {% for crop in crop %}
+                                <option value={{crop}} > {{crop}} </option>
+                                {% endfor %}
+                            </select>
+                            <p id="p2" style="color: red;"></p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div>
+                            <label for="contracted_payment_option">Contracted Payment Option<span class="asteriskField">*</span></label>
+                            <select id="contracted_payment_option" name="contracted_payment_option" class="textinput textInput form-control">
+                                <option value='all' selected disabled>Select Contracted Payment Option</option>
+                                <option value='Fixed Price'>Fixed Price</option>
+                                <option value='Delivered Market Price'>Delivered Market Price</option>
+                                {% if 'RICE' in  crop %}
+                                <option value='Acreage Release'>Acreage Release</option>
+                                {% endif %}
+                            </select>
+                            <p id="p3" style="color: red;"></p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div>
+                            <label for="from_date">From Date<span class="asteriskField">*</span></label>
+                            <input type="date" value="{{from_date}}" name="from_date" class="textinput textInput form-control">
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div>
+                            <label for="to_date">To Date<span class="asteriskField">*</span></label>
+                            <input type="date" value="{{to_date}}" name="to_date" class="textinput textInput form-control">
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3" id="hiddiv1" style="display: none;">
+                        <div>
+                            <label for="contract_base_price">Contract Base Price / LBS<span class="asteriskField">*</span></label>
+                            <input type="number" name="contract_base_price" id="contract_base_price" class="textinput textInput form-control" step="0.0001">
+                        </div>
+                        <p id="p4" style="color: red;"></p>
+                    </div>
+                    <div class="col-md-4 mb-3" id="hiddiv2" style="display: none;">
+                        <div>
+                            <label for="sustainability_premium">Sustainability Premium / LBS<span class="asteriskField">*</span></label>
+                            <input type="number" name="sustainability_premium" id="sustainability_premium" class="textinput textInput form-control" step="0.0001">
+                        </div>
+                        <p id="p5" style="color: red;"></p>
+                    </div>
+                    <!-- <div class="col-md-4 mb-3">
+                        <div>
+                            <label for="quality_premium">Quality Premium / LBS<span class="asteriskField">*</span></label>
+                            <input type="number" name="quality_premium" id="quality_premium" class="textinput textInput form-control" step="0.0001">
+                        </div>
+                        <p id="p6" style="color: red;"></p>
+                    </div> -->
+                </div>
+                <!-- <hr>
+                <div class="row">
+                    <div class="form-btn-row" style="text-align:left">
+                    <input type="button" class="btn-close-cancel btn-space" value="+ Add Contact" onclick="createSelect()">
+                </div>
+                <div id="root"></div> -->
+                
+                <div class="row">
+                    <div class="form-btn-row">
+                        <a href="{% url 'entry_feeds_list' %}" class="btn-close-cancel btn-space">Cancel</a>
+                        <input style="display: none;" id="submitBtn2" type="submit" class="btn-save-submit" value="Save"> 
+                        <input type="button" class="btn-save-submit" value="Save" onclick="activityButton1()">
+                    </div>
+                </div>
+
+                {% if show_entry %}
+                <div style="margin-top: 15px;">
+                    <table class="table table-striped dt-responsive nowrap" style="width:100%">
+                        <thead>
+                            <tr style="border-bottom: 2px solid #e0e0e0;">
+                                <th width="10%" style="text-align:center">Grower</th>
+                                <th width="10%" style="text-align:center">Crop</th>
+                                <th width="10%" style="text-align:center">From Date</th>
+                                <th width="10%" style="text-align:center">To Date</th>
+                                <th width="10%" style="text-align:center">Payment Option</th>
+                                <th width="20%" style="text-align:center">Contract Base Price /LBS</th>
+                                <th width="20%" style="text-align:center">Sustainability Premium /LBS</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for entery in show_entry %}
+                            <tr>
+                                <td align="center" style="vertical-align: middle;">{{ entery.grower.name }}</td>
+                                <td align="center" style="vertical-align: middle;">{{ entery.crop }}</td>
+                                <td align="center" style="vertical-align: middle;">{% if entery.from_date %}{{ entery.from_date }}{% else %}{% endif %}</td>
+                                <td align="center" style="vertical-align: middle;">{% if entery.to_date %}{{ entery.to_date }}{% else %}{% endif %}</td>
+                                <td align="center" style="vertical-align: middle;">{{ entery.contracted_payment_option }}</td>
+                                <td align="center" style="vertical-align: middle;">{{ entery.contract_base_price }}</td>
+                                <td align="center" style="vertical-align: middle;">
+                                    {% if entery.contracted_payment_option == 'Delivered Market Price' %}
+                                    0.04
+                                    {% else %}
+                                    {{ entery.sustainability_premium }}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% endif %}
+        </div>
+        </form>
+  </main>
+  {% include 'footer.html' %}
+</div>
+{% endblock %}
+
+{% block jquery %}
+<script>
+    $(document).ready(function() {
+    $('#growerSelction').change( function () {
+        // growerSelction = document.getElementById("growerSelction").value
+    $('#submitBtn2').click();
+    });
+    });
+
+    function checkcotton(){
+        crop_value = document.getElementById("grower_crop").value
+        if ( crop_value == 'COTTON') {
+        $('#contracted_payment_option option').filter('[value="Delivered Market Price"]').prop('disabled', true);
+    }
+    }
+
+    // 
+    
+    $(document).ready(function() {
+    $('#contracted_payment_option').change( function () {
+        contracted_payment_option = document.getElementById("contracted_payment_option").value
+        if (contracted_payment_option == "Fixed Price"){
+            document.getElementById("hiddiv1").style.display = "";
+            document.getElementById("hiddiv2").style.display = "";
+            document.getElementById("contract_base_price").value="";
+            // document.getElementById("contract_base_price").readOnly = false;
+            document.getElementById("sustainability_premium").value="";
+            // document.getElementById("sustainability_premium").readOnly = false;
+        }
+        if (contracted_payment_option == "Delivered Market Price"){
+            document.getElementById("hiddiv1").style.display = "none";
+            document.getElementById("hiddiv2").style.display = "none";
+        }
+        if (contracted_payment_option == "Acreage Release"){
+            document.getElementById("hiddiv1").style.display = "";
+            document.getElementById("hiddiv2").style.display = "";
+            document.getElementById("contract_base_price").value="0";
+            // document.getElementById("contract_base_price").readOnly = true;
+            document.getElementById("sustainability_premium").value="0.04";
+            // document.getElementById("sustainability_premium").readOnly = true;
+            
+        }
+    // $('#contracted_payment_option').value();
+    });
+    });
+
+
+    function activityButton1(){
+        growerSelction = document.getElementById("growerSelction").value
+        grower_crop = document.getElementById("grower_crop").value
+        contracted_payment_option = document.getElementById("contracted_payment_option").value
+        contract_base_price = document.getElementById("contract_base_price").value
+        sustainability_premium = document.getElementById("sustainability_premium").value
+        // quality_premium = document.getElementById("quality_premium").value
+        if (growerSelction != "all" && grower_crop != "all" && contracted_payment_option !="all"){
+            $('#submitBtn2').click();
+        }
+        else{
+            if (growerSelction == "all"){
+                document.getElementById("p1").innerHTML = "*Please Select A Grower";
+            }
+            if (grower_crop == "all"){
+                document.getElementById("p2").innerHTML = "*Please Select A Crop";
+            }
+            if (contracted_payment_option == "all"){
+                document.getElementById("p3").innerHTML = "*Please Select Contracted Payment Option";
+            }
+            if (contract_base_price == ""){
+                document.getElementById("p4").innerHTML = "*Please Give Contract Base Price / LBS";
+            }
+            if (sustainability_premium == ""){
+                document.getElementById("p5").innerHTML = "*Please Give Sustainability Premium / LBS";
+            }
+            // if (quality_premium == ""){
+            //     document.getElementById("p6").innerHTML = "*Please Give Quality Premium / LBS";
+            // }
+            
+        }
+    }
+// function createSelect(){
+//     var counter = $('#product_counter').val();
+//     var counter = eval(counter)+1;
+//     $('#product_counter').val(counter);
+
+//     document.querySelector('#root').insertAdjacentHTML("afterend",
+//         `<div class="row">
+//         <div class="col-md-3">
+//             <div>
+//                 <label for="contact_name${counter}">Contact Name<span class="asteriskField">*</span></label>
+//                 <input type="text" name="contact_name${counter}" id="contact_name${counter}" class="textinput textInput form-control" required>
+//             </div>
+//         </div>
+//         <div class="col-md-3">
+//             <div>
+//                 <label for="contact_email${counter}">Contact Email<span class="asteriskField">*</span></label>
+//                 <input type="email" name="contact_email${counter}" id="contact_email${counter}" class="textinput textInput form-control" required>
+//             </div>
+//         </div>
+//         <div class="col-md-3">
+//             <div>
+//                 <label for="contact_phone${counter}">Contact Phone</label>
+//                 <input type="number" name="contact_phone${counter}" id="contact_phone${counter}" class="textinput textInput form-control" required>
+//             </div>
+//         </div>
+//         <div class="col-md-3" style="margin-bottom: 15px;">
+//             <div>
+//                 <label for="contact_fax${counter}">Contact Fax</label>
+//                 <input type="number" name="contact_fax${counter}" id="contact_fax${counter}" class="textinput textInput form-control" required>
+//             </div>
+//         </div>
+//     </div>`);
+// }
+</script>
+<script>
+    $('#Growers-Payments-active').addClass('activeLink');
+                  
+    $('#Growers-Payments-down').addClass('down');
+    $('#Growers-Payments-sub').show();
+    
+    $('#Grower-Entry-Feeds').addClass('activeLink active-nav');
+</script>
+{% endblock jquery %}

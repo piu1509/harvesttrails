@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Contract Verification</title>
+</head>
+
+<body>
+	<h2>Hello {{ obj.name }},</h2>
+	<h5>The contract {{ obj.contract.name }} has been signed by the grower {{ grower_name }}.</h5>
+	<h5>Please click the link below to review the contract and verify it with your signature.</h5>
+	<h5>{{ contract_verification_link }}</h5>
+
+	<h3>Thanking you</h3>
+	<h3>Traceableoutcomes Team. </h3>
+
+	<img src="https://traceableoutcomes.tech/static/img/logo.png"
+		alt="logo.png" style="width:15%;">
+</body>
+
+</html>

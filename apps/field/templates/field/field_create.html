@@ -1,0 +1,232 @@
+{% extends "base.html" %}
+{% load static %} {% block title %} Create Field {% endblock title %} 
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+{% block content %}
+{% include 'navbar.html' %}
+<style>
+
+select option:disabled{text-decoration: line-through; background-color: #ccc; font-style: italic;}
+.bootstrap-select .dropdown-menu li.disabled.selected{display: none;}
+.dropdown.bootstrap-select.form-control .btn{border: 1px solid #B2BEB5; padding: 13px 8px; border-radius:0;}
+.bootstrap-select .dropdown-menu{max-width: 280px;}
+.bootstrap-select .dropdown-menu li.selected.active .dropdown-item.active.selected{margin-left: 0;padding: 0;}
+</style>
+<div class="main-content">
+    {% include 'header.html' %} {% load crispy_forms_tags %}
+    <main>
+        {% include '_alerts.html' %}
+        <span class="farm headingtop">Create Field</span>
+        
+        <div class="card farm-fields-container">
+            <div class="container-fluid">
+                <form method="post" class="farm-fields-form" action="{% url 'test' %}">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="input-group align-items-center custom-input-group">
+                                <div class="input-group-prepend pe-1">
+                                  <label for=""><strong>Select Crop Year</strong></label>
+                                </div>
+                                <select name="scrop_year" class="select form-control" id="scrop_year" required>
+                                    <option value="" disabled>Select Crop Year</option>
+                                    <option value="2024">2024</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            {{ form.name|as_crispy_field }}
+                        </div>
+                        <!-- <div class="col-md-4">
+                            {{ form.farm|as_crispy_field }}
+                        </div> -->
+                        <div class="col-md-4">
+                            <div id="div_id_farm" class="form-group">
+                                <label for="id_farm" class=" requiredField">
+                                    Farm<span class="asteriskField">*</span>
+                                </label>
+                                <div>
+                                    <select name="farm" class="select form-control selectpicker" required="" id="id_farm" data-live-search="true">
+                                        <option value="all" selected disabled>Select Farm</option>
+                                        {% for frm in farms %}
+                                        <option value="{{frm.id}}">{{frm.name}}-{{frm.id}}</option>
+                                        {% endfor %}
+                                    </select>
+
+                                </div>
+
+                            </div>
+                        </div>
+                        <!-- <div class="col-md-4">
+                            {{ form.grower|as_crispy_field }}
+                        </div> -->
+                        <div class="col-md-4">
+                            <div id="div_id_grower" class="form-group">
+                                <label for="id_grower" class=" requiredField">
+                                    Grower<span class="asteriskField">*</span>
+                                </label>
+                                <div>
+                                    <select name="grower" class="select form-control disabled-consultants selectpicker" required="" id="id_grower" data-live-search="true">
+                                        <option value="all" selected disabled>Select Grower</option>
+                                        {% for gwdp in growers_dpdwn %}
+                                        <option value="{{gwdp.id}}">{{gwdp.name}}-{{gwdp.id}}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            {{ form.batch_id|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.acreage|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.fsa_farm_number|as_crispy_field }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            {{ form.fsa_tract_number|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.fsa_field_number|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.latitude|as_crispy_field }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            {{ form.longitude|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.crop|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            <div id="div_id_variety" class="form-group">
+                                <label for="id_variety" class=" requiredField">
+                                    Variety<span class="asteriskField">*</span>
+                                </label>
+                                <div>
+                                    <select name="variety" class="select form-control" required id="id_variety">
+                                        <option value="">Select Variety</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3">
+                            {{ form.yield_per_acre|as_crispy_field }}
+                        </div>
+                        <div class="col-md-3">
+                            {{ form.total_yield|as_crispy_field }}
+                        </div>
+                        <div class="col-md-3">
+                            {{ form.crop_tech|as_crispy_field }}
+                        </div>
+                        <div class="col-md-3">
+                            {{ form.eschlon_id|as_crispy_field }}
+                        </div>
+                        
+                    </div>
+                    
+                    <div class="row">
+                        <div class="form-btn-row">
+                            <a href="{% url 'field-list' %}" class="btn-close-cancel btn-space">Cancel</a>
+                            <input type="submit" class="btn-save-submit" value="Continue">
+                        </div>
+                    </div>
+            </div>
+            </form>
+    </main>
+    {% include 'footer.html' %}
+</div>
+{% endblock %}
+{% block jquery %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script
+  src="https://code.jquery.com/jquery-3.6.3.min.js"
+  integrity="sha256-pvPw+upLPUjgMXY0G+8O0xUf+/Im1MZjXxxgOcBQBXU="
+  crossorigin="anonymous"></script>
+<script>
+    $(document).ready(function () {
+        // Attach change event listener to the crop field
+        $('#id_crop').change(function () {
+            var cropCode = $(this).val();  // Get the selected crop code
+            var varietySelect = $('#id_variety');  // Get the variety field
+
+            // Clear current variety options
+            varietySelect.empty();
+            varietySelect.append('<option value="">Select Variety</option>');
+
+            if (cropCode) {
+                // Make an AJAX request to get the varieties for the selected crop
+                $.ajax({
+                    url: `/field/get-varieties/${cropCode}/`, // Django view URL
+                    type: 'GET',
+                    success: function (data) {
+                        // Populate the variety dropdown with the returned data
+                        $.each(data, function (index, variety) {
+                            varietySelect.append('<option value="' + variety.id + '">' + variety.variety_name + '</option>');
+                        });
+                    },
+                    error: function () {
+                        console.log('Error loading crop varieties');
+                    }
+                });
+            }
+        });
+    });
+</script>
+
+{% comment %} <script>
+    $('#id_crop').on('change', function(e){
+        $('#id_variety').val('');
+        $('#id_variety').find('option').prop('disabled', false);
+        var crop_val = $(this).val();
+        if(crop_val == 'RICE')
+        {
+            $('#id_variety option').filter('[value="DG 2425 XF"],[value="DG 3450 B2XF"],[value="DG 3470 B3XF"],[value="DG 3570 B3XF"],[value="DG 3635 B2XF"],[value="DG 3544 B2XF"],[value="DG 3651NR B2XF"],[value="DG 3109 B2XF"],[value="DG 3387 B3XF"],[value="DG 3421 B3XF"],[value="DG H929 B3XF"],[value="DG 3555 B3XF"],[value="DG 3402 B3XF"],[value="DG H959 B3XF"],[value="DG 3469 B3XF"],[value="DG 3615 B3XF"],[value="DG P224 B3XF"],[value="DG 3385 B2XF"],[value="DG 3422 B3XF"],[value="DG 3799 B3XF"],[value="DG-Wheat"],[value="DG 1464"],[value="DG3605"],[value="DG 3215 B3XF"]').prop('disabled', true);
+        }
+
+        if(crop_val == 'COTTON')
+        {
+            $('#id_variety option').filter('[value="DG-263L"],[value="DG-Wheat"]').prop('disabled', true);
+        }
+        if(crop_val == 'WHEAT')
+        {
+            $('#id_variety option').filter('[value="DG-263L"],[value="DG 2425 XF"],[value="DG 3450 B2XF"],[value="DG 3470 B3XF"],[value="DG 3570 B3XF"],[value="DG 3635 B2XF"],[value="DG 3544 B2XF"],[value="DG 3651NR B2XF"],[value="DG 3109 B2XF"],[value="DG 3387 B3XF"],[value="DG 3421 B3XF"],[value="DG H929 B3XF"],[value="DG 3555 B3XF"],[value="DG 3402 B3XF"],[value="DG H959 B3XF"],[value="DG 3469 B3XF"],[value="DG 3615 B3XF"],[value="DG P224 B3XF"],[value="DG 3385 B2XF"],[value="DG 3422 B3XF"],[value="DG 3799 B3XF"],[value="DG 1464"],[value="DG3605"],[value="DG 3215 B3XF"]').prop('disabled', true);
+        }
+        if(crop_val == 'PEANUT')
+        {
+            $('#id_variety option').filter('[value="DG-263L"],[value="DG-Wheat"],[value="DG 2425 XF"],[value="DG 3450 B2XF"],[value="DG 3470 B3XF"],[value="DG 3570 B3XF"],[value="DG 3635 B2XF"],[value="DG 3544 B2XF"],[value="DG 3651NR B2XF"],[value="DG 3109 B2XF"],[value="DG 3387 B3XF"],[value="DG 3421 B3XF"],[value="DG H929 B3XF"],[value="DG 3555 B3XF"],[value="DG 3402 B3XF"],[value="DG H959 B3XF"],[value="DG 3469 B3XF"],[value="DG 3615 B3XF"],[value="DG P224 B3XF"],[value="DG 3385 B2XF"],[value="DG 3422 B3XF"],[value="DG 3799 B3XF"],[value="DG-Wheat"],[value="DG 1464"],[value="DG3605"],[value="DG 3215 B3XF"],[value="DG-263L"],[value="DG 2425 XF"],[value="DG 3450 B2XF"],[value="DG 3470 B3XF"],[value="DG 3570 B3XF"],[value="DG 3635 B2XF"],[value="DG 3544 B2XF"],[value="DG 3651NR B2XF"],[value="DG 3109 B2XF"],[value="DG 3387 B3XF"],[value="DG 3421 B3XF"],[value="DG H929 B3XF"],[value="DG 3555 B3XF"],[value="DG 3402 B3XF"],[value="DG H959 B3XF"],[value="DG 3469 B3XF"],[value="DG 3615 B3XF"],[value="DG P224 B3XF"],[value="DG 3385 B2XF"],[value="DG 3422 B3XF"],[value="DG 3799 B3XF"],[value="DG 1464"],[value="DG3605"],[value="DG 3215 B3XF"]').prop('disabled', true);
+        }
+    });
+</script> {% endcomment %}
+<script>
+    $('#Farm-Configuration-active').addClass('activeLink');
+                  
+    $('#Farm-Configuration-down').addClass('down');
+    $('#Farm-Configuration-sub').show();
+    
+    $('#Field-Management').addClass('activeLink active-nav');
+    </script>
+{% endblock jquery %}

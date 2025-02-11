@@ -1,0 +1,763 @@
+{% extends "base.html" %} {% load static %}
+{% block title %} Grower Dashboard {% endblock title %}
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+{% load crispy_forms_tags %}
+{% block content %}
+{% include 'navbar.html' %}
+
+
+
+<!-- datepicker styles -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker3.min.css">
+
+<style>
+    .canvasjs-chart-credit{
+        display: none;
+    }
+    .designbox{
+        border-radius:20px;
+        border:1px solid #ccc;
+        background: #f8f8f8;
+        font-size:20px;
+        box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
+        padding: 20px;
+        text-align: left !important;
+        margin: 0px 0px 20px 0;
+    }
+    .designbox .topmainClass{
+        overflow-y: auto;
+    }
+    .designbox.newdesignbox .topmainClass{
+        height: 12vh;
+    }
+
+    @media(min-width: 768px) {
+        .designbox .topmainClass{
+        height: 36vh;
+        }
+    }
+    .designbox .topmainClass::-webkit-scrollbar{width:6px;max-height:20px;padding-right: 10px;}
+
+    .designbox .topmainClass::-webkit-scrollbar-track{background:#ccc}
+    .designbox .topmainClass::-webkit-scrollbar-thumb{background-color:#000;border-radius:20px;min-height:20px}
+
+
+    
+    .designbox h4{ text-align: left !important; font-size: 27px; font-weight: bold; color: #1a416d;}
+    .designbox p{ text-align: left; font-size: 16px; color:rgb(39, 39, 39); list-style: disc; padding: 5px 10px; margin: 0px;}
+
+    .designbox .mainClass{
+        padding: 5px 10px;
+    }
+    .designbox .mainClass h6{
+        font-size: 16px;
+        font-weight: 700;
+        margin-bottom: 2px;
+        color: rgb(39, 39, 39);
+    }
+    .designbox .mainClass p{
+        font-size: 16px;
+        padding: 0;
+    }
+
+    .h-100 {height: 100%;}
+    .relative{
+        position: relative;
+    }
+
+    .bootstrap-select>select {
+        top: 0;
+        left: 0;
+    }
+
+    .dropdown.bootstrap-select.form-control .btn {
+        line-height: 2.5;
+    }
+
+    .selected {
+        margin-top: 0;
+        padding: 5px 7px;
+        margin-left: 0;
+    }
+    .form-select {
+        padding-top: 12px !important;
+        padding-bottom: 12px !important;
+        height: auto !important;
+    }
+
+    .dropdown-toggle:after {
+        background-image: url(data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%234f4f4f' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3E%3C/svg%3E);
+    }
+
+    .card-padding {
+        box-shadow: none;
+    }
+    .bootstrap-select .dropdown-menu li.disabled.selected{display: none;}
+    .dropdown.bootstrap-select.form-control .btn{border: 1px solid; padding: 14px 8px; border-radius: 0;}
+    .bootstrap-select .dropdown-menu{max-width: 280px;}
+    .bootstrap-select .dropdown-menu li.selected.active .dropdown-item.active.selected{margin-left: 0;padding: 0;}
+
+    @media(max-width:767px) {
+        .mob-canvas-scroll {
+            overflow-x: auto;
+        }
+
+        .mob-width-768px {
+            width: 768px;
+        }
+    }
+</style>
+
+<div class="main-content">
+    {% include 'header.html' %}
+    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css"> -->
+    <!-- <link rel="stylesheet" href="https://cdn.datatables.net/1.11.0/css/dataTables.bootstrap4.min.css"> -->
+    <!-- <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.bootstrap4.min.css"> -->
+
+    <main>
+        <!-- {% include '_alerts.html' %} -->
+        <div class="page-title-with-or-without-btn d-flex">
+            <div class="farm headingtop ">Grower Dashboard</div> 
+            {% if show_grower %}
+            <div class="mst-auto">
+                <button onclick="downloadimage()" class="btn-close-cancel">Click To Download Image</button>
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- <div class="page-title-with-or-without-btn">
+            <div class="flex-header-btn">
+                <button onclick="downloadimage()" class="clickbtn">Click To Download Image</button>
+            </div>
+        </div> -->
+
+        <div id="htmltoimage">
+            <div>
+                {% include '_alerts.html' %}
+                <form action="" method="post" class="align-items-center">
+                    {% csrf_token %}
+                    <div class="p-3" style="margin-top: 0px;">
+                        <h4 > Select a Grower{{min_break_point}}</h4>
+                        <div class="input-group">
+                            <select name="get_grower" id="tags" class="form-control selectpicker rounded-pill" data-live-search="true">
+                                <option value=''>Select a Grower</option>
+                                {% for i in growers %}
+                                    {% if i.id == select_get_grower_id %}
+                                    <option value={{i.id}} data-tokens={{i.name}} selected>{{i.name}}</option>
+                                    {% else %}
+                                    <option value={{i.id}} data-tokens={{i.name}}>{{i.name}}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                            <div class="input-group-append">
+                                <input  id="submitBtn2" type="submit" class="apply-filter-btn primary-btn" value="Apply Filter"  style="padding: 14px 20px 36px 20px;"/>
+                            </div>
+                        </div>
+                            <!-- <input name="get_grower" onkeyup="getText()" value="{{show_grower}}" class="form-control" type="text" id="tags" placeholder="Search Grower"/> -->
+                        <!-- <div class="col-2" >
+                            <button class="btn-close-cancel" onclick="resetBTN()" style="padding: 14px 20px 14px 20px;">Reset</button>
+                        </div> -->
+                    </div>
+                    {% if show_grower %}
+                    <div class="p-3 pb-0 bg-white">
+                        <div class="row">
+                            <div class="col-md-3 col-sm-12 col-12 text-center ">
+                                <div class="designbox newdesignbox">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h4 class="mb-0"><i class="fas fa-tractor"></i> Farm</h4>
+                                        <p style="font-size: 27px; line-height: 1; text-align: right; color: #1a416d; font-weight: bold;">{{grower_farms|length}}</p>
+                                    </div>
+                                    <!-- <h4 class="text-center"> <i class="fas fa-tractor"></i>Farm</h4> -->
+                                    <div class="topmainClass">
+                                        {% for i in grower_farms %}
+                                            <div class="mainClass">
+                                                <h6>{{i.name}} {% if i.cultivation_year %}- {{i.cultivation_year}}{% endif %}</h6>
+                                                {% if i.area %}<p>Area : {{i.area}}</p>{% endif %}
+                                                {% if i.state %}<p>State : {{i.state}}</p>{% endif %}
+                                                {% if i.county %}<p>County : {{i.county}}</p>{% endif %}
+                                                {% if i.village %}<p>Village : {{i.village}}</p>{% endif %} 
+                                                {% if i.town %}<p>Town : {{i.town}}</p>{% endif %} 
+                                                {% if i.street %}<p>Street : {{i.street}}</p>{% endif %}
+                                                {% if i.zipcode %}<p>Zipcode : {{i.zipcode}}</p>{% endif %}
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <div class="designbox newdesignbox">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h4 class="mb-0"><i class="fas fa-warehouse"></i> Storage</h4>
+                                        <p style="font-size: 27px; line-height: 1; text-align: right; color: #1a416d; font-weight: bold;">{{grower_storages|length}}</p>
+                                    </div>
+                                    <!-- <h4 class="text-center"> <i class="fas fa-warehouse"></i> Storage</h4> -->
+                                    <div class="topmainClass">
+                                        {% for i in grower_storages %}
+                                            <div class="mainClass">
+                                                <h6>{{i.storage_name}}</h6>
+                                                <p>{{i.upload_type}}</p>
+                                            </div>         
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-sm-12 col-12 text-center">
+                                <div class="designbox ">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h4 class="mb-0"><i class="fas fa-seedling"></i> Field</h4>
+                                        <p style="font-size: 27px; line-height: 1; text-align: right; color: #1a416d; font-weight: bold;">{{grower_fields|length}}</p>
+                                    </div>
+                                    <!-- <h4 class="text-center"> <i class="fas fa-seedling"></i> Field</h4> -->
+                                    <div class="topmainClass">
+                                        {% for i in grower_fields %}
+                                        
+                                            <div class="mainClass">
+                                                <h6>{{i.name}} {% if i.acreage %} - {{i.acreage}} acreage{% endif %}</h6>
+                                                <p>{{i.farm.name}} | {{i.crop}}</p>
+                                            </div>
+                                        
+                                        <!-- <p>{{i.farm.name}} - {{i.name}} - {{i.crop}}</p> -->
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-5 col-sm-12 col-12 text-center">
+                                <div class="designbox">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h4 class="mb-0"><i class="far fa-credit-card"></i> Payment Summary</h4>
+                                        <!-- <p style="font-size: 27px;line-height: 1; text-align: right; color: #1a416d; font-weight: bold;">{{grower_fields|length}}</p> -->
+                                    </div>
+                                    <!-- <h4 class="text-center"><i class="far fa-credit-card"></i> Payment Summary</h4> -->
+                                    <div class="topmainClass">
+                                        
+                                            <div class="mainClass">
+                                                <h6>Total Delivered LBS :</h6>
+                                                <p>{{grower_payments.sum_delivery_lbs}}</p>
+                                            </div>
+                                            <div class="mainClass">
+                                                <h6>Total Number of Deliveries :</h6>
+                                                <p>{{grower_payments.sum_deliverys_count}}</p>
+                                            </div>
+                                            <div class="mainClass">
+                                                <h6>Total Delivered Value :</h6>
+                                                <p>{{grower_payments.sum_deliverd_value}}</p>
+                                            </div>
+                                            {% if grower_payments.g_payment_option %}
+                                                {% for i in grower_payments.g_payment_option %}
+                                                <div class="mainClass">
+                                                    <h6>Entry Feeds :</h6>
+                                                    <p>{{i.payment_option}} </p>
+                                                    <p>{% if i.payment_option_from_date %}{{i.payment_option_from_date}}{% endif %} {% if i.payment_option_to_date %} To {{i.payment_option_to_date}}{% endif %}</p>
+                                                </div>
+                                                {% endfor %}
+                                            {% endif %}
+                                        <!-- <p><b>Total Delivered LBS :</b><br>{{i.sum_delivery_lbs}}</p>
+                                        <p><b>Total Number of Deliveries :</b> <br>{{i.sum_deliverys_count}}</p>
+                                        <p><b>Total Delivered Value :</b> <br>{{i.sum_deliverd_value}}</p> -->
+                                        <!-- <p>Number of Payee : {{i.g_payee_count}}</p>
+                                        <p>[ Number of Lien Holder : {{i.lien_holder_count}}, Number of Split Payee : {{i.payment_split_count}} ]</p> -->
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                    <div class="p-3" style="background: #455e36;">
+                        <h4 style="color:#fff; padding-left: 20px;">Select a Field</h4>
+                        <select id="chat_fieldSelction" name="chat_field_id" class="form-select rounded-pill" data-live-search="true">
+                            {% for i in grower_fields %}
+                            {% if selcted_filed == i %}
+                            <option value={{i.id}} selected>{{i.name}} - {{i.id}}</option>
+                            {% else %}
+                            <option value={{i.id}}>{{i.name}} - {{i.id}}</option>
+                            {% endif %}
+                            {% endfor %}
+                        </select>
+                        <input type="submit" name="" id="submitBtn1" style="display: none;">
+                    </div>
+                </form>
+            </div>
+        
+            <div class="p-3 bg-white">
+                <div class="row">
+                    <div class="col-md-6 col-sm-12 col-12 mb-3">
+                        <div class="designbox h-100">
+                            <div class="text-center">
+                                {% if grower_Field_Shipment_Details.crop == 'COTTON' %}
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h4 class="mb-0"><i class="fas fa-truck"></i> Shipment</h4>
+                                    <p style="font-size: 27px; line-height: 1; text-align: right; color: #1a416d; font-weight: bold;">{{grower_Field_Shipment_Details.shipment_count}}</p>
+                                </div>
+                                    <p><strong>Total Weight of Shipment :</strong> {{grower_Field_Shipment_Details.shipment_wt}}</p>
+                                    <!-- <p>[ <strong >Llano Super : </strong>{{grower_Field_Shipment_Details.lls}}, <strong>Gold : </strong>{{grower_Field_Shipment_Details.gold}}, <strong>Silver : </strong>{{grower_Field_Shipment_Details.silver}}, <strong>Bronze : </strong>{{grower_Field_Shipment_Details.bronze}}, <strong>None : </strong>{{grower_Field_Shipment_Details.nonee}} ]</p> -->
+                                    <p><strong>Total Number of Delivered Shipment :</strong> {{grower_Field_Shipment_Details.shipment_delivered_count}}</p>
+                                    <p><strong>Total Weight of Delivered Shipment :</strong> {{grower_Field_Shipment_Details.shipment_delivered_wt}}</p>
+                                    <p><strong>Projected Yield :</strong> {{grower_Field_Shipment_Details.projected_yield}}</p>
+                                    <p><strong>Actual Yield :</strong> {{grower_Field_Shipment_Details.actual_yield}}</p>
+                                    <p><strong>Yield Delta :</strong> {{grower_Field_Shipment_Details.yield_delta}}</p>
+                                    
+                                    <p><strong>Number of Payee :</strong> {{grower_Field_Shipment_Details.g_payee_count}}</p>
+                                    <p><strong>[ Number of Lien Holder : {{grower_Field_Shipment_Details.lien_holder_count}}, Number of Split Payee : {{grower_Field_Shipment_Details.payment_split_count}} ]</strong></p>
+
+                                {% elif grower_Field_Shipment_Details.crop == 'RICE' %}
+                                    
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h4 class="mb-0"><i class="fas fa-truck"></i> Shipment</h4>
+                                    <p style="font-size: 27px; line-height: 1; text-align: right; color: #1a416d; font-weight: bold;">{{grower_Field_Shipment_Details.shipment_count}}</p>
+                                </div>
+                                    <p><strong>Total Weight of Shipment :</strong> {{grower_Field_Shipment_Details.shipment_wt}}</p>
+                                    <p><strong>Total Received Weight of Approved Shipment :</strong> {{grower_Field_Shipment_Details.shipment_delivered_wt}}</p>
+                                    <p><strong>Total Paid Amount :</strong> {{grower_Field_Shipment_Details.shipment_paid_amount}}</p>
+                                    <p><strong>Projected Yield :</strong> {{grower_Field_Shipment_Details.projected_yield}}</p>
+                                    <p><strong>Actual Yield :</strong> {{grower_Field_Shipment_Details.actual_yield}}</p>
+                                    <p><strong>Yield Delta :</strong> {{grower_Field_Shipment_Details.yield_delta}}</p>
+                                    <p><strong>Number of Payee :</strong> {{grower_Field_Shipment_Details.g_payee_count}}</p>
+                                    <p><strong>[ Number of Lien Holder :</strong> {{grower_Field_Shipment_Details.lien_holder_count}}, <strong>Number of Split Payee :</strong> {{grower_Field_Shipment_Details.payment_split_count}} <strong>]</strong></p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 col-sm-12 col-12 mb-3">
+                        <div class="designbox h-100">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h4 class="mb-0"><i class="fas fa-poll"></i> Survey Summary</h4>
+                                <p style="font-size: 27px; line-height: 1; text-align: right; color: #1a416d; font-weight: bold;">{{ grower_surveys|length }}</p>
+                            </div>
+                            {% for i in grower_surveys %}
+                            <p><b>Survey Name :</b> {{i.sus_name}}</p>
+                            <p><b>Survey Score :</b> {{i.sus_score}}</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <div class="col-12 mb-3">
+                        <div class="designbox h-100 newdesignbox">
+                            <h4 class="mb-3 text-center"><i class="fab fa-pagelines"></i> Field Info - Vegetation Report </h4>
+                            <div class="mob-canvas-scroll">
+                                {% for i in grower_Field_Vegetation_Chart %}
+                                <table>
+                                    <tr>
+                                        <th>Gal Water Saved</th>
+                                        <th>Water/LB Saved</th>
+                                        <th>C02-eq Reduced</th>
+                                        <th>Increase Nitrogen</th>
+                                      </tr>
+                                      <tr>
+                                        <td>{{i.gal_water_saved}}</td>
+                                        <td>{{i.water_lbs_saved}}</td>
+                                        <td>{{i.co2_eq_reduced}}</td>
+                                        <td>{{i.increase_nitrogen}}</td>
+                                      </tr>
+                                      <tr>
+                                        <th>GHG Reduction</th>
+                                        <th>Land Use Efficiency</th>
+                                        <th>Grower Premium %</th>
+                                        <th>Grower Dollar Premium</th>
+                                      </tr>
+                                      <tr>
+                                        <td>{{i.ghg_reduction}}</td>
+                                        <td>{{i.grower_premium_percentage}}</td>
+                                        <td>{{i.land_use_efficiency}}</td>
+                                        <td>{{i.grower_dollar_premium}}</td>
+                                      </tr>
+                                </table>
+
+
+                                <!-- <p>Gal water saved : {{i.gal_water_saved}}</p>
+                                <p>Water/LB saved : {{i.water_lbs_saved}}</p>
+                                <p>C02-eq reduced : {{i.co2_eq_reduced}}</p>
+                                <p>Increase Nitrogen : {{i.increase_nitrogen}}</p>
+                                <p>GHG Reduction : {{i.ghg_reduction}}</p>
+                                <p>Land Use Efficiency : {{i.grower_premium_percentage}}</p>
+                                <p>Grower Premium % : {{i.land_use_efficiency}}</p>
+                                <p>Grower Dollar Premium : {{i.grower_dollar_premium}}</p> -->
+                                {% endfor %} 
+                                <!-- <div class="mob-width-768px">
+                                    <div id="chartFieldInfo" style="height: 300px;"></div>
+                                </div> -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            
+                <div class="row justify-content-centerb">
+                        {% if grower_Field_Shipment_Details.crop == 'COTTON' %}
+                        <div class="col-md-6 col-sm-12 col-12">
+                        {% elif grower_Field_Shipment_Details.crop == 'RICE' %}
+                        <div class="col-12">
+                        {% endif %}
+                        
+                            {% if grower_Field_Shipment_Details.shipment_delivered_count == 0 %}
+                            {% else %}
+                            <div class="designbox h-100 newdesignbox">
+                                <h4 class="mb-3 text-center"><i class="fas fa-truck"></i> Shipments Info - Delivered Level</h4>
+                                <div class="mob-canvas-scroll">
+                                    <div class="mob-width-768px">
+                                        <div id="chartShipmentLevel" style="height: 300px; width: 100%;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% if grower_Field_Shipment_Details.crop == 'COTTON' %}
+                            <div class="col-md-6 col-sm-12 col-12">
+                                {% if grower_Field_Shipment_Details.shipment_delivered_count == 0 %}
+                                {% else %}
+                                <div class="designbox h-100 newdesignbox">
+                                    <h4 class="mb-3 text-center"><i class="fas fa-truck"></i> Shipments Info - Delivered vs None Level</h4>
+                                    <div id="chartShipmentDeliverd" style="height: 300px; width: 100%;"></div>
+                                </div>
+                                {% endif %}
+                            </div>
+                            
+                            {% if grower_Field_Shipment_Details.crop == 'COTTON' and  grower_Field_Shipment_Details.shipment_delivered_count != 0 %}
+                                <div class="col-12 text-center relative">
+                                    <p class="mt-3"><strong >[ Llano Super : </strong>{{grower_Field_Shipment_Details.lls}}, <strong>Gold : </strong>{{grower_Field_Shipment_Details.gold}}, <strong>Silver : </strong>{{grower_Field_Shipment_Details.silver}}, <strong>Bronze : </strong>{{grower_Field_Shipment_Details.bronze}}, <strong>None : </strong>{{grower_Field_Shipment_Details.nonee}} <strong >]</strong></p>
+                                </div>
+                            {% endif %}
+                        {% endif %}
+
+                        {% if grower_Field_Shipment_Details.crop == 'RICE' and  grower_Field_Shipment_Details.shipment_delivered_count != 0 %}
+                        <div class="col-12 text-center relative">
+                            <p class="mt-3"><strong>[ APPROVED : </strong>{{grower_Field_Shipment_Details.shipment_approved}}, <strong>DISAPPROVED : </strong>{{grower_Field_Shipment_Details.shipment_disapproved}}, <strong>PENDING : </strong>{{grower_Field_Shipment_Details.shipment_pending}} <strong >]</strong></p>
+                        </div>
+                        {% endif %}
+                        
+
+                        <div class="col-12 mt-3">
+                            {% if grower_Field_Shipment_Details.shipment_delivered_count == 0 %}
+                            {% else %}
+                            <div class="designbox h-100 newdesignbox">
+                                <h4 class="mb-3 text-center"><i class="fas fa-chart-bar"></i> Field Info - Shipment Report</h4>
+                                <div class="mob-canvas-scroll">
+                                    <div class="mob-width-768px">
+                                        <div id="chartShipment" style="height: 300px; width: 100%;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        
+            {% endif %}
+        </div>
+            
+            <!-- <div>
+                <div id="chartContainer" style="height: 300px; width: 100%;"></div>
+            </div> -->
+            
+    </main>
+    {% include 'footer.html' %}
+</div>
+{% endblock content %}
+
+{% block scripts %}
+<!-- <script src="https://cdn.datatables.net/1.11.0/js/jquery.dataTables.min.js"></script> -->
+<!-- <script src="https://cdn.datatables.net/1.11.0/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/responsive.bootstrap4.min.js"></script> -->
+
+<script>
+    $(document).ready(function() {
+    $('#chat_fieldSelction').change( function () {
+    $('#submitBtn1').click();
+    });
+    });
+
+    // function resetBTN(){
+    //     $('#tags').val("");
+    //     $('#chat_fieldSelction').val("");
+    //     var path = `${window.location.protocol + "//" + window.location.host}/grower/grower_dashboard_com/`
+    //     path.click();
+    // }
+
+    $(document).ready(function() {
+    $('#submitBtn2').click(function() {
+        // Your function code here
+        document.getElementById('chat_fieldSelction').value = null;
+        // You can write any code or call any function here that you want to execute after the button is clicked
+    });
+    });
+</script>
+
+<script src="https://cdn.canvasjs.com/canvasjs.min.js"></script>
+
+<script>
+    window.onload = function () {
+    var date_calc = "";
+    // var chartField = new CanvasJS.Chart("chartFieldInfo", {
+    //     animationEnabled: true,
+    //     theme: "light3",
+    //     title:{
+    //         //text: '{{min_break_point}}'
+    //     },
+    //     axisY:{
+    //         title: "Data",
+    //         maximum: {{maximum_y}},
+    //         scaleBreaks: {
+    //             customBreaks: [
+    //             {
+    //                 startValue: {{break_startValue}},
+    //                 endValue: {{break_endValue}}
+    //             }
+                
+    //         ]
+                
+    //         }
+    //     },
+    //     data: [{        
+    //         type: "column",
+    //         showInLegend: true, 
+    //         legendMarkerColor: "green",
+    //         //indexLabel: "{a}",
+    //         indexLabel: "{label}: {y}",
+    //         indexLabelPlacement: "inside",
+    //         indexLabelFontColor: "black",
+    //         indexLabelTextAlign: "center",
+    //         indexLabelMaxWidth: 90,
+    //         indexLabelWrap: true,
+    //         indexLabelFontWeight: "bold",
+    //         legendText: "Field Name = {% for i in grower_Field_Vegetation_Chart %}{{i.name}}{% endfor %}",
+
+    //         // toolTipContent: "<b>Field : </b>{% for i in grower_Field_Chart %}{{i.name}}{% endfor %}<br/><b>Close/Last : </b>{y}<br/>",
+    //         dataPoints: [            
+    //         {% for i in grower_Field_Vegetation_Chart %}
+    //             { y: {{i.gal_water_saved}}, label: "Gal water saved", a: "Gal water saved" },
+    //             { y: {{i.water_lbs_saved}}, label: "Water/LB saved", a: "Water/LB saved" }, 
+    //             { y: {{i.co2_eq_reduced}}, label: "C02-eq reduced", a: "C02-eq reduced" },
+    //             { y: {{i.increase_nitrogen}}, label: "Increase Nitrogen", a: "Increase Nitrogen"},
+    //             { y: {{i.ghg_reduction}}, label: "GHG Reduction", a: "GHG Reduction" },
+    //             { y: {{i.land_use_efficiency}}, label: "Land Use Efficiency", a: "Land Efficiency" },
+    //             { y: {{i.grower_premium_percentage}}, label: "Grower Premium %", a: "Grower Premium %"},
+    //             { y: {{i.grower_dollar_premium}}, label: "Grower Dollar Premium", a: "Grower Premium" }
+    //         {% endfor %}       
+    //         ]
+    //     }]
+    // });
+    // chartField.render();
+
+    var chartShipment = new CanvasJS.Chart("chartShipment", {
+        animationEnabled: true,
+        zoomEnabled: true,
+        title:{
+            // text: "Field Info - Shipment Report"
+        },
+        axisX:{
+            title: "No of Shipments",
+        },
+        axisY: {
+            title: "Shipment Weight (in LBS)",
+            crosshair: {
+                enabled: true,
+                snapToDataPoint: true,
+            }
+        },
+        data: [{
+            type: "line",
+            {% if grower_Field_Shipment_Details.crop == 'COTTON' %}
+            toolTipContent: "<b>Shipment ID : </b>{s}<br/><b>Shipment Weight : </b>{y} LBS<br/><b>Shipment Date : </b>{d}<br/><b>Level : </b>{a}<br/><b>Payment Status : </b>{b}<br/><b>Paid Amount : </b>{p}<br/>",
+            {% elif grower_Field_Shipment_Details.crop == 'RICE' %}
+            toolTipContent: "<b>Shipment ID : </b>{s}<br/><b>Shipment Weight : </b>{y} LBS<br/><b>Shipment Date : </b>{d}<br/><b>Payment Status : </b>{b}<br/><b>Paid Amount : </b>{p}<br/>",
+            {% endif %}
+            dataPoints: [
+                {% for i in grower_Field_Shipment_Chart %}
+                    // {y: {{i.shipment_wt}} , z: '{{i.shipment_dt|join:"/"}}' , a: '{{i.payment_status}}', b: '{{i.payment_amount}}' },
+                    {y: {{i.shipment_wt}} , a: '{{i.level}}', b: '{{i.payment_status}}', p: '{{i.payment_amount}}', s:'{{i.shipment_id}}', d:'{{i.finale_date}}' },
+                {% endfor %}
+            ]
+        }]
+    });
+    chartShipment.render();
+    
+
+    //  Test with Date
+    // var chart = new CanvasJS.Chart("chartContainer", {
+    //     animationEnabled: true,
+    //     theme: "light2",
+    //     title:{
+    //         text: "Site Traffic"
+    //     },
+    //     axisX:{
+    //         valueFormatString: "DD MMM",
+    //         crosshair: {
+    //             enabled: true,
+    //             snapToDataPoint: true
+    //         }
+    //     },
+    //     axisY: {
+    //         title: "Shipment Weight (in LBS)",
+    //         includeZero: true,
+    //         crosshair: {
+    //             enabled: true
+    //         }
+    //     },
+    //     toolTip:{
+    //         shared:true
+    //     },  
+    //     legend:{
+    //         cursor:"pointer",
+    //         verticalAlign: "bottom",
+    //         horizontalAlign: "left",
+    //         dockInsidePlotArea: true,
+    //         itemclick: toogleDataSeries
+    //     },
+    //     data: [{
+    //         type: "line",
+    //         showInLegend: true,
+    //         name: "Total Payments",
+    //         markerType: "square",
+    //         xValueFormatString: "DD MMM, YY",
+    //         color: "#F08080",
+    //         toolTipContent: "<b>Payment Amount : </b>{p}<br/>",
+    //         dataPoints: [
+    //             {% for i in grower_Field_Shipment_Chart %}
+    //             { x: new Date('{{i.finale_date}}'), y: {{i.shipment_wt}}+100, p: '{{payment_amount}}'},
+    //             {% endfor %}
+                
+    //         ]
+    //     },
+    //     {
+    //         type: "line",
+    //         showInLegend: true,
+    //         name: "Total Shipments Weight",
+    //         lineDashType: "dash",
+    //         dataPoints: [
+    //             {% for i in grower_Field_Shipment_Chart %}
+    //             { x: new Date("{{i.finale_date}}"), y: {{i.shipment_wt}} },
+    //             {% endfor %}
+                
+    //         ]
+    //     }]
+    // });
+    // chart.render();
+
+    // function toogleDataSeries(e){
+    //     if (typeof(e.dataSeries.visible) === "undefined" || e.dataSeries.visible) {
+    //         e.dataSeries.visible = false;
+    //     } else{
+    //         e.dataSeries.visible = true;
+    //     }
+    //     chart.render();
+    // }
+    
+    // 
+    // 
+
+    var shipment_level = new CanvasJS.Chart("chartShipmentLevel", {
+        animationEnabled: true,
+        title: {
+            // text: "{{grower_Field_Shipment_Details.shipmentLevelText}}"
+        },
+        data: [{
+            type: "pie",
+            startAngle: 240,
+            yValueFormatString: "##0.00\"%\"",
+            indexLabel: "{label} {y}",
+            dataPoints: [
+                {% if grower_Field_Shipment_Details.crop == 'COTTON' %}
+                    {y: {{grower_Field_Shipment_Details.per_lls}}, label: "Llano Super", color: "#03f4fc"},
+                    {y: {{grower_Field_Shipment_Details.per_gold}}, label: "Gold", color: "#FFD700"},
+                    {y: {{grower_Field_Shipment_Details.per_silver}}, label: "Silver", color: "#C0C0C0"},
+                    {y: {{grower_Field_Shipment_Details.per_bronze}}, label: "Bronze", color: "#CD7F32"},
+                {% elif grower_Field_Shipment_Details.crop == 'RICE' %}
+                    {y: {{grower_Field_Shipment_Details.per_approved_shipment}}, label: "APPROVED", color: "#007500"},
+                    {y: {{grower_Field_Shipment_Details.per_disapproved_shipment}}, label: "DISAPPROVED", color: "#E32227"},
+                    {y: {{grower_Field_Shipment_Details.per_noStatus__shipment}}, label: "PENDING", color: "#000000"},
+                {% endif %}
+            ]
+        }]
+    });
+    shipment_level.render();
+
+    var shipment_deliverd = new CanvasJS.Chart("chartShipmentDeliverd", {
+        animationEnabled: true,
+        title: {
+            // text: "{{grower_Field_Shipment_Details.chartShipmentDeliverdText}}"
+        },
+        data: [{
+            type: "pie",
+            startAngle: 240,
+            yValueFormatString: "##0.00\"%\"",
+            indexLabel: "{label} {y}",
+            dataPoints: [
+                {% if grower_Field_Shipment_Details.crop == 'COTTON' %}
+                    {y: {{grower_Field_Shipment_Details.per_nonee}}, label: "None", color: "#000000"},
+                    {y: {{grower_Field_Shipment_Details.per_delivered}}, label: "Delivered", color: "#007500"},
+                {% endif %}
+            ]
+        }]
+    });
+    shipment_deliverd.render();
+    
+    }
+</script>
+
+<script src="{% static 'js/farm/farm_list.js' %}"></script>
+
+
+
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.js"></script>
+<script>
+    function downloadimage() {
+                /*var container = document.getElementById("image-wrap");*/ /*specific element on page*/
+                var container = document.getElementById("htmltoimage"); /* full page */
+                html2canvas(container, { allowTaint: true }).then(function (canvas) {
+
+                    var link = document.createElement("a");
+                    document.body.appendChild(link);
+                    link.download = "{{select_get_grower_name}}.jpg";
+                    link.href = canvas.toDataURL();
+                    link.target = '_blank';
+                    link.click();
+                });
+            }
+    
+</script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.js">
+</script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.js">
+</script>
+
+<link href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/ui-lightness/jquery-ui.css" rel="stylesheet"
+    type="text/css" />
+
+<!-- <script>
+    function getText(){
+        var availableTags = [
+                {% for i in growers %}
+                "{{i.name}}",
+                {% endfor %}
+        ];
+        
+        $("#tags").autocomplete({
+            source: availableTags
+        });
+    };
+</script> -->
+<script>
+$('#Grower-Configuration-active').addClass('activeLink');
+      
+$('#Grower-Configuration-down').addClass('down');
+$('#Grower-Configuration-sub').show();
+
+$('#Grower-Dashboard').addClass('activeLink active-nav');
+</script>
+{% endblock scripts %}

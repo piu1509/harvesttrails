@@ -1,0 +1,828 @@
+{% extends "base.html" %} 
+{% block title %} Classing All CSV {% endblock title %}
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+
+{% block content %}
+{% include 'navbar.html' %}
+<style>
+    table.classing tbody tr td {
+        vertical-align: top;
+    }
+
+    ul.pagination {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+    }
+
+    ul.pagination li {
+        list-style: none;
+        line-height: 45px;
+        text-align: center;
+        font-size: 18px;
+        font-weight: 500;
+        cursor: pointer;
+        user-select: none;
+        transition: all 0.3s ease;
+    }
+
+    ul.pagination li {
+        display: none;
+        position: relative;
+    }
+
+
+    ul.pagination li:first-of-type,
+    ul.pagination li:nth-of-type(2),
+    ul.pagination li:last-of-type,
+    ul.pagination li:has( + li:last-of-type),
+    ul.pagination li.active,
+    ul.pagination li.active + li,
+    ul.pagination li.active + li + li,
+    ul.pagination li:has(+ li.active),
+    ul.pagination li:has(+ li + li.active){
+        display: block;
+    }
+
+    ul.pagination li:has(+ li + li.active){
+        padding-left: 35px;
+    }
+
+    ul.pagination li.active + li + li {
+        padding-right: 35px;
+    }
+
+    ul.pagination li:has( + li + li.active) a:before,
+    ul.pagination li.active + li + li a:after {
+        content: "...";
+        font-size: 16px;
+        display: inline-block;
+        width: 35px;
+        height: 40px;
+        position: absolute;
+        top: -1px;
+        background-color: #fff;
+        border: 1px solid #ddd;
+    }
+
+    ul.pagination li:has( + li + li.active) a:before {
+        left: -35px;
+    }
+
+    ul.pagination li.active + li + li a:after {
+        right: -35px;
+    }
+
+    ul.pagination li:nth-of-type(1) a:before,
+    ul.pagination li:nth-of-type(2) a:before,
+    ul.pagination li:nth-of-type(3) a:before {
+        display: none !important;
+    }
+
+    ul.pagination li:nth-of-type(1),
+    ul.pagination li:nth-of-type(2),
+    ul.pagination li:nth-of-type(3) {
+        padding-left: 0 !important;
+    }
+
+    ul.pagination li:nth-of-type(1) a:after,
+    ul.pagination li:nth-of-type(2) a:after,
+    ul.pagination li:nth-of-type(3) a:after {
+        display: none !important;
+    }
+
+    ul.pagination li:nth-of-type(1),
+    ul.pagination li:nth-of-type(2),
+    ul.pagination li:nth-of-type(3) {
+        padding-left: 0 !important;
+    }
+
+
+    .brnz{background-color: #CD7F32;}
+    .slvr{background-color: #C0C0C0;}
+    .gold{background-color: #FFD700;}
+    .supr{background-color: #03f4fc;}
+    .nocls{background-color: #fff;}
+    .csv_name_info {
+    width: 90px;
+    }
+</style>
+<div class="main-content">
+    {% include 'header.html' %}
+    
+    <main>
+        {% include '_alerts.html' %}
+        <div class="page-title-with-or-without-btn">
+            <span class="farm headingtop">Classing All CSV</span>
+            <div class="inline-apply-filter justify-content-center justify-content-md-end ewr-report">
+                
+                <div>
+                    <a href="{% url 'classing_csv_all' %}" class="btn-close-cancel" target="_blank">Download All CSV</a>
+                </div>
+            </div>
+        </div>
+        <div class="card card-padding">
+            <div class="three-fields-with-label">
+                <form action="" method="post" class="">
+                    {% csrf_token %}
+                    {% if request.user.is_superuser or 'SubAdmin' in request.user.get_role or 'SuperUser' in request.user.get_role %}
+                
+                    {% endif %}
+                    
+                    </div>
+                    <div class="col-lg-12 col-md-12 mb-2">
+                        <div class="row">
+                            
+                            <div class="col-md-3 col-sm-6">
+                                <input class="form-control" name="search_name" type="search" placeholder="Search" aria-label="Search" id="search_name" value="{{search_get}}">
+                            </div>
+
+                            <div class="col-md-2 col-sm-6">
+                                <button class="btn btn-outline-success btn-block" type="submit">Search</button>
+                            </div>
+                            <div class="col-md-7 col-sm-6 align-left" >
+                                ( Search with Bale id, Farm name or Field name )
+                            </div>
+                            
+                        </div>
+                    </div>
+                </form>
+            </div>
+          
+            <div class="main-simple-table-with-search">                
+                <div class="both-data-in" style="display: inherit;">
+                    <div class="simple-responsive-table">
+                        <table id="" class="table table-striped dt-responsive nowrap" style="width:100%">
+                            <thead>
+                                <tr style="border-bottom: 2px solid #e0e0e0;">
+                                    <th width="10%">Farm Name</th>
+                                    <th width="10%">Grower</th>
+                                    <!-- <th width="10%">wh id</th> -->
+                                    <th width="10%">bale id</th>
+                                    <th width="10%">field name</th>
+                                    <th width="10%">Certificate</th>
+                                    <th width="10%">Level</th>
+                                    <th width="10%">Warehouse id</th>
+                                    <th width="10%">date</th>
+                                    <th width="10%">net wt</th>
+                                    <!-- <th width="10%">pk num</th>
+                                    <th width="10%">gr</th>
+                                    <th width="10%">lf</th>
+                                    <th width="10%">Stp</th>
+                                    <th width="10%">ex</th>
+                                    <th width="10%">rm</th>
+                                    <th width="10%">str</th>
+                                    <th width="10%">cgr</th>
+                                    <th width="10%">rd</th>
+                                    <th width="10%">+B</th>
+                                    <th width="10%">MIC</th>
+                                    <th width="10%">unif</th>
+                                    <th width="10%">len</th>
+                                    <th width="10%">elong</th> -->
+                                    <th width="10%">value</th>
+                                    <th width="10%">view</th>
+                                    
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for i in report %}
+                                <tr>
+                                    <td>
+                                        {% if '.' in i.farm_name %}
+                                        {{i.farm_name|cut:".0"}}
+                                        {% else %}
+                                        {{i.farm_name}}
+                                        {% endif %}
+                                    </td>
+                                    <td>{{i.ob3}}</td>
+                                    <!-- <td>{{i.wh_id}}</td> -->
+                                    <td>{{i.bale_id}}</td>
+                                    <td>{{i.field_name}}</td>
+                                    <td style="background-color: {% if i.ob5 == 'Fail' %} #991f14 {% elif i.ob5 == 'Pass' %} #257a3c {% else %} #000 {% endif %}; color:#fff">{{i.ob5}}</td>
+                                    <td style="background: {%if i.level == 'Llano Super' %}#03f4fc {%elif i.level == 'Gold' %}#FFD700 {% elif i.level == 'Silver' %} #C0C0C0 {% elif i.level == 'Bronze' %} #CD7F32 {% else %} #ffffff {% endif %}">{{i.level}}</td>
+                                    <td>
+                                        {% if '.' in i.warehouse_wh_id %}
+                                        {{i.warehouse_wh_id|cut:".0"}}
+                                        {% else %}
+                                        {{i.warehouse_wh_id}}
+                                        {% endif %}
+                                    </td>
+                                    <td>{{i.dt_class}}</td>
+                                    <td>{{i.net_wt}}</td>
+                                    <!-- <td>{{i.pk_num}}</td>
+                                    <td>{{i.gr}}</td>
+                                    <td >{{i.lf}}</td>
+                                    <td >{{i.st}}</td>
+                                    <td>{{i.ex}}</td>
+                                    <td>{{i.rm}}</td>
+                                    <td >{{i.str_no}}</td>
+                                    <td >
+                                        {% if i.cgr == "31-Jan" %}
+                                        '31-1'
+                                        {% elif i.cgr == "21-Jan" %}
+                                        '21-1'
+                                        {% elif i.cgr == "21-Feb" %}
+                                        '21-2'
+                                        {% elif i.cgr == "21-Mar" %}
+                                        '21-3'
+                                        {% elif i.cgr == "21-Apr" %}
+                                        '21-4'
+                                        {% elif i.cgr == "31-Mar" %}
+                                        '31-3'
+                                        {% else %}
+                                        '{{ i.cgr }}'
+                                        {% endif %}
+                                    </td>
+                                    <td>{{i.rd}}</td>
+                                    <td>{{i.ob1}}</td>
+                                    <td >{{i.tr}}</td>
+                                    <td >{{i.unif}}</td>
+                                    <td>{{i.len_num}}</td>
+                                    <td>{{i.elong}}</td> -->
+                                    <td>{{i.value}}</td>
+                                    <td>
+                                        <a onclick="showClassing({{i.id}})" class="update-btn-link" alt="view" title="view" style="cursor: pointer;"> <span class="fas fa-eye"></span> </a>
+                                                
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            
+                        </table>
+                    </div>
+                    
+                </div>
+                <div class="text-center mt-2" style="text-align:center">
+                    <span>Showing {{ report_grower_index }} of {{ report_grower_index }} entries</span>
+                </div>
+            </div>
+    </main>
+    {% include 'footer.html' %}
+</div>
+!-- Add Que Popup -->
+<div class="modal fade" id="addqueModal" aria-hidden="true" aria-labelledby="exampleModalToggleLabel22" tabindex="-1">
+    <div class="modal-dialog" style="max-width: 800px !important;">
+        <div class="modal-content">
+            <div class="modal-header" style="text-align: center;">
+                <button type="button" class="btn-close cust-close-ds-btn close_modal_addqueModal"
+                    data-mdb-dismiss="modal" aria-label="Close" onclick="closeAddModal()" style="top:14px"></button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-center-btn-footer">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div style="text-align: center;" align="center">
+                                <h5 class="text-decoration-underline">Classing Csv Report</h5>
+                                <div style="width:100%" id="csv_name" class="csv_name_info"></div>
+                            </div>
+                            <div class="simple-responsive-table">
+                                <table id="" class="table dt-responsive nowrap classing" style="width:100%">
+                                    <tbody>
+                                        <tr>
+                                            <td><strong>Prod id :</strong><br>
+                                                <div id="prod_id"></div>
+                                            </td>
+                                            <td><strong>Farm name : </strong><br>
+                                                <div id="farm_name"></div>
+                                            </td>
+                                            <td><strong>Grower name : </strong><br>
+                                                <div id="grower_name"></div>
+                                            </td>
+                                        
+                                            <td><strong>Wh id :</strong><br>
+                                                <div id="wh_id"></div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Bale id : </strong><br>
+                                                <div id="bale_id"></div>
+                                            </td>
+                                            <td><strong>Warehouse id : </strong><br>
+                                                <div id="warehouse_wt"></div>
+                                            </td>
+                                        
+                                            <td><strong>Date :</strong><br>
+                                                <div id="dt_class"></div>
+                                            </td>
+                                            <td><strong>Net wt : </strong><br>
+                                                <div id="net_wt"></div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Farm id : </strong><br>
+                                                <div id="farm_id"></div>
+                                            </td>
+                                        
+                                            <td><strong>Load id :</strong><br>
+                                                <div id="load_id"></div>
+                                            </td>
+                                            <td><strong>Field name : </strong><br>
+                                                <div id="field_name"></div>
+                                            </td>
+                                            <td><strong>Certificate : </strong><br>
+                                                <div id="certificate"></div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Level :</strong><br>
+                                                <div id="level"></div>
+                                            </td>
+                                            <td><strong>Variety :</strong><br>
+                                                <div id="crop_variety"></div>
+                                            </td>
+                                            <td><strong>CGr : </strong><br>
+                                                <div id="cgr"></div>
+                                            </td>
+                                            <td><strong>LF :</strong><br>
+                                                <div id="lf"></div>
+                                            </td>
+                                            
+                                        
+                                            
+                                        </tr>
+                                        <tr>
+                                            <td><strong>ST : </strong><br>
+                                                <div id="st"></div>
+                                            </td>
+                                            <td><strong>Str no : </strong><br>
+                                                <div id="str_no"></div>
+                                            </td>
+                                            <td><strong>MIC : </strong><br>
+                                                <div id="mic"></div>
+                                            </td>
+                                            <td><strong>Unif :</strong><br>
+                                                <div id="unif"></div>
+                                            </td>
+                                            
+                                        </tr>
+                                        <tr>
+                                            <td><strong>GR : </strong><br>
+                                                <div id="gr"></div>
+                                            </td>
+                                            
+                                            <td><strong>Pk num : </strong><br>
+                                                <div id="pk_num"></div>
+                                            </td>
+                                            
+                                            <td><strong>RD :</strong><br>
+                                                <div id="rd"></div>
+                                            </td>
+                                            <td><strong>+B : </strong><br>
+                                                <div id="ob1"></div>
+                                            </td>
+                                            
+                                        </tr>
+                                        <tr>
+                                            <td><strong>TR : </strong><br>
+                                                <div id="tr"></div>
+                                            </td>
+                                            <td><strong>RM :</strong><br>
+                                                <div id="rm"></div>
+                                            </td>
+                                            <td><strong>Len_num : </strong><br>
+                                                <div id="len_num"></div>
+                                            </td>
+                                            
+                                        
+                                            <td><strong>Elong : </strong><br>
+                                                <div id="elong"></div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Ex :</strong><br>
+                                                <div id="ex"></div>
+                                            </td>
+                                            <td><strong>Value :</strong><br>
+                                                <div id="value"></div>
+                                            </td>
+                                            <td><strong>Csv type : </strong><br>
+                                                <div id="csv_type"></div>
+                                            </td>
+                                            <td>
+                                            </td>
+                                        </tr>
+                                        {% if request.user.is_superuser or 'SubAdmin' in request.user.get_role or 'SuperUser' in request.user.get_role %}
+                                        <tr>
+                                            <form action="" method="post" class="">
+                                                {% csrf_token %}
+                                                
+                                                <td><strong>Tier 2 processor : </strong><br>
+                                                    <div>
+                                                        <div id="processor_drop" style="display: none;"></div>
+                                                        <div id="processor_drop_2">
+                                                            <select id="processor2Selction" name="processor2_id" class="mb-0">
+                                                                <option value='' selected disabled>Processors2 All</option>
+                                                                {% for processor2 in processor2 %}
+                                                                {% if processor2 == selectedprocessor2 %}
+                                                                <option selected value="{{ processor2.pk }}">{{processor2.entity_name}} - {{processor2.id}}
+                                                                </option>
+                                                                {% else %}
+                                                                <option value="{{ processor2.pk }}">{{processor2.entity_name}} - {{processor2.id}}</option>
+                                                                {% endif %}
+                                                                {% endfor %}
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td><strong>Mark ID : </strong><br>
+                                                    <div>
+                                                        <div id="mark_id_show" style="display: none;"></div>
+                                                        <input type="text" value="" name="mark_id" id="mark_id" placeholder="Mark ID" style="padding: 5px;">
+                                                    </div>
+                                                </td>
+                                                <td><strong>Gin ID :</strong>
+                                                    <div>
+                                                        <div id="gin_id_show" style="display: none;"></div>
+                                                        <input type="text" name="gin_id" id="gin_id" placeholder="Gin ID" style="padding: 5px;">
+                                                    </div>
+                                                </td>
+                                                <td style="vertical-align: bottom;">
+                                                    <input type="hidden" name="raw_id" id="raw_id">
+                                                    <input type="hidden" name="get_bale2" id="assigned_bale_processor2">
+                                                    <input type="submit" value="save" id="savebtn" class="btn-save-submit">
+                                                    <input type="button" value="Unassign" id="delbtn" class="btn btn-danger" style="display: none; border-radius:20px;" onclick="delbtnfunc()">
+                                                </td>
+                                            </form>
+                                        </tr>
+                                        {% endif %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end -->
+{% endblock content %}
+
+{% block scripts %}
+
+<script>
+    // const element = document.querySelectorAll(".pagination");
+    // console.log(element)
+    // const navItems = document.getElementsByClassName('pagination')
+    // console.log(navItems.childNodes)
+
+    let lis = document.getElementById('nav_1').getElementsByTagName('li');
+    
+    for (let i = 0; i <= lis.length - 1; i++) {
+    var invar =  lis[i].innerHTML
+    console.log(invar)
+    }
+</script>
+<script>
+    function delbtnfunc(){
+        // alert("delbtnfunc()");
+    }
+</script>
+<script>
+
+        var getactiveurl = document.location.href
+        var getactive = parseInt(getactiveurl.split('=')[1])
+        
+        var plusonepage = getactive + 1
+        var plustwopage = getactive + 2
+        var monepage = getactive - 1
+        var mtwopage = getactive - 2
+
+       $(document).ready(function() {
+        $('#growerSelction').change( function () {
+        $('#submitBtn').click();
+        });
+        });
+
+        $(document).ready(function() {
+        $('#cerSelction').change( function () {
+        $('#submitBtn2').click();
+        });
+        });
+
+        $(document).ready(function() {
+        $('#lelSelction').change( function () {
+        $('#submitBtn3').click();
+        });
+        });
+
+
+        function showClassing(classing_pk) {
+            $.ajax({
+                type: "GET",
+                url: `/processor/classing_csv_list_view/${classing_pk}`,
+                data: {},
+                contentType: false,
+                cache: false,
+                processData: false,
+                success: function (response) {
+                    document.getElementById("prod_id").innerHTML = response.prod_id;
+                    document.getElementById("farm_name").innerHTML = response.farm_name;
+                    document.getElementById("grower_name").innerHTML = response.grower_name;
+                    document.getElementById("wh_id").innerHTML = response.wh_id;
+                    document.getElementById("bale_id").innerHTML = response.bale_id;
+                    var exist_processor2name = response.exist_processor2name;
+                    // console.log("exist_processor2name",exist_processor2name);
+                    if(exist_processor2name!='')
+                    {
+                        
+                        $("#processor_drop").show();
+                        $("#processor_drop_2").hide();
+                        $("#processor_drop").html(exist_processor2name);
+
+                        $("#savebtn").hide();
+                        $("#delbtn").show();
+
+                        $( "#delbtn" ).click(function() {
+                           var bale_id=response.bale_id;
+                           
+                            $.get(`${window.location.protocol + "//" + window.location.host}/processor/unassign_bale_processor2/`+bale_id,
+                            function(data,success) 
+                            { 
+                               
+                                $("#processor_drop").hide();
+                                $("#processor_drop").html('');
+                                $("#processor_drop_2").show();
+                                $("#mark_id").val('');
+                                $("#gin_id").val('');
+                                document.getElementById("mark_id_show").style.display = "none";
+                                document.getElementById("gin_id_show").style.display = "none";
+                                document.getElementById("mark_id").style.display = "block"; 
+                                document.getElementById("gin_id").style.display = "block";  
+                                document.getElementById("mark_id").innerHTML = "";
+                                document.getElementById("gin_id").innerHTML = "";
+                                $("#savebtn").show();
+                                $("#delbtn").hide();
+                                
+                                
+                            });
+
+                            
+                        });
+
+
+                    }
+                    else{
+
+                        $("#processor_drop").hide();
+                        $("#processor_drop").html('');
+                        $("#processor_drop_2").show();
+                        $("#savebtn").show();
+                        $("#delbtn").hide();
+
+                    }
+
+                    
+                    {% if request.user.is_superuser or 'SubAdmin' in request.user.get_role or 'SuperUser' in request.user.get_role %}
+                    document.getElementById("assigned_bale_processor2").value = response.bale_id;
+                    document.getElementById("raw_id").value = response.raw_id;
+                    {% endif %}
+                    document.getElementById("warehouse_wt").innerHTML = response.warehouse_wt;
+                    document.getElementById("dt_class").innerHTML = response.dt_class;
+                    document.getElementById("net_wt").innerHTML = response.net_wt;
+                    document.getElementById("farm_id").innerHTML = response.farm_id;
+                    document.getElementById("load_id").innerHTML = response.load_id;
+                    document.getElementById("field_name").innerHTML = response.field_name;
+                    document.getElementById("crop_variety").innerHTML = response.crop_variety;
+                    document.getElementById("certificate").innerHTML = response.certificate;
+
+                    document.getElementById("level").innerHTML = response.level;
+                    if(response.level == 'Bronze'){
+                        $("#level").css("background-color", "#CD7F32");
+                    }
+
+                    else if(response.level == 'Gold'){
+                        $("#level").css("background-color", "#FFD700");
+                    }
+
+                    else if(response.level == 'Silver'){
+                        $("#level").css("background-color", "#C0C0C0");
+                    }
+
+                    else if(response.level == 'Llano Super'){
+                        $("#level").css("background-color", "#03f4fc");
+                    }
+                    else {
+                        $("#level").css("background-color", "#ffffff");
+
+                    }
+
+                    document.getElementById("pk_num").innerHTML = response.pk_num;
+                    document.getElementById("gr").innerHTML = response.gr;
+                    document.getElementById("lf").innerHTML = response.lf;
+                    if(response.lf=='' || response.lf=='none' || response.st=='nan') 
+                   {
+                    var lfvalue = 0;
+                   }
+                   else
+                   {
+                    var lfvalue = parseFloat(response.lf);
+                   }
+                    
+
+                    if(lfvalue>=1 && lfvalue<=2)
+                    {
+
+                        $("#lf").removeClass( "slvr brnz nocls" ).addClass("gold");   
+                    }
+                    else if(lfvalue==3 )
+                    {
+                        $("#lf").removeClass( "gold brnz nocls" ).addClass("slvr");
+                    }
+                    else if(lfvalue==4 )
+                    {
+                        $("#lf").removeClass( "gold slvr nocls" ).addClass("brnz");
+                    }
+                    else 
+                    {
+                        $("#lf").removeClass( "gold slvr brnz" ).addClass("nocls");
+                    }
+                    document.getElementById("st").innerHTML = response.st;
+                    if(response.st=='' || response.st=='none' || response.st=='nan') 
+                   {
+                    var stvalue = 0;
+                   }
+                   else
+                   {
+                    var stvalue = parseFloat(response.st);
+                   }
+
+                    if(stvalue>=43 )
+                    {
+                        $("#st").removeClass( "gold slvr brnz nocls" ).addClass("supr");   
+                    }
+                    else if(stvalue>= 38 && stvalue < 43)
+                    {
+                        $("#st").removeClass( "supr slvr brnz nocls" ).addClass("gold");   
+                    }
+                    else if(stvalue>= 37 && stvalue < 38 )
+                    {
+                        $("#st").removeClass( "supr gold brnz nocls" ).addClass("slvr");
+                    }
+                    else if(stvalue >= 36 && stvalue < 37 )
+                    {
+                        $("#st").removeClass( "supr gold slvr nocls" ).addClass("brnz");
+                    }
+                    else 
+                    {
+                        $("#st").removeClass( "supr gold slvr brnz" ).addClass("nocls");
+                    }
+                    document.getElementById("mic").innerHTML = response.mic;
+                    if(response.mic=='' || response.mic=='none' || response.mic=='nan') 
+                    {
+                        var micvalue = 0;
+                    }
+                    else
+                    {
+                        var micvalue = parseFloat(response.mic);
+                        console.log("micvalue",micvalue);
+                    }
+                    if(micvalue >= 3.7 && micvalue < 4.3)
+                    {
+                        
+                        $("#mic").removeClass( "nocls" ).addClass("gold");  
+                        
+                    }
+                    else 
+                    {
+                        $("#mic").removeClass( "gold" ).addClass("nocls");
+                    }
+                    document.getElementById("ex").innerHTML = response.ex;
+                    document.getElementById("rm").innerHTML = response.rm;
+                    document.getElementById("str_no").innerHTML = response.str_no;
+                    if(response.str_no=='' || response.str_no=='none' || response.str_no=='nan') 
+                    {
+                        var str_novalue = 0;
+                    }
+                    else
+                    {
+                        var str_novalue = parseFloat(response.str_no);
+                    }
+                   if(str_novalue >= 33 )
+                    {
+
+                        $("#str_no").removeClass( "slvr brnz nocls" ).addClass("gold");   
+                    }
+                    else if(str_novalue >= 31 && str_novalue < 33)
+                    {
+                        $("#str_no").removeClass( "gold brnz nocls" ).addClass("slvr");   
+                    }
+                    else if(str_novalue >= 29 && str_novalue < 31 )
+                    {
+                        $("#str_no").removeClass( "slvr gold nocls" ).addClass("brnz");   
+                    }
+                    else 
+                    {
+                        $("#str_no").removeClass( "slvr brnz gold" ).addClass("nocls");
+                    }
+                    document.getElementById("cgr").innerHTML = response.cgr;
+                    if(response.cgr=='' || response.cgr=='none' || response.cgr=='nan') 
+                    {
+                        var cgrvalue = 0;
+                    }
+                    else
+                    {
+                        var cgrvalue = response.cgr.split('-');
+                        var cgrvalue0 = parseInt(cgrvalue[0]);
+                    }
+                    if(cgrvalue0 == 11 || cgrvalue0 == 21 )
+                    {
+                        $("#cgr").removeClass( "slvr brnz nocls" ).addClass("gold");   
+                    }
+                    else if(cgrvalue0 == 31)
+                    {
+                        $("#cgr").removeClass( "gold brnz nocls" ).addClass("slvr");   
+                    }
+                    else if(cgrvalue0 == 41)
+                    {
+                        $("#cgr").removeClass( "gold slvr nocls" ).addClass("brnz");   
+                    }
+                    else 
+                    {
+                        $("#cgr").removeClass( "gold slvr brnz" ).addClass("nocls");
+                    }
+                    document.getElementById("rd").innerHTML = response.rd;
+                    document.getElementById("ob1").innerHTML = response.ob1;
+                    document.getElementById("tr").innerHTML = response.tr;
+                    document.getElementById("unif").innerHTML = response.unif;
+                    if(response.unif=='' || response.unif=='none' || response.unif=='nan') 
+                    {
+                        var unifvalue = 0;
+                    }
+                    else
+                    {
+                        var unifvalue = parseFloat(response.unif);
+                    }
+                    if(unifvalue >= 82 )
+                    {
+                        $("#unif").removeClass( "nocls slvr brnz" ).addClass("gold");   
+                    }
+                    else if(unifvalue >= 81 && unifvalue < 82 )
+                    {
+                        $("#unif").removeClass( "nocls gold brnz" ).addClass("slvr");   
+                    }
+                    else if(unifvalue >= 80 && unifvalue < 81 )
+                    {
+                        $("#unif").removeClass( "nocls gold slvr" ).addClass("brnz");   
+                    }
+                    else 
+                    {
+                        $("#unif").removeClass( "brnz gold slvr" ).addClass("nocls");
+                    }
+                    document.getElementById("len_num").innerHTML = response.len_num;
+                    document.getElementById("elong").innerHTML = response.elong;
+                    document.getElementById("value").innerHTML = response.value;
+                    document.getElementById("csv_type").innerHTML = response.csv_type;
+                    document.getElementById("csv_name").innerHTML = response.csv_name;
+                    var mark_id = response.mark_id;
+                    var gin_id = response.gin_id;                
+                    if (mark_id != "" ){
+                        document.getElementById("mark_id_show").style.display = "block";
+                        document.getElementById("mark_id_show").innerHTML = response.mark_id;
+                        document.getElementById("gin_id_show").style.display = "block";
+                        document.getElementById("gin_id_show").innerHTML = response.gin_id;
+                        document.getElementById("mark_id").style.display = "none"; 
+                        document.getElementById("gin_id").style.display = "none"; 
+                    }
+                    else{
+                        document.getElementById("mark_id_show").style.display = "none";
+                        document.getElementById("gin_id_show").style.display = "none";
+                        document.getElementById("mark_id").style.display = "block"; 
+                        document.getElementById("gin_id").style.display = "block";
+                        document.getElementById("mark_id").innerHTML = "";
+                        document.getElementById("gin_id").innerHTML = "";
+                    }
+                }
+            });
+            $('#addqueModal').modal('show');
+        }
+
+        function closeAddModal() {
+            $('#addqueModal').modal('hide');
+        }
+
+
+</script>
+<script>
+    $('#Processor-active').addClass('activeLink');
+  
+    $('#Processor-down').addClass('down');
+    $('#Processor-sub').show();
+  
+    $('#Classing-All-Reports').addClass('activeLink active-nav');
+  
+  </script>
+{% endblock scripts %}

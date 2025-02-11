@@ -1,0 +1,211 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %} Create Location {% endblock title %}
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+
+{% block content %}
+{% include 'navbar.html' %}
+
+<style>
+    .mystyle {
+        display: none;
+    }
+
+    .upload-file-main label {
+        font-size: 16px
+    }
+
+    .file-upload-wrapper {
+        border-radius: 0px;
+        border: 1px solid #ccc;
+    }
+
+    .file-upload-wrapper:before {
+        border-bottom-right-radius: 0px;
+        border-top-right-radius: 0px
+    }
+
+    .file-upload-wrapper:after {
+        background: none;
+    }
+
+    .gro_dd {
+        border-color: #ccc;
+        margin-top: 0px;
+        height: 50px;
+    }
+    .bootstrap-select .dropdown-menu li.disabled.selected{display: none;}
+    .dropdown.bootstrap-select.form-control .btn{border: 1px solid #B2BEB5; padding: 12px 8px;border-radius:0;}
+    .bootstrap-select .dropdown-menu{max-width: 280px;}
+    .bootstrap-select .dropdown-menu li.selected.active .dropdown-item.active.selected{margin-left: 0;padding: 0;}
+</style>
+
+<div class="main-content">
+    {% include 'header.html' %}
+    {% load crispy_forms_tags %}
+    {% include '_alerts.html' %}
+    <main>
+        <span class="farm headingtop">Create Location</span>
+        <div class="card farm-fields-container">
+            <div class="container-fluid">
+                {% if messages %}
+                {% for messages in messages %}
+                <div class="alert alert-danger" role="alert">
+                    {{messages}}
+                  </div>
+                {% endfor %}
+                {% endif %}
+                
+                <form action="" method="post" class="farm-fields-form"
+                    enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-4">
+                            {{form.name|as_crispy_field}}
+                            <p id="disp0" style="color: red;"></p>
+                        </div>
+                        {% if request.user.is_processor2 %}
+                        {% else %}
+                        <div class="col-md-4">
+                            <label>Select Processor <span class="asteriskField">*</span></label>
+                            <br>
+                            <select id="growerSelction" name="processor_id" class="gro_dd form-control selectpicker" data-live-search="true" style="width: 100%;padding-left:10px ;">
+                                <option value=''> Select All Processors </option>
+                                {% for processor in processor %}
+                                <option value="{{ processor.pk }}">{{processor.entity_name}} - {{ processor.pk }}</option>
+                                {% endfor %}
+                            </select>
+                            <p id="disp1" style="color: red;"></p>
+                        </div>
+                        {% endif %}
+                        <div class="col-md-4" onchange="myFunction()">
+                            {{form.upload_type|as_crispy_field}}
+                            <p id="disp2" style="color: red;"></p>
+                        </div>
+                        <div class="col-md-4" id="div1">
+                            <div class="upload-file-main">
+                                <label for="">Upload File</label>
+                                <div class="file-upload-wrapper" data-text="shapefilename.zip">
+                                    <input type="file" name="zip_file" accept=".zip"
+                                        class="clearablefileinput file-upload-field" id="id_csv_file">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4" id="div2">
+                            {{form.latitude|as_crispy_field}}
+                        </div>
+                        <div class="col-md-4" id="div3">
+                            {{form.longitude|as_crispy_field}}
+                        </div>
+                        <div class="row">
+                            <div class="form-btn-row">
+                                <a href="{% url 'location_list_processor2' %}" class="btn-close-cancel btn-space">Cancel</a>
+                                <input style="display: none;" id="submitBtn" type="submit" class="btn-save-submit" value="Save">
+                                <input type="button" class="btn-save-submit" value="Save" onclick="locationBtn()">
+                            </div>
+                        </div>
+                </form>
+            </div>
+        </div>
+</div>
+</main>
+{% include 'footer.html' %}
+</div>
+{% endblock content %}
+{% block scripts %}
+<script>
+    var upload_type = document.getElementById("id_upload_type").value
+    if (upload_type === "") {
+        document.getElementById("div1").classList.add("mystyle");
+        document.getElementById("div2").classList.add("mystyle");
+        document.getElementById("div3").classList.add("mystyle");
+    }
+    function myFunction() {
+
+        var upload_type = document.getElementById("id_upload_type").value
+        if (upload_type === "shapefile") {
+            document.getElementById("div1").classList.remove("mystyle");
+            document.getElementById("div2").classList.add("mystyle");
+            document.getElementById("div3").classList.add("mystyle");
+        }
+        else if (upload_type === "coordinates") {
+            document.getElementById("div1").classList.add("mystyle");
+            document.getElementById("div2").classList.remove("mystyle");
+            document.getElementById("div3").classList.remove("mystyle");
+        }
+        else if (upload_type === "") {
+            document.getElementById("div1").classList.add("mystyle");
+            document.getElementById("div2").classList.add("mystyle");
+            document.getElementById("div3").classList.add("mystyle");
+        }
+    }
+
+</script>
+{% endblock scripts %}
+{% block jquery %}
+<script>
+    function locationBtn(){
+        var location_name = $('#id_name').val();
+        var select_processor = $('#growerSelction').val();
+        var id_upload_type = $('#id_upload_type').val()
+        
+        console.log(location_name, select_processor, id_upload_type)
+
+        if(location_name != '' && select_processor != '' && id_upload_type != ''){
+            $('#submitBtn').click();
+        }else{
+            if(location_name == '')
+                  {
+                    $('#id_name').css('border-color', 'red');
+                    document.getElementById("disp0").innerHTML = "*Please select a location name";
+                  }
+                  else{
+                    $('#id_name').css('border-color', '#bdbdbd');
+                    document.getElementById("disp0").innerHTML = "";
+                  }
+
+                  if(select_processor == '')
+                  {
+                    $('#growerSelction').css('border-color', 'red');
+                    document.getElementById("disp1").innerHTML = "* It can't be empty";
+                  }
+                  else{
+                    $('#growerSelction').css('border-color', '#bdbdbd');
+                    document.getElementById("disp1").innerHTML = "";
+                  }
+
+                  if(id_upload_type == '')
+                  {
+                    $('#id_upload_type').css('border-color', 'red');
+                    document.getElementById("disp2").innerHTML = "* It can't be empty";
+                  }
+                  else{
+                    $('#id_upload_type').css('border-color', '#bdbdbd');
+                    document.getElementById("disp2").innerHTML = "";
+                  }
+        }
+
+    }
+</script>
+<script>
+    $('#Tier2-Processor-active').addClass('activeLink');
+    
+      $('#Tier2-Processor-down').addClass('down');
+      $('#Tier2-Processor-sub').show();
+    
+      $('#Location-Management-Processor2').addClass('activeLink active-nav');
+  
+  </script>
+{% endblock jquery %}

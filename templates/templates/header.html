@@ -1,0 +1,36 @@
+{% load static %}
+<header>
+    <h2>
+        <label for="nav-toggle">
+                    <span><img src="{% static 'img/icon.png' %}" class="for-head-img"></span>
+                    {% comment %} <span class="dboard">Dashboard</span> {% endcomment %}
+                </label>
+    </h2>
+    {% if user.is_authenticated %}
+    <li class="hovveer">{{user.first_name}} {{user.last_name}}<a href="#" class="activebtn"><span class="fas fa-chevron-down"></span>
+                    <ul class="dropdown--1">
+                        <li>
+                            <div class="bimg"><img src="{% static 'img/icons/img1.png' %}" height="40px" width="40px"
+                                    alt="customer"><span> {{user.first_name}} {{user.last_name}}</span>
+                            </div>
+                        </li>
+                        <li class="align-center"><a href="{% url 'logout' %}" class="logout">Logout</a><i class="fas fa-sign-out-alt"></i></li>
+    </ul>
+    </a>
+    </li>
+    {% else %}
+    <li class="hovveer">Hi, You are not logged in! <a href="#" class="activebtn"><span class="fas fa-chevron-down"></span>
+							<ul class="dropdown--1">
+									<li>
+											<div class="bimg"><img src="{% static 'img/icons/img1.png' %}" height="40px" width="40px"
+															alt="customer">
+											</div>
+									</li>
+									<li class="align-center"><a href="{% url 'login' %}" class="login">Login</a><i class="fas fa-sign-out-alt"></i></li>
+    <li class="align-center"><a href="{% url 'signup' %}" class="login">Register</a><i class="fas fa-sign-out-alt"></i></li>
+    {% endif %}
+    </ul>
+    </a>
+    </li>
+
+</header>

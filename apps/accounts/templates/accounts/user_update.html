@@ -1,0 +1,114 @@
+{% extends "base.html" %} {% load static %} {% block title %} User Update {% endblock title %} 
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+{% load crispy_forms_tags %} {% block content %} {% include 'navbar.html' %}
+<div class="main-content">
+    {% include 'header.html' %}
+
+    <main>
+        <span class="farm headingtop">User Update Form</span>
+
+        <div class="card farm-fields-container">
+            <div class="container-fluid">
+
+                <form method="post" class="farm-fields-form">
+
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-4" style="display: none;">
+                            {{ form.username|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.first_name|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.last_name|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.email|as_crispy_field }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        
+                        <div class="col-md-4">
+                            {{ form.role|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.grower|as_crispy_field }}
+                        </div>
+                        <!-- <div class="col-md-4">
+                            <div id="div_id_password" class="form-group">
+                                <label for="id_password" class=" requiredField">
+                                       Change Password<span class="asteriskField">*</span>
+                                    </label>
+                                        <div>
+                                             <input type="text" name="password_raw" class="textinput textInput form-control" required="" id="id_password">
+                                             <input type="hidden" name="password" class="textinput textInput form-control" required="" id="id_password_hash">
+                                        </div>
+                            </div>
+                        </div> -->
+
+                    </div>
+                    
+                    <div class="row">
+                        <div class="form-btn-row">
+                            <a href="{% url 'user-list' %}" class="btn-close-cancel btn-space">Cancel</a>
+                            <input type="submit" class="btn-save-submit" value="Save">
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+    </main>
+    {% include 'footer.html' %}
+    </div>
+    {% endblock %}
+    {% block jquery %}
+    <script>
+       $('#id_password').on('keyup, input', function(){
+           var id_password_val = $(this).val();
+          console.log(id_password_val);
+          $('#id_password_hash').val(id_password_val);
+       });
+
+       $('#id_email').on('keyup, input', function(){
+           var id_email_val = $(this).val();
+          console.log(id_email_val);
+          $('#id_username').val(id_email_val);
+       });
+
+       $("#id_role").css({"height":"83px"});
+        $(document).ready(function(){
+            var sel_id_role = $("#id_role").val();
+            if(sel_id_role == 4 || sel_id_role == 2)
+            {
+                $("#id_role").css({"pointer-events":"none"});
+            }
+            else
+            {
+                $("#id_role option[value='2']").remove();
+                $("#id_role option[value='4']").remove();
+            }
+        });
+    </script>
+    <script>
+        $('#User-Management-active').addClass('activeLink');
+
+        $('#User-Management-down').addClass('down');
+        $('#User-Management-sub').show();
+
+        $('#user-list').addClass('activeLink active-nav');
+
+      </script>
+    {% endblock jquery %}

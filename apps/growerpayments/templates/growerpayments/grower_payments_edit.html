@@ -1,0 +1,186 @@
+{% extends "base.html" %} {% load static %} {% block title %} Grower Payment Edit {% endblock title %} 
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+{% block content %} {% include 'navbar.html' %}
+<div class="main-content">
+    {% include 'header.html' %} {% load crispy_forms_tags %}
+  <main>
+    {% include '_alerts.html' %}
+    <span class="farm headingtop">Grower Payment Edit</span>
+    <div class="card farm-fields-container">
+        <div class="container-fluid">
+            <form method="post" class="farm-fields-form">
+                {% csrf_token %}
+                <div class="row">
+                
+                    <div class="col-md-3 mb-3">
+                        <div>
+                            <label for=""><strong>Delivery Date</strong></label>
+                            <div>{{lst|slice:":1"|join:" "}}</div>
+                            <!-- <input type="text" value="{{lst|slice:":1"|join:" "}}" id="" class="textinput textInput form-control" readonly> -->
+                        </div>
+                    </div>
+    
+                    <div class="col-md-3 mb-3">
+                        <div>
+                            <label for=""><strong>Delivery Id</strong></label>
+                            <div>{{lst|slice:"1:2"|join:" "}}</div>
+                            <!-- <input type="text" value="{{lst|slice:"1:2"|join:" "}}" id="" class="textinput textInput form-control" readonly> -->
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div>
+                            <label for=""><strong>Grower</strong></label>
+                            <div>{{lst|slice:"2:3"|join:" "}}</div>
+                            <!-- <input type="text" value="{{lst|slice:"2:3"|join:" "}}" id="" class="textinput textInput form-control" readonly> -->
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div>
+                            <label for=""><strong>Crop</strong></label>
+                            <div>{{lst|slice:"3:4"|join:" "}}</div>
+                            <!-- <input type="text" value="{{lst|slice:"2:3"|join:" "}}" id="" class="textinput textInput form-control" readonly> -->
+                        </div>
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <div>
+                            <label for=""><strong>Variety</strong></label>
+                            <div>{{lst|slice:"4:5"|join:" "}}</div>
+                            <!-- <input type="text" name="" id="" class="textinput textInput form-control" readonly> -->
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div>
+                            <label for=""><strong>Farm</strong></label>
+                            <div>{{lst|slice:"5:6"|join:" "}}</div>
+                            <!-- <input type="text" name="" id="" class="textinput textInput form-control" readonly> -->
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div>
+                            <label for=""><strong>Field</strong></label>
+                            <div>{{lst|slice:"6:7"|join:" "}}</div>
+                            <!-- <input type="text" name="" id="" class="textinput textInput form-control" readonly> -->
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-3 mb-3">
+                        <div>
+                            <label for=""><strong>Delivery LBS</strong></label>
+                            <div>{{lst|slice:"7:8"|join:" "}}</div>
+                            <!-- <input type="text" value="{{lst|slice:"3:4"|join:" "}}" name="" id="" class="textinput textInput form-control" readonly> -->
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div>
+                            <label for=""><strong>Total Price / LBS</strong></label>
+                            <div>$ {{lst|slice:"8:9"|join:" "}}</div>
+                            <!-- <input type="text" value="{{lst|slice:"4:5"|join:" "}}" name="" id="" class="textinput textInput form-control" readonly> -->
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div>
+                            <label for=""><strong>Delivered Value</strong></label>
+                            <div>$ {{lst|slice:"9:10"|join:" "}}</div>
+                            <!-- <input type="text"  value="{{lst|slice:"5:6"|join:" "}}" name="" id="" class="textinput textInput form-control" readonly> -->
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div>
+                            <label for=""><strong>Payment Due Date</strong></label>
+                            <div>{{lst|slice:"10:11"|join:" "}}</div>
+                            <!-- <input type="text" value="{{lst|slice:"6:7"|join:" "}}" name="" id="" class="textinput textInput form-control" readonly> -->
+                        </div>
+                    </div>
+                    
+                <hr>
+                <div class="col-md-3 mb-3">
+                    <div>
+                        <label for="">Payment Amount ($)<span class="asteriskField">*</span></label>
+                        <input type="text" value="{{gp.payment_amount}}" name="payment_amount" id="payment_amount" class="textinput textInput form-control" required> 
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div>
+                        <label for="">Payment Date<span class="asteriskField">*</span></label>
+                        <input type="date" value="{{gp_date}}" name="payment_date" id="payment_date" class="textinput textInput form-control" required> 
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div>
+                        <label for="">Payment Type<span class="asteriskField">*</span></label>
+                        <select name="payment_type" id="payment_type" class="textinput textInput form-control" required>
+                            <option value="" selected disabled>Select Payment Type</option>
+                            {% if gp.payment_type == "Check" %}
+                            <option value="Check" selected>Check</option>
+                            <option value="ACH">ACH</option>
+                            {% elif gp.payment_type == "ACH" %}
+                            <option value="ACH" selected>ACH</option>
+                            <option value="Check" >Check</option>
+                            {% endif %}
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div>
+                        <label for="">Payment Confirmation #<span class="asteriskField">*</span></label>
+                        <input value="{{gp.payment_confirmation}}" type="text" name="payment_confirmation" id="payment_confirmation" class="textinput textInput form-control" required> 
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-btn-row">
+                        <a href="{% url 'grower_payments_list' %}?get_page_no_temp=1" class="btn-close-cancel btn-space">Back</a>
+                        <input id="subbtn" type="submit" class="btn-save-submit" value="Save"> 
+                        <!-- <input onclick="validpass()" type="button" class="btn-save-submit" value="Save">  -->
+                    </div>
+                </div>
+        </div>
+        <input style="display: none;" type="text" id="product_counter" value="0" name="counter">
+        </form>
+  </main>
+  {% include 'footer.html' %}
+</div>
+{% endblock %}
+
+{% block jquery %}
+<script>
+
+// function validpass(){
+//     var password1 = document.getElementById("password1").value
+//     var password2 = document.getElementById("password2").value
+//     if (password1 != "" && password2 !="" && password1==password2 ){
+//         document.getElementById("subbtn").click() 
+//     }else{
+//         if (password1 != password2){
+//             document.getElementById("p3").innerHTML = "Password is Not Matching !!"
+//         }
+//         if (password1 == ""){
+//             document.getElementById("p1").innerHTML = "Enter New Password !!"
+//         }
+//         if (password2 == ""){
+//             document.getElementById("p2").innerHTML = "Enter Confirm Password !!"
+//         }
+//         if (password1 != ""){
+//             document.getElementById("p1").innerHTML = ""
+//         }
+//         if (password2 != ""){
+//             document.getElementById("p2").innerHTML = ""
+//         }
+//     }
+// }
+
+</script>
+
+{% endblock jquery %}

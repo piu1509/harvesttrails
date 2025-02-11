@@ -1,0 +1,110 @@
+<div class="chart-title-flex">
+    <div class="inner-chart-title-filter d-flex align-items-center">
+      <h6 class="chart-heading mb-0">SRP Scroling Dashboard</h6>
+      <h6 class="mb-0 ml-auto" style="color: #00b258;">Provisional Score : {% if Avg_Percentage_Score > 100 %} 100% {% else %} {{Avg_Percentage_Score}}% {% endif %}</h6>
+    </div>
+</div>
+<canvas id="survey_chart"></canvas>
+<script>
+$(function(){
+
+    var score_arr = [];
+    var label_arr = [];
+    {% for name_survey_score in sustain_data %}
+        label_arr.push('{{name_survey_score.namesurvey.typesurvey}}');
+        score_arr.push('{{name_survey_score.sustainabilityscore}}');
+    {% endfor %}
+
+//get the line chart canvas
+var ctx = $("#survey_chart");
+
+//line chart data
+var data = {
+  labels: label_arr,
+  datasets: [
+    {
+      label: "SRP SCORING",
+      data: score_arr,
+      backgroundColor: [
+            /*('#ef8c86'),
+            ('#fcb677'),
+            ('#685268'), */
+
+            ('#D3E3BB'),
+            ('#B0C69F'),
+            ('#81A179'),
+        ],
+      fill: false,
+      lineTension: 0,
+      radius: 5,
+    },
+  ]
+};
+
+
+var options = {
+  responsive: true,
+  scales: {
+        yAxes: [{
+            display: true,
+            stacked: true,
+            ticks: {
+                min: 0, // minimum value
+                max: 100 // maximum value
+            }
+        }]
+    },
+
+  animation: {
+      onComplete: function() {
+        //console.log(chart.toBase64Image());
+        //localStorage.setItem('chartdata',chart.toBase64Image());
+        //document.getElementById('chart-image-tag').src = chart.toBase64Image();
+
+        $.ajax({ // create an AJAX call...
+              data: {chart_data:chart.toBase64Image()}, // get the form data
+              type: 'POST', // GET or POST
+              url: "{% url 'set-chart-image' %}", // the file to call
+              beforeSend: function(xhr, settings){
+                    xhr.setRequestHeader("X-CSRFToken", '{{csrf_token}}');
+              },  
+              success: function(response) { // on success..
+                  
+                // console.log(response);
+                  
+              }
+        });
+
+
+      }
+    },
+  title: {
+    display: true,
+    position: "left",
+    text: "",
+    position: "top",
+    fontSize: 16,
+    fontColor: "#111",
+    colors: ['red','green', 'purple'],
+  },
+
+  legend: {
+    display: true,
+    position: "bottom",
+    labels: {
+      fontColor: "#333",
+      fontSize: 16
+    }
+  },
+ 
+};
+
+
+//create Chart class object
+var chart = new Chart(ctx, {
+  type: "bar",
+  data: data,
+  options: options
+});
+});
+</script>

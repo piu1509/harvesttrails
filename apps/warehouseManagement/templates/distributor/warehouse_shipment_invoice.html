@@ -1,0 +1,321 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %} Shipment Invoice View {% endblock title %}
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+{% block style %}
+<style>
+    @page {
+    size: A4;
+    margin: 0;
+    }
+    @media print {
+    html, body {
+        width: 210mm;
+        height: 297mm;
+    }
+    /* ... the rest of the rules ... */
+    }
+
+    body{
+    background:#EEE;
+    /* font-size:0.9em !important; */
+    }
+
+    .bigfont {
+    font-size: 3rem !important;
+    }
+    .invoice{
+    width:970px !important;
+    margin:50px auto;
+    }
+
+    .logo {
+    float:left;
+    padding-right: 10px;
+    margin:10px auto;
+    }
+
+    dt {
+    float:left;
+    }
+    dd {
+    float:left;
+    clear:right;
+    }
+
+    .customercard {
+    min-width:65%;
+    }
+
+    .itemscard {
+    min-width:98.5%;
+    margin-left:0.5%;
+    }
+
+    .logo {
+    max-width: 5rem;
+    margin-top: -0.25rem;
+    }
+
+    .invDetails {
+    margin-top: 0rem;
+    }
+
+    .pageTitle {
+    margin-bottom: -1rem;
+    }
+</style>
+    
+{% endblock style %}
+    
+{% load crispy_forms_tags %}
+{% block content %}
+{% include 'navbar.html' %}
+
+<div class="main-content">
+    {% include 'header.html' %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.0/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.bootstrap4.min.css">
+    
+    <main>
+        {% include '_alerts.html' %}
+
+        <div class="page-title-with-or-without-btn">
+            <span class="farm headingtop">Shipment Invoice</span>
+            <!-- Create button for add-processor-->
+            
+            <div class="flex-header-btn">
+                {% if request.user.is_customer %} 
+                {% if not shipment.is_paid %}
+                <form action="{% url 'create_payment_for_shipment' shipment.id type %}" method="POST">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-close-cancel me-3">Pay Now</button>
+                </form>
+                {% endif %}
+                {% endif %} 
+                <button id="download-pdf-new" class="btn-close-cancel">Download PDF</button>
+            </div>
+            
+        </div>
+
+        <body style="margin: 0; padding: 0; font-family: Arial, sans-serif;">
+            <div id="invoice" class="container-fluid bg-light p-4 border">
+                <!-- Invoice Header -->
+                <div class="text-center mb-4">
+                    <h2 class="font-weight-bold text-uppercase">Invoice For Shipment ID -{{shipment.shipment_id}}</h2>
+                </div>
+        
+                <!-- Company and Customer Details -->
+                <div class="row mb-4 mx-0">
+                    <div class="col-md-6 border p-3">
+                        <strong>AGREETA SOLUTIONS PVT. LTD</strong>
+                        <p class="mb-1">107 Atlanta Tech Park, Suite 674, Peachtree Corners, GA 30092<br>
+                            1-833-AGREETA (2478332)<br>
+                            infoUS@agreeta.com<br>
+                            www.agreeta.com</p>
+                    </div>
+                    <div class="col-md-6 border p-3">
+                        <strong>Customer Details:</strong>
+                        <p class="mb-1">{{customer.name}}</p>
+                        <p>{{customer.location}}<br>
+                        Ph. - {{customer_user.contact_phone}}</p>
+                    </div>
+                </div>
+        
+                <!-- Invoice Information -->
+                <div class="row mb-4 mx-0">
+                    <div class="col-md-6 border p-3">
+                        <strong>Shipping Address:</strong>
+                        <p>{{customer.location}}<br>
+                            Latitude - {{customer.latitude}},<br>
+                            Longitude - {{customer.longitude}}
+                        </p>
+                    </div>
+                    <div class="col-md-6 border p-3">
+                        <p><strong>Invoice Number: </strong>{{shipment.invoice_id}}</p>
+                        <p><strong>Invoice Date: </strong>{{shipment.date_pulled.date}}<br>
+                        <strong>Place of Service Supply:</strong> {{customer.location}}<br>
+                        <strong>Credit Limit:</strong> {{customer.credit_limit}} Days<br>
+                        <strong>Due Date:</strong> {{due_date.date}} </p>
+                        {% comment %} <strong>Reference P.O. Number:</strong> POSTD2400021</p> {% endcomment %}
+                    </div>
+                </div>
+                
+                <h5>Bill Details:- </h5>
+                <!-- Invoice Items Table -->
+                <table class="table table-bordered">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Date</th>
+                            <th>Product Or Service</th>
+                            <th>Description</th>
+                            <th>Quantity</th>
+                            <th>Per Unit Rate</th>
+                            <th>Amount</th>                            
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for crop in shipment_crops %}
+                        <tr>
+                            <td>{{shipment.date_pulled.date}}</td>
+                            <td>
+                                {{crop.crop_type}} {{crop.crop}}
+                            </td>
+                            <td></td>
+                            <td>{{crop.net_weight}} {{crop.weight_unit}}</td>
+                            <td>&#36; {{crop.per_unit_rate}}</td>
+                            <td>&#36; {{crop.payment_amount}}</td>
+                        </tr>
+                        {% endfor %}
+                        {% if customer.is_tax_payable %}
+                        <tr>
+                            <td>{{shipment.date_pulled.date}}</td>
+                            <td>Sales</td>
+                            <td>Freight</td>
+                            <td>1</td>
+                            <td>{{customer.tax_percentage}}</td>
+                            <td>&#36; {{shipment.tax_amount}}</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+        
+                <!-- Subtotal and Footer -->
+                <table class="table table-bordered">
+                    <tfoot>
+                        <tr>
+                            <td colspan="6" width="100%">
+                                <table width="100%">
+                                    <tr>
+                                        <td colspan="5" class="text-right"><strong>Subtotal:</strong></td>
+                                        <td class="text-right">&#36;{{shipment.total_payment}}</td>
+                                    </tr>
+                                    {% if customer.is_tax_payable %}
+                                    <tr>
+                                        <td colspan="5" class="text-right"><strong>Tax:</strong></td>
+                                        <td class="text-right">&#36;{{shipment.tax_amount}}</td>
+                                    </tr>
+                                    {% endif %}
+                                    <tr>
+                                        <td colspan="5" class="text-right"><strong>Total Amount:</strong></td>
+                                        <td class="text-right">&#36;{{total_amount}}</td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        
+                    </tfoot>
+                </table>
+                
+                <br>
+                {% if shipment.is_paid %}
+                <h5>Payment Details:- </h5>                
+        
+                <div class="row mb-4 mx-0">
+                   
+                    <div class="col-md-8  p-3">
+                        <p><strong>Total Amount: </strong>&#36; {{total_amount}}<br>
+                        <strong>Payment Date: </strong>{{payment.paid_at.date}}<br>
+                        <strong>Payment By: </strong> {{payment.payment_by}}<br>
+                        <strong>Payment Status: </strong> Success.<br>
+                        
+                    </div>
+                </div>
+                {% else %}
+                <div class="row mb-4 mx-0">
+                   <i style='color:red;'>Payment is yet to be done.</i>
+                   {% if request.user.is_customer %} 
+                   <i style='color:red;'>Please click on the above "Pay Now" Button To make payment.</i>
+                   {% endif %}
+                </div>
+                {% endif %}
+                <table width="100%">
+                    <div class="row">
+                        <div class="col-8">
+                            <td colspan="8" width="70%">
+                                <strong>Way to Pay</strong>
+                                <p>Stripe</p>
+                            </td>
+                        </div>
+                        <div class="col-4">
+                            <td colspan="2" width="30%">
+                                
+                                <img src="{% static 'img/logo.png' %}" height="100%", width="200" style="margin-left:70px;">
+                                <span style="display: block;text-align: center; color: blueviolet;">HARVESTTRAILS</span>
+                            </td>
+                        </div>
+                    </div>
+                </table>
+                                        
+    </main>
+{% endblock content %}
+
+{% block scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.2/jspdf.min.js"></script>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.getElementById('download-pdf-new').addEventListener('click', function () {
+            console.log('Download PDF button clicked');
+            
+            var invoiceElement = document.getElementById('invoice');
+            if (invoiceElement) {
+                console.log('Invoice element found');
+                
+                html2canvas(invoiceElement, {
+                    onrendered: function (canvas) {
+                        var imgData = canvas.toDataURL('image/png');
+                        var pdf = new jsPDF('p', 'mm', 'a4');
+                        var imgWidth = 210; // A4 width in mm
+                        var pageHeight = 295; // A4 height in mm
+                        var imgHeight = canvas.height * imgWidth / canvas.width;
+                        var heightLeft = imgHeight;
+                        var position = 0;
+
+                        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                        heightLeft -= pageHeight;
+
+                        while (heightLeft >= 0) {
+                            position = heightLeft - imgHeight;
+                            pdf.addPage();
+                            pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                            heightLeft -= pageHeight;
+                        }
+
+                        pdf.save('invoice.pdf');
+                    },
+                    logging: true, // Optional for debugging
+                    useCORS: true, // Ensure cross-origin resources are allowed
+                });
+            } else {
+                console.error('Invoice element not found');
+            }
+        });
+    });
+</script>
+<script>
+    $('#Warehouse-active').addClass('activeLink');
+  
+    $('#Warehouse-down').addClass('down');
+    $('#Warehouse-sub_unic').show();
+  
+    $('#Warehouse-Shipment').addClass('activeLink active-nav');
+  
+</script>
+
+{% endblock scripts %}

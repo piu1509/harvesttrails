@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %} Add Tier 2 Processor {% endblock title %}
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+{% block content %}
+{% include 'navbar.html' %}
+<div class="main-content">
+    {% include 'header.html' %}
+    {% load crispy_forms_tags %}
+    <main>
+        {% include '_alerts.html' %}
+        <span class="farm headingtop">Add Processor</span>
+        <div class="card farm-fields-container">
+            <div class="container-fluid">
+                <form method="post" class="farm-fields-form">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-4">
+                            {{ form.fein|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.entity_name|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.billing_address|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.shipping_address|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.main_email|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.main_number|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.main_fax|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.website|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.processor_type|as_crispy_field }}
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="form-btn-row" style="text-align:left">
+                            <input type="button" class="btn-close-cancel btn-space" value="+ Add Contact" onclick="createSelect()">
+                        </div>
+                        <div id="root"></div>
+                    </div>
+                    <div class="row">
+                        <input style="display: none;" type="text" id="product_counter" value="0" name="counter">
+                        <div class="form-btn-row">
+                            <a href="{% url 'list_processor4' %}" class="btn-close-cancel btn-space">Cancel</a>
+                            <input type="submit" class="btn-save-submit" value="Save">
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+    {% include 'footer.html' %}
+</div>
+{% endblock content %}
+
+{% block jquery %}
+<script>
+function createSelect(){
+    var counter = $('#product_counter').val();
+    var counter = eval(counter) + 1;
+    $('#product_counter').val(counter);
+
+    document.querySelector('#root').insertAdjacentHTML("afterend",
+        `<div class="row">
+        <div class="col-md-3">
+            <div>
+                <label for="contact_name${counter}">Contact Name<span class="asteriskField">*</span></label>
+                <input type="text" name="contact_name${counter}" id="contact_name${counter}" class="textinput textInput form-control" required>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div>
+                <label for="contact_email${counter}">Contact Email<span class="asteriskField">*</span></label>
+                <input type="email" name="contact_email${counter}" id="contact_email${counter}" class="textinput textInput form-control" required>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div>
+                <label for="contact_phone${counter}">Contact Phone</label>
+                <input type="number" name="contact_phone${counter}" id="contact_phone${counter}" class="textinput textInput form-control" required>
+            </div>
+        </div>
+        <div class="col-md-3" style="margin-bottom: 15px;">
+            <div>
+                <label for="contact_fax${counter}">Contact Fax</label>
+                <input type="number" name="contact_fax${counter}" id="contact_fax${counter}" class="textinput textInput form-control" required>
+            </div>
+        </div>
+    </div>`);
+}
+</script>
+<script>
+    $('#Tier4-Processor-active').addClass('activeLink');
+  
+  $('#Tier4-Processor-down').addClass('down');
+  $('#Tier4-Processor-sub').show();
+
+  $('#User-Management-Processor4').addClass('activeLink active-nav');
+</script>
+{% endblock jquery %}

@@ -1,0 +1,595 @@
+{% extends "base.html" %} {% load static %}
+{% block title %} Grower Delivery Details {% endblock title %}
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+{% load crispy_forms_tags %}
+{% block content %}
+{% include 'navbar.html' %}
+
+<div class="main-content">
+    {% include 'header.html' %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.0/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.bootstrap4.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/fixedcolumns/4.2.1/css/fixedColumns.dataTables.min.css">
+  <!-- <style>
+    .dataTables_scrollHead,
+        .dataTables_scrollBody,
+        .dataTables_scrollFoot {
+            width: 100% !important;
+        }
+    </style> -->
+    <style>
+        table.classing tbody tr td {
+            vertical-align: top;
+        }
+    
+        ul.pagination {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+        }
+    
+        ul.pagination li {
+            list-style: none;
+            line-height: 45px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 500;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.3s ease;
+        }
+    
+        ul.pagination li {
+            display: none;
+            position: relative;
+        }
+    
+    
+        ul.pagination li:first-of-type,
+        ul.pagination li:nth-of-type(2),
+        ul.pagination li:last-of-type,
+        ul.pagination li:has( + li:last-of-type),
+        ul.pagination li.active,
+        ul.pagination li.active + li,
+        ul.pagination li.active + li + li,
+        ul.pagination li:has(+ li.active),
+        ul.pagination li:has(+ li + li.active){
+            display: block;
+        }
+    
+        ul.pagination li:has(+ li + li.active){
+            padding-left: 35px;
+        }
+    
+        ul.pagination li.active + li + li {
+            padding-right: 35px;
+        }
+    
+        ul.pagination li:has( + li + li.active) a:before,
+        ul.pagination li.active + li + li a:after {
+            content: "...";
+            font-size: 16px;
+            display: inline-block;
+            width: 35px;
+            height: 40px;
+            position: absolute;
+            top: -1px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+        }
+    
+        ul.pagination li:has( + li + li.active) a:before {
+            left: -35px;
+        }
+    
+        ul.pagination li.active + li + li a:after {
+            right: -35px;
+        }
+    
+        ul.pagination li:nth-of-type(1) a:before,
+        ul.pagination li:nth-of-type(2) a:before,
+        ul.pagination li:nth-of-type(3) a:before {
+            display: none !important;
+        }
+    
+        ul.pagination li:nth-of-type(1),
+        ul.pagination li:nth-of-type(2),
+        ul.pagination li:nth-of-type(3) {
+            padding-left: 0 !important;
+        }
+    
+        ul.pagination li:nth-of-type(1) a:after,
+        ul.pagination li:nth-of-type(2) a:after,
+        ul.pagination li:nth-of-type(3) a:after {
+            display: none !important;
+        }
+    
+        ul.pagination li:nth-of-type(1),
+        ul.pagination li:nth-of-type(2),
+        ul.pagination li:nth-of-type(3) {
+            padding-left: 0 !important;
+        }
+    
+    
+    
+    </style>
+
+<style>
+    
+    .simple-responsive-table {
+        overflow-x: auto;
+    }
+
+    .selected {
+            margin-top: 0;
+            margin-left: 0;
+            padding-left: 12px;
+            padding-right: 10px;
+            font-size: 16px;
+        }
+    .dropdown.bootstrap-select.form-control .btn {
+    border-radius:8px ;
+    }
+    .bootstrap-select .dropdown-menu li.disabled.selected{display: none;}
+    .dropdown.bootstrap-select.form-control .btn{border: 1px solid; padding: 6px 8px;}
+    .bootstrap-select .dropdown-menu{max-width: 280px;}
+    .bootstrap-select .dropdown-menu li.selected.active .dropdown-item.active.selected{margin-left: 0;padding: 0;}
+</style>
+    <!-- <style>
+
+        .pagination {
+            text-align: center;
+        }
+        .pagination ul {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+        }
+    
+        .pagination ul li {
+    /*        color: #55c176;*/
+            list-style: none;
+            line-height: 45px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 500;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.3s ease;
+        }
+    
+        .pagination ul li.numb {
+            list-style: none;
+            height: 45px;
+            width: 45px;
+            margin: 0 1px;
+            line-height: 45px;
+            border-radius: 6px;
+        }
+    
+        .pagination ul li.numb.first {
+            margin: 0px 5px 0 0;
+        }
+    
+        .pagination ul li.numb.last {
+            margin: 0px 0 0 5px;
+        }
+    
+        .pagination ul li.dots {
+            font-size: 22px;
+            cursor: default;
+        }
+    
+        .pagination ul li.btn {
+            padding: 0 20px;
+            border-radius: 6px;
+        }
+    
+        .pagination li.active,
+        .pagination li.active.numb:hover {
+            color: #fff;
+            background: #55c176;
+        }
+    
+        .pagination ul li.numb:hover,
+        .pagination ul li:first-child:hover,
+        .pagination ul li:last-child:hover {
+    /*        color: #55c176;*/
+            background: #ddd;
+        }
+        </style> -->
+    <main>
+        {% include '_alerts.html' %}
+        <div class="page-title-with-or-without-btn">
+            <span class="farm headingtop">Grower Delivery Details </span>
+            <!-- Create button for Add-->
+            <div class="flex-header-btn">
+                <div id="Export_CSV" style="margin-right: 10px;"></div>
+                <div>
+                    <a href="{% url 'grower_payments_table_csv_download' %}" class="btn-close-cancel" target="_blank">Download All CSV</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="card card-padding">
+            <div class="main-simple-table-with-search col-12">
+                
+                <div class="row">
+                    
+                        
+                        <div class="col-md-4 mb-3">
+                            <form method="get" class="farm-fields-form">
+                                <div>
+                                    <label for="">Grower<span class="asteriskField">*</span></label>
+                                    <select id="growerSelction" name="grower_id" class="form-control selectpicker" data-live-search="true">
+                                        <option value="All" selected> Select All Growers </option>
+                                        {% for grower in growers %}
+                                        {% if grower == selectedGrower %}
+                                        <option selected value="{{ grower.id }}">{{grower.name}} - {{grower.id}}
+                                        </option>
+                                        {% else %}
+                                        <option value="{{ grower.id}}">{{grower.name}} - {{grower.id}}</option>
+                                        {% endif %}
+                                        {% endfor %}
+                                      </select>
+                                    <input type="text" style="display: none;" value="{{selectedGrower}}" id="getselectedGrower">                            
+                                </div>
+                                <input style="display: none;" id="submitBtn" type="submit" class="btn-save-submit" value="Save"> 
+                            </form>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <form method="get" class="farm-fields-form">
+                                <div>
+                                    <label for="">Crop<span class="asteriskField">*</span></label>
+                                    <select id="cropSelction" name="crop_id" class="form-control selectpicker " data-live-search="true">
+                                        <option value='all' selected> Select Crop </option>
+                                        {% for crop in crops %}
+                                        <option value='{{crop.code}}' {% if selectedCrop == crop.code %}selected {% endif %}>{{crop.code}}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <input style="display: none;" id="submitBtn2" type="submit" class="btn-save-submit" value="Save"> 
+                            </form>
+                        </div>
+                    </div>
+                        
+                </div>
+                
+                <div class="">
+                    <div class="simple-responsive-table">
+                        <table id="" class="table table-striped dt-responsive nowrap"
+                            style="width:100%">
+                            <thead>
+                                <tr style="border-bottom: 2px solid #e0e0e0;">
+                                    <th width="7%"><sup>Delivery</sup><br> Date</th>
+                                    <th width="7%"><sup>Delivery</sup><br> Id</th>
+                                    <th width="7%">Grower</th>
+                                    
+                                    <th width="7%">Crop</th>
+                                    <th width="7%">Variety</th>
+                                    <th width="7%">Farm</th>
+                                    
+                                    <th width="7%">Field</th>
+                                    <th width="7%"><sup>Delivery</sup><br> Lbs</th>
+                                    <th width="7%">Processor</th>
+                                    
+                                    <th width="7%">class</th>
+                                    <th width="7%" style="text-align:center">CBP / LBS</th>
+                                    <th width="7%" style="text-align:center">SP / LBS</th>
+                                    
+                                    <th width="7%" style="text-align:center">QP / LBS</th>
+                                    <th width="7%" style="text-align:center">Total price ($)</th>
+                                    <th width="7%"><sup>Delivered</sup><br> Value ($)</th>
+                                    
+                                    <th width="7%"><sup>Payment</sup><br> Due Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for grower_payment in grower_payment %}
+                                <tr>
+                                    <td>{{grower_payment.delivery_date}}</td>
+                                    <td>{{grower_payment.delivery_id}}</td>
+                                    <td>{{grower_payment.grower_name}}</td>
+                                    <td>{{grower_payment.crop}}</td>
+                                    <td>{{grower_payment.variety}}</td>
+                                    <td></td>
+                                    <td>{{grower_payment.field}}</td>
+                                    <td>{{grower_payment.delivery_lbs}}</td>
+                                    <td>{{grower_payment.processor}}</td>
+                                    <td style="background: {%if grower_payment.class  == 'Llano Super' %}#03f4fc {%elif grower_payment.class == 'Gold' %}#FFD700 {% elif grower_payment.class == 'Silver' %} #C0C0C0 {% elif grower_payment.class == 'Bronze' %} #CD7F32 {% else %} #ffffff {% endif %}">{{grower_payment.class}}</td>
+                                    <td align="center">{{grower_payment.cpb_lbs}}</td>
+                                    <td align="center">{{grower_payment.sp_lbs}}</td>
+                                    <td align="center">{{grower_payment.qp_lbs}}</td>
+                                    <td align="center">{{grower_payment.total_price}}</td>
+                                    <td style="background-color: {{grower_payment.colorcode}};">{{grower_payment.delivered_value}}</td>
+                                    <td>{{grower_payment.payment_due_date}}</td>
+                                </tr>
+                                {% endfor %}
+                                {% if data_text == 'No Record Found' %}
+                                <tr>
+                                    <td colspan="16" align="center">{{ data_text }}</td>
+                                </tr>
+                                {% endif %}
+                            </tbody>
+                           
+                        </table>
+                    </div>
+                    <div style="margin-top: 20px">
+                        <p>*CBP = Contract Base Price<br>*SP = Sustainability Premium<br>*QP = Quality Premium</p>
+                    </div>
+
+                    <div class="row align-items-center">
+                        {% if selectedGrower %}
+                            <div class="text-center mt-1">
+                                <span>Showing 1 - {{ temp_grower_payment_count }} of {{ temp_grower_payment_count }} entries</span>
+                            </div>
+                        {% elif selectedCrop %}
+                            <div class="text-center">
+                                <ul class="pagination">
+                                    <!-- Generate page numbers for crop-specific pagination -->
+                                    {% for i in range %}
+                                        {% if var_get_page_no_temp == forloop.counter %}
+                                            <li class="active">
+                                                <a href="?crop_id={{ selectedCrop }}&get_page_no_temp={{ forloop.counter }}">{{ forloop.counter }}</a>
+                                            </li>
+                                        {% else %}
+                                            <li>
+                                                <a href="?crop_id={{ selectedCrop }}&get_page_no_temp={{ forloop.counter }}">{{ forloop.counter }}</a>
+                                            </li>
+                                        {% endif %}
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            <div class="text-center mt-1">
+                                <span>Showing {{ temp_grower_payment_start_index }} - {{ temp_grower_payment_end_index }} of {{ temp_grower_payment_count }} entries</span>
+                            </div>
+                        {% else %}
+                            <div class="text-center">
+                                <ul class="pagination">
+                                    <!-- Generate page numbers for all growers -->
+                                    {% for i in range %}
+                                        {% if var_get_page_no_temp == forloop.counter %}
+                                            <li class="active">
+                                                <a href="?get_page_no_temp={{ forloop.counter }}">{{ forloop.counter }}</a>
+                                            </li>
+                                        {% else %}
+                                            <li>
+                                                <a href="?get_page_no_temp={{ forloop.counter }}">{{ forloop.counter }}</a>
+                                            </li>
+                                        {% endif %}
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            <div class="text-center mt-1">
+                                <span>Showing {{ temp_grower_payment_start_index }} - {{ temp_grower_payment_end_index }} of {{ temp_grower_payment_count }} entries</span>
+                            </div>
+                        {% endif %}
+                    </div>
+                                 
+
+
+                    <!-- <div class="row align-items-center">
+                        {% if selectedGrower %}
+                        <div class="col-md-12 col-sm-12 col-12 text-center">
+                            {% if grower_payment.has_other_pages %}
+                            <ul class="pagination" id="nav_1">
+                            {% if grower_payment.has_previous %}
+                                <li><a href="?grower_id={{ selectedGrower.id }}&page={{ grower_payment.previous_page_number }}">&laquo;</a></li>
+                                {% else %}
+                                <li class="disabled"><span>&laquo;</span></li>
+                                {% endif %}
+                                {% for i in grower_payment.paginator.page_range %}
+                                {% if grower_payment.number == i %}
+                                <li class="active pagi" id="getactive"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+                                {% else %}
+                                <li><a href="?grower_id={{ selectedGrower.id }}&page={{ i }}">{{ i }}</a></li>
+                                {% endif %}
+                                {% endfor %}
+                                {% if grower_payment.has_next %}
+                                <li><a href="?grower_id={{ selectedGrower.id }}&page={{ grower_payment.next_page_number }}">&raquo;</a></li>
+                                {% else %}
+                                <li class="disabled"><span>&raquo;</span></li>
+                            {% endif %}
+                            </ul>
+                        {% endif %}
+                        </div>
+                        <div class="col-md-12 col-sm-12 col-12 text-center mt-2" style="text-align:right">
+                            {% if user.is_superuser %}
+                            {% if report_grower_index %}
+                            <span>
+                                Showing {{ report_grower_index }} of {{ report_grower_index }} entries
+                            </span>
+                            {% else %}
+                            <span>Showing  {{ grower_payment.start_index }} - {{ grower_payment.end_index }} of {{ grower_payment.paginator.count }} entries
+                            </span>
+                            {% endif %}
+                            {% endif %}
+                            
+                        </div>
+                        {% elif selectedCrop %}
+                        <div class="col-md-12 col-sm-12 col-12 text-center">
+                            {% if grower_payment.has_other_pages %}
+                            <ul class="pagination" id="nav_1">
+                            {% if grower_payment.has_previous %}
+                                <li><a href="?crop_id={{ selectedCrop }}&page={{ grower_payment.previous_page_number }}">&laquo;</a></li>
+                                {% else %}
+                                <li class="disabled"><span>&laquo;</span></li>
+                                {% endif %}
+                                {% for i in grower_payment.paginator.page_range %}
+                                {% if grower_payment.number == i %}
+                                <li class="active pagi" id="getactive"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+                                {% else %}
+                                <li><a href="?crop_id={{ selectedCrop }}&page={{ i }}">{{ i }}</a></li>
+                                {% endif %}
+                                {% endfor %}
+                                {% if grower_payment.has_next %}
+                                <li><a href="?crop_id={{ selectedCrop }}&page={{ grower_payment.next_page_number }}">&raquo;</a></li>
+                                {% else %}
+                                <li class="disabled"><span>&raquo;</span></li>
+                            {% endif %}
+                            </ul>
+                        {% endif %}
+                        </div>
+                        <div class="col-md-12 col-sm-12 col-12 text-center mt-2" style="text-align:right">
+                            {% if user.is_superuser %}
+                            {% if report_grower_index %}
+                            <span>
+                                Showing {{ report_grower_index }} of {{ report_grower_index }} entries
+                            </span>
+                            {% else %}
+                            <span>Showing  {{ grower_payment.start_index }} - {{ grower_payment.end_index }} of {{ grower_payment.paginator.count }} entries
+                            </span>
+                            {% endif %}
+                            {% endif %}
+                        </div>
+                        {% else %}
+                        <div class="col-md-12 col-sm-12 col-12 text-center">
+                            {% if grower_payment.has_other_pages %}
+                            <ul class="pagination" id="nav_1">
+                            {% if grower_payment.has_previous %}
+                                <li><a href="?page={{ grower_payment.previous_page_number }}">&laquo;</a></li>
+                                {% else %}
+                                <li class="disabled"><span>&laquo;</span></li>
+                                {% endif %}
+                                {% for i in grower_payment.paginator.page_range %}
+                                {% if grower_payment.number == i %}
+                                <li class="active pagi" id="getactive"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+                                {% else %}
+                                <li><a href="?page={{ i }}">{{ i }}</a></li>
+                                {% endif %}
+                                {% endfor %}
+                                {% if grower_payment.has_next %}
+                                <li><a href="?page={{ grower_payment.next_page_number }}">&raquo;</a></li>
+                                {% else %}
+                                <li class="disabled"><span>&raquo;</span></li>
+                            {% endif %}
+                            </ul>
+                        {% endif %}
+                        </div>
+                        <div class="col-md-12 col-sm-12 col-12 text-center mt-2" style="text-align:right">
+                            {% if user.is_superuser %}
+                            {% if report_grower_index %}
+                            <span>
+                                Showing {{ report_grower_index }} of {{ report_grower_index }} entries
+                            </span>
+                            {% else %}
+                            <span>Showing  {{ grower_payment.start_index }} - {{ grower_payment.end_index }} of {{ grower_payment.paginator.count }} entries
+                            </span>
+                            {% endif %}
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                    </div> -->
+                </div>
+
+            </div>
+        </div>
+</div>
+</main>
+{% include 'footer.html' %}
+</div>
+
+
+{% endblock content %}
+
+{% block scripts %}
+<script src="https://cdn.datatables.net/1.11.0/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.0/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/responsive.bootstrap4.min.js"></script>
+<script src="{% static 'js/dataTables.buttons.min.js' %}"></script>
+<script src="{% static 'js/buttons.html5.min.js' %}"></script>
+<script src="https://cdn.datatables.net/fixedcolumns/4.2.1/js/dataTables.fixedColumns.min.js"></script>
+
+<script>
+     $(document).ready(function() {
+    $('#growerSelction').change( function () {
+    $('#submitBtn').click();
+    });
+    });
+
+    $(document).ready(function() {
+    $('#cropSelction').change( function () {
+    $('#submitBtn2').click();
+    });
+    });
+
+
+
+//     let getselectedGrower = "All GROWER"
+//     $(document).ready(function () {
+//     let data_table_odj = $('#processorList_tbl').DataTable({
+//             responsive: false,
+//             "paging": true,
+//             "pageLength": 100,
+// 			"autoWidth": true,
+//             scrollY: "600px",
+//             scrollX: true,
+//             scrollCollapse: true,
+//             fixedColumns: {
+//                 left: 2,
+//                 right: 0
+//             },
+//         buttons: [ 
+//             { 
+//                 extend: 'csv', 
+//                 text: 'CSV EXPORT',
+//                 title: `${getselectedGrower ? `${getselectedGrower} DELIVERY DETAILS`: `All GROWER DELIVERY DETAILS` } - {% now "jS F Y" %}`, 
+//                 className: "btn-export", 
+//                 exportOptions: { 
+//                     columns: 'th:not(:last-child)' 
+//                 },
+//                 customize: function (csv) {
+//                 var csvRows = csv.split('\n');
+//                 csvRows[0] = csvRows[0].replace('"CBP / LBS"', '"Contract Base Price / LBS"')
+//                 csvRows[0] = csvRows[0].replace('"SP / LBS"', '"Sustainability Premium / LBS"')
+//                 csvRows[0] = csvRows[0].replace('"QP / LBS"', '"Quality Premium / LBS"')
+//                 return csvRows.join('\n');
+//                 } 
+//             }
+//         ],
+
+//     });
+//     $('#growerSelction').on('change',function()
+//             { 
+//                 var selectedGrower = $(this).val();
+//                 data_table_odj.columns(2).search( selectedGrower ).draw();
+//             });
+
+//     $('#cropSelction').on('change',function()
+//             { 
+//                 var selectedValue = $(this).val();
+//                 data_table_odj.columns(3).search( selectedValue ).draw();
+//             });
+//     data_table_odj.buttons().container().appendTo('#Export_CSV');
+    
+
+// });
+
+
+    
+</script>
+<script>
+    $('#Growers-Payments-active').addClass('activeLink');
+                  
+    $('#Growers-Payments-down').addClass('down');
+    $('#Growers-Payments-sub').show();
+    
+    $('#Grower-Delivery-Details').addClass('activeLink active-nav');
+</script>
+{% endblock scripts %}

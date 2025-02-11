@@ -1,0 +1,220 @@
+{% extends "base.html" %} {% load static %} {% block title %} Grower Dashboard {% endblock title %} {% block content %} {% include "navbar.html" %}
+	<div class="main-content">
+    {% include 'header.html' %}
+
+	<input hidden id="default_grower" type="text" value={{default_grower}}>
+
+		<main>
+			<div class="container-fluid">
+			<div class="row">
+				<div class="col-lg-12">
+					<div class="top-content-row">
+						<div class="farm1 headingtop">Most Savings Variety</div>
+						<div class="btn-row-btn">
+							<a href="{% url 'grower_dashboard' %}" class="btn-inffo backbtn"><i class="fa fa-chevron-left"></i> Back</a>
+							<a href="{{excel_file_path}}" class="btn-inffo ml-2 exportbtn" id="btnexport"><i class="fas fa-file-export"></i>
+								Export</a>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="card card-padding">
+				<div class="row mb-2">
+					{% if user.is_superuser %}
+					<div class="col-lg-3" id="superUserSelect">
+						<div class="three-fields-with-label">
+		   					<label for="grower">Grower</label>
+							<select name="grower" id="grower-selection" style="border-radius:5px;">
+							{% for grower_nm in grower_names %}
+								<option value="{{grower_nm}}">{{grower_nm}}</option>
+							{% endfor %}
+							</select>
+							</div>
+					</div>
+						{% else %}
+						<div class="col-lg-3" id='nonSuperUser' style="display: none;">
+						<div hidden class="three-fields-with-label">
+		   					<label for="grower">Grower</label>
+							<select name="grower" id="grower-selection" style="border-radius:5px;">
+							{% for grower_nm in grower_names %}
+							<option value="{{grower_nm}}">{{grower_nm}}</option>
+							{% endfor %}
+							</select>
+							</div>
+						</div>
+						{% endif %}
+					<div class="col-lg-3 col-12">
+						<div class="three-fields-with-label">
+							<label for="grower">Savings type</label>
+							<select name="savings" id="savings" style="border-radius:5px;">
+								{% for savings_type in savings_types %}
+								<option value={{savings_type}} >{{savings_type}}</option>
+								{% endfor %}
+
+							</select>
+						</div>
+					</div>
+				</div>
+
+											<!-- <span class="">Savings type</span>
+							<select name="savings" id="savings" style="border-radius:5px;">
+
+
+								{% for savings_type in savings_types %}
+								<option value={{savings_type}} >{{savings_type}}</option>
+								{% endfor %}
+								</select> -->
+
+					<div class="row">
+
+						<div class="col-lg-3">
+							<select id='farmsFields' multiple>
+								<option value="0" selected>Choose Farm</option>
+								{% for farm_name in farm_names  %}
+								<option class="farm_nm" value={{farm_name}}>{{farm_name}}</option>
+								{% endfor %}
+
+							</select>
+						</div>
+						<div class="col-lg-3">
+							<select id='fields_Fields' multiple>
+								<option value="0" selected>Choose Field</option>
+								{% for field_name in field_names  %}
+								<option class="field_nm" value={{field_name}}>{{field_name}}</option>
+								{% endfor %}
+
+							</select>
+						</div>
+						<div class="col-lg-3">
+							<select id='varietyFilter' multiple>
+								<option value='0' selected>Choose state</option>
+								{% for state_name in state_names %}
+								<option class="state_nm" value={{state_name}}>{{state_name}}</option>
+								{% endfor %}
+							</select>
+						</div>
+						<div class="col-lg-3">
+							<select id='yearFilter' multiple aria-placeholder="Choose Year">
+								<option value='0' selected>Choose Year</option>
+								{% for year in cultivation_year %}
+								<option class="year" name="year" value={{year}}>{{year}}</option>
+								{% endfor %}
+
+							</select>
+						</div>
+
+					</div>
+				</div>
+			</div>
+
+			<div class="card card-padding">
+				<div class="row">
+					<div class="col-lg-12">
+						<div class="main-tab">
+							<div class="tab-chart-data">
+							   <button type="submit" id="chartbtn" class="tablinkschartdata active" onclick="switchtab(event, 'chartab')">Chart</button>
+							   <button class="tablinkschartdata" onclick="switchtab(event, 'datatabletab')">Datatable</button>
+							</div>
+						 </div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-lg-12">
+						<div class="tabcontainer">
+							<div id="chartab" class="tabcontentcontainer" style="display: block;">
+								<div class="container-fluid">
+									<div class="row">
+										<div class="col-lg-12">
+											<div class="datashow-datatable">
+											<canvas id="mostsavingsvar2021"></canvas>
+											</div>
+										</div>
+										<!-- <div class="col-lg-4">
+
+										</div> -->
+									</div>
+								</div>
+							</div>
+							<div id="datatabletab" class="tabcontentcontainer">
+								<div class="datashow-datatable">
+									<table id="mostsavingsvar_table" class="table table-striped nowrap table-bordered table-hover footable grower-dashborad1-details-table" style="width:100%">
+										<thead>
+											<tr>
+												<th>Variety</th>
+												<th>Water Use Sav.</th>
+												<th>State Avg Water Use</th>
+												<th>Current Sav. VS State AVG</th>
+												<th data-breakpoints="xs sm md lg">National Avg Water</th>
+												<th data-breakpoints="xs sm md lg">Current Sav. VS National Avg</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr>
+												<td>Pvl 10</td>
+												<td>652.32</td>
+												<td>2515,235</td>
+												<td>5365,235</td>
+												<td>6355,235</td>
+												<td>20315,235</td>
+											</tr>
+											<tr>
+												<td>Pvl 10</td>
+												<td>652.32</td>
+												<td>2515,235</td>
+												<td>5365,235</td>
+												<td>6355,235</td>
+												<td>20315,235</td>
+											</tr>
+											<tr>
+												<td>Pvl 10</td>
+												<td>652.32</td>
+												<td>2515,235</td>
+												<td>5365,235</td>
+												<td>6355,235</td>
+												<td>20315,235</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+
+						 </div>
+					</div>
+				</div>
+			</div>
+			</div>
+			 <!-- <div class="container-fluid">
+				 <div class="row">
+					 <div class="col-lg-12">
+						<div class="remark-point">
+							<div class="alert alert-warning" role="alert">
+								<p class="note-point">
+									<span class="fw-600">Note*: </span>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.
+								</p>
+							  </div>
+						</div>
+					 </div>
+				 </div>
+			 </div> -->
+		</main>
+	</div>
+	<footer>
+		<div class="last-section">
+			<spna>Copyright @ 2021-2022 Agreeta reserved</spna>
+		</div>
+	</footer>
+	</div>
+
+	   <!-- Add Data Tables -->
+
+	<script type="text/javascript" src="{% static 'js/chart.js' %}"></script>
+	<script type="text/javascript" src="{% static 'js/multiselect.min.js' %}"></script>
+	<script type="text/javascript" src="{% static 'js/grower/grower_dashboard1.js' %}"></script>
+
+
+{% endblock content %}
+
+
+{% block scripts %}
+<script type="text/javascript" src="{% static 'js/grower/grower_chart1.js' %}"></script>
+{% endblock scripts %}

@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %} View Crop {% endblock title %}
+{% block extrahead %} 
+<style>
+    .list_card_unic ul li:nth-child(even){
+        background-color: #e4e4e4;
+        padding: 8px 15px;
+        margin-top: 15px;
+    }
+</style>
+{% endblock extrahead %}
+
+
+{% block content %}
+{% include 'navbar.html' %}
+<div class="main-content">
+    {% include 'header.html' %}
+    <main>
+        <div class="container-fluid">
+
+            <div class="card list_card_unic">
+                <div class="card-body">
+                    <ul>
+                        <li>
+                            <h5 class="card-title">Crop Name:- {{ crop.name }}</h5>
+                        </li>
+                        <li>
+                            <h3 style="text-transform: capitalize;font-weight: 700;font-size: 24px;">varieties</h3>
+                            <div class="varieties">
+                                {% if varieties %}
+                                    <p>
+                                        {% for variety in varieties %}
+                                            <b>{{ variety.variety_name }}</b>{% if not forloop.last %}, {% endif %}
+                                        {% endfor %}
+                                    </p>
+                                {% else %}
+                                    <p>No varieties available for this crop.</p>
+                                {% endif %}
+                            </div>
+                        </li>
+                    </ul>
+                    <div class="button-group mt-4" style="display: flex; justify-content: end; gap: 15px;">
+                        <a href="{% url 'crop_management_list' %}" class="btn-close-cancel">Back</a>
+                        <a href="{% url 'edit_crop' crop.id %}" class="btn-save-submit">Edit Crop</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    {% include 'footer.html' %}
+</div>
+{% endblock %}
+{% block jquery %}
+    <script>
+        $('#crop_management').addClass('activeLink');
+    </script>
+{% endblock jquery %}
+

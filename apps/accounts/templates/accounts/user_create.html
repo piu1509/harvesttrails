@@ -1,0 +1,85 @@
+ {% extends "base.html" %} 
+ {% load static %} 
+ {% block title %} Add New User {% endblock title %} 
+ {% load crispy_forms_tags %} 
+ {% block content %} 
+ {% include 'navbar.html' %}
+<div class="main-content">
+    {% include 'header.html' %}
+    <main>
+        <span class="farm headingtop">User Registration Form</span>
+        <div class="card farm-fields-container">
+            <div class="container-fluid">
+                <form method="post" class="farm-fields-form">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-4">
+                            {{ form.username|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.first_name|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.last_name|as_crispy_field }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            {{ form.email|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.role|as_crispy_field }}
+                            {{ form.is_consultant.as_hidden }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.grower|as_crispy_field }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            {{ form.password1|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.password2|as_crispy_field }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-btn-row">
+                            <a href="{% url 'user-list' %}" class="btn-close-cancel btn-space">Cancel</a>
+                            <input type="submit" class="btn-save-submit" value="Save">
+                        </div>
+                    </div>
+                </form>
+            </div>
+    </main>
+    {% include 'footer.html' %}
+    </div>
+    
+    {% endblock %}
+
+    {% block jquery %}
+    <script>
+        $(function(){
+           //alert('hello');
+           $("#id_is_consultant").val('False');
+            $("body").on('change', '#id_role', function(e){
+                $("#id_is_consultant").val('False');
+                //console.log($(this).val());
+                var selected_role_ids = $(this).val();
+                console.log(selected_role_ids);
+
+                if(selected_role_ids.includes('2'))
+                {
+                    $("#id_is_consultant").val('True');
+                }
+                else
+                {
+                    $("#id_is_consultant").val('False');
+                }
+            });
+        });
+    
+            
+        </script>
+
+    {% endblock jquery %}

@@ -1,0 +1,717 @@
+{% extends "base.html" %}
+{% load static %}
+{% load custom_tags %}
+{% block title %} 
+    Trace Module 
+{% endblock title %} 
+
+{% block extrahead %}
+<style>
+    .map-container {
+        height: 300px;
+        width: 100%;
+        margin-bottom: 20px;
+    }
+</style>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAQ_OGAb4yuL8g55IMufP3Dwd4yjrWxrdI&libraries=places"></script>
+
+{% endblock extrahead %}
+
+{% block content %}
+{% include 'navbar.html' %}
+<div class="main-content">
+    {% include 'header.html' %}
+
+    <main>
+        <form method="post" class="farm-fields-form">
+            <div class="page-title-with-or-without-btn">
+                <span class="farm headingtop">Trace Module</span>
+                {% if origin_context %}
+                <div class="inline-apply-filter justify-content-center justify-content-md-end ewr-report">
+                    <div>
+                        <input type="button" onclick="printDiv()" value="PDF Export" class="btn-close-cancel" />
+                    </div>
+                    &nbsp;
+                    &nbsp;
+                    <div>
+                        <a href="{% url 'traceability_report_all_csv_download' select_crop get_search_by search_text from_date to_date %}" class="btn-close-cancel me-3">DOWNLOAD ALL CSV</a>
+                    </div>
+                    <div>
+                        <input type="submit" class="btn-close-cancel" name="map_view" value="MAP VIEW">
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        
+            <div class="card farm-fields-container">
+                <div class="container-fluid">
+                    {% csrf_token %}
+                    <div class="row">
+                        <!-- First Row -->
+                        <div class="col-md-4">
+                            <label><strong>Select Crop</strong><span class="asteriskField">*</span></label>
+                            <select name="select_crop" id="select_crop_id" class="form-control" required>
+                                <option value="">Select Crop</option>
+                                {% for crop in crops %}
+                                <option value="{{ crop.code }}" {% if select_crop == crop.code %}selected{% endif %}>{{ crop.code }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label><strong>Select Search By</strong><span class="asteriskField">*</span></label>
+                            <select name="get_search_by" onchange="removeSelectedOption()" id="getTextid" class="form-control" required>
+                                <option value="">Select Search By</option>
+                                <option value="grower" {% if get_search_by == 'grower' %}selected{% endif %}>Grower</option>
+                                <option value="field" {% if get_search_by == 'field' %}selected{% endif %}>Field</option>
+                                <option value="processor" {% if get_search_by == 'processor' %}selected{% endif %}>Processor</option>
+                                <option value="sku_id" {% if get_search_by == 'sku_id' %}selected{% endif %}>SKU ID</option>
+                                <option value="deliveryid" {% if get_search_by == 'deliveryid' %}selected{% endif %}>Delivery ID</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label><strong>Search Text</strong><span class="asteriskField">*</span></label>
+                            <input name="search_text" onkeyup="getText()" id="tags" value="{{ search_text }}" type="text" class="form-control" placeholder="Search Delivery ID, Field, Grower, Processor, etc." required>
+                        </div>
+                    </div>
+        
+                    <!-- Second Row -->
+                    <div class="row mt-3">
+                        <div class="col-md-4">
+                            <label><strong>Select Filter Type</strong><span class="asteriskField">*</span></label>
+                            <select name="filter_type" id="filter_type" class="form-control" onchange="toggleFilterFields()">
+                                <option value="all" {% if filter_type == "all" %} selected {% endif %}>All</option>
+                                <option value="date_range" {% if filter_type == "date_range" %} selected {% endif %}>Date Range</option>
+                                <option value="year" {% if filter_type == "year" %} selected {% endif %}>Year</option>
+                                
+                            </select>
+                        </div>
+                        <div class="col-md-4" id="year_field" style="display: none;">
+                            <label><strong>Select Crop Year</strong></label>
+                            <select name="crop_year" class="form-control">
+                                <option value="">Select Crop Year</option>
+                                <option value="2022" {% if crop_year == '2022' %}selected{% endif %}>2022</option>
+                                <option value="2023" {% if crop_year == '2023' %}selected{% endif %}>2023</option>
+                                <option value="2024" {% if crop_year == '2024' %}selected{% endif %}>2024</option>
+                                
+                            </select>
+                        </div>
+                        <div class="col-md-4" id="date_range_fields" style="display: none;">
+                            <div class="row">
+                                <div class="col-6">
+                                    <label><strong>From Date</strong></label>
+                                    <input name="from_date" value="{{ from_date }}" type="date" class="form-control">
+                                </div>
+                                <div class="col-6">
+                                    <label><strong>To Date</strong></label>
+                                    <input name="to_date" value="{{ to_date }}" type="date" class="form-control">
+                                </div>                        
+                            </div>
+                        </div>
+                        <div class="col-md-3 text-left" style="margin-top:35px;">
+                            <input type="submit" id="searchBtn" class="btn-save-submit" value="TABLE SHOW" name="table_view">
+                        </div>
+                    </div>
+        
+                </div>
+            </div>
+        </form>
+        <script>
+            function toggleFilterFields() {
+                const filterType = document.getElementById('filter_type').value;
+                const yearField = document.getElementById('year_field');
+                const dateRangeFields = document.getElementById('date_range_fields');
+            
+                yearField.style.display = 'none';
+                dateRangeFields.style.display = 'none';
+            
+                if (filterType === 'year') {
+                    yearField.style.display = 'block';
+                } else if (filterType === 'date_range') {
+                    dateRangeFields.style.display = 'block';
+                }
+            }
+        
+            // Ensure correct fields are displayed on page load
+            document.addEventListener('DOMContentLoaded', function() {
+                toggleFilterFields();
+            });
+        </script>
+
+        <section id="map_show" class="map_show main_section hidden" style="background-color: #fff; max-width: 100%; width: 100%; margin: auto; padding: 20px 0;">
+            <div class="container-fluid">
+                <div class="heading"  style="">
+                    <h1 style="font-size: 35px;"><b>Traceability Report for Map</b></h1>
+                </div>
+                
+                {% if origin_context %}
+                <div class="row" style="padding-top: 15px; margin-top: 30px; border-top: 1px solid #dadada; display: flex;">
+                    <div class="col-6 mb-3">
+                        <div class="text_wapper">
+                            <h3 style="font-size: 30px; margin-bottom: 20px;">Origin</h3>
+                            
+                            {% for gr in origin_context|unique_growers %}
+                            <ul style="list-style: none; padding: 0; margin: 0;">
+                                <li>
+                                    <span style="display: block; font-size: 18px; font-weight: bold; margin-bottom: 10px;">{{gr.grower_name}}</span>
+                                    <span>Farm:{{gr.farm_name}}, Field: {{gr.field_name}}, Variety: {{gr.variety}}</span>
+                                </li>
+                            </ul>
+                            {% endfor %}
+                            
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="img_wapper" id="grower_location" style="width: 100%; height: 250px;" >
+                            {% comment %} <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d14736.291556014114!2d88.42368324144367!3d22.576377035307207!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a0275b020703c0d%3A0xece6f8e0fc2e1613!2sSector%20V%2C%20Bidhannagar%2C%20Kolkata%2C%20West%20Bengal!5e0!3m2!1sen!2sin!4v1713427063064!5m2!1sen!2sin"  style="border:0; width: 100%; height: 100%; max-height: 100% !important;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe> {% endcomment %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+        
+                {% if t1_processor %}
+                <div class="row" style="padding-top: 15px; margin-top: 30px; border-top: 1px solid #dadada; display: flex;">
+                    <div class="col-6 mb-3">
+                        <div class="text_wapper">
+                            <h3 style="font-size: 30px; margin-bottom: 20px;">Processor 1</h3>
+                            {% if t1_processor %}
+                            {% for pro in t1_processor|unique_processor %}                   
+                                  
+                            <ul style="list-style: none; padding: 0; margin: 0;">
+                                <li style="font-weight: 500;">Entity Name: <em style="font-weight: 400; font-style: normal;">{{pro.processor_name}}</em></li>
+                                <li style="font-weight: 500;">SKU Id: <em style="font-weight: 400; font-style: normal;">{% if pro.skuid %}{{pro.skuid}}{% else %} Not defined {% endif %}</em></li>
+                            </ul>
+                            <ul style="list-style: none; padding: 0; margin: 0; margin-top: 30px;">
+                                <li style="font-weight: 500; margin-bottom: 5px;">Processing Date: <em style="font-weight: 400; font-style: normal;">{{pro.date}}</em></li>
+                                <li style="font-weight: 500;">Resulting Lot Number: <em style="font-weight: 400; font-style: normal;"> {% if pro.lot_number %} {{pro.lot_number}} {% else %} Not defined {% endif %}</em></li>
+                                
+                            </ul>
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="img_wapper" id="t1_processor_location" style="width: 100%; height: 250px;" >
+                            
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if outbound2_wip %}
+                <!-- new implement-->
+                <div class="row" style="padding-top: 15px; margin-top: 30px; border-top: 1px solid #dadada; flex-direction: row-reverse; display: flex;">
+                    <div class="col-12">
+                        <div class="text_wapper">
+                            <h3 style="font-size: 30px; margin-bottom: 40px;">Transport to Processor 2</h3>
+                            <ul style="list-style: none; padding: 0; margin: 0;">
+                                <li style="margin-bottom: 30px;">
+        
+                                    {% for out2 in outbound2_wip %}
+                                    <div class="container-fluid">
+                                        <div class="main_map_container">
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <div class="map_holder">
+                                                        <div id="map-{{ forloop.counter }}" class="map-container"></div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-6">
+                                                   <span style="display: block; font-size: 18px; font-weight: bold; margin-bottom: 10px;">{{ out2.equipment_type }}</span>
+                                                    <ul style="list-style: none; padding: 0; margin: 0; margin-top: 30px;">
+                                                        <li style="font-weight: 500; margin-bottom: 5px;">Transport ID: <em style="font-weight: 400; font-style: normal;">{{ out2.shipment_id }}</em></li>
+                                                        <li style="font-weight: 500;">Transport Date: <em style="font-weight: 400; font-style: normal;">{{ out2.date_pulled }}</em></li>                                                        
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}        
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+        
+                {% if inbound2_wip %}
+                <div class="row" style="padding-top: 15px; margin-top: 30px; border-top: 1px solid #dadada; display: flex;">
+                    <div class="col-6 mb-3">
+                        <div class="text_wapper">
+                            <h3 style="font-size: 30px; margin-bottom: 20px;">Processor 2</h3>
+                            
+                            {% if inbound2_wip %}
+                            {% for pro in inbound2_wip|unique1_processor %}                   
+                                  
+                            <ul style="list-style: none; padding: 0; margin: 0;">
+                                <li style="font-weight: 500;">Entity Name: <em style="font-weight: 400; font-style: normal;">{{pro.processor2_name}}</em></li>
+                                <li style="font-weight: 500;">SKU Id: <em style="font-weight: 400; font-style: normal;">{{pro.storage_bin_recive}}</em></li>
+                            </ul>
+                            <ul style="list-style: none; padding: 0; margin: 0; margin-top: 30px;">
+                                <li style="font-weight: 500; margin-bottom: 5px;">Processing Date: <em style="font-weight: 400; font-style: normal;">{{pro.recive_delivery_date}}</em></li>
+                                <li style="font-weight: 500;">Resulting Lot Number: <em style="font-weight: 400; font-style: normal;">{{pro.lot_number}}</em></li>
+                            </ul>
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="img_wapper" id="t2_processor_location" style="width: 100%; height: 250px;" >
+                            
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                {% if outbound3_wip %}
+                <!-- new implement-->
+                <div class="row" style="padding-top: 15px; margin-top: 30px; border-top: 1px solid #dadada; flex-direction: row-reverse; display: flex;">
+                    <div class="col-12">
+                        <div class="text_wapper">
+                            <h3 style="font-size: 30px; margin-bottom: 40px;">Transport to Processor 3</h3>
+                            <ul style="list-style: none; padding: 0; margin: 0;">
+                                <li style="margin-bottom: 30px;">
+        
+                                    {% for out3 in outbound3_wip %}
+                                    <div class="container-fluid">
+                                        <div class="main_map_container">
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <div class="map_holder">
+                                                        <div id="map3-{{ forloop.counter }}" class="map-container"></div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-6">
+                                                    <span style="display: block; font-size: 18px; font-weight: bold; margin-bottom: 10px;">{{ out3.equipment_type }}</span>
+                                                    <ul style="list-style: none; padding: 0; margin: 0; margin-top: 30px;">
+                                                        <li style="font-weight: 500; margin-bottom: 5px;">Transport ID: <em style="font-weight: 400; font-style: normal;">{{ out3.shipment_id }}</em></li>
+                                                        <li style="font-weight: 500;">Transport Date: <em style="font-weight: 400; font-style: normal;">{{ out3.date_pulled }}</em></li>
+                                                       
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}        
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                {% if inbound3_wip %}
+                <div class="row" style="padding-top: 15px; margin-top: 30px; border-top: 1px solid #dadada; display: flex;">
+                    <div class="col-6 mb-3">
+                        <div class="text_wapper">
+                            <h3 style="font-size: 30px; margin-bottom: 20px;">Processor 3</h3>
+                            {% if inbound3_wip %}
+                            {% for pro in inbound3_wip|unique1_processor %}                   
+                                  
+                            <ul style="list-style: none; padding: 0; margin: 0;">
+                                <li style="font-weight: 500;">Entity Name: <em style="font-weight: 400; font-style: normal;">{{pro.processor2_name}}</em></li>
+                                <li style="font-weight: 500;">SKU Id: <em style="font-weight: 400; font-style: normal;">{{pro.storage_bin_recive}}</em></li>
+                            </ul>
+                            <ul style="list-style: none; padding: 0; margin: 0; margin-top: 30px;">
+                                <li style="font-weight: 500; margin-bottom: 5px;">Processing Date: <em style="font-weight: 400; font-style: normal;">{{pro.recive_delivery_date}}</em></li>
+                                <li style="font-weight: 500;">Resulting Lot Number: <em style="font-weight: 400; font-style: normal;">{{pro.lot_number}}</em></li>
+                            </ul>
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="img_wapper" id="t3_processor_location" style="width: 100%; height: 250px;" >
+                            
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if outbound4_wip %}
+                <!-- new implement-->
+                <div class="row" style="padding-top: 15px; margin-top: 30px; border-top: 1px solid #dadada; flex-direction: row-reverse; display: flex;">
+                    <div class="col-12">
+                        <div class="text_wapper">
+                            <h3 style="font-size: 30px; margin-bottom: 40px;">Transport to Processor 4</h3>
+                            <ul style="list-style: none; padding: 0; margin: 0;">
+                                <li style="margin-bottom: 30px;">        
+                                    {% for out4 in outbound4_wip %}
+                                    <div class="container-fluid">
+                                        <div class="main_map_container">
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <div class="map_holder">
+                                                        <div id="map4-{{ forloop.counter }}" class="map-container"></div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-6">
+                                                    <span style="display: block; font-size: 18px; font-weight: bold; margin-bottom: 10px;">{{ out4.equipment_type }}</span>
+                                                    <ul style="list-style: none; padding: 0; margin: 0; margin-top: 30px;">
+                                                        <li style="font-weight: 500; margin-bottom: 5px;">Transport ID: <em style="font-weight: 400; font-style: normal;">{{ out4.shipment_id }}</em></li>
+                                                        <li style="font-weight: 500;">Transport Date: <em style="font-weight: 400; font-style: normal;">{{ out4.date_pulled }}</em></li>
+                                                        
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}        
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                {% if inbound4_wip %}
+                <div class="row" style="padding-top: 15px; margin-top: 30px; border-top: 1px solid #dadada; display: flex;">
+                    <div class="col-6 mb-3">
+                        <div class="text_wapper">
+                            <h3 style="font-size: 30px; margin-bottom: 20px;">Processor 4</h3>
+                            {% if inbound4_wip %}
+                            {% for pro in inbound4_wip|unique1_processor %}                   
+                                  
+                            <ul style="list-style: none; padding: 0; margin: 0;">
+                                <li style="font-weight: 500;">Enity Name: <em style="font-weight: 400; font-style: normal;">{{pro.processor2_name}}</em></li>
+                                <li style="font-weight: 500;">SKU Id: <em style="font-weight: 400; font-style: normal;">{{pro.storage_bin_recive}}</em></li>
+                            </ul>
+                            <ul style="list-style: none; padding: 0; margin: 0; margin-top: 30px;">
+                                <li style="font-weight: 500; margin-bottom: 5px;">Processing Date: <em style="font-weight: 400; font-style: normal;">{{pro.recive_delivery_date}}</em></li>
+                                <li style="font-weight: 500;">Resulting Lot Number: <em style="font-weight: 400; font-style: normal;">{{pro.lot_number}}</em></li>
+                            </ul>
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="img_wapper" id="t4_processor_location" style="width: 100%; height: 250px;" >
+                            
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </section>
+
+    </main>
+    {% include 'footer.html' %}
+</div>
+{% endblock %}
+
+{% block jquery %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.js">
+</script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.js">
+</script>
+
+<link href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/ui-lightness/jquery-ui.css" rel="stylesheet"
+    type="text/css" />
+<script>
+    $('#Traceability-Report').addClass('activeLink');
+</script>
+
+
+<script>
+    function initMap2() {
+        var defaultCenter = { lat: 0, lng: 0 };
+        var locations = {{ field_location_list|safe }};
+        var center;
+        if (locations && locations.length > 0) {
+            center = { lat: locations[0].lat, lng: locations[0].lng };
+        } else {
+            center = defaultCenter; 
+        }
+        var map = new google.maps.Map(document.getElementById('grower_location'), {
+            center: center,
+            zoom: 5 // Set the initial zoom level
+        });
+
+        // If locations are available, add markers to the map
+        if (locations) {
+            locations.forEach(function(location) {
+                var marker = new google.maps.Marker({
+                    position: { lat: location.lat, lng: location.lng },
+                    map: map,
+                    title: `${location.field} ${location.grower}`
+                });
+
+                // Create an info window for each marker
+                var infowindow = new google.maps.InfoWindow({
+                    content: `${location.field} -- ${location.grower}`
+                });
+
+                // Add click event listener to each marker to open the info window
+                marker.addListener('click', function() {
+                    infowindow.open(map, marker);
+                });
+            });
+        }
+    }
+
+    window.onload = initMap2();
+</script>
+
+<script>
+    // Initialize and display the map
+    function initMap3() {
+        // Define a default center
+        //alert("hello riju233")
+
+        var defaultCenter = { lat: 0, lng: 0 };
+
+        // Check if locations are available
+        var locations = {{ t1_location_list|safe }};
+        var center;
+
+        // If locations are available and there is at least one location, set the center to the first location
+        if (locations && locations.length > 0) {
+            center = { lat: locations[0].lat, lng: locations[0].lng };
+        } else {
+            center = defaultCenter; // Set default center if no locations are available
+        }
+
+        // Create a new map object
+        var map = new google.maps.Map(document.getElementById('t1_processor_location'), {
+            center: center,
+            zoom: 5 // Set the initial zoom level
+        });
+
+        // If locations are available, add markers to the map
+        if (locations) {
+            locations.forEach(function(location) {
+                var marker = new google.maps.Marker({
+                    position: { lat: location.lat, lng: location.lng },
+                    map: map,
+                    title: `${location.processor}`
+                });
+
+                // Create an info window for each marker
+                var infowindow = new google.maps.InfoWindow({
+                    content: `${location.processor}`
+                });
+
+                // Add click event listener to each marker to open the info window
+                marker.addListener('click', function() {
+                    infowindow.open(map, marker);
+                });
+            });
+        }
+    }
+
+    window.onload = initMap3();
+</script>
+
+<script>
+    
+    function initMap4() {
+        // Define a default center
+        
+        var defaultCenter = { lat: 0, lng: 0 };
+
+        // Check if locations are available
+        var locations = {{ t2_location_list|safe }};
+        var center;
+
+        // If locations are available and there is at least one location, set the center to the first location
+        if (locations && locations.length > 0) {
+            center = { lat: locations[0].lat, lng: locations[0].lng };
+        } else {
+            center = defaultCenter; // Set default center if no locations are available
+        }
+
+        // Create a new map object
+        var map = new google.maps.Map(document.getElementById('t2_processor_location'), {
+            center: center,
+            zoom: 5 // Set the initial zoom level
+        });
+
+        // If locations are available, add markers to the map
+        if (locations) {
+            locations.forEach(function(location) {
+                var marker = new google.maps.Marker({
+                    position: { lat: location.lat, lng: location.lng },
+                    map: map,
+                    title: `${location.processor}`
+                });
+
+                // Create an info window for each marker
+                var infowindow = new google.maps.InfoWindow({
+                    content: `${location.processor}`
+                });
+
+                // Add click event listener to each marker to open the info window
+                marker.addListener('click', function() {
+                    infowindow.open(map, marker);
+                });
+            });
+        }
+    }
+
+    window.onload = initMap4();
+</script>
+
+<script>
+    
+    function initMap5() {
+        // Define a default center
+        
+        var defaultCenter = { lat: 0, lng: 0 };
+
+        // Check if locations are available
+        var locations = {{ t3_location_list|safe }};
+        var center;
+
+        // If locations are available and there is at least one location, set the center to the first location
+        if (locations && locations.length > 0) {
+            center = { lat: locations[0].lat, lng: locations[0].lng };
+        } else {
+            center = defaultCenter; // Set default center if no locations are available
+        }
+
+        // Create a new map object
+        var map = new google.maps.Map(document.getElementById('t3_processor_location'), {
+            center: center,
+            zoom: 5 // Set the initial zoom level
+        });
+
+        // If locations are available, add markers to the map
+        if (locations) {
+            locations.forEach(function(location) {
+                var marker = new google.maps.Marker({
+                    position: { lat: location.lat, lng: location.lng },
+                    map: map,
+                    title: `${location.processor}`
+                });
+
+                // Create an info window for each marker
+                var infowindow = new google.maps.InfoWindow({
+                    content: `${location.processor}`
+                });
+
+                // Add click event listener to each marker to open the info window
+                marker.addListener('click', function() {
+                    infowindow.open(map, marker);
+                });
+            });
+        }
+    }
+
+    window.onload = initMap5();
+</script>
+
+<script>
+    
+    function initMap6() {
+        // Define a default center
+        
+        var defaultCenter = { lat: 0, lng: 0 };
+
+        // Check if locations are available
+        var locations = {{ t4_location_list|safe }};
+        var center;
+
+        // If locations are available and there is at least one location, set the center to the first location
+        if (locations && locations.length > 0) {
+            center = { lat: locations[0].lat, lng: locations[0].lng };
+        } else {
+            center = defaultCenter; // Set default center if no locations are available
+        }
+
+        // Create a new map object
+        var map = new google.maps.Map(document.getElementById('t4_processor_location'), {
+            center: center,
+            zoom: 5 // Set the initial zoom level
+        });
+
+        // If locations are available, add markers to the map
+        if (locations) {
+            locations.forEach(function(location) {
+                var marker = new google.maps.Marker({
+                    position: { lat: location.lat, lng: location.lng },
+                    map: map,
+                    title: `${location.processor}`
+                });
+
+                // Create an info window for each marker
+                var infowindow = new google.maps.InfoWindow({
+                    content: `${location.processor}`
+                });
+
+                // Add click event listener to each marker to open the info window
+                marker.addListener('click', function() {
+                    infowindow.open(map, marker);
+                });
+            });
+        }
+    }
+
+    window.onload = initMap6();
+</script>
+
+<script>
+    function initMap() {
+        {% for out2 in outbound2_wip %}
+        generateMapAndDirections({{ out2.origin_lat }}, {{ out2.origin_lng }}, {{ out2.destination_lat }}, {{ out2.destination_lng }}, 'map-{{ forloop.counter }}');
+        {% endfor %}
+
+        {% for out3 in outbound3_wip %}
+        generateMapAndDirections({{ out3.origin_lat }}, {{ out3.origin_lng }}, {{ out3.destination_lat }}, {{ out3.destination_lng }}, 'map3-{{ forloop.counter }}');
+        {% endfor %}
+
+        {% for out4 in outbound4_wip %}
+        generateMapAndDirections({{ out4.origin_lat }}, {{ out4.origin_lng }}, {{ out4.destination_lat }}, {{ out4.destination_lng }}, 'map4-{{ forloop.counter }}');
+        {% endfor %}
+    }
+
+    function generateMapAndDirections(originLat, originLng, destLat, destLng, mapId) {
+        var map = new google.maps.Map(document.getElementById(mapId), {
+            zoom: 6,
+            center: { lat: originLat, lng: originLng }
+        });
+
+        var directionsService = new google.maps.DirectionsService();
+        var directionsRenderer = new google.maps.DirectionsRenderer({ map: map });
+
+        var request = {
+            origin: { lat: originLat, lng: originLng },
+            destination: { lat: destLat, lng: destLng },
+            travelMode: 'DRIVING'
+        };
+
+        directionsService.route(request, function (result, status) {
+            if (status == 'OK') {
+                directionsRenderer.setDirections(result);
+            }
+        });
+    }
+
+    window.onload = initMap;
+
+
+    
+</script>
+
+<script>
+    function getText(){
+        // alert("okay")
+        getTextid = $("#getTextid").val();
+        select_crop_id = $("#select_crop_id").val();
+        // console.log("svdhsg", getTextid, select_crop_id)
+        if (getTextid != '' && select_crop_id != ''){
+            $.ajax({
+                type: "GET",
+                    url: `/tracemodule/autocomplete_suggestions/${getTextid}/${select_crop_id}/`,
+                    data: {},
+                    contentType: false,
+                    cache: false,
+                    processData: false,
+                    success: function (response){
+                        var availableTags  = response.select_search;
+                        $("#tags").autocomplete({
+                            source: availableTags
+                        });
+                    }
+            })
+        }
+    }
+</script>
+{% endblock jquery %}

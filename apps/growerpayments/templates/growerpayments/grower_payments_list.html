@@ -1,0 +1,730 @@
+{% extends "base.html" %} {% load static %}
+{% block title %} Grower Payment Details {% endblock title %}
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+{% load crispy_forms_tags %}
+{% block content %}
+{% include 'navbar.html' %}
+
+<div class="main-content">
+    {% include 'header.html' %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.0/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.bootstrap4.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/fixedcolumns/4.2.1/css/fixedColumns.dataTables.min.css">
+    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.0/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.bootstrap4.min.css">
+
+    <link rel="stylesheet"  href="vendor/DataTables/datatables.min.css">	
+	<link rel="stylesheet"  href="style.css">	
+	<script src="vendor/jquery/jquery-1.11.2.min.js" type="text/javascript"></script>
+    <script src="vendor/DataTables/datatables.min.js" type="text/javascript"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/fixedcolumns/4.2.1/css/fixedColumns.dataTables.min.css"> -->
+  <!-- <style>
+    .dataTables_scrollHead,
+        .dataTables_scrollBody,
+        .dataTables_scrollFoot {
+            width: 100% !important;
+        }
+    .dataTables_scrollBody table td:nth-of-type(9)::before,
+    .dataTables_scrollBody table td:nth-of-type(10)::before,
+    .dataTables_scrollFoot table tfoot td:nth-of-type(12)::before
+    {
+        content:"$ ";
+    }
+    .dataTables_scrollBody table td:nth-of-type(9)::after,
+    .dataTables_scrollBody table td:nth-of-type(10)::after,
+    .dataTables_scrollFoot table tfoot td:nth-of-type(12)::after
+    {
+        content:" USD";
+    }
+    </style> -->
+    <style>
+        table.classing tbody tr td {
+            vertical-align: top;
+        }
+    
+        ul.pagination {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+        }
+    
+        ul.pagination li {
+            list-style: none;
+            line-height: 45px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 500;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.3s ease;
+        }
+    
+        ul.pagination li {
+            display: none;
+            position: relative;
+        }
+    
+    
+        ul.pagination li:first-of-type,
+        ul.pagination li:nth-of-type(2),
+        ul.pagination li:last-of-type,
+        ul.pagination li:has( + li:last-of-type),
+        ul.pagination li.active,
+        ul.pagination li.active + li,
+        ul.pagination li.active + li + li,
+        ul.pagination li:has(+ li.active),
+        ul.pagination li:has(+ li + li.active){
+            display: block;
+        }
+    
+        ul.pagination li:has(+ li + li.active){
+            padding-left: 35px;
+        }
+    
+        ul.pagination li.active + li + li {
+            padding-right: 35px;
+        }
+    
+        ul.pagination li:has( + li + li.active) a:before,
+        ul.pagination li.active + li + li a:after {
+            content: "...";
+            font-size: 16px;
+            display: inline-block;
+            width: 35px;
+            height: 40px;
+            position: absolute;
+            top: -1px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+        }
+    
+        ul.pagination li:has( + li + li.active) a:before {
+            left: -35px;
+        }
+    
+        ul.pagination li.active + li + li a:after {
+            right: -35px;
+        }
+    
+        ul.pagination li:nth-of-type(1) a:before,
+        ul.pagination li:nth-of-type(2) a:before,
+        ul.pagination li:nth-of-type(3) a:before {
+            display: none !important;
+        }
+    
+        ul.pagination li:nth-of-type(1),
+        ul.pagination li:nth-of-type(2),
+        ul.pagination li:nth-of-type(3) {
+            padding-left: 0 !important;
+        }
+    
+        ul.pagination li:nth-of-type(1) a:after,
+        ul.pagination li:nth-of-type(2) a:after,
+        ul.pagination li:nth-of-type(3) a:after {
+            display: none !important;
+        }
+    
+        ul.pagination li:nth-of-type(1),
+        ul.pagination li:nth-of-type(2),
+        ul.pagination li:nth-of-type(3) {
+            padding-left: 0 !important;
+        }
+        .bootstrap-select .dropdown-menu li.disabled.selected{display: none;}
+        .dropdown.bootstrap-select.form-control .btn{border: 1px solid; padding: 6px 8px; border-radius: 0;}
+        .bootstrap-select .dropdown-menu{max-width: 280px;}
+        .bootstrap-select .dropdown-menu li.selected.active .dropdown-item.active.selected{margin-left: 0;padding: 0;}
+    
+    
+    </style>
+    
+    <style>
+        .main-header-login a{
+            cursor: pointer;
+        }
+        .main-header-login .dropdown-menu{min-width: 16rem;}
+        .main-simple-table-with-search .simple-responsive-table {
+            overflow-x: auto;
+        }
+        
+        .dropdown.bootstrap-select.form-control .btn {
+            border-radius: 8px !important;
+            /* outline: 1px solid #ddd; */
+            outline: 0 !important;
+        }
+         
+        .selected {
+            margin-top: 0;
+            margin-left: 0;
+            padding-left: 12px;
+            padding-right: 10px;
+            /* padding: 5px 10px 5px 5px; */
+            font-size: 16px;
+        }
+        
+    </style>
+    <main>
+        {% include '_alerts.html' %}
+        <div class="page-title-with-or-without-btn">
+            <span class="farm headingtop">Grower Payment Details </span>
+            <!-- Create button for Add-->
+            <div class="flex-header-btn">
+                <div id="Export_CSV" style="margin-right: 10px;"></div>
+                {% if 'Grower' in request.user.get_role and not request.user.is_superuser %}
+                {% else %}
+                <div class="d-flex">
+                    <a href="{% url 'grower_payments_bulk_add' %}" class="btn-close-cancel">Upload Bulk Csv</a>
+                    &nbsp;
+                    <!-- <a href="{% url 'grower_payments_list_csv_download' %}" class="btn-close-cancel" target="_blank">Download All CSV</a> -->
+                    <div class="dropdown main-header-login">
+                        <a
+                            class="dropdown-toggle activebtn btn-close-cancel"
+                            href="javascript:void(0)"
+                            role="button"
+                            id="csv"
+                            data-mdb-toggle="dropdown"
+                            aria-expanded="false"
+                            >Download All CSV
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="csv">
+                            <li><a class="dropdown-item" href="{% url 'grower_payments_list_paid_csv_download' %}" target="_blank">Download Paid CSV</a></li>
+                            <li><a class="dropdown-item" href="{% url 'grower_payments_list_not_paid_csv_download' %}" target="_blank">Download Not Paid CSV</a></li>
+                        </ul>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card card-padding">
+            <div class="main-simple-table-with-search">
+                
+                <div class="row">
+                    <div id="loading-image" style="display: none;">
+                        <img src="/static/img/Hourglass.gif " alt="logo" class="logoimmg">
+                        <div style="margin-bottom: 15px;">
+                            Loading Calculation
+                        </div>
+                    </div>
+                    
+                    {% if 'Grower' in request.user.get_role and not request.user.is_superuser %}
+                    <div class="row" id="">
+                    <div class="col-md-6 mb-6">
+                        <p><strong>Crop year : </strong>2022 -2023</p>
+                        <p><strong>Total Delivered LBS : </strong>{{total_deliverd_lbs}} LBS</p>
+                        <p><strong>Total Number of Deliveries : </strong>{{count}}</p>
+                    </div>
+                    <div class="col-md-6 mb-6">
+                        <p><strong>Total Delivered Value : </strong>{{total_deliverd_values}}</p>
+                        <p><strong>Amount Paid : </strong>{{paid_amount}}</p>
+                        <p><strong>Amount open for payments : </strong><span {% if netamount_open_for_payments < 0 %}  style="color:red"{% endif %}>{{amount_open_for_payments}}</span></p>
+                    </div>
+                    </div>
+                    {% else %}
+                    <div class="row" id="result-id" style="display: none;">
+                    <div class="col-md-6 mb-6">
+                        <p><strong>Crop year : </strong>2022 -2023</p>
+                        <p id="p-total_deliverd_lbs"><strong>Total Delivered LBS : </strong>{{total_deliverd_lbs}} LBS</p>
+                        <p id="p-total_cal_count"><strong>Total Number of Deliveries : </strong>{{count}}</p>
+                    </div>
+                    <div class="col-md-6 mb-6">
+                        <p id="p-total_deliverd_values"><strong>Total Delivered Value : </strong>{{total_deliverd_values}}</p>
+                        <p id="p-paid_amount"><strong>Amount Paid : </strong>{{paid_amount}}</p>
+                        <p id="p-open_for_payments"><strong>Amount open for payments : </strong><span {% if netamount_open_for_payments < 0 %}  style="color:red"{% endif %}>{{amount_open_for_payments}}</span></p>
+                    </div>
+
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <form method="get" class="farm-fields-form row">
+                            <div>
+                                <label for="">Grower<span class="asteriskField">*</span></label>
+                                <!-- <input type="text" name="" id="" class="textinput textInput form-control">style="border-radius:0px !important" -->
+                                <!-- <select id="growerSelction" name="grower_id" class="textinput textInput form-control">-->
+                                    <select id="growerSelction" name="grower_id" class="form-control selectpicker" data-live-search="true">
+                                    <option value='All'> Select All Growers </option>
+                                    {% for grower in growers %}
+                                    {% if grower == selectedGrower  %}
+                                    <option  value="{{ grower.id }}" selected>{{grower.name}} - {{grower.id}}</option>
+                                    {% else %}
+                                    <option  value="{{ grower.id }}">{{grower.name}} - {{grower.id}}</option>
+                                    {% endif %}
+                                    {% endfor %}
+                                </select>
+                               
+                                <input type="text" style="display: none;" value="{{selectedGrower}}" id="getselectedGrower">                            
+                            </div>
+                            <input style="display: none;" id="submitBtn" type="submit" class="btn-save-submit" value="Save"> 
+                        </form>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <form method="get" class="farm-fields-form row">
+                        <div>
+                            <label for="">Crop<span class="asteriskField">*</span></label>
+                            <select id="cropSelction" name="crop_id"  class="form-control selectpicker" data-live-search="true">
+                                <option value='All' > Select Crop </option>
+                                {% for crop in crops %}
+                                <option value='{{crop.code}}' {% if selectedCrop == crop.code %}selected {% endif %}> {{crop.code}} </option>
+                                {% endfor %}
+                                
+                            </select>
+                        </div>
+                        <input style="display: none;" id="submitBtn2" type="submit" class="btn-save-submit" value="Save"> 
+                    </form>
+                    </div>
+                    {% if selectedGrower and crop_check == 'COTTON' %}
+                    <div class="col-md-4 mt-4">
+                        <div class="row">
+                            <a href="{% url 'classing_invoice_bundle_zip' selectedGrower.pk %}" class="btn-close-cancel" style="border-radius: 0px; padding: 13px; width: 75%;" target="_blank">Classing Invoice Bundle Zip</a>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% endif %}
+                </div>
+                
+                <div class="both-data-in" style="display: inherit;">
+                    <div class="simple-responsive-table">
+                        <table id="processorList_tbl" class="table table-striped dt-responsive nowrap" style="width:100%">
+                            <thead>
+                                <tr style="border-bottom: 2px solid #e0e0e0;">
+                                        <th width="5%"><sup>Delivery</sup><br>Date</th>
+                                        <th width="5%"><sup>Delivery</sup><br>Id</th>
+                                        <th width="5%">Grower</th>
+
+                                        <th width="5%">Crop</th>
+                                        <th width="5%">Variety</th> 
+                                        <th width="5%">Farm</th>
+
+                                        <th width="5%">Field</th>
+                                        <th width="5%">Level</th>
+                                        <th><sup>Delivered</sup><br>LBS</th>
+                                        <th><sup>Total Price</sup><br>/ LBS ($)</th>
+
+                                        <th width="5%"><sup>Delivered</sup><br>Value ($)</th>
+                                        <th width="5%"><sup>Payment</sup><br>Due Date</th>
+                                        <th width="5%"><sup>Payment</sup><br>Amount ($)</th>
+
+                                        <th width="5%"><sup>Payment</sup><br>Date</th>
+                                        <th width="5%"><sup>Payment</sup><br>Type</th>
+                                        <th width="5%"><sup>Payment</sup><br>Confirmation</th>
+                                        {% if 'Grower' in request.user.get_role and not request.user.is_superuser %}
+                                        {% else %}
+                                        <th width="5%">Action</th>
+                                        {% endif %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for grower_payment in grower_payment %}
+                                <tr>
+                                    <td>{{ grower_payment.delivery_date }}</td>
+                                    <td>{{ grower_payment.delivery_id }}</td>
+                                    <td>{{ grower_payment.grower_name }}</td>
+
+                                    <td>{{ grower_payment.crop }}</td>
+                                    <td>{{ grower_payment.variety }}</td>
+                                    <td></td>
+
+                                    <td>{{ grower_payment.field }}</td>
+                                    <td style="background: {%if grower_payment.class  == 'Llano Super' %}#03f4fc {%elif grower_payment.class == 'Gold' %}#FFD700 {% elif grower_payment.class == 'Silver' %} #C0C0C0 {% elif grower_payment.class == 'Bronze' %} #CD7F32 {% endif %}">{{ grower_payment.class }}</td>
+                                    <td>{{ grower_payment.delivery_lbs }}</td>
+                                    <td>{{ grower_payment.total_price }}</td>
+
+                                    <td>{{ grower_payment.delivered_value }}</td>
+                                    <td>{{ grower_payment.payment_due_date }}</td>
+                                    <td>{{ grower_payment.payment_amount }}</td>
+
+                                    <td>{{ grower_payment.payment_date }}</td>
+                                    <td>{{ grower_payment.payment_type }}</td>
+                                    <td>{{ grower_payment.payment_confirmation }}</td>
+                                    <td>
+                                        <ul>
+                                            {% if 'Grower' in request.user.get_role and not request.user.is_superuser %}
+                                            {% else %}
+                                            {% if grower_payment.payment_add == 'add' %}
+                                            <li>
+                                                <a href="{% url 'grower_payments_add' grower_payment.var  grower_payment.id %}" alt="Add Payments" title="Add Payments"><span class="fas fa-credit-card"></span></a>
+                                            </li>
+                                            {% else %}
+                                            <li>
+                                                <a href="{% url 'grower_payments_edit' grower_payment.var  grower_payment.id %}" alt="Edit Payments" title="Edit Payments"><span class="fas fa-credit-card" ></span></a>
+                                                &nbsp;<span class="fas fa-check" style="color: green;" alt="Payments Added" title="Payments Added"></span>
+                                            </li>
+                                            {% endif %}
+                                            {% endif %}
+                                        </ul>
+                                    </td>
+                                   
+                                </tr>
+                                {% endfor %}
+                                {% if data_text == 'No Record Found' %}
+                                <tr>
+                                    <td colspan="17" align="center">{{ data_text }}</td>
+                                </tr>
+                                {% endif %}
+                            </tbody>
+
+                        </table>
+                    </div>
+           
+                    <!-- <div style="margin-top: 20px">
+                        <p>*CBP = Contract Base Price<br>*SP = Sustainability Premium<br>*QP = Quality Premium</p>
+                    </div> -->
+                    <div class="row align-items-center">
+                        {% if selectedGrower %}
+                        <div class="text-center mt-1">
+                            <span>Showing  1 - {{ temp_grower_payment_count }} of {{ temp_grower_payment_count }} entries</span>
+                        </div>
+                        {% elif selectedCrop %}
+                        <div class="text-center">
+                            <ul class="pagination" >
+                                <li></li>
+                                <!-- <li><a href="#">&laquo;</a></li> -->
+                                {% for i in range %}
+                                {% if var_get_page_no_temp == forloop.counter %}  
+                                <li class="active"><a href="/growerpayments/grower_payments_list/?crop_id={{selectedCrop}}&get_page_no_temp={{forloop.counter}}">{{ forloop.counter }}</a></li>
+                                {% else %}
+                                <li><a href="/growerpayments/grower_payments_list/?crop_id={{selectedCrop}}&get_page_no_temp={{forloop.counter}}">{{ forloop.counter }}</a></li>
+                                {% endif %}
+                                {% endfor %}
+                                <!-- <li><a href="#">&raquo;</a></li> -->
+                            </ul>
+                        </div>
+                        <div class="text-center mt-1">
+                            <span>Showing  {{ temp_grower_payment_start_index }} - {{ temp_grower_payment_end_index }} of {{ temp_grower_payment_count }} entries</span>
+                        </div>
+                        {% else %}
+                        <div class="text-center">
+                        <ul class="pagination" >
+                            <li></li>
+                            <!-- <li><a href="#">&laquo;</a></li> -->
+                            {% for i in range %}
+                            {% if var_get_page_no_temp == forloop.counter %} 
+                            <li class="active"><a href="/growerpayments/grower_payments_list/?get_page_no_temp={{forloop.counter}}">{{ forloop.counter }}</a>
+                            </li>
+                            {% else %}
+                            <li><a href="/growerpayments/grower_payments_list/?get_page_no_temp={{forloop.counter}}">{{ forloop.counter }}</a>
+                        
+                            </li>
+                            {% endif %}
+                            
+                            {% endfor %}
+                            <!-- <li><a href="#">&raquo;</a></li> -->
+                        </ul>
+                        </div>
+                        <div class="text-center mt-1">
+                            <span>Showing  {{ temp_grower_payment_start_index }} - {{ temp_grower_payment_end_index }} of {{ temp_grower_payment_count }} entries</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    
+                    <!-- <div class="row align-items-center">
+                        {% if selectedGrower %}
+                        <div class="col-md-12 col-sm-12 col-12 text-center">
+                            {% if grower_payment.has_other_pages %}
+                            <ul class="pagination" id="nav_1">
+                            {% if grower_payment.has_previous %}
+                                <li><a href="?grower_id={{ selectedGrower.id }}&page={{ grower_payment.previous_page_number }}">&laquo;</a></li>
+                                {% else %}
+                                <li class="disabled"><span>&laquo;</span></li>
+                                {% endif %}
+                                {% for i in grower_payment.paginator.page_range %}
+                                {% if grower_payment.number == i %}
+                                <li class="active pagi" id="getactive"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+                                {% else %}
+                                <li><a href="?grower_id={{ selectedGrower.id }}&page={{ i }}">{{ i }}</a></li>
+                                {% endif %}
+                                {% endfor %}
+                                {% if grower_payment.has_next %}
+                                <li><a href="?grower_id={{ selectedGrower.id }}&page={{ grower_payment.next_page_number }}">&raquo;</a></li>
+                                {% else %}
+                                <li class="disabled"><span>&raquo;</span></li>
+                            {% endif %}
+                            </ul>
+                          {% endif %}
+                        </div>
+                        <div class="col-md-12 col-sm-12 col-12 text-center mt-2" style="text-align:right">
+                            {% if user.is_superuser %}
+                            {% if report_grower_index %}
+                            <span>
+                                Showing {{ report_grower_index }} of {{ report_grower_index }} entries
+                            </span>
+                            {% else %}
+                            <span>Showing  {{ grower_payment.start_index }} - {{ grower_payment.end_index }} of {{ grower_payment.paginator.count }} entries
+                            </span>
+                            {% endif %}
+                            {% endif %}
+                            
+                        </div>
+                        {% elif selectedCrop %}
+                        <div class="col-md-12 col-sm-12 col-12 text-center">
+                            {% if grower_payment.has_other_pages %}
+                            <ul class="pagination" id="nav_1">
+                            {% if grower_payment.has_previous %}
+                                <li><a href="?crop_id={{ selectedCrop }}&page={{ grower_payment.previous_page_number }}">&laquo;</a></li>
+                                {% else %}
+                                <li class="disabled"><span>&laquo;</span></li>
+                                {% endif %}
+                                {% for i in grower_payment.paginator.page_range %}
+                                {% if grower_payment.number == i %}
+                                <li class="active pagi" id="getactive"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+                                {% else %}
+                                <li><a href="?crop_id={{ selectedCrop }}&page={{ i }}">{{ i }}</a></li>
+                                {% endif %}
+                                {% endfor %}
+                                {% if grower_payment.has_next %}
+                                <li><a href="?crop_id={{ selectedCrop }}&page={{ grower_payment.next_page_number }}">&raquo;</a></li>
+                                {% else %}
+                                <li class="disabled"><span>&raquo;</span></li>
+                            {% endif %}
+                            </ul>
+                          {% endif %}
+                        </div>
+                        <div class="col-md-12 col-sm-12 col-12 text-center mt-2" style="text-align:right">
+                            {% if user.is_superuser %}
+                            {% if report_grower_index %}
+                            <span>
+                                Showing {{ report_grower_index }} of {{ report_grower_index }} entries
+                            </span>
+                            {% else %}
+                            <span>Showing  {{ grower_payment.start_index }} - {{ grower_payment.end_index }} of {{ grower_payment.paginator.count }} entries
+                            </span>
+                            {% endif %}
+                            {% endif %}
+                        </div>
+                        {% else %}
+                        <div class="col-md-12 col-sm-12 col-12 text-center">
+                            {% if grower_payment.has_other_pages %}
+                            <ul class="pagination" id="nav_1">
+                            {% if grower_payment.has_previous %}
+                                <li><a href="?page={{ grower_payment.previous_page_number }}">&laquo;</a></li>
+                                {% else %}
+                                <li class="disabled"><span>&laquo;</span></li>
+                                {% endif %}
+                                {% for i in grower_payment.paginator.page_range %}
+                                {% if grower_payment.number == i %}
+                                <li class="active pagi" id="getactive"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+                                {% else %}
+                                <li><a href="?page={{ i }}">{{ i }}</a></li>
+                                {% endif %}
+                                {% endfor %}
+                                {% if grower_payment.has_next %}
+                                <li><a href="?page={{ grower_payment.next_page_number }}">&raquo;</a></li>
+                                {% else %}
+                                <li class="disabled"><span>&raquo;</span></li>
+                            {% endif %}
+                            </ul>
+                          {% endif %}
+                        </div>
+                        <div class="col-md-12 col-sm-12 col-12 text-center mt-2" style="text-align:right">
+                            {% if user.is_superuser %}
+                            {% if report_grower_index %}
+                            <span>
+                                Showing {{ report_grower_index }} of {{ report_grower_index }} entries
+                            </span>
+                            {% else %}
+                            <span>Showing  {{ grower_payment.start_index }} - {{ grower_payment.end_index }} of {{ grower_payment.paginator.count }} entries
+                            </span>
+                            {% endif %}
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                        </div> -->
+                </div>
+
+            </div>
+        </div>
+</div>
+</main>
+{% include 'footer.html' %}
+</div>
+
+
+{% endblock content %}
+
+{% block scripts %}
+<script src="https://cdn.datatables.net/1.11.0/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.0/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/responsive.bootstrap4.min.js"></script>
+<script src="{% static 'js/dataTables.buttons.min.js' %}"></script>
+<script src="{% static 'js/buttons.html5.min.js' %}"></script>
+<script src="https://cdn.datatables.net/fixedcolumns/4.2.1/js/dataTables.fixedColumns.min.js"></script>
+<!-- <script src="https://cdn.datatables.net/1.11.0/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.0/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/responsive.bootstrap4.min.js"></script>
+<script src="{% static 'js/dataTables.buttons.min.js' %}"></script>
+<script src="{% static 'js/buttons.html5.min.js' %}"></script>
+
+<script src="https://cdn.datatables.net/plug-ins/1.13.1/api/sum().js"></script>
+<script src="https://cdn.datatables.net/fixedcolumns/4.2.1/js/dataTables.fixedColumns.min.js"></script> -->
+{% if 'Grower' in request.user.get_role and not request.user.is_superuser %}
+{% else %}
+<script>
+    $('#loading-image').show();
+    $('#result-id').hide();
+    
+    $.ajax({
+        type: "GET",
+        {% if selectedGrower.id %}
+        url: `/growerpayments/ajax_grower_payments_list/grower/{{selectedGrower.id}}/`,
+        {% elif selectedCrop %}
+        url: `/growerpayments/ajax_grower_payments_list/crop/{{selectedCrop}}`,
+        {% else %}
+        url: `/growerpayments/ajax_grower_payments_list/All/All`,
+        {% endif %}
+        data: {},
+        contentType: false,
+        cache: false,
+        processData: false,
+        success: function(html){
+            console.log('response1', html)
+            console.log('response1', html.total_cal_amount_open_for_payments)
+            // $('.info').append(html);
+            $('#p-total_deliverd_lbs').html('<strong>Total Delivered LBS : </strong>'+html.total_cal_total_deliverd_lbs+' LBS');
+            $('#p-total_cal_count').html('<strong>Total Number of Deliveries : </strong>'+html.total_cal_count);
+            $('#p-total_deliverd_values').html('<strong>Total Delivered Value : </strong>$ '+html.total_cal_total_deliverd_values+' USD');
+            $('#p-paid_amount').html('<strong>Amount Paid : </strong>$ '+html.total_cal_paid_amount+' USD');
+            var am = parseFloat(html.netamount_open_for_payments);
+            if (am < 0 ){
+                $('#p-open_for_payments').html('<strong>Amount open for payments : </strong><span style="color:red">$ '+html.total_cal_amount_open_for_payments+' USD');
+            }
+            else{
+                $('#p-open_for_payments').html('<strong>Amount open for payments : </strong><span>$ '+html.total_cal_amount_open_for_payments+' USD');
+            }            
+        },
+        complete: function(){ 
+            $('#loading-image').hide();
+            $('#result-id').show();
+           
+        }
+        });
+</script>
+{% endif %}
+<script>
+     $(document).ready(function() {
+    $('#growerSelction').change( function () {
+    $('#submitBtn').click();
+    });
+    });
+    $(document).ready(function() {
+    $('#cropSelction').change( function () {
+    $('#submitBtn2').click();
+    });
+    });
+</script>
+
+<!-- <script>
+
+$(document).ready(function() {
+	let data_table_odj = $('#processorList_tbl').DataTable({
+        
+            responsive: false,
+            "paging": true,
+            "pageLength": 100,
+			"autoWidth": true,
+            scrollY: "600px",
+            scrollX: true,
+            scrollCollapse: true,
+            
+            fixedColumns: {
+                left: 2,
+                right: 1
+            },
+			"footerCallback": function ( row, data, start, end, display ) {
+				var api = this.api();
+				nb_cols = api.columns().nodes().length;
+				var j = 7;
+				while(j < nb_cols){
+					var pageTotal = api
+                .column( j, { page: 'current'} )
+                .data()
+                .reduce( function (a, b) {
+                    let toadd = Number(a) + Number(b);
+                    return toadd.toFixed(2);
+                }, 0 );
+            
+          // Update footer
+          $( api.column( j ).footer() ).html(pageTotal);
+					j++;
+				} 
+			},
+            
+            // CSV download
+            buttons: [ 
+            { 
+                extend: 'csv', 
+                text: 'CSV EXPORT',
+                title: `${getselectedGrower ? `${getselectedGrower} PAYMENT DETAILS`: `All GROWER PAYMENT DETAILS` } - {% now "jS F Y" %}`, 
+                className: "btn-export", 
+                exportOptions: { 
+                    columns: 'th:not(:last-child)' 
+                },
+               
+            }
+            ],
+                       
+            
+		});
+        // $('#growerSelction').on('change',function()
+        //         { 
+        //             var selectedGrower = $(this).val();
+        //             data_table_odj.columns(2).search( selectedGrower ).draw();
+        //         });
+
+        // $('#cropSelction').on('change',function()
+        //         { 
+        //             var selectedValue = $(this).val();
+        //             data_table_odj.columns(3).search( selectedValue ).draw();
+        //         });
+                   
+        data_table_odj.buttons().container().appendTo('#Export_CSV');
+        
+});
+</script> -->
+
+<!-- <script>
+    // $(document).ready(function () {
+    //     $('#processorList_tbl').DataTable();
+    // });
+    // $('#processorList_tbl').dataTable( {
+    // "pageLength": 100
+    // } );
+    let getselectedGrower = document.getElementById("getselectedGrower").value
+    
+  
+// var table = $('#example').DataTable();
+// table.column( 1 ).data().sum();
+// $('#processorList_tbl').DataTable( {
+//     drawCallback: function () {
+//       var api = this.api();
+//       $( api.table().footer() ).html(
+//         api.column( 4, {page:'current'} ).data().sum()
+//       );
+//     }
+//   } );
+   
+</script> -->
+<script>
+    $('#Growers-Payments-active').addClass('activeLink');
+                  
+    $('#Growers-Payments-down').addClass('down');
+    $('#Growers-Payments-sub').show();
+    
+    $('#Grower-Payment-Details').addClass('activeLink active-nav');
+</script>
+{% endblock scripts %}

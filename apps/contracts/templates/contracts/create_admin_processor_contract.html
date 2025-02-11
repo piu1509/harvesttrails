@@ -1,0 +1,401 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}Create Admin Processor Contract{% endblock title %}
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+<!-- Include jQuery (required for Select2) -->
+
+{% endblock extrahead %}
+
+{% block content %}
+{% include 'navbar.html' %}
+<div class="main-content">
+    {% include 'header.html' %}
+    <main>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+        <!-- Include Select2 JS -->
+        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+        <style>
+            .btn_remove_unic{
+                width: 41px;
+                height: 24px;
+                padding: 0;
+                display: inline-flex;
+                justify-content: center;
+                align-items: center;
+                font-size: 19px;
+            }
+            .bootstrap-select .dropdown-menu li.disabled.selected{display: none;}
+            .dropdown.bootstrap-select.form-control .btn{border: 1px solid; padding: 16px 10px; border-radius: 0;}
+            .bootstrap-select .dropdown-menu{max-width: 280px;}
+            .bootstrap-select .dropdown-menu li.selected.active .dropdown-item.active.selected{margin-left: 0;padding: 0;}
+            .select2-container--default .select2-results__option--highlighted.select2-results__option--selectable {
+                background-color:#0b6c39;
+                
+            }
+        </style>
+        
+
+        {% include '_alerts.html' %}
+        <span class="farm headingtop">Admin Processor Contract Add</span>
+        <div class="card farm-fields-container">
+            <div class="container-fluid">               
+                <form id="contractForm" method="post" class="farm-fields-form" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Select Processor<span class="asteriskField">*</span></label>
+                                <select name="selected_processor" id="processor_id" class="form-control" required >
+                                    <option value="All">Select Processor</option>
+                                    {% with t1_processors=processor|dictsort:"type" %}
+                                        {% if t1_processors %}
+                                            <optgroup label="Select T1 Processor">
+                                            {% for pro in t1_processors %}
+                                                {% if pro.type == "T1" %}
+                                                    <option value="{{pro.id}}_{{pro.type}}">{{pro.entity_name}}</option>
+                                                {% endif %}
+                                            {% endfor %}
+                                            </optgroup>
+                                        {% endif %}
+                                    {% endwith %}
+                                    {% with t2_processors=processor|dictsort:"type" %}
+                                        {% if t2_processors %}
+                                            <optgroup label="Select T2 Processor">
+                                            {% for pro in t2_processors %}
+                                                {% if pro.type == "T2" %}
+                                                    <option value="{{pro.id}}_{{pro.type}}">{{pro.entity_name}}</option>
+                                                {% endif %}
+                                            {% endfor %}
+                                            </optgroup>
+                                        {% endif %}
+                                    {% endwith %}
+                                    {% with t3_processors=processor|dictsort:"type" %}
+                                        {% if t3_processors %}
+                                            <optgroup label="Select T3 Processor">
+                                            {% for pro in t3_processors %}
+                                                {% if pro.type == "T3" %}
+                                                    <option value="{{pro.id}}_{{pro.type}}">{{pro.entity_name}}</option>
+                                                {% endif %}
+                                            {% endfor %}
+                                            </optgroup>
+                                        {% endif %}
+                                    {% endwith %}
+                                    {% with t4_processors=processor|dictsort:"type" %}
+                                        {% if t4_processors %}
+                                            <optgroup label="Select T4 Processor">
+                                            {% for pro in t4_processors %}
+                                                {% if pro.type == "T4" %}
+                                                    <option value="{{pro.id}}_{{pro.type}}">{{pro.entity_name}}</option>
+                                                {% endif %}
+                                            {% endfor %}
+                                            </optgroup>
+                                        {% endif %}
+                                    {% endwith %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>                         
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="contract_type">Contract Type<span class="asteriskField">*</span></label>
+                                <select name="contract_type" id="contract_type" class="form-control" required>
+                                    <option value="Single Crop">Single Crop Contract</option>
+                                    <option value="Multiple Crop">Multiple Crop Contract</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div id="add-crop-btn-container" class="text-end" style="display: none;">
+                            <button type="button" id="add-crop-btn" class="btn btn-primary" style="width: 41px; height: 24px; padding: 0; display: inline-flex; justify-content: center; align-items: center; font-size: 19px;">+</button>
+                        </div> 
+                        <div id="crop-fields-container">                           
+                            <div class="crop-fields-row">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="crop">Crop<span class="asteriskField">*</span></label>
+                                            <select name="crop[]" class="form-control crop-select selectpicker" required data-live-search="true">
+                                                <option value="">Select Crop</option>
+                                                {% for crop in crops %}
+                                                <option value="{{crop.item}}">{{crop.item}}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="crop_type">Crop Type<span class="asteriskField">*</span></label>
+                                            <select name="crop_type[]" class="form-control crop-type-select" required>
+                                                <option value="">Select Crop Type</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="contract_amount">Contract Amount<span class="asteriskField">*</span></label>
+                                            <div class="d-flex">
+                                                <input type="number" name="contract_amount[]" id="contract_amount" class="form-control" style="margin-top:0; border-top-right-radius:0 !important; border-bottom-right-radius:0 !important" required>
+                                                <select name="amount_unit[]" class="form-select" style="border-top-left-radius:0 !important; border-bottom-left-radius:0 !important; border-left:0; width:90px;" required>
+                                                    <option value="LBS">LBS</option>
+                                                    <option value="MT">MT</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="per_unit_rate">Per Unit Rate<span class="asteriskField">*</span></label>
+                                            <input type="number" step="0.01" name="per_unit_rate[]" id="per_unit_rate" class="form-control" required>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                                               
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="contract_start_date">Contract Start Date<span class="asteriskField">*</span></label>
+                                <input type="date" name="contract_start_date" id="contract_start_date" class="form-control" required>
+                            </div>
+                        </div>                      
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="contract_period">Contract Period<span class="asteriskField">*</span></label>
+                                <div class="d-flex">
+                                <input type="number" name="contract_period" id="contract_amount" class="textinput textInput form-control" style="margin-top:0; border-top-right-radius:0 !important; border-bottom-right-radius:0 !important"  required>
+                                <select name="contract_period_choice" id="unitSelction" class="form-control" style="border-top-left-radius:0 !important; border-bottom-left-radius:0 !important; border-left:0; width:100px;" required>                                   
+                                    <option value="Days">Days</option>
+                                    <option value="Months">Months</option>
+                                    <option value="Year">Year</option>
+                                </select>
+                            </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="status">Status<span class="asteriskField">*</span></label>
+                                <select name="status" id="status" class="form-control" required>                                   
+                                    <option value="Contract Initiated">Contract Initiated</option>
+                                    <option value="Under Review">Under Review</option>
+                                    <option value="Active With Documentation Processing">Active With Documentation Processing</option>
+                                    <option value="Active With Documentation Completed">Active With Documentation Completed</option>
+                                    <option value="Completed">Completed</option>
+                                    <option value="Terminated">Terminated</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group d-flex align-items-center justify-content-center">
+                                <label for="required_documents" class="mb-0">Required Documents:</label>                               
+                                {% comment %} <div class="flex-grow-1"></div> {% endcomment %}
+                                <button type="button" class="btn btn-primary font-weight-bold btn-lg ms-2" id="add-document" style="width: 41px;height: 24px;padding: 0;display: inline-flex;justify-content: center;align-items: center;font-size: 19px;">+</button>                                
+                                <div class="flex-grow-1"></div>
+                            </div>                            
+                            <div id="document-container">
+                                
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="form-btn-row text-center text-md-end">
+                            <a href="{% url 'list-contract' %}" class="btn-close-cancel">Cancel</a>
+                            <button type="submit" class="btn-save-submit">Save</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+    {% include 'footer.html' %}
+</div>
+{% endblock %}
+{% block jquery %}
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#processor_id').select2({
+            placeholder: "Select a Processor",
+            allowClear: true, // Adds a clear button
+            width: 'resolve' // Ensures proper width adjustment
+        });
+    });
+</script>
+<script>
+    document.getElementById('contract_type').addEventListener('change', function () {
+        const contractType = this.value;
+        const cropFieldsContainer = document.getElementById('crop-fields-container');
+        const addCropBtnContainer = document.getElementById('add-crop-btn-container');
+        
+        if (contractType === 'Multiple Crop') {
+            // Show the Add Crop button if multiple crops
+            addCropBtnContainer.style.display = 'block';
+        } else {
+            // Hide the Add Crop button if single crop contract
+            addCropBtnContainer.style.display = 'none';
+        }
+    });
+    document.addEventListener('change', function(event) {
+        if (event.target && event.target.classList.contains('crop-select')) {
+            const cropCode = event.target.value;
+            const cropFieldsRow = event.target.closest('.crop-fields-row');
+            const cropTypeSelect = cropFieldsRow.querySelector('.crop-type-select');
+            const perUnitRateInput = cropFieldsRow.querySelector('[name="per_unit_rate[]"]');
+    
+            if (cropCode) {
+                fetch(`/contracts/get-crop-types/?crop_code=${cropCode}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        // Clear the current crop type options
+                        cropTypeSelect.innerHTML = '<option value="">Select Crop Type</option>';
+    
+                        // Populate the new crop type options
+                        data.crop_types.forEach(type => {
+                            const option = document.createElement('option');
+                            option.value = type.item_type; // Adjust field based on your model
+                            option.textContent = type.item_type; // Adjust field based on your model
+                            cropTypeSelect.appendChild(option);
+                        });
+    
+                        // Update the per_unit_rate field with the first rate found (or your preferred logic)
+                        if (data.crop_types.length > 0) {
+                            perUnitRateInput.value = data.crop_types[0].per_unit_price || ''; // Adjust field based on your model
+                        } else {
+                            perUnitRateInput.value = '';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching crop types:', error);
+                    });
+            } else {
+                // Clear the options and reset the per_unit_rate field if no crop is selected
+                cropTypeSelect.innerHTML = '<option value="">Select Crop Type</option>';
+                perUnitRateInput.value = '';
+            }
+        }
+    });
+
+    document.getElementById('add-crop-btn').addEventListener('click', function () {
+        // Create a new div for the crop fields
+        var newCropRow = document.createElement('div');
+        newCropRow.classList.add('crop-fields-row');
+        newCropRow.innerHTML = `
+            <div class="row">
+                <div class="col-md-12 text-end me-3">
+                    <button type="button" class="btn btn-danger remove-crop-btn" style="width: 41px; height: 24px; padding: 0; display: inline-flex; justify-content: center; align-items: center; font-size: 19px;">-</button>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="crop">Crop<span class="asteriskField">*</span></label>
+                        <select name="crop[]" class="form-control crop-select selectpicker" required data-live-search="true">
+                            <option value="">Select Crop</option>
+                            {% for crop in crops %}
+                            <option value="{{crop.item}}">{{crop.item}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="crop_type">Crop Type<span class="asteriskField">*</span></label>
+                        <select name="crop_type[]" class="form-control crop-type-select" required>
+                            <option value="">Select Crop Type</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="contract_amount">Contract Amount<span class="asteriskField">*</span></label>
+                        <div class="d-flex">
+                            <input type="number" name="contract_amount[]" class="form-control" style="margin-top:0; border-top-right-radius:0 !important; border-bottom-right-radius:0 !important" required>
+                            <select name="amount_unit[]" class="form-select" style="border-top-left-radius:0 !important; border-bottom-left-radius:0 !important; border-left:0; width:100px;" required>
+                                <option value="LBS">LBS</option>
+                                <option value="MT">MT</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="per_unit_rate">Per Unit Rate<span class="asteriskField">*</span></label>
+                        <input type="number" step="0.01" name="per_unit_rate[]" class="form-control" required>
+                    </div>
+                </div>
+                
+            </div>
+        `;
+
+        // Append the new crop row
+        document.getElementById('crop-fields-container').appendChild(newCropRow);
+
+        // Add event listener to the remove button
+        newCropRow.querySelector('.remove-crop-btn').addEventListener('click', function () {
+            newCropRow.remove();
+        });
+    });
+</script>
+<script>
+    document.getElementById('add-document').addEventListener('click', function () {
+        // Create a new div to hold the document name and remove button
+        var newDocumentRow = document.createElement('div');
+        newDocumentRow.classList.add('document-row', 'd-flex', 'align-items-center');
+        
+        // Create the document name input
+        var nameInput = document.createElement('input');
+        nameInput.setAttribute('type', 'text');
+        nameInput.setAttribute('name', 'document_name[]');
+        nameInput.setAttribute('placeholder', 'Document Name');
+        nameInput.classList.add('form-control', 'mb-2', 'mr-2','me-5');
+        
+        // Create the remove button
+        var removeButton = document.createElement('button');
+        removeButton.setAttribute('type', 'button');
+        removeButton.classList.add('btn', 'btn-danger', 'btn-remove','btn_remove_unic');
+        removeButton.textContent = '-';
+        
+        // Append the inputs and remove button to the new div
+        newDocumentRow.appendChild(nameInput);
+        newDocumentRow.appendChild(removeButton);
+        
+        // Append the new document row to the document container
+        document.getElementById('document-container').appendChild(newDocumentRow);
+        
+        // Attach event listener to the remove button
+        removeButton.addEventListener('click', function () {
+            newDocumentRow.remove();
+        });
+    });
+    
+    // Attach event listener to the initial remove button
+    document.querySelector('.btn-remove').addEventListener('click', function () {
+        this.parentElement.remove();
+    });
+</script>
+<script>
+    $('#Contracts-active').addClass('activeLink');
+  
+    $('#Contracts-down').addClass('down');
+    $('#Contracts-sub').show();
+  
+    $('#Contract-List').addClass('activeLink active-nav');
+  
+</script>
+
+{% endblock jquery %}

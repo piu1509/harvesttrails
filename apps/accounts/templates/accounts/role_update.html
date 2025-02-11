@@ -1,0 +1,56 @@
+{% extends "base.html" %} {% load static %} {% block title %} Role Update {% endblock title %} 
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+{% load crispy_forms_tags %} {% block content %} {% include 'navbar.html' %} {% include 'header.html' %}
+<div class="main-content">
+    <main>
+        <span class="farm headingtop margin-left-none pl-0">Update Role</span>
+        <div class="container-fluid card px-4 py-4 mt-3">
+            <form method="post" class="farm-fields-form">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-4" style="display: none;">
+                        {{ form.grower|as_crispy_field }}
+                    </div>
+                    <div class="col-md-4">
+                        {{ form.role|as_crispy_field }}
+                    </div>
+                    <div class="col-md-12">
+                        {{ form.permissions|as_crispy_field }}
+                    </div>
+
+                </div>
+                <div class="row">
+                    <div class="form-btn-row">
+                        <a href="{% url 'role-list' %}" class="btn-close-cancel btn-space">Cancel</a>
+                        <input type="submit" class="btn-save-submit" value="Save">
+                    </div>
+                </div>
+            </form>
+            </div>
+    </main>
+    {% include 'footer.html' %}
+    {% endblock %}
+
+    {% block jquery %}
+    <script>
+        $('#User-Management-active').addClass('activeLink');
+      
+        $('#User-Management-down').addClass('down');
+        $('#User-Management-sub').show();
+      
+        $('#role-list').addClass('activeLink active-nav');
+      
+      </script>
+      {% endblock jquery %}

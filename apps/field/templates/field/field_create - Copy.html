@@ -1,0 +1,416 @@
+{% extends "base.html" %}
+{% load static %} {% block title %} Create Field {% endblock title %} 
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+{% block content %}
+{% include 'navbar.html' %}
+<style>
+
+select option:disabled{text-decoration: line-through; background-color: #ccc; font-style: italic;}
+</style>
+<div class="main-content">
+    {% include 'header.html' %} {% load crispy_forms_tags %}
+    <main>
+        {% include '_alerts.html' %}
+        <span class="farm headingtop">Create Field</span>
+        <div class="card farm-fields-container">
+            <div class="container-fluid">
+                <form method="post" class="farm-fields-form" action="{% url 'test' %}">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-4">
+                            {{ form.name|as_crispy_field }}
+                        </div>
+                        <!-- <div class="col-md-4">
+                            {{ form.farm|as_crispy_field }}
+                        </div> -->
+                        <div class="col-md-4">
+                            <div id="div_id_farm" class="form-group">
+                                <label for="id_farm" class=" requiredField">
+                                    Farm<span class="asteriskField">*</span>
+                                </label>
+                                <div>
+                                    <select name="farm" class="select form-control" required="" id="id_farm">
+                                        {% for frm in farms %}
+                                        <option value="{{frm.id}}">{{frm.name}}-{{frm.id}}</option>
+                                        {% endfor %}
+                                    </select>
+
+                                </div>
+
+                            </div>
+                        </div>
+                        <!-- <div class="col-md-4">
+                            {{ form.grower|as_crispy_field }}
+                        </div> -->
+                        <div class="col-md-4">
+                            <div id="div_id_grower" class="form-group">
+                                <label for="id_grower" class=" requiredField">
+                                    Grower<span class="asteriskField">*</span>
+                                </label>
+                                <div>
+                                    <select name="grower" class="select form-control disabled-consultants" required=""
+                                        id="id_grower">
+                                        {% for gwdp in growers_dpdwn %}
+                                        <option value="{{gwdp.id}}">{{gwdp.name}}-{{gwdp.id}}</option>
+                                        {% endfor %}
+                                    </select>
+
+
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            {{ form.batch_id|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.acreage|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.fsa_farm_number|as_crispy_field }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            {{ form.fsa_tract_number|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.fsa_field_number|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.latitude|as_crispy_field }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            {{ form.longitude|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.crop|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.variety|as_crispy_field }}
+                        </div>
+                        
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3">
+                            {{ form.yield_per_acre|as_crispy_field }}
+                        </div>
+                        <div class="col-md-3">
+                            {{ form.total_yield|as_crispy_field }}
+                        </div>
+                        <div class="col-md-3">
+                            {{ form.crop_tech|as_crispy_field }}
+                        </div>
+                        <div class="col-md-3">
+                            {{ form.eschlon_id|as_crispy_field }}
+                        </div>
+                        <!-- <div class="col-md-4">
+                            {{ form.plant_date|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.harvest_date|as_crispy_field }}
+                        </div> -->
+                    </div>
+                    <!-- <div class="row">
+                        <div class="col-md-4">
+                            {{ form.burndown_chemical|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.burndown_chemical_date|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.plant_date|as_crispy_field }}
+                        </div>
+                    </div> -->
+                    <!-- <div class="row">
+                        <div class="col-md-4">
+                            {{ form.preemergence_chemical|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.stand_count|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.emergence_date|as_crispy_field }}
+                        </div>
+                    </div> -->
+                    <!-- <div class="row">
+                        <div class="col-md-4">
+                            {{ form.post_emergence_chemical_1|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.post_emergence_chemical_1_date|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.post_emergence_chemical_2|as_crispy_field }}
+                        </div>
+                    </div> -->
+                    <!-- <div class="row">
+                        <div class="col-md-4">
+                            {{ form.post_emergence_chemical_2_date|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.post_emergence_chemical_3|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.post_emergence_chemical_3_date|as_crispy_field }}
+                        </div>
+                    </div> -->
+                    <!-- <div class="row">
+                        <div class="col-md-4">
+                            {{ form.post_emergence_chemical_4|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.post_emergence_chemical_4_date|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.flood_date|as_crispy_field }}
+                        </div>
+                    </div> -->
+                    <!-- <div class="row">
+                        <div class="col-md-4">
+                            {{ form.awd_drydown_date|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.fungicide_micronutrients|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.fungicide_micronutrients_date|as_crispy_field }}
+                        </div>
+                    </div> -->
+                    <!-- <div class="row">
+                        <div class="col-md-4">
+                            {{ form.insecticide_application|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.insecticide_application_date|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.drain_date|as_crispy_field }}
+                        </div>
+                    </div> -->
+                    <!-- <div class="row">
+                        <div class="col-md-4">
+                            {{ form.sodium_chlorate_date|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.harvest_date|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.soil_sample_date|as_crispy_field }}
+                        </div>
+                    </div> -->
+                    <!-- <div class="row">
+                        <div class="col-md-4">
+                            {{ form.litter|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.pre_fert_rate|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.pre_fert_product|as_crispy_field }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            {{ form.early_post_fert_rate|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.early_post_fert_product|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.early_post_fert_date|as_crispy_field }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            {{ form.foliar_fert_app_rate|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.foliar_fert_app_product|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.foliar_fert_app_date|as_crispy_field }}
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4">
+                            {{ form.pre_flood_fert_rate|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.pre_flood_fert_product|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.pre_flood_fert_date|as_crispy_field }}
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4">
+                            {{ form.post_flood_midseason_fert_rate|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.post_flood_midseason_fert_product|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.post_flood_midseason_fert_date|as_crispy_field }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            {{ form.post_flood_midseason_fert_rate2|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.post_flood_midseason_fert_product2|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.post_flood_midseason_fert_date2|as_crispy_field }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            {{ form.post_flood_midseason_fert_rate3|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.post_flood_midseason_fert_product3|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.post_flood_midseason_fert_date3|as_crispy_field }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            {{ form.boot_fertilizer_rate|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.boot_fertilizer_product|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.boot_fertilizer_date|as_crispy_field }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            {{ form.total_n_applied_lbs_ac|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.flow_meter_beginning_reading|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.flow_meter_multiplier|as_crispy_field }}
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4">
+                            {{ form.flow_meter_end_reading|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.water_source|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.total_n_applied|as_crispy_field }}
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4">
+                            {{ form.measured_water_use|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.field_design_and_use_of_plastic_pipe|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.soil_clay_percentage|as_crispy_field }}
+                        </div>
+                    </div> -->
+
+                    <!-- <div class="row">
+                        <div class="col-md-4">
+                            {{ form.previous_crop|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.straw_burnt_or_residue_removed|as_crispy_field }}
+                        </div>
+			        
+                    </div> -->
+
+                    <!-- <div class="row">
+			        <div class="col-md-4">
+                            {{ form.straw_residue_tillage_and_cover_crop_management|as_crispy_field }}
+                        </div>    
+                        <div class="col-md-4">
+                            {{ form.tillage_equipment_and_passes_or_fuel_usage_for_tillage|as_crispy_field }}
+                        </div>
+                    </div> -->
+                    <div class="row">
+                        <div class="form-btn-row">
+                            <a href="{% url 'field-list' %}" class="btn-close-cancel btn-space">Cancel</a>
+                            <input type="submit" class="btn-save-submit" value="Continue">
+                        </div>
+                    </div>
+            </div>
+            </form>
+    </main>
+    {% include 'footer.html' %}
+</div>
+{% endblock %}
+{% block jquery %}
+<!-- <script>
+    var super_user = '{{user.is_superuser}}';
+    $('#id_grower').removeClass('disabled-consultants');
+
+    if (super_user != "True") {
+        $('#id_grower').addClass('disabled-consultants');
+        $('#id_grower option').prop('disabled', true);
+        var logged_in_grower_id = "{{grower}}";
+        $('#id_grower').val(logged_in_grower_id);
+        $('#id_grower option[value="' + logged_in_grower_id + '"]').prop('disabled', false);
+    }
+</script> -->
+
+<script>
+    $('#id_crop').on('change', function(e){
+        $('#id_variety').val('');
+        $('#id_variety').find('option').prop('disabled', false);
+        var crop_val = $(this).val();
+        if(crop_val == 'RICE')
+        {
+            $('#id_variety option').filter('[value="DG 2425 XF"],[value="DG 3450 B2XF"],[value="DG 3470 B3XF"],[value="DG 3570 B3XF"],[value="DG 3635 B2XF"],[value="DG 3544 B2XF"],[value="DG 3651NR B2XF"],[value="DG 3109 B2XF"],[value="DG 3387 B3XF"],[value="DG 3421 B3XF"],[value="DG H929 B3XF"],[value="DG 3555 B3XF"],[value="DG 3402 B3XF"],[value="DG H959 B3XF"],[value="DG 3469 B3XF"],[value="DG 3615 B3XF"],[value="DG P224 B3XF"],[value="DG 3385 B2XF"],[value="DG 3422 B3XF"],[value="DG 3799 B3XF"],[value="DG-Wheat"],[value="DG 1464"],[value="DG3605"],[value="DG 3215 B3XF"]').prop('disabled', true);
+        }
+
+        if(crop_val == 'COTTON')
+        {
+            $('#id_variety option').filter('[value="DG-263L"],[value="DG-Wheat"]').prop('disabled', true);
+        }
+        if(crop_val == 'WHEAT')
+        {
+            $('#id_variety option').filter('[value="DG-263L"],[value="DG 2425 XF"],[value="DG 3450 B2XF"],[value="DG 3470 B3XF"],[value="DG 3570 B3XF"],[value="DG 3635 B2XF"],[value="DG 3544 B2XF"],[value="DG 3651NR B2XF"],[value="DG 3109 B2XF"],[value="DG 3387 B3XF"],[value="DG 3421 B3XF"],[value="DG H929 B3XF"],[value="DG 3555 B3XF"],[value="DG 3402 B3XF"],[value="DG H959 B3XF"],[value="DG 3469 B3XF"],[value="DG 3615 B3XF"],[value="DG P224 B3XF"],[value="DG 3385 B2XF"],[value="DG 3422 B3XF"],[value="DG 3799 B3XF"],[value="DG 1464"],[value="DG3605"],[value="DG 3215 B3XF"]').prop('disabled', true);
+        }
+    });
+</script>
+<script>
+    $('#Farm-Configuration-active').addClass('activeLink');
+                  
+    $('#Farm-Configuration-down').addClass('down');
+    $('#Farm-Configuration-sub').show();
+    
+    $('#Field-Management').addClass('activeLink active-nav');
+    </script>
+{% endblock jquery %}

@@ -1,0 +1,85 @@
+{% extends "base.html" %} {% load static %} 
+{% block title %} Processor Shipment Detail {% endblock title %} 
+{% load crispy_forms_tags %} {% block content %} 
+{% include 'navbar.html' %}
+
+<div class="main-content">
+  {% include 'header.html' %}
+  <main>
+    <div class="back-all-btn mb-2">
+      <a href="{% url 'outbound_shipment_mgmt' %}" class="btn-back-btn">Back</a>
+    </div>
+    <div class="page-title-with-or-without-btn">
+      <span class="farm headingtop">Shipment Detail</span>
+    </div>
+    <div class="card card-padding">
+      <div class="container-fluid">
+        <div class="row mt-5">
+          <div class="col-lg-12">
+            <div class="table-responsive tblborder">
+              <table class="table table-striped dt-responsive nowrap"style="width:100%" id="userDetails">
+                <thead>
+                  <tr style="border-bottom: 2px solid #e0e0e0">
+                    <th width ="15%" data-title="Bin Location">Bin Location</th>
+                    <th width ="15%" data-title="Processor">Processor</th>
+                    <th width ="15%" data-title="Milled Volume">Milled Volume</th>
+                    <th width ="15%" data-title="Date Pulled">Date Pulled</th>
+                    <th width ="15%" data-title="Equipment Type">Equipment Type</th>
+                    <th width ="15%" data-title="Equipment ID">Equipment ID</th>
+                    <th width ="15%" data-title="Storage Bin">Storage Bin (SKU ID)</th>
+                    <th width ="15%" data-title="Weight Of Product">Weight Of Product</th>
+                    <th width ="15%" data-title="Expected Yield">Expected Yield</th>
+                    <th width ="15%" data-title="Moisture Percentage">Moisture Percentage (%)</th>
+                    <th width ="15%" data-title="Purchase Order Number">Purchase Order Number</th>
+                    <th width ="15%" data-title="Lot Number">Lot Number</th>
+                    <th width ="15%" data-title="Volume Shipped">Volume Shipped</th>
+                    <th width ="15%" data-title="T2 Processor /(ID)">T2 Processor /(ID)</th>
+                    <th width ="15%" data-title="Balance">Balance</th>
+                    {% comment %} <th width ="15%" data-title="Uploaded Files">Uploaded Files</th> {% endcomment %}
+                  </tr>
+                </thead>
+                <tbody>
+                        
+                  <tr>
+                    {% for i in report %}
+                    <td>{{i.bin_location}}</td>
+                    <td>{{i.processor_e_name}}</td>
+                    <td>{{i.milled_volume}}</td>                                   
+                    <td>{{i.date_pulled}} </td>
+                    <td>{{i.equipment_type}} </td>
+                    <td>{{i.equipment_id}} </td>
+                    <td>{{i.storage_bin}} </td>
+                    <td>{{i.weight_of_product}} {{i.weight_of_product_unit}} </td>
+                    <td>{{i.excepted_yield}} {{i.excepted_yield_unit}} </td>
+                    <td>{{i.moisture_percent}} </td>
+                    <td>{{i.purchase_order_number}} </td>
+                    <td>{{i.lot_number}} </td>
+                    <td>{{i.volume_shipped}} Lbs</td>
+                    <td>{{i.processor2_name}} / ({{i.processor2_idd}})</td>
+                    <td>{{i.volume_left}} Lbs</td>
+                    {% comment %} <td>
+                    {% for j in file_data %}
+                        {{ j }}{% if not forloop.last %},<br>{% endif %}
+                      {% endfor %}
+                    </td>   {% endcomment %}
+                    {% endfor %}
+
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div></div>
+  </main>
+  {% include 'footer.html' %}
+</div>
+
+{% endblock content %}
+{% comment %} {% block jquery %}
+<script>
+ 
+</script>
+{% endblock jquery %} {% endcomment %}

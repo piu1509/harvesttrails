@@ -1,0 +1,60 @@
+{% extends "base.html" %} {% load static %} {% block title %} Upload Bulk Payment Csv {% endblock title %} 
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+{% block content %} {% include 'navbar.html' %}
+<div class="main-content">
+    {% include 'header.html' %} {% load crispy_forms_tags %}
+  <main>
+    <span class="farm headingtop">Upload Bulk Payment Csv</span>
+    <div class="card farm-fields-container">
+        {% include '_alerts.html' %}
+        <div class="container-fluid">
+            <form method="post" class="farm-fields-form" enctype="multipart/form-data">
+                {% csrf_token %}
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                <label for="">Upload Payment Sheet</label>
+                <input type="file" name="csv_file" accept=".csv" id="id_csv_file" class="textinput textInput form-control" required>
+                
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <p>Example : <a href="{{ '/media/example_csv/grower_bulk_payments.csv' }}">grower_bulk_payments.csv</a></p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <input type="submit" class="btn-save-submit mt-2" value="Upload">
+                    <a href="{% url 'grower_payments_list' %}" class="btn-close-cancel">Back</a>
+                </div>
+            </div>
+        </form>
+    </div>
+    </div>
+</main>
+{% include 'footer.html' %}
+</div>
+{% endblock %}
+
+{% block jquery %}
+<script>
+    $('#Growers-Payments-active').addClass('activeLink');
+                  
+    $('#Growers-Payments-down').addClass('down');
+    $('#Growers-Payments-sub').show();
+    
+    $('#Payment-CSV-Upload').addClass('activeLink active-nav');
+</script>
+{% endblock jquery %}

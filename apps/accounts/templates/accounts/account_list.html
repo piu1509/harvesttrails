@@ -1,0 +1,386 @@
+{% extends "base.html" %} {% load static %}
+{% block title %} Growers {% endblock title %}
+{% load crispy_forms_tags %} {% block content %}
+{% include 'navbar.html' %}
+
+<div class="main-content">
+  {% include 'header.html' %}
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css" />
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.11.0/css/dataTables.bootstrap4.min.css" />
+  <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.bootstrap4.min.css" />
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+  <style>
+    table.classing tbody tr td {
+        vertical-align: top;
+    }
+
+    ul.pagination {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+    }
+
+    ul.pagination li {
+        list-style: none;
+        line-height: 45px;
+        text-align: center;
+        font-size: 18px;
+        font-weight: 500;
+        cursor: pointer;
+        user-select: none;
+        transition: all 0.3s ease;
+    }
+
+    ul.pagination li {
+        display: none;
+        position: relative;
+    }
+
+
+    ul.pagination li:first-of-type,
+    ul.pagination li:nth-of-type(2),
+    ul.pagination li:last-of-type,
+    ul.pagination li:has( + li:last-of-type),
+    ul.pagination li.active,
+    ul.pagination li.active + li,
+    ul.pagination li.active + li + li,
+    ul.pagination li:has(+ li.active),
+    ul.pagination li:has(+ li + li.active){
+        display: block;
+    }
+
+    ul.pagination li:has(+ li + li.active){
+        padding-left: 35px;
+    }
+
+    ul.pagination li.active + li + li {
+        padding-right: 35px;
+    }
+
+    ul.pagination li:has( + li + li.active) a:before,
+    ul.pagination li.active + li + li a:after {
+        content: "...";
+        font-size: 16px;
+        display: inline-block;
+        width: 35px;
+        height: 40px;
+        position: absolute;
+        top: -1px;
+        background-color: #fff;
+        border: 1px solid #ddd;
+    }
+
+    ul.pagination li:has( + li + li.active) a:before {
+        left: -35px;
+    }
+
+    ul.pagination li.active + li + li a:after {
+        right: -35px;
+    }
+
+    ul.pagination li:nth-of-type(1) a:before,
+    ul.pagination li:nth-of-type(2) a:before,
+    ul.pagination li:nth-of-type(3) a:before {
+        display: none !important;
+    }
+
+    ul.pagination li:nth-of-type(1),
+    ul.pagination li:nth-of-type(2),
+    ul.pagination li:nth-of-type(3) {
+        padding-left: 0 !important;
+    }
+
+    ul.pagination li:nth-of-type(1) a:after,
+    ul.pagination li:nth-of-type(2) a:after,
+    ul.pagination li:nth-of-type(3) a:after {
+        display: none !important;
+    }
+
+    ul.pagination li:nth-of-type(1),
+    ul.pagination li:nth-of-type(2),
+    ul.pagination li:nth-of-type(3) {
+        padding-left: 0 !important;
+    }
+
+
+
+</style>
+<style>
+  .main-header-login a{
+      cursor: pointer;
+  }
+  .main-header-login .dropdown-menu{min-width: 16rem;}
+  .main-simple-table-with-search .simple-responsive-table {
+      overflow-x: auto;
+  }
+  .ui-menu{height: 20vh;overflow-y: auto;padding: 0px 10px;margin: 0px 15px;}
+  .ui-menu::-webkit-scrollbar{width:6px;max-height:20px;padding-right: 10px;}
+  .ui-menu::-webkit-scrollbar-track{background:#ccc}
+  .ui-menu:-webkit-scrollbar-thumb{background-color:#000;border-radius:20px;min-height:20px}
+</style>
+  <main>
+    {% include '_alerts.html' %}
+    <div class="page-title-with-or-without-btn">
+      <span class="farm headingtop">Grower Management</span>
+      <!-- Create button for Account-->
+      <div class="flex-header-btn">
+        {% if request.user.is_superuser or 'SubAdmin' in request.user.get_role or 'SuperUser' in request.user.get_role %}
+        <a href="{% url 'grower_details_csv' %}" class="btn-close-cancel">Download Grower Details CSV</a>
+        {% endif %}
+        &nbsp;
+        &nbsp;
+        &nbsp;
+        {% if 'Grower Edit' in request.user.get_role_perm or request.user.is_superuser %}
+        <a href="{% url 'account-create' %}" class="btn-close-cancel">Create Grower</a>
+        {% endif %}
+      </div>
+    </div>
+    <div class="card card-padding">
+      <div class="main-simple-table-with-search">
+        <div class="simple-responsive-table">
+          	<table id="" class="table table-striped table-bordered dt-responsive nowrap" style="width: 100%"> 
+              	<form method="get" action="">
+					<div class="row">
+						<div class="col-md-6 col-sm-12 col-12 d-block sm-right" id="example_length">
+						<div class="d-flex mb-3">
+							<label style="white-space: nowrap;">Show Entries</label>
+							<select name="example_length" id="numselection" aria-controls="example" class="form-select form-select-sm ms-2" style="width: 80px;">
+								{% if get_entity == "10" %}
+								<option  value="10" selected>10</option>
+								<option  value="25">25</option>
+								<option  value="50">50</option>
+								<option  value="100">100</option>
+								{% elif get_entity == "25" %}
+								<option  value="10">10</option>
+								<option  value="25" selected>25</option>
+								<option  value="50">50</option>
+								<option  value="100">100</option>
+								{% elif get_entity == "50" %}
+								<option  value="10">10</option>
+								<option  value="25" >25</option>
+								<option  value="50" selected>50</option>
+								<option  value="100">100</option>
+								{% else %}
+								<option  value="10">10</option>
+								<option  value="25">25</option>
+								<option  value="50">50</option>
+								<option  value="100" selected>100</option>
+								{% endif %}
+							</select> 
+						</div>
+						</div>
+						<div class="col-md-6 col-sm-12 col-12">
+							<div class="d-flex justify-content-end">
+								<div class="form-inline mb-3"> 
+									<div class="d-flex sm-right" style="gap: 10px;"> 
+										<input name="search"  id="search" value="{{get_search}}" type="search" class="form-control" autocomplete="off" placeholder="Search here" style="width: 270px;">
+										<button class="btn btn-outline-success" id="submitBtn3" type="submit">Search</button>
+										<div id="autocomplete-results"></div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</form>
+                     
+				<thead>
+				<tr style="border-bottom: 2px solid #e0e0e0">
+					<th>Name</th>
+					<th>Email</th>
+					<th data-title="Phone Number" data-breakpoints="xs sm">
+					Phone Number
+					</th>
+					<th data-title="Physical Address" data-breakpoints="xs sm">
+					Physical Address
+					</th>
+					<th>Actions</th>
+				</tr>
+				</thead>
+				<tbody> 
+				{% for account in object_list %}
+				<tr>
+					<td>{{account.name}}</td>
+					<td>{{account.email}}</td>
+					<td>{{account.phone}}</td>
+					<td>{{account.physical_address}}</td>
+					<td class="backk1">
+					{% if 'Grower Edit' in request.user.get_role_perm or request.user.is_superuser %}
+					<li>
+						<a href="{% url 'account-update' account.pk %}" alt="edit grower" title="edit grower"><span class="fas fa-edit"> </span></a>
+					</li>
+					{% endif %}
+					{% if 'Grower Delete' in request.user.get_role_perm or request.user.is_superuser %}
+					<li>
+						<a onclick="delGrower('{% url 'account-delete' account.pk %}')" href="javascript:void(0)"
+						data-mdb-toggle="modal" data-mdb-target="#deleteModal" alt="delete grower" title="delete grower">
+						<span class="fas fa-trash"></span></a>
+					</li>
+					{% endif %}
+					{% if 'Grower Resend' in request.user.get_role_perm or request.user.is_superuser %}
+					<li>
+						<a href="{% url 'email-resend' account.pk %}" alt="email resend" title="email resend"><span class="fas fa-send"></span>
+						</a>
+					<li>
+						{% endif %}
+						{% if 'Grower View' in request.user.get_role_perm or request.user.is_superuser %}
+					<li>
+						<a href="{% url 'account-detail' account.pk %}" alt="view grower details" title="view grower details"><span class="fas fa-eye"></span>
+						</a>
+					</li>
+					{% endif %}
+					{% if request.user.is_superuser or 'SubAdmin' in request.user.get_role or 'SuperUser' in request.user.get_role %}
+					<li>
+						<a href="{% url 'grower_dashboard_com' account.pk %}" alt="view grower dashboard" title="view grower dashboard"><span class="fas fa-chart-line"></span>
+						</a>
+					</li>
+					{% endif %}
+					<li></li>
+					</td>
+				</tr>
+				{% endfor %}
+				</tbody>
+          	</table>
+          <!-- pagination code start -->
+       
+            <nav aria-label="Page navigation example">
+              {% if object_list.has_other_pages %}
+                <ul class="pagination" id="nav_1">
+                {% if object_list.has_previous %}
+                    <li><a href="?example_length={{get_entity}}&search={{get_search}}&page={{ object_list.previous_page_number }}">&laquo;</a></li>
+                    {% else %}
+                  <li class="disabled"><span>&laquo;</span></li>
+                  {% endif %}
+                  {% for i in object_list.paginator.page_range %}
+                  {% if object_list.number == i %}
+                  <li class="active pagi" id="getactive"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+                  {% else %}
+                  <li><a href="?example_length={{get_entity}}&search={{get_search}}&page={{ i }}">{{ i }}</a></li>
+                  {% endif %}
+                  {% endfor %}
+                  {% if object_list.has_next %}
+                  <li><a href="?example_length={{get_entity}}&search={{get_search}}&page={{ object_list.next_page_number }}">&raquo;</a></li>
+                  {% else %}
+                  <li class="disabled"><span>&raquo;</span></li>
+              {% endif %}
+              </ul>
+            {% endif %}
+            </nav>
+
+
+          
+            <div class="col-md-12 col-sm-12 col-12 text-center mt-2" style="text-align:right">
+                <span>Showing  {{ object_list.start_index }} - {{ object_list.end_index }} of {{ object_list.paginator.count }} entries
+                </span>
+            </div>
+        </div> 
+
+        <!-- pagination code end -->
+        </div>
+      </div>
+    </div>
+  </main>
+  {% include 'footer.html' %}
+</div>
+
+<!-- Delete Popup -->
+
+<div class="modal fade" id="deleteModal" aria-hidden="true" aria-labelledby="exampleModalToggleLabel22" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-body">
+        <button type="button" class="btn-close cust-close-ds-btn" data-mdb-dismiss="modal" aria-label="Close"></button>
+        <div class="center-content-status">
+          <img src="{% static 'img/trash.png' %}" alt="right" id="rightImg" class="warning-icon" />
+          <p id="message" class="modal-title titlepad">
+            Are you sure you want to delete?
+          </p>
+        </div>
+        <div class="modal-center-btn-footer">
+          <button onclick="reloadwindow()" id="closeBtnpopup" type="button" class="btn-close-cancel btn-space"
+            data-mdb-dismiss="modal">
+            Close
+          </button>
+          <a onclick="growerdeleteNow()" id="growerDelete" pkidhref=""><button type=""
+              class="btn-save-submit">Delete</button></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- end -->
+
+{% endblock content %} // Js for datatables 
+{% block scripts %}
+
+<!-- <script src="https://cdn.datatables.net/1.11.0/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.0/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/responsive.bootstrap4.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> -->
+<script type="text/javascript" src="{% static 'js/accounts/account_list.js' %}"> </script>
+<script>
+  // $(document).ready(function () {
+  //   $("#growerListtbl").DataTable({
+  //     paging:false,
+  //     info: false,
+  //     searching:false,
+  //   });
+  // });
+  $(document).ready(function() {
+        $('#numselection').change( function () {
+        $('#submitBtn3').click();
+        });
+        });
+            
+</script>
+{% endblock scripts %}
+
+
+{% block jquery %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.js">
+</script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.js">
+</script>
+
+<link href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/ui-lightness/jquery-ui.css" rel="stylesheet"
+    type="text/css" />
+<script>
+// $(function() {
+//     $('#search').on('input', function() {
+//         var query = $(this).val().trim();
+//         if (query !== '') {
+//             $.ajax({
+//                 url: '/autocomplete_suggestions_account_list/',
+//                 data: {},
+//                 dataType: 'json',
+//                 success: function(response) {
+// 					var availableTags  = response.select_search;
+//                     $("#search").autocomplete({
+//                         source: availableTags
+//                     });
+// 				}
+//             });
+//         } else {
+//             $('#autocomplete-results').empty();
+//         }});});
+
+
+        $(function() {
+          var availableTags  = {{ select_search_json|safe }};
+              $("#search").autocomplete({
+                  source: availableTags
+              });
+        });
+</script>
+<script>
+  $('#Grower-Configuration-active').addClass('activeLink');
+
+  $('#Grower-Configuration-down').addClass('down');
+  $('#Grower-Configuration-sub').show();
+
+  $('#Grower-Management').addClass('activeLink active-nav');
+
+</script>
+{% endblock jquery %}

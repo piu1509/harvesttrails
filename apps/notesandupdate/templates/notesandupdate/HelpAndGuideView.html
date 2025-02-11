@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% load static %} {% block title %} Help And Guide List {% endblock title %} {% block content %}
+{% include 'navbar.html' %}
+<div class="main-content">
+    {% include 'header.html' %}
+<main> 
+    <div class="page-title-with-or-without-btn">
+      <span class="farm headingtop">Help And Guide Listing</span>
+      <!-- Create button for Account-->
+      <div class="flex-header-btn">
+        
+      </div>
+    </div>
+
+    <div class="card card-padding">
+
+      <div class="main-simple-table-with-search">
+        <div class="simple-responsive-table">
+          <form action="" method="post">
+            {% csrf_token %}
+          <div class="d-flex mb-3">
+            
+            <input placeholder="Search Help Topics" type="text" name="search_key" id="search_key" class="textinput form-control">
+            <input type="submit" name="" id="" class="btn-save-submit" value="search" style="border-radius: 0%;">
+          </div>
+        </form>
+              {% for help_guide in help_guide %}
+              <div>
+                <a href="{% url 'HelpAndGuideDetails' help_guide.pk %}" style="font-size: 24px; color: #3258a8; font-weight: bold; text-decoration: none;">{{help_guide.title}}</a>
+              </div>   
+                <div>
+                  {% autoescape off %}
+                  {{help_guide.description|truncatechars:350}}
+                  {% endautoescape %}
+                </div>
+                <div style="margin-bottom: 40px;">
+                    {% if help_guide.upload_file %}
+                    Attachment : {{ help_guide.upload_file }}
+                    {% endif %}
+                </div>
+              {% endfor %}
+              {% if data_text == 'No Record Found' %}
+            <div>
+                {{ data_text }}
+            </div>
+              {% endif %}
+        </div>
+      </div>
+    </div>
+</main>
+
+</div>
+{% include 'footer.html' %}
+</div>
+{% endblock %}
+{% block jquery %}
+<script>
+  $('#Setting-Configuration-active').addClass('activeLink');
+
+  $('#Setting-Configuration-down').addClass('down');
+  $('#Setting-Configuration-sub').show();
+
+  $('#Help-and-Guide').addClass('activeLink active-nav');
+
+</script>
+{% endblock jquery %}

@@ -1,0 +1,74 @@
+{% extends "base.html" %} {% load static %} {% block title %} Grower Account List {% endblock title %}
+{% load crispy_forms_tags %} {% block content %} {% include 'navbar.html' %}
+
+<div class="main-content">
+{% include 'header.html' %}
+    <main> <span class="farm headingtop">Search Results</span>
+    <form method="get">
+    {% csrf_token %}
+        {{ filter.form|crispy}}
+        <input type="submit" />
+    </form>
+        <div>
+            <div class="bs-example mt-4">
+                <div class="table-responsive tblborder">
+                    <table class="table">
+                        <thead>
+                            <tr style="border-bottom: 2px solid #e0e0e0;">
+                                <th class="clr2">Name</th>
+                                <th class="clr2">Email</th>
+                                <th class="clr2">Phone</th>
+                                <th class="clr2">Physical Address</th>
+                                <th class="clr2">Mailing Address</th>
+                                <th class="clr2">CCA Name</th>
+                                <th class="clr2">CCA Number</th>
+                                <th class="clr2">CCA Phone</th>
+                                <th class="clr2">CCA Email</th>
+																<th class="clr2">Notes</th>
+																<th class="clr2">Date Created</th>
+                                <th class="clr2">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for account in filter.qs %}
+                            <tr>
+                                <td>{{account.name}}</td>
+                                <td>{{account.email}}</td>
+                                <td>{{account.phone}}</td>
+                                <td>{{account.physical_address}}</td>
+                                <td>{{account.mailing_address}}</td>
+                                <td>{{account.cca_name}}</td>
+                                <td>{{account.cca_number}}</td>
+                                <td>{{account.cca_email}}</td>
+                                <td>{{account.cca_phone}}</td>
+																<td>{{account.notes}}</td> 
+																<td>{{account.date_created}}</td>
+                                <td class="backk1">
+                                    <li> <a href="{% url 'accounts-update' account.pk %}"><span class="fas fa-edit"> </span></a></li>
+                                    <li> <a href="{% url 'accounts-delete' account.pk %}"><span class="fas fa-trash"
+												data-mdb-toggle="modal" data-mdb-target="#exampleModal-delete"></span></a></li>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock content %}
+
+{% comment %} {% extends "base.html" %}
+
+{% block content %}
+    <form method="get">
+    {% csrf_token %}
+        {{ filter.form.as_p }}
+        <input type="submit" />
+    </form>
+    {% for obj in filter.qs %}
+        {{ obj.name }}<br />
+    {% endfor %}
+{% endblock %} {% endcomment %}
+

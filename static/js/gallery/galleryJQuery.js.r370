@@ -1,0 +1,153 @@
+$(document).ready(function(){
+    $("#emailsend").show();
+$("#emailsend").click(function(){
+    $("#loader").show();
+    $("#emailsend").hide();
+    $("#inputemail").show();
+    $("#EmailPopCloseBtn").html("Cancel")
+    $("#remarkTextSingleShare").show();
+    
+    console.log("Email ", $("#inputemail").val());
+
+$.get("/gallery/email/",
+{
+    emailid: $("#inputemail").val(),
+    id: $("#recordid").val(),
+    remark: $("#remarkTextSingleShare").val(),
+    // csrfmiddlewaretoken: $("input[name='csrfmiddlewaretoken']").val()
+},
+function(data, status){
+    console.log("Data: " + data + "\nStatus: " + status);
+    if(data==1){
+    $("#emailsend").hide();
+    $("#inputemail").hide();
+    $("#EmailPopCloseBtn").html("Close")
+    $("#remarkTextSingleShare").hide();
+    $("#remarkLabelSingleShare").hide();
+    $("#warningImg").hide();
+    $("#wrongImg").hide();
+    $("#rightImg").hide();
+    
+    $("#EmailPopTitle").text("File has been sent successfully")
+    $("#loader").hide();
+    
+    $("#EmailPopTitle").css('color', '#00b258')
+
+
+    }
+    else{
+    $("#emailsend").hide();
+    $("#inputemail").hide();
+    $("#EmailPopCloseBtn").html("Close")
+    $("#remarkTextSingleShare").hide();
+    $("#remarkLabelSingleShare").hide();
+    $("#warningImg").show();
+    $("#wrongImg").hide();
+    $("#rightImg").hide();
+    $("#EmailPopTitle").text("File sending has been failed, please try after some time.")
+    $("#loader").hide();
+    $("#EmailPopTitle").css('color', 'red')
+    }
+    }).fail(function(response) {
+    console.log('Error: ');
+    });
+});
+});
+
+
+$(document).ready(function(){
+$('#multisharebtn').on('click', function() {
+    var array = [];
+    $('.photocheckbox[name="photo-select"]:checked').each(function() {
+        array.push($(this).val());
+    });
+
+    $('#multipkid').val(array);
+    console.log(array);
+});
+
+});
+
+$(document).ready(function(){
+    $("#multiemailsend").show();
+$("#multiemailsend").click(function(){
+    $("#multiloader").show();
+    $("#multiemailsend").hide();
+
+$.get("/gallery/multiemail/",
+{
+    emailid: $("#inputmultiemail").val(),
+    id: $("#multipkid").val(),
+    remark: $("#remarkText").val(),
+},
+function(data, status){
+    console.log("Data: " + data + "\nStatus: " + status);
+
+    if(data==1){
+    $("#multiemailsend").hide();
+    $("#inputmultiemail").hide();
+    $("#MultiEmailPopCloseBtn").html("Close")
+    $("#remarkText").hide();
+    $("#remarkLabel").hide();
+    $("#rightImg").show();
+    $("#multiloader").hide();
+    $("#MultiSharePopTitle").text("File has been sent successfully").css({'text-align':'center', 'font-size': '20px', 'padding-bottom': '10px'})
+    $("#MultiSharePopTitle").css('color', '#28a745')
+    }
+    else{
+    $("#multiemailsend").hide();
+    $("#inputmultiemail").hide();
+    $("#MultiEmailPopCloseBtn").html("Close")
+    $("#remarkText").hide();
+    $("#remarkLabel").hide();
+    $("#wrongImg").show();
+    $("#rightImg").hide();
+    $("#multiloader").hide();
+    $("#MultiSharePopTitle").text("Invalid Email address, please try again").css({'text-align':'center', 'font-size': '20px', 'padding-bottom': '10px'})
+
+    }
+    }).fail(function(response) {
+    console.log('Error: ' + response.responseText);
+    });
+});
+});
+$(document).ready(function(){
+$('#multisharebtn').on('click', function() {
+    var array = [];
+    $('.photocheckbox[name="photo-select"]:checked').each(function() {
+        array.push($(this).val());
+    });
+    console.log("length ",array.length)
+    if (array.length === 0) {
+    $('#multipkid').hide();
+    $("#warningImg").show();
+    $("#rightImg").hide();
+    $("#wrongImg").hide();
+    $("#multiemailsend").hide();
+    $("#remarkText").hide();
+    $("#inputmultiemail").hide();
+    $("#remarkLabel").hide();
+    $("#MultiEmailPopCloseBtn").html("Cancel");
+    $("#MultiSharePopTitle").text("Nothing is selected").css('text-align','center');
+    $("#MultiSharePopTitle").css('color', 'black');
+    }
+    else{
+    //console.log("Array ",array)
+    $("#warningImg").hide();
+    $("#wrongImg").hide();
+    $("#rightImg").hide();
+    $('#multipkid').show();
+    $('#multipkid').val(array);
+    $("#multiemailsend").show();
+    $("#remarkText").show();
+    $("#inputmultiemail").show();
+    $("#remarkLabel").show();
+    
+    $("#MultiEmailPopCloseBtn").html("Cancel");
+    $("#MultiSharePopTitle").text("Please provide one or more Email ID separated by comma").css({'text-align':'left', 'font-size': '16px', 'padding-bottom': '0px'});
+    $("#MultiSharePopTitle").css('color', 'black');
+    }
+
+});
+});
+

@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% load static %} {% block title %} Field Location Real View {% endblock title %} 
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+{% block content %}
+{% include 'navbar.html' %}
+<div class="main-content">
+    {% include 'header.html' %}
+    <style>
+        #map {
+            height: 400px;
+            width: 100%;
+        }
+    </style>
+<main>
+    <div class="page-title-with-or-without-btn">
+        <span class="farm headingtop">{{field_obj.name}}</span>
+        <!-- Create button for Account-->
+        <div class="flex-header-btn">
+          <div class="flex-header-btn-col">
+            <a href="javascript:void(0);" onclick="history.back()" class="btn btn-black btn-rounded btn-small">Back</a>
+          </div>
+        </div>
+      </div>
+      
+       
+        <div class="row">
+            <div class="col-12">
+                <p>Location : {{location}}</p>
+            </div>
+            <div class="col-12">
+                <p>Map ; lat: {{ latitude }}, lng: {{ longitude }}</p>
+                <div id="map"></div>
+            </div>
+        </div>
+    
+    </main>
+    </div>
+    {% include 'footer.html' %}
+    </div>
+    {% endblock %}
+    {% block scripts %}
+    <!-- <script src="https://maps.google.com/maps/api/js?key=AIzaSyBA6EZ3fYAqY3DEG1Z4MFvayhIxIRCacx8"></script> -->
+    <!-- <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBGUMvqjFS5vgcA1m23k8LrgDXqIY-oAUQ"></script> -->
+    {% endblock scripts %}
+    {% block jquery %}
+     
+    <!-- <script>
+        $( document ).ready(function() {
+            var myLatLng = {lat: {{ latitude }}, lng: {{ longitude }}};
+
+            var map = new google.maps.Map(document.getElementById('map'), {
+                center: myLatLng,
+                zoom: 10
+            });
+
+            var marker = new google.maps.Marker({
+                position: myLatLng,
+                map: map
+            });
+        });
+
+
+    </script> -->
+    <script>
+    $('#Farm-Configuration-active').addClass('activeLink');
+                    
+    $('#Farm-Configuration-down').addClass('down');
+    $('#Farm-Configuration-sub').show();
+    
+    $('#Field-Management').addClass('activeLink active-nav');
+    </script>
+    {% endblock jquery %}

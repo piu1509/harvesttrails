@@ -1,0 +1,30 @@
+{% extends "registration/auth_header.html" %} 
+{% load static %} 
+{% block title %} Logout
+{% endblock title %} 
+{% block content %}
+<div class="bg">
+    <div class="box pt-5">
+        <h3 class="text-center1">Logout</h3><br>
+        <h2>You have been logged out!</h2>
+        <a href="{% url 'login' %}"><button class="btn1 mt-4" type="button">Log In Again</button></a>
+    </div>
+</div>
+{% endblock content %}
+
+{% comment %} <div id="popup1" class="overlay">
+    <div class="popup">
+        <img src="{% static 'img/logo.png' %}"><br>
+        <h3>Reset Password</h3>
+        <a class="close" href="#">&times;</a>
+        <div class="content">
+            <hr style="background:white;">
+            <div class="form-outline">
+                <input type="text" id="form1" class="form-control">
+                <label class="form-label" for="form1" style="padding-top: 20px;padding-left: 20px;">Enter mail</label>
+            </div>
+            <button class="btn1" type="button" style="margin:20px 00 20px;">Send</button>
+        </div>
+    </div>
+</div> {% endcomment %}
+

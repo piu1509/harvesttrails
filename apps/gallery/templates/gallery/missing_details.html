@@ -1,0 +1,44 @@
+{% extends "base.html" %} {% load static %} {% block title %} Gallery {% endblock title %} {% block content %} {% include "navbar.html" %}
+
+<style>
+
+.iconbox {
+    text-align: center;
+    margin-top: 0px;
+}
+.filter-detail{height:72px;}
+.select-dropdown select:active, .select-dropdown select:focus {
+   
+    border-radius: 50px !important;
+}
+
+.select-dropdown {
+    margin:1px;
+    position: relative;
+    
+    border-radius: 50px !important;
+    </style>
+
+<div class="main-content">
+    {% include 'header.html' %}
+  
+        <span class="farm headingtop"></span>
+
+        <a href="{% url 'gallery-create' %}">
+        <!-- Upload button for Gallery-->
+        <button class="btn-inffo">Upload</button>
+        </a>
+        <div class="main-filter-document">
+            <div class="rightbox2">
+                <div class="flex-container iconbox">
+              
+                    <form action="" method="POST"> {% csrf_token %}  
+                     <div class="flex-filter-all">
+                    
+                        <div class="three-fields-with-label">
+               <label for="grower"><h2>Grower details are missing</h2></label>
+                             
+                     
+               
+
+{% endblock content %}

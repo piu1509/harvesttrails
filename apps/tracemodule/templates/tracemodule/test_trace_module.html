@@ -1,0 +1,389 @@
+{% extends "base.html" %}
+{% load static %}
+{% load custom_tags %}
+{% block title %} Trace Module {% endblock title %}
+
+{% block extrahead %}
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+<style>
+    .table th, .table td {
+        text-align: center;
+        vertical-align: middle;
+        background: transparent;
+    }
+
+    .hover-table td {
+        padding: 10px;
+        transition: all 0.3s ease;
+    }
+    
+    .hover-table td:hover {
+        color: blue;
+        cursor: pointer;
+        transform: scale(1.05);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+    }
+    tr:nth-child(even){
+        background: transparent !important;
+    }
+    
+</style>
+{% endblock extrahead %}
+
+{% block content %}
+{% include 'navbar.html' %}
+<div class="main-content">
+    {% include 'header.html' %}
+    <main>       
+        <form method="post" class="form-fields">
+            
+            <div class="page-title d-flex justify-content-between align-items-center">
+                <h2 class="mb-0">Trace Module</h2>
+            </div>
+           
+            <div class="card form-container mt-4">
+                <div class="container-fluid">
+                    {% csrf_token %}
+                    <div class="row mt-4 mb-4" >
+                        <div class="col-md-10">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label for="getTextid">Select Search By<span class="asteriskField">*</span></label>
+                                    <select name="get_search_by" id="getTextid" class="form-control" required onchange="getText()">
+                                        <option value="">Select Search By</option>
+                                        <option value="grower" {% if get_search_by == 'grower' %}selected{% endif %}>Grower</option>
+                                        <option value="field" {% if get_search_by == 'field' %}selected{% endif %}>Field</option>
+                                        <option value="processor" {% if get_search_by == 'processor' %}selected{% endif %}>Processor</option>
+                                        <option value="sku_id" {% if get_search_by == 'sku_id' %}selected{% endif %}>SKU ID</option>
+                                        <option value="deliveryid" {% if get_search_by == 'deliveryid' %}selected{% endif %}>Delivery ID</option>
+                                        <option value="customer" {% if get_search_by == 'customer' %}selected{% endif %}>Customer</option>
+                                        <option value="warehouse" {% if get_search_by == 'warehouse' %}selected{% endif %}>Warehouse</option>
+                                    </select>
+                                </div>
+                            
+                                <div class="col-md-4">
+                                    <label for="tags">Search Text<span class="asteriskField">*</span></label>
+                                    <input name="search_text" id="tags" value="{{ search_text }}" type="text" class="form-control" placeholder="Search..." required>
+                                </div>
+                            
+                                <div class="col-md-4">
+                                    <label for="select_crop">Select Crop</label>
+                                    <select name="select_crop" id="select_crop" class="form-control" onchange="getText()">
+                                        <option value="">Select Crop</option>
+                                        {% for crop in crops %}
+                                            <option value="{{ crop.code }}" {% if select_crop == crop.code %}selected{% endif %}>{{ crop.code }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="row mt-3">
+                                <!-- Filter Type Selection -->
+                                <div class="col-md-4">
+                                    <label for="filter_type">Select Date Range / Year</label>
+                                    <select name="filter_type" id="filter_type" class="form-control" onchange="toggleFilterFields()">
+                                        <option value="all" {% if filter_type == "all" %}selected{% endif %}>All</option>
+                                        <option value="date_range" {% if filter_type == "date_range" %}selected{% endif %}>Date Range</option>
+                                        <option value="year" {% if filter_type == "year" %}selected{% endif %}>Year</option>
+                                    </select>
+                                </div>
+                            
+                                <!-- Year Selection Field -->
+                                <div class="col-md-4" id="year_field" style="display: none;">
+                                    <label for="crop_year">Select Crop Year</label>
+                                    <select name="crop_year" id="crop_year" class="form-control">
+                                        <option value="">Select Crop Year</option>
+                                        <option value="2022" {% if crop_year == '2022' %}selected{% endif %}>2022</option>
+                                        <option value="2023" {% if crop_year == '2023' %}selected{% endif %}>2023</option>
+                                        <option value="2024" {% if crop_year == '2024' %}selected{% endif %}>2024</option>
+                                    </select>
+                                </div>
+                            
+                                <!-- Date Range Fields -->
+                                <div class="col-md-4" id="date_range_fields" style="display: none;">
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <label for="crop_year">Select From Date</label>
+                                            <input name="from_date" id="from_date" value="{{ from_date }}" type="date" class="form-control" placeholder="Start Date">
+                                        </div>
+                                        <div class="col-6">
+                                            <label for="crop_year">Select To Date</label>
+                                            <input name="to_date" id="to_date" value="{{ to_date }}" type="date" class="form-control" placeholder="End Date">
+                                        </div>
+                                    </div>
+                                </div>
+                            
+                                <!-- Submit Button -->
+                                <div class="col-md-4 flex-grow-1 mt-4">
+                                    <input type="submit" value="Show Table" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {% if shipments %}
+                        <div class="col-md-2 mt-4">
+                            <div class="justify-content-center align-items-center">
+                                <a href="{% url 'generate_csv_for_multiple_shipments' search_text get_search_by from_date to_date %}?select_crop={{ select_crop }}" class="form-control d-flex font-weight-bold justify-content-center align-items-center" style="width:190px; height:140px;text-size:20px;">DOWNLOAD ALL CSV</a>
+                            </div>
+                        </div>
+                        {%else %}
+                        <div class="col-md-2 mt-4">
+                            <div class="justify-content-center align-items-center">
+                                <a href="{% url 'generate_csv_for_recent_shipments' from_date to_date %}" class="form-control d-flex font-weight-bold justify-content-center align-items-center" style="width:190px; height:140px;text-size:20px;">DOWNLOAD ALL CSV</a>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                  
+                    <div class="container-fluid mt-4 mb-4">
+                        {% if shipments %}
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                  <th scope="col">Shipment Id</th>
+                                  <th scope="col">Sender Name, Id</th>                                  
+                                  <th scope="col">Receiver Name, Id</th>                                  
+                                  <th scope="col">Receive Date</th>
+                                  <th scope="col">Crop</th>
+                                  <th scope="col">Weight</th>
+                                  <th scope="col">Lot Number</th>
+                                  <th scope="col">Status, Location</th>
+                                </tr>
+                              </thead>
+                              <tbody>                            
+                                {% if type == "contract_shipments" and get_search_by == "customer" %}                              
+                                
+                                {% for i in shipments|unique_by_shipment_id %}                                
+                                <tr onclick="window.location.href='{% url 'view_trace' i.shipment_id from_date to_date %}';" style="cursor: pointer;">
+                                    <th scope="row">{{i.shipment_id}}</th>
+                                    <td>{%if i.warehouse_name %} {{i.warehouse_name}} {%else %} {{i.processor_entity_name}}{%endif %}, {%if i.warehouse_id %} {{i.warehouse_id}} {%else %} {{i.processor_id}}{%endif %}</td>                                    
+                                    <td> {{i.customer_name}}, {{i.customer_id}}</td>                                   
+                                    <td>{% if i.customer_receive_date %}{{i.customer_receive_date|date:"j" | ordinal_day }} {{i.customer_receive_date|date:"M, Y"}} {% elif i.distributor_receive_date %}{{i.distributor_receive_date|date:"j" | ordinal_day }} {{i.distributor_receive_date|date:"M, Y"}}{%else%}N/A{% endif %}</td>
+                                    <td>{% for crop in i.crops %}{{crop.crop_name}} <br>{% endfor %}</td>
+                                    <td>{% for crop in i.crops %}{{crop.net_weight}} {{crop.weight_unit}}<br>{% endfor %}</td>
+                                    <td>{% for crop in i.crops %}{{crop.lot_number}}<br>{% endfor %}</td>
+                                    <td>{% if i.status%} {{i.status}}{%else%} N/A {% endif %}, {{i.location}}</td>
+                                </tr>
+                               
+                              {% endfor %} 
+                              {% elif type == "contract_shipments" and get_search_by == "warehouse" %} 
+                              {% for i in shipments|unique_by_shipment_id %}
+                                
+                                <tr onclick="window.location.href='{% url 'view_trace' i.shipment_id from_date to_date %}';" style="cursor: pointer;">
+                                    <th scope="row">{{i.shipment_id}}</th>
+                                    <td>{%if i.processor_entity_name %} {{i.processor_entity_name}} {% else %} {{i.warehouse_name}}{%endif %}, {%if i.processor_id %} {{i.processor_id}} {%else %} {{i.warehouse_id}}{%endif %}</td>                                    
+                                    <td>{% if i.customer_name %}{{i.customer_name}}{%else %} {{i.warehouse_name}} {%endif%}, {% if i.customer_id %}{{i.customer_id}}{%else %} {{i.warehouse_id}} {%endif%}</td>                                    
+                                    <td>{% if i.customer_receive_date %}{{i.customer_receive_date|date:"j" | ordinal_day }} {{i.customer_receive_date|date:"M, Y"}} {% elif i.distributor_receive_date %}{{i.distributor_receive_date|date:"j" | ordinal_day }} {{i.distributor_receive_date|date:"M, Y"}}{%else %}N/A{% endif %}</td>
+                                    <td>{% for crop in i.crops %}{{crop.crop_name}}<br>{% endfor %}</td>
+                                    <td>{% for crop in i.crops %}{{crop.net_weight}} {{crop.weight_unit}}<br>{% endfor %}</td>
+                                    <td>{% for crop in i.crops %}{{crop.lot_number}}<br>{% endfor %}</td>
+                                    <td>{% if i.status%} {{i.status}}{%else%} N/A {% endif %} {{i.location}}</td>
+                                </tr>
+                               
+                              {% endfor %}
+                              {% elif type == "processor_shipments" and get_search_by == "processor" %}  
+                              {% for i in shipments|unique_by_shipment_id %}
+                                
+                                <tr onclick="window.location.href='{% url 'view_trace' i.shipment_id from_date to_date %}';" style="cursor: pointer;">
+                                    <th scope="row">{{i.shipment_id}}</th>
+                                    <td>{%if i.processor_entity_name %} {{i.processor_entity_name}} {% elif i.processor_e_name %} {{i.processor_e_name}}{%else %} {{i.grower__name}} {%endif %}, {%if i.processor_id %} {{i.processor_id}} {%elif i.processor_idd %} {{i.processor_idd }}{%else %}{{i.grower_id}}{%endif %}</td>                                    
+                                    <td>{% if i.customer_name %}{{i.customer_name}}{%elif i.warehouse_name %} {{i.warehouse_name}} {%elif i.processor2_name %} {{i.processor2_name}}{% else%}{{i.processor__entity_name}}{%endif %}, {% if i.customer_id %}{{i.customer_id}}{%elif i.warehouse_id %} {{i.warehouse_id}} {%elif i.processor2_idd %} {{i.processor2_idd}}{% else %}{{i.processor__id}}{%endif %}</td>                                   
+                                    <td>{% if i.customer_receive_date %}{{i.customer_receive_date|date:"j" | ordinal_day }} {{i.customer_receive_date|date:"M, Y"}} {% elif i.distributor_receive_date %}{{i.distributor_receive_date|date:"j" | ordinal_day }} {{i.distributor_receive_date|date:"M, Y"}}{% elif i.recive_delivery_date %} {{i.recive_delivery_date|date:"j" | ordinal_day }} {{i.recive_delivery_date|date:"M, Y"}}{%elif i.approval_date %}{{i.approval_date|date:"j" | ordinal_day }} {{i.approval_date|date:"M, Y"}}{%else %} N/A{%endif %}</td>
+                                    <td>{%if i.crop %}{{i.crop}} {% elif i.crops %} {% for crop in i.crops %}{{crop.crop_name}}{%endfor %} {%else%} N/A {%endif%}</td>
+                                    <td>{%if i.crop %}{% if i.received_weight%}{{i.received_weight}}{{i.weight_of_product_unit}} {%elif i.weight_of_product %} {{i.weight_of_product}}{{i.weight_of_product_unit}} {% elif i.received_amount%}{{i.received_amount}}{{i.unit_type}} {%else%} {{i.total_amount}}{{i.unit_type}} {%endif %}{% elif i.crops %} {% for crop in i.crops %} {{crop.net_weight}} {{crop.weight_unit}}{%endfor %} {%else%} N/A {%endif%}</td>
+                                    <td>{%if i.lot_number %}{{i.lot_number}} {% elif i.crops %} {% for crop in i.crops %}{{crop.lot_number}}{%endfor %} {%else%} N/A {%endif%}</td>
+                                    <td>{% if i.status%} {{i.status}}{%else%} N/A {% endif %}, {{i.location}}</td>
+                                </tr>
+                               
+                              {% endfor %}
+                              {% elif type == "processor_shipments" and get_search_by == "sku_id" %}  
+                              {% for i in shipments %}
+                                
+                                <tr onclick="window.location.href='{% url 'view_trace' i.shipment_id from_date to_date %}';" style="cursor: pointer;">
+                                    <th scope="row">{{i.shipment_id}}</th>
+                                    <td>{%if i.processor_e_name %} {{i.processor_e_name}} {% else %} {{i.grower__name}}{%endif %}, {%if i.processor_idd %} {{i.processor_idd}} {%else %} {{i.grower_id }}{%endif %}</td>                                    
+                                    <td>{% if i.processor2_name %} {{i.processor2_name}}{%else %}{{i.processor__entity_name}}{%endif %}, {% if i.processor2_idd %} {{i.processor2_idd}}{%else %}{{i.processor__id}}{%endif %}</td>                                   
+                                    <td>{% if i.approval_date %}{{i.approval_date|date:"j" | ordinal_day }} {{i.approval_date|date:"M, Y"}} {% elif i.recive_delivery_date %} {{i.recive_delivery_date|date:"j" | ordinal_day }} {{i.recive_delivery_date|date:"M, Y"}}{%else %} N/A{%endif %}</td>
+                                    <td>{{i.crop}}</td>
+                                    <td>{% if i.received_weight%}{{i.received_weight}}{{i.weight_of_product_unit}} {%elif i.weight_of_product%} {{i.weight_of_product}}{{i.weight_of_product_unit}} {% elif i.received_amount%}{{i.received_amount}}{{i.unit_type}} {%else%} {{i.total_amount}}{{i.unit_type}}{%endif %}</td>
+                                    <td>{%if i.lot_number %}{{i.lot_number}}{%else %}N/A {%endif %}</td>
+                                    <td>{% if i.status%} {{i.status}}{%else%} N/A {% endif %}, {{i.location}}</td>
+                                </tr>
+                               
+                              {% endfor %}
+                              {% elif type == "processor_shipments" and get_search_by == "deliveryid" %}  
+                              {% for i in shipments %}
+                                
+                                <tr onclick="window.location.href='{% url 'view_trace' i.shipment_id from_date to_date %}';" style="cursor: pointer;">
+                                    <th scope="row">{{i.shipment_id}}</th>
+                                    <td>{{i.processor_e_name}}, {{i.processor_idd}} </td>                                    
+                                    <td> {{i.processor2_name}}, {{i.processor2_idd}}</td>                                    
+                                    <td> {%if i.recive_delivery_date %}{{i.recive_delivery_date|date:"j" | ordinal_day }} {{i.recive_delivery_date|date:"M, Y"}}{% else %} N/A{%endif %}</td>
+                                    <td>{{i.crop}}</td>
+                                    <td>{% if i.received_weight%}{{i.received_weight}}{{i.weight_of_product_unit}} {%elif i.weight_of_product%} {{i.weight_of_product}}{{i.weight_of_product_unit}} {% elif i.received_amount%}{{i.received_amount}}{{i.unit_type}} {%else%} {{i.total_amount}}{{i.unit_type}}{%endif %}</td>
+                                    <td>{{i.lot_number}}</td>
+                                    <td>{% if i.status%} {{i.status}}{%else%} N/A {% endif %}, {{i.location}}</td>
+                                </tr>
+                               
+                              {% endfor %}
+                              {% elif type == "grower_shipments" and get_search_by == "deliveryid" %}  
+                              {% for i in shipments %}
+                                
+                                <tr onclick="window.location.href='{% url 'view_trace' i.shipment_id from_date to_date %}';" style="cursor: pointer;">
+                                    <th scope="row">{{i.shipment_id}}</th>
+                                    <td>{{i.grower__name}}, {{i.grower_id}}  </td>                                    
+                                    <td> {{i.processor__entity_name}}, {{i.processor__id}}</td>                                   
+                                    <td> {%if i.approval_date %}{{i.approval_date|date:"j" | ordinal_day }} {{i.approval_date|date:"M, Y"}}{% else %} N/A{%endif %}</td>
+                                    <td>{{i.crop}}</td>
+                                    <td>{% if i.received_amount%}{{i.received_amount}}{{i.unit_type}} {%else%} {{i.total_amount}}{{i.unit_type}} {%endif %}</td>
+                                    <td>{%if i.lot_number %}{{i.lot_number}}{%else %}N/A {%endif %}</td>
+                                    <td>{% if i.status%} {{i.status}}{%else%} N/A {% endif %}, {{i.location}}</td>
+                                </tr>
+                               
+                              {% endfor %}
+                              {% elif type == "contract_shipments" and get_search_by == "deliveryid" %}  
+                              {% for i in shipments|unique_by_shipment_id %}
+                                
+                                <tr onclick="window.location.href='{% url 'view_trace' i.shipment_id from_date to_date %}';" style="cursor: pointer;">
+                                    <th scope="row">{{i.shipment_id}}</th>
+                                    <td>{%if i.processor_entity_name %} {{i.processor_entity_name}} {% else %} {{i.warehouse_name}}{%endif %}, {%if i.processor_id %} {{i.processor_id}} {%else %} {{i.warehouse_id}}{%endif %}</td>                                    
+                                    <td>{% if i.customer_name %}{{i.customer_name}}{%else %} {{i.warehouse_name}} {%endif%}, {% if i.customer_id %}{{i.customer_id}}{%else %} {{i.warehouse_id}} {%endif%}</td>                                    
+                                    <td> {% if i.customer_receive_date %}{{i.customer_receive_date|date:"j" | ordinal_day }} {{i.customer_receive_date|date:"M, Y"}} {% elif i.distributor_receive_date %}{{i.distributor_receive_date|date:"j" | ordinal_day }} {{i.distributor_receive_date|date:"M, Y"}}{%else %} N/A{% endif %}</td>
+                                    <td>{% for crop in i.crops %}{{crop.crop_name}}<br>{% endfor %}</td>
+                                    <td>{% for crop in i.crops %}{{crop.net_weight}} {{crop.weight_unit}}<br>{% endfor %}</td>
+                                    <td>{% for crop in i.crops %}{{crop.lot_number}}<br>{% endfor %}</td>
+                                    <td>{% if i.status%} {{i.status}}{%else%} N/A {% endif %}, {{i.location}}</td>
+                                </tr>
+                               
+                              {% endfor %}
+                              {% elif type == "grower_shipments" and get_search_by == "grower" or get_search_by == "field" %} 
+                              {% for i in shipments %}
+                                
+                                <tr onclick="window.location.href='{% url 'view_trace' i.shipment_id from_date to_date %}';" style="cursor: pointer;">
+                                    <th scope="row">{{i.shipment_id}}</th>
+                                    <td>{{i.grower__name}}, {{i.grower_id}}</td>                                    
+                                    <td>{{i.processor__entity_name}}, {{i.processor__id}}</td>                                    
+                                    <td> {%if i.approval_date %}{{i.approval_date|date:"j" | ordinal_day }} {{i.approval_date|date:"M, Y"}}{% else %} N/A{%endif %}</td>
+                                    <td>{{i.crop}}</td>
+                                    <td>{% if i.received_amount%}{{i.received_amount}}{{i.unit_type}} {%else%} {{i.total_amount}}{{i.unit_type}} {%endif %}</td>
+                                    <td>{%if i.lot_number %}{{i.lot_number}}{%else %}N/A {%endif %}</td>
+                                    <td>{% if i.status%} {{i.status}}{%else%} N/A {% endif %}, {{i.location}}</td>
+                                </tr>                               
+                              {% endfor %}
+                              {% endif %}                         
+                            </tbody>
+                        </table>     
+                        {% else %} 
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                  <th scope="col">Shipment Id</th>
+                                  <th scope="col">Sender Name, Id</th>                                  
+                                  <th scope="col">Receiver Name, Id</th>                                  
+                                  <th scope="col">Receive Date</th>
+                                  <th scope="col">Crop</th>
+                                  <th scope="col">Weight</th>
+                                  <th scope="col">Lot Number</th>
+                                  <th scope="col">Status, Location</th>
+                                </tr>
+                              </thead>
+                              <tbody>                                                                                
+                                
+                                {% for i in recent_shipments|unique_by_shipment_id %}                                
+                                <tr onclick="window.location.href='{% url 'view_trace' i.shipment_id from_date to_date %}';" style="cursor: pointer;">
+                                    <th scope="row">{{i.shipment_id}}</th>
+                                    <td>{%if i.processor_entity_name %} {{i.processor_entity_name}}{%elif i.warehouse_name %} {{i.warehouse_name}} {% elif i.processor_e_name %} {{i.processor_e_name}}{% else %} {{i.grower__name}} {%endif %},{% if i.processor_id %} {{i.processor_id}} {%elif i.warehouse_id %} {{i.warehouse_id}}  {% elif i.processor_idd %} {{i.processor_idd}}{% else %} {{i.grower_id}}{%endif %}</td>                                    
+                                    <td>{%if i.customer_name %} {{i.customer_name}} {%elif i.warehouse_name %} {{i.warehouse_name}}{% elif i.processor2_name %} {{i.processor2_name}} {% elif i.processor__entity_name %} {{i.processor__entity_name}} {%endif %}, {%if i.customer_id %} {{i.customer_id}} {%elif i.warehouse_id %} {{i.warehouse_id}}{% elif i.processor2_idd %} {{i.processor2_idd}} {% elif i.processor__id %} {{i.processor__id}} {%endif %}</td>                                   
+                                    <td>{% if i.customer_receive_date %}{{i.customer_receive_date|date:"j" | ordinal_day }} {{i.customer_receive_date|date:"M, Y"}} {% elif i.distributor_receive_date %}{{i.distributor_receive_date|date:"j" | ordinal_day }} {{i.distributor_receive_date|date:"M, Y"}}{%elif i.recive_delivery_date %} {{i.recive_delivery_date|date:"j" | ordinal_day }} {{i.recive_delivery_date|date:"M, Y"}} {%elif i.approval_date %} {{i.approval_date|date:"j" | ordinal_day }} {{i.approval_date|date:"M, Y"}}{%else%}N/A{% endif %}</td>
+                                    <td>{%if i.crops %}{% for crop in i.crops %}{{crop.crop_name}}<br>{% endfor %}{% elif i.crop %} {{i.crop}}{% endif %}</td>
+                                    <td>{%if i.crops %}{% for crop in i.crops %}{{crop.net_weight}} {{crop.weight_unit}}<br>{% endfor %}{% elif i.crop  and i.received_weight %}{{i.received_weight}} {{i.weight_of_product_unit}}{%elif i.crop and i.received_amount %}{{i.received_amount}} {{i.unit_type}}{% endif %}</td>
+                                    <td>{%if i.lot_number %} {{i.lot_number}} {% elif i.crops %}{% for crop in i.crops %}{{crop.lot_number}}<br>{% endfor %} {%else%}N/A{% endif %}</td>
+                                    <td>{% if i.status%} {{i.status}}{%else%} N/A {% endif %}, {{i.location}}</td>
+                                </tr>
+                               
+                              {% endfor %}
+                                                                     
+                            </tbody>
+                        </table>    
+                        {% endif %}                   
+                    </div>
+                </div>
+            </div>
+        </form>                    
+    </main>
+    {% include 'footer.html' %}
+</div>
+{% endblock %}
+
+{% block jquery %}
+
+<script>
+    function toggleFilterFields() {
+        // Get the selected filter type
+        const filterType = document.getElementById('filter_type').value;
+        const yearField = document.getElementById('year_field');
+        const dateRangeFields = document.getElementById('date_range_fields');
+
+        // Hide both fields by default
+        yearField.style.display = 'none';
+        dateRangeFields.style.display = 'none';
+
+        // Show the corresponding field based on the selected filter type
+        if (filterType === 'year') {
+            yearField.style.display = 'block';
+        } else if (filterType === 'date_range') {
+            dateRangeFields.style.display = 'block';
+        }
+    }
+
+    // Ensure the correct fields are displayed on page load
+    document.addEventListener('DOMContentLoaded', toggleFilterFields);
+</script>
+
+
+<!-- jQuery and jQuery UI -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.js"></script>
+<link href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/ui-lightness/jquery-ui.css" rel="stylesheet" />
+
+<!-- Autocomplete Suggestions -->
+<script>
+    function getText(){
+        var getTextid = $("#getTextid").val();
+        
+        if (getTextid != '') {
+            $.ajax({
+                type: "GET",
+                url: `/tracemodule/autocomplete_suggestions/${getTextid}/`,
+                data: {},
+                contentType: false,
+                cache: false,
+                processData: false,
+                success: function (response){
+                    var availableTags  = response.select_search;
+                    $("#tags").autocomplete({
+                        source: availableTags  // Suggest values from the AJAX response
+                    });
+                }
+            });
+        }
+    }
+
+    // Call getText() on initial page load if search parameters are prefilled
+    $(document).ready(function() {
+        getText();
+    });
+</script>
+
+<script>
+    $('#Traceability-Report').addClass('activeLink');
+</script>
+
+
+{% endblock jquery %}

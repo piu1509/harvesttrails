@@ -1,0 +1,217 @@
+{% extends "base.html" %} {% load static %}
+{% block title %}Tier 1 Processor To Processor Management {% endblock title %}
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+{% load crispy_forms_tags %}
+{% block content %}
+{% include 'navbar.html' %}
+
+<div class="main-content">
+    {% include 'header.html' %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.0/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.bootstrap4.min.css">
+
+    <main>
+        {% include '_alerts.html' %}
+        <div class="page-title-with-or-without-btn">
+            <span class="farm headingtop"> Tier 3 Processor To Processor Management</span>
+            <!-- Create button for Account-->
+            {% if 'Processor Management' in request.user.get_role_perm or request.user.is_superuser or 'SubAdmin' in request.user.get_role or 'SuperUser' in request.user.get_role %}
+            {% if not request.user.is_processor %}
+            <div class="flex-header-btn">
+                <a href="{% url 'link_processor_three' %}" class="btn-close-cancel">Link Tier 3 Processor To Processor</a>
+            </div>
+            {% endif %}
+            {% endif %}
+        </div>      
+                
+        <div class="card card-padding">
+            <div class="main-simple-table-with-search">
+                <div class="row">
+                <div class="col-8">
+                    <form action="" method="get" class="">                      
+                        <div class="inline-apply-filter">
+                            <div class="three-fields-with-label">
+                                <select name="pro1_id" id="mult_select"  class="form-control selectpicker" data-live-search="true">
+                                    <option value='all' selected> Select All Processor</option>
+                                    {% for pro1 in Processor1 %}
+                                    {% if pro1.id == selectedpro1 %}
+                                    <option value="{{ pro1.id }}" selected>{{pro1.entity_name}} - {{ pro1.pk }}
+                                    </option>
+                                    {% else %}
+                                    <option value="{{ pro1.id }}">{{pro1.entity_name}} - {{ pro1.pk }}
+                                    </option>
+                                    {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <input style="display : none;" id="submitBtn" type="submit"
+                                class="apply-filter-btn primary-btn" value="Apply Filter" />
+                        </div>
+                    </form>
+                </div>
+                <div class="form-inline justify-content-end">
+                    <div class="table-filter-col ml-auto">
+                    
+                    </div>
+                </div>
+                </div>
+                <div class="both-data-in" style="display: inherit;">
+                    <div class="simple-responsive-table">
+                        <table id="processorList_tbl" class="table table-striped dt-responsive nowrap" style="width:100%">
+                            <thead>
+                                <tr style="border-bottom: 2px solid #e0e0e0;">
+                                    <th width="50%">T3 Processor</th>
+                                    {% if 'Processor2' in request.user.get_role and request.user.is_processor %}
+                                    {% else %}
+                                    <th width="25%">processor</th>
+                                    <th width="15%">processor Type</th>
+                                    {% endif %}
+                                    <th width="10%" >Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if link_processor_to_processor_all %}
+                                {% for pro in link_processor_to_processor_all %}
+                                <tr>
+                                    <td>{{pro.processor.entity_name}}</td>   
+                                    {% if 'Processor2' in request.user.get_role and request.user.is_processor %}
+                                    {% else %}                              
+                                    <td>{{pro.linked_processor.entity_name}}</td>  
+                                    {% endif %} 
+                                    <td>{% for type in pro.linked_processor.processor_type.all %} {{type.type_name}} {% endfor %}</td>                               
+                                    <td class="backk action-td" >
+                                        
+                                        {% if 'Processor2' in request.user.get_role and request.user.is_processor %}
+                                        {% else %}
+                                        <li>
+                                            <a type="button"
+                                        data-mdb-toggle="modal" data-mdb-target="#deleteModal{{pro.id}}" alt="delete linked processor to processor" title="delete linked processor to processor">
+                                        <span class="fas fa-trash"></span></a>
+                                        </li>
+
+                                        <div class="modal fade" id="deleteModal{{pro.id}}" aria-hidden="true" aria-labelledby="exampleModalToggleLabel22" tabindex="-1">
+                                            <div class="modal-dialog">
+                                              <div class="modal-content">
+                                          
+                                                <div class="modal-body">
+                                                  <button type="button" class="btn-close cust-close-ds-btn" data-mdb-dismiss="modal" aria-label="Close"></button>
+                                                  <div class="center-content-status">
+                                                    <img src="{% static 'img/trash.png' %}" alt="right" id="rightImg" class="warning-icon">
+                                                    <p id="message" class="modal-title titlepad">Are you sure you want to delete?</p>
+                                                  </div>
+                                                  <div class="modal-center-btn-footer">
+                                                    <button onclick="reloadwindow()" id="closeBtnpopup" type="button" class="btn-close-cancel btn-space"
+                                                      data-mdb-dismiss="modal">
+                                                      Close
+                                                    </button>
+                                                    <!-- <button type="submit" class="btn-save-submit">Delete</button> -->
+                                                    
+                                                    <a href="{% url 'delete_link_processor_three' pro.id %}" id="storageDelete"class="btn-save-submit" >Delete</a>
+                                                   
+                                                  </div>
+                                                </div>
+                                          
+                                              </div>
+                                            </div>
+                                          </div>
+
+                                        {% endif %}  
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="4" style="text-align:center;">No Result Found</td>
+                                    </tr>
+                                    {% endif %}
+                            </tbody>
+                        </table>
+                        <div class="col-md-12 col-sm-12 col-12 text-center mt-2" style="text-align:right">
+                            <span>Showing {{ link_processor_to_processor_all.start_index }} - {{ link_processor_to_processor_all.end_index }} of {{ link_processor_to_processor_all.paginator.count }} entries</span>
+                          </div>
+                          <!-- Pagination controls -->
+                          <div class="row d-flex justify-content-center align-items-center">
+                              <div class="col-sm-4"></div>
+                              <div class="col-sm-4">
+                                  {% if link_processor_to_processor_all.has_other_pages %}
+                                  <ul class="pagination" id="nav_1">
+                                      {% if link_processor_to_processor_all.has_previous %}
+                                      <li><a href="?pro1_id={{ selectedpro1 }}&page={{ link_processor_to_processor_all.previous_page_number }}">&laquo;</a></li>
+                                      {% else %}
+                                      <li class="disabled"><span>&laquo;</span></li>
+                                      {% endif %}
+                                      {% for i in link_processor_to_processor_all.paginator.page_range %}
+                                      {% if link_processor_to_processor_all.number == i %}
+                                      <li class="active pagi" id="getactive"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+                                      {% else %}
+                                      <li><a href="?pro1_id={{ selectedpro1 }}&page={{ i }}">{{ i }}</a></li>
+                                      {% endif %}
+                                      {% endfor %}
+                                      {% if link_processor_to_processor_all.has_next %}
+                                      <li><a href="?pro1_id={{ selectedpro1 }}&page={{ link_processor_to_processor_all.next_page_number }}">&raquo;</a></li>
+                                      {% else %}
+                                      <li class="disabled"><span>&raquo;</span></li>
+                                      {% endif %}
+                                  </ul>
+                                  {% endif %}
+                              </div>
+                              <div class="col-sm-4"></div>
+                          </div>
+                    </div>
+                </div>
+            
+            </div>
+            </div>
+        </div>
+    </main>
+    {% include 'footer.html' %}
+</div>
+<!-- Delete Popup -->
+
+<!-- end -->
+
+{% endblock content %}
+
+{% block scripts %}
+<script src="https://cdn.datatables.net/1.11.0/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.0/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/responsive.bootstrap4.min.js"></script>
+
+<script src="{% static 'js/farm/farm_list.js' %}"></script>
+
+<script>
+    $(document).ready(function () {
+        $('#processorList_tbl').DataTable();
+    });
+    
+    $(document).ready(function () {
+        $('#growerSelction').change(function () {
+            $('#submitBtn').click();
+        });
+    });
+
+</script>
+<script>
+    $('#Tier3-Processor-active').addClass('activeLink');
+  
+    $('#Tier3-Processor-down').addClass('down');
+    $('#Tier3-Processor-sub').show();
+  
+    $('#Processor3-Processor-Management').addClass('activeLink active-nav');
+  
+  </script>
+{% endblock scripts %}

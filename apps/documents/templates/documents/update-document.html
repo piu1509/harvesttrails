@@ -1,0 +1,258 @@
+{% extends "base.html" %}
+{% load static %} {% block title %} Update Document {% endblock title %} {% block content %}
+{% include 'navbar.html' %}
+<div class="main-content">
+    {% include 'header.html' %}
+    <link href="https://unpkg.com/@yaireo/tagify/dist/tagify.css" rel="stylesheet" type="text/css" />
+<!-- MID CONTENT -->
+
+<main> 
+    <span class="farm headingtop">Update Document</span>
+    <div class="card farm-fields-container">
+        <form method="post" class="farm-fields-form" name="createDocument" id="createDocument" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-md-12">
+                    <div id="div_id_Upload_File" class="form-group">
+                        <label for="Upload_File">
+                            Upload File (doc docx and pdf is allowed)
+                        </label>
+                        <div class="">
+                            <input type="file" name="File" id="File" accept=".doc,.docx,application/pdf" {% if not single_doc_obj.file %}required{% endif %} >
+                            <!-- <small id="hint_id_name" class="form-text text-muted">ex: Fred Farmer</small> -->
+                            <a href="/media/{{single_doc_obj.file}}" download>{{single_doc_obj.filename}}</a>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div id="div_id_Folder" class="form-group">
+                        <label for="Folder">
+                            Folder (required)
+                        </label>
+                        <div class="">
+                            <select name="Folder" class="select form-control" id="Folder" required >
+                              <option value="">Select</option>
+                              {% for folder in folder_data %}
+                              <option value="{{folder.id}}" {% if single_doc_obj.folder_id == folder.id %}selected{% endif %}>{{folder.name}}</option>
+                              {% endfor %}
+                            </select>
+                            <!-- <small id="hint_id_name" class="form-text text-muted">ex: Fred Farmer</small> -->
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div id="div_id_Grower" class="form-group">
+                        <label for="Grower">
+                            Grower (required)
+                        </label>
+                        <div class="">
+                            <select name="Grower" class="select form-control" id="Grower" required >
+                              <option value="">Select</option>
+                              {% for grower in get_growers %}
+                              <option value="{{grower.id}}" {% if single_doc_obj.grower_id == grower.id %}selected{% endif %}>{{grower.name}}</option>
+                              {% endfor %}
+                            </select>
+                            <!-- <small id="hint_id_name" class="form-text text-muted">ex: Fred Farmer</small> -->
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div id="div_id_Farm" class="form-group">
+                        <label for="Farm">
+                            Farm
+                        </label>
+                        <div class="">
+                            <select name="Farm" class="select form-control" id="Farm" >
+                              <option value="">Select</option>
+                            </select>
+                            <!-- <small id="hint_id_name" class="form-text text-muted">ex: Fred Farmer</small> -->
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div id="div_id_Field" class="form-group">
+                        <label for="Field">
+                            Field
+                        </label>
+                        <div class="">
+                            <select name="Field" class="select form-control" id="Field" >
+                              <option value="">Select</option>
+                            </select>
+                            <!-- <small id="hint_id_name" class="form-text text-muted">ex: Fred Farmer</small> -->
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div id="div_id_Corp_Year" class="form-group">
+                        <label for="Corp_Year">
+                            Crop Year
+                        </label>
+                        <div class="">
+                            <select name="Corp_Year" class="select form-control" id="Corp_Year" >
+                                <option value="">Select</option>
+                                {% for year in year_dropdown %}
+                                <option value="{{year}}" {% if single_doc_obj.corp_year == year|slugify %}selected{% endif %}>{{year}}</option>
+                                {% endfor %}
+                            </select>
+                            <!-- <small id="hint_id_name" class="form-text text-muted">ex: Fred Farmer</small> -->
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div id="div_id_Tag" class="form-group">
+                        <label for="Tag">
+                            Tag
+                        </label>
+                        <div class="">
+                            <input type="text" name="Tag" id="Tag" class="form-control" value="{{single_doc_obj.tag}}">
+                            <small id="hint_id_Tag" class="form-text text-muted">ex: Use 'comma (,)' or 'Enter key' to add multiple tags.</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div id="div_id_Keyword" class="form-group">
+                        <label for="Keyword">
+                            Keyword (required)
+                        </label>
+                        <div class="">
+                            <textarea name="Keyword" id="Keyword" class="form-control" required >{{single_doc_obj.keyword}}</textarea>
+                            <!-- <small id="hint_id_name" class="form-text text-muted">ex: Fred Farmer</small> -->
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div id="div_id_Survey_Type" class="form-group">
+                        <label for="Survey_Type">
+                            Survey Type (required)
+                        </label>
+                        <div class="">
+                            <select name="Survey_Type" class="select form-control" id="Survey_Type" required >
+                              <option value="">Select</option>
+                              {% for type_survey in type_survey_data %}
+                              <option value="{{type_survey.id}}" {% if single_doc_obj.survey_type_id == type_survey.id %}selected{% endif %} >{{type_survey.name}}</option>
+                              {% endfor %}
+                            </select>
+                            <!-- <small id="hint_id_name" class="form-text text-muted">ex: Fred Farmer</small> -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-12">
+                    <div class="form-btn-row text-center text-md-end">
+                        <a href="{% url 'document-list' %}" class="btn-close-cancel">Cancel</a>
+                        <input type="hidden" name="doc_id" id="doc_id" value="{{single_doc_obj.id}}">
+                        <input type="submit" name="create_document" id="create_document" class="btn-save-submit" value="Save">
+                    </div>
+                </div>
+                
+            </div>
+        </form>   
+    </div>    
+</main>
+<!-- MID CONTENT END-->
+  <!-- end -->
+  <!-- Add Que Popup -->
+{% include 'footer.html' %}
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="https://unpkg.com/@yaireo/tagify"></script>
+<script src="https://unpkg.com/@yaireo/tagify@3.1.0/dist/tagify.polyfills.min.js"></script>
+{% endblock scripts %}
+{% block jquery %}
+<script>
+function onlyNumberKey(evt) { 
+    // Only ASCII charactar in that range allowed 
+    var ASCIICode = (evt.which) ? evt.which : evt.keyCode 
+    if (ASCIICode > 31 && (ASCIICode < 48 || ASCIICode > 57)) 
+        return false; 
+    return true; 
+}
+
+$('#Grower').on('change', function(e){
+      var grower_id = $(this).val();
+      var farm_id = '{{single_doc_obj.farm_id}}';
+      //alert("farm_id"+farm_id);
+      if(grower_id > 0)
+      {
+        $.ajax({ // create an AJAX call...
+                  data: {grower_id:grower_id}, // get the form data
+                  type: 'GET', // GET or POST
+                  url: "{% url 'get-all-farm' %}", // the file to call 
+                  dataType: 'JSON',
+                  success: function(response) { // on success..
+                      var farm_items = ['<option value="">Select</option>'];
+                      for (const [val, key] of response.farm_list) {
+
+                            if(key == farm_id){ var sel= 'selected'; } else { var sel= ''; }
+                        farm_items.push("<option value='" + key + "'" + sel + " >" + val + "</option>");
+                      }
+                      var farm_items_options = farm_items.join("");
+                      $('#Farm').html(farm_items_options);
+                      setTimeout(function(){ $('#Farm').change(); }, 100);
+                  }
+              });
+      }
+      else
+      {
+        $('#Farm').html('<option value="">Select</option>');
+      }
+  });
+
+  $('#Farm').on('change', function(e){
+    var farm_id = $(this).val();
+    var filed_id = '{{single_doc_obj.field_id}}';
+    //alert("filed_id"+filed_id);
+    if(farm_id > 0)
+    {
+      $.ajax({ // create an AJAX call...
+              data: {farm_id:farm_id}, // get the form data
+              type: 'GET', // GET or POST
+              url: "{% url 'get-all-field' %}", // the file to call 
+              dataType: 'JSON',
+              success: function(response) { // on success..
+                  var field_items = ['<option value="">Select</option>'];
+                  for (const [val, key] of response.field_list) {
+                    if(key == filed_id){ var sel= 'selected'; } else { var sel= ''; }
+                    field_items.push("<option value='" + key + "'" + sel + " >" + val + "</option>");
+                  }
+                  var field_items_options = field_items.join("");
+                  $('#Field').html(field_items_options);
+              }
+          });
+
+    }
+    else
+    {
+      $('#Field').html('<option value="">Select</option>');
+    }
+  });
+
+  $(document).ready(function(e){
+    $('#Grower').change();
+    // setTimeout(function(){
+    //     $('#Farm').val('{{single_doc_obj.farm_id}}');
+    //     $('#Farm').change();
+    // }, 200);
+
+    // setTimeout(function(){
+    //     $('#Field').val('{{single_doc_obj.field_id}}');
+    // }, 500);
+
+  });
+
+var Tag_input = document.querySelector('input[name=Tag]');
+// initialize Tagify on the above input node reference
+new Tagify(Tag_input);
+</script>
+<script>
+    $('#Documents-and-Photos-active').addClass('activeLink');
+  
+    $('#Documents-and-Photos-down').addClass('down');
+    $('#Documents-and-Photos-sub').show();
+  
+    $('#Document-List').addClass('activeLink active-nav');
+  
+  </script>
+{% endblock jquery %}

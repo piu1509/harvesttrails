@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% load static %} {% block title %} Help And Guide Details {% endblock title %} {% block content %}
+{% include 'navbar.html' %}
+<div class="main-content">
+    {% include 'header.html' %}
+<main> 
+    <div class="page-title-with-or-without-btn">
+      <span class="farm headingtop">Help And Guide Details</span>
+      <!-- Create button for Account-->
+      <a href="{% url 'HelpAndGuideView' %}" class="btn-close-cancel btn-space">Back</a>
+    </div>
+
+    <div class="card card-padding">
+      <div class="main-simple-table-with-search">
+        <div class="simple-responsive-table">
+            <div style="font-size: 32px; color: #3258a8; font-weight: bold; text-decoration: none;">
+                {{help_guide.title}}
+              </div>   
+                <div style="font-size: 18px; color: black;">
+                  {% autoescape off %}
+                  {{help_guide.description}}
+                  {% endautoescape %}
+                </div>
+                <div style="color: #00b258;font-weight: bold;">
+                    {% if help_guide.upload_file %}
+                    Attachment : {{ help_guide.upload_file }} <a href="{{ help_guide.upload_file.url }}"><i class="fas fa-download"></i></a>
+                    {% endif %}
+                </div>
+        </div>
+      </div>
+    </div>
+</main>
+
+
+</div>
+{% include 'footer.html' %}
+</div>
+{% endblock %}
+{% block jquery %}
+<script>
+  $('#Setting-Configuration-active').addClass('activeLink');
+
+  $('#Setting-Configuration-down').addClass('down');
+  $('#Setting-Configuration-sub').show();
+
+  $('#Help-and-Guide').addClass('activeLink active-nav');
+
+</script>
+{% endblock jquery %}

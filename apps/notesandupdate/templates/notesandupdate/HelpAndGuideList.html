@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+{% load static %} {% block title %} Help And Guide List {% endblock title %} {% block content %}
+{% include 'navbar.html' %}
+<div class="main-content">
+    {% include 'header.html' %}
+<main> 
+    <div class="page-title-with-or-without-btn">
+      <span class="farm headingtop">Help And Guide Listing</span>
+      <!-- Create button for Account-->
+      <div class="flex-header-btn">
+        {% if 'Help guide' in request.user.get_role_perm or request.user.is_superuser  %}
+        <a href="{% url 'HelpAndGuideCreate' %}" class="btn-add-green"
+          >+ Create Help And Guide</a
+        >
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="card card-padding">
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}" role="alert">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+      <div class="main-simple-table-with-search">
+        <div class="simple-responsive-table">
+          <table
+            id="growerListtbl"
+            class="table table-striped table-bordered dt-responsive nowrap"
+            style="width: 100%"
+          >
+            <thead>
+              <tr style="border-bottom: 2px solid #e0e0e0">
+                <th>Title</th>
+                <th>Description</th>
+                <th>File</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for help_guide in help_guide %}
+              <tr>
+                <td>
+                    {{help_guide.title|truncatechars:50}}
+                </td>
+                <td>
+                  {% autoescape off %}
+                  {{help_guide.description|truncatechars:90}}
+                  {% endautoescape %}
+                </td>
+                <td>
+                    {{help_guide.upload_file|truncatechars:50}}
+                </td>
+                <td class="backk1">
+                  {% if 'Help guide' in request.user.get_role_perm or request.user.is_superuser  %}
+                  <li>
+                    <a href="{% url 'HelpAndGuideEdit' help_guide.pk %}" ><span class="fas fa-edit"> </span></a>
+                  </li>
+                  {% endif %}
+
+                  {% if 'Help guide' in request.user.get_role_perm or request.user.is_superuser  %}
+
+                  <a href="javascript:void(0)" onclick="deleteNote('{{help_guide.pk}}')">
+                    <span class="fas fa-trash"></span>
+                  </a>
+                  {% endif %}
+                  
+                </td>
+              </tr>
+              {% endfor %}
+              {% if data_text == 'No Record Found' %}
+              <tr>
+                  <td colspan="4" align="center">{{ data_text }}</td>
+              </tr>
+              {% endif %}
+              
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+</main>
+
+<div class="modal fade" id="deleteModal" aria-hidden="true" aria-labelledby="exampleModalToggleLabel22"  tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-body">
+        <button
+          type="button"
+          class="btn-close cust-close-ds-btn"
+          data-mdb-dismiss="modal"
+          aria-label="Close"
+          onclick="cancelDelete()"
+        ></button>
+        <div class="center-content-status">
+          <img
+            src="/static/img/trash.png"
+            alt="right"
+            id="rightImg"
+            class="warning-icon"
+          />
+          <p id="message" class="modal-title titlepad">
+            Are you sure you want to delete?
+          </p>
+        </div>
+        <div class="modal-center-btn-footer">
+          <button
+            onclick="cancelDelete()"
+            id="closeBtnpopup"
+            type="button"
+            class="btn-close-cancel btn-space"
+            data-mdb-dismiss="modal"
+          >
+            Close
+          </button>
+          <a href="javascript:void(0);" id="noteDelete">
+            <button type="" class="btn-save-submit">Delete</button>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+{% include 'footer.html' %}
+</div>
+{% endblock %}
+{% block jquery %}
+<script>
+  function deleteNote(id)
+  {
+    $('#deleteModal').modal('show');
+    $('#noteDelete').attr('onclick','confirmDelete('+id+')');
+  }
+
+  function cancelDelete()
+  {
+    $('#noteDelete').attr('onclick','');
+    $('#deleteModal').modal('hide');
+  }
+
+  function confirmDelete(id)
+  {
+    $.ajax({ // create an AJAX call...
+        data: {id:id}, // get the form data
+        type: 'POST', // GET or POST
+        url: "{% url 'HelpAndGuideDelete' %}", // the file to call
+        beforeSend: function(xhr, settings){
+            xhr.setRequestHeader("X-CSRFToken", '{{csrf_token}}');
+        }, 
+        success: function(response) { // on success..
+            //console.log(response);
+            if(response > 0)
+            {
+              location.reload();
+            }
+        }
+    });
+  }
+</script>
+<script>
+  $('#Setting-Configuration-active').addClass('activeLink');
+
+  $('#Setting-Configuration-down').addClass('down');
+  $('#Setting-Configuration-sub').show();
+
+  $('#Help-and-Guide').addClass('activeLink active-nav');
+
+</script>
+{% endblock jquery %}

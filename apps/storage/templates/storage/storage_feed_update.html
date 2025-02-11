@@ -1,0 +1,281 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %} Storage Feed {% endblock title %}
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+{% block content %}
+{% include 'navbar.html' %}
+
+{% comment %} <style>
+    .mystyle {
+        display: none;
+    }
+
+    .upload-file-main label {
+        font-size: 16px
+    }
+
+    .file-upload-wrapper {
+        border-radius: 0px;
+        border: 1px solid #ccc;
+    }
+
+    .file-upload-wrapper:before {
+        border-bottom-right-radius: 0px;
+        border-top-right-radius: 0px
+    }
+
+    .file-upload-wrapper:after {
+        background: none;
+    }
+
+    .gro_dd {
+        border-color: #ccc;
+        margin-top: 0px;
+        height: 50px;
+    }
+</style> {% endcomment %}
+<style>
+    .bootstrap-select .btn {
+        box-shadow: none;
+        border: 1px solid #ddd;
+    }
+
+    input.textinput.textInput.form-control {
+        height: 36px !important;
+        border-radius: 3px !important;
+    }
+
+    .bootstrap-select:not([class*=col-]):not([class*=form-control]):not(.input-group-btn) {
+        width: 100%
+    }
+    input.textinput.textInput.form-control {
+        height: 35px !important;
+        border-radius: 3px !important;
+        width: 134px;
+   
+    }
+
+    .selected.active{
+        margin-top: 0 !important;
+        margin-left: 0 !important;
+        padding-top: 4px !important;
+        padding-left: 8px !important;
+        padding-bottom: 4px !important;
+        padding-right: 8x !important;
+        font-size: 16px !important;
+        
+        border: 0 !important
+    }
+
+    .dropdown.bootstrap-select.form-control .btn {
+    border-radius: 6px;
+    }
+    .bootstrap-select .dropdown-menu li.disabled.selected{display: none;}
+    .dropdown.bootstrap-select.form-control .btn{border: 1px solid; padding: 7px 8px;}
+    .bootstrap-select .dropdown-menu{max-width: 280px;}
+    .bootstrap-select .dropdown-menu li.selected.active .dropdown-item.active.selected{margin-left: 0;padding: 0;}
+    {% comment %} fields-form select.form-select {
+        height: auto;
+        padding: 4px 22px !important;
+        border-radius: 0 !important;
+        width: 5px;
+    } {% endcomment %}
+</style>
+
+<div class="main-content">
+    {% include 'header.html' %}
+    {% load crispy_forms_tags %}
+    {% comment %} {% include '_alerts.html' %} {% endcomment %}
+    <main>
+        <span class="farm headingtop">Storage Qnt Edit</span>
+        <div class="card farm-fields-container">
+            <nav aria-label="breadcrumb m-5">
+                {% if error_messages %}
+                <div id="alertMessage" class="alert alert-warning alert-dismissible fade show" role="alert">
+                    <strong>{{error_messages}}</strong>  
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>                         
+                  </div> 
+                  <script>                            
+                    setTimeout(function() {
+                        document.getElementById('alertMessage').style.display = 'none';
+                    }, 5000);
+                </script>                          
+                  {% endif %}
+            </nav>
+            <div class="container-fluid">
+                
+                <form action="" method="post" class="farm-fields-form"
+                    enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <lable>Select Growers<span class="asteriskField">*</span></lable>
+                                <select id="growerSelction" name="grower_id" class="selectpicker " data-live-search="true" onchange="this.form.submit()">
+                                    <option value="all"> Select All Growers </option>
+                                    {% for grower in growers %}
+                                    {% if selectedGrower == grower %}
+                                    <option value="{{ grower.pk }}" selected>{{grower.name}} - {{ grower.pk }}</option>
+                                    {% else %}
+                                    <option value="{{ grower.pk }}">{{grower.name}} - {{ grower.pk }}</option>
+                                    {% endif %}
+                                    {% endfor %}
+                                </select>
+                                <p id="p1" style="color: red;"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <lable>Select Crop<span class="asteriskField">*</span></lable>
+                                <select id="grower_crop" name="grower_crop" class="selectpicker " data-live-search="true", onchange="this.form.submit()">
+                                    <option value='all'> Select Crop </option>
+                                    {% for crop in crop %}
+                                    {% if selectedCrop == crop %}
+                                    <option value={{crop}} selected>{{crop}} </option>
+                                    {%else%}
+                                    <option value={{crop}} >{{crop}} </option>
+                                    {% endif %}
+                                    {% endfor %}
+                                </select>
+                                <p id="p2" style="color: red;"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <lable>Select Storage<span class="asteriskField">*</span></lable>
+                                <select id="storageSelction" name="storage_id" class="selectpicker" data-live-search="true" onchange="this.form.submit()">
+                                    <option value="all"> Select All Storage </option>
+                                    {% for storage in storage_name %}
+                                    {% if selectedStorage == storage %}
+                                    <option value="{{ storage.pk }}" selected>{{storage.storage_name}} - {{ storage.pk }}</option>
+                                    {% else %}
+                                    <option value="{{ storage.pk }}">{{storage.storage_name}} - {{ storage.pk }}</option>
+                                    {% endif %}
+                                    {% endfor %}
+                                </select>
+                                <p id="p3" style="color: red;"></p>
+                            </div>
+                        </div>
+                        {% comment %} <div class="col-md-2">
+                            <div class="form-group">
+                                <lable>Select Field<span class="asteriskField">*</span></lable>
+                                <select id="fieldSelction" name="field_id" class="selectpicker" data-live-search="true">
+                                    <option value="all"> Select All Field </option>
+                                    {% for field in field_name %}
+                                    {% if selectedField == field %}
+                                    <option value="{{ field.pk }}" selected>{{field.name}} - {{ field.pk }}</option>
+                                    {% else %}
+                                    <option value="{{ field.pk }}">{{field.name}} - {{ field.pk }}</option>
+                                    {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>   {% endcomment %}
+                         
+                        <div class="col-md-3">
+                            <label for="quantity">Quantity<span class="asteriskField">*</span></label>
+                            <div class="d-flex">
+                                <input type="text" name="quantity" id="quantity" autocomplete="off"
+                                    class="textinput textInput form-control" value="{{total_quantity}}" style="margin-top:0 !important; padding-left: 8px !important; padding-right: 8px; border-top-right-radius:0 !important; border-bottom-right-radius:0 !important">
+                            
+                                <select id="unitSelction" name="unit_id" class="form-select" style="border-top-left-radius:0 !important; border-bottom-left-radius:0 !important; border-left:0;width: 85px;  padding: 3px 22px !important;">
+                                    <option value="LBS" {% if amount_unit == "LBS" %}selected{% endif %}>LBS</option>
+                                    <option value="BU" {% if amount_unit == "BU" %}selected{% endif %}>BU</option>
+                                </select>
+                            </div>
+                            <p id="p4" style="color: red;"></p>
+                        </div> 
+                        
+                        <div class="form-btn-row text-center text-md-end">
+                            <a href="{% url 'storage_feed_list' %}" class="btn-close-cancel btn-space">Cancel</a>
+                            {% comment %} <button id="mainSavebutton" type="button" class="btn-save-submit" value="Save" onclick="activityButton1()">Save</button>
+                            <input id="mainSave" type="submit" name="mainSave" class="btn-save-submit" value="Save" style="display:none;" >
+                            <input id="submitBtn" type="submit" style="display:none;" name="submitBtn" class="btn-save-submit" value="submitBtn"> {% endcomment %}
+                            <input style="display: none;" id="hide_btn1" type="submit" class="btn-save-submit"
+                                value="Save" name="save">
+                            <!-- <input type="button" id="hide_btn2" class="btn-save-submit" value="Save" onclick="btnClick()"> -->
+                            <input type="submit" name="save" class="btn-save-submit" value="Save" onclick="activityButton1()">
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+</div>
+</main>
+{% include 'footer.html' %}
+</div>
+{% endblock content %}
+
+{% block jquery %}
+{% comment %} <script>
+    function activityButton1(){
+        var growerSelction = document.getElementById("growerSelction").value;
+        var grower_crop = document.getElementById("grower_crop").value;
+        var storageSelction = document.getElementById("storageSelction").value;
+        var raw_val = '{{raw_val}}';
+        console.log("raw_val",raw_val);
+        var quantity = parseFloat(document.getElementById("quantity").value);
+        console.log("quantity",quantity);
+
+        if (growerSelction != "all" && grower_crop != "all" && storageSelction != 'all' && quantity && typeof quantity === 'number' && raw_val > quantity ){
+            $('#mainSave').click();
+        }
+        else{
+            if (growerSelction == "all"){
+                document.getElementById("p1").innerHTML = "*Please Select A Grower";
+            }else{
+                document.getElementById("p1").innerHTML = "";
+            }
+
+            if (grower_crop == "all"){
+                document.getElementById("p2").innerHTML = "*Please Select A Crop";
+            }else{
+                document.getElementById("p2").innerHTML = "";
+            }
+
+            if (storageSelction == "all"){
+                document.getElementById("p3").innerHTML = "*Please Select A Storage";
+            }else{
+                document.getElementById("p3").innerHTML = "";
+            }
+            
+            if (raw_val < quantity){
+                document.getElementById("p4").innerHTML = "Quantity is greater than available qnt.";
+            }else{
+                if(quantity == NaN || quantity == "" || quantity != NaN){
+                    document.getElementById("p4").innerHTML = "*Please enter a valid Quantity number.";
+                    
+                }else{
+                    document.getElementById("p4").innerHTML = "";
+                }
+            }               
+            }
+ 
+        }
+
+</script> {% endcomment %}
+
+<script>
+    $('#Storage-Management-active').addClass('activeLink');
+                    
+    $('#Storage-Management-down').addClass('down');
+    $('#Storage-Management-sub').show();
+    
+    $('#Storage-Feed-List').addClass('activeLink active-nav'); 
+</script>
+{% endblock jquery %}

@@ -1,0 +1,39 @@
+{% extends "base.html" %} {% load static %} {% block title %} Delete Field {% endblock title %} 
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+{% block content %} {% include 'navbar.html' %}
+
+<div class="main-content">
+    {% include 'header.html' %}
+    <div class="modal-dialog">
+        <div class="modal-content deletepopup">
+            <div class="modal-body">
+                <div class="container">
+                    <form method="post" action="{% url 'field-delete' object.pk %}">
+                        {% csrf_token %}
+                        <p>Are you sure you want to delete "{{object}}"?</p>
+                        <div class="modal-footer">
+                            <button class="btn-inffo">Delete</button><span>
+                        </div> 
+											</form>
+                      <a href="{% url 'field-list' %}"><button class="btn-inffo2" data-mdb-dismiss="modal" aria-label="Close">Cancel</button></span></a>
+                        </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer"> </div>
+    </div>
+</div>
+
+{% endblock content %}

@@ -1,0 +1,689 @@
+{% extends "base.html" %} {% load static %}
+{% load custom_tags %}{% block title %} Trace Module {% endblock title %} 
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+{% block content %} {% include 'navbar.html' %}
+<div class="main-content">
+    {% include 'header.html' %} {% load crispy_forms_tags %}
+  <main>
+<style>
+    
+    .clickcss{
+        cursor: pointer;
+    }
+    tr:nth-child(even) {
+        background-color: #D3E3BB; 
+    }
+    .table th {
+        text-transform: capitalize;
+    }
+    /* .col-md-6{
+        width: 50%;
+    } */
+
+    /* .loader {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.7);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .loader:after {
+        content: "";
+        display: block;
+        width: 50px;
+        height: 50px;
+        border: 5px solid #ccc;
+        border-top: 5px solid #000;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    } */
+
+    .img_wapper {
+        position: relative;
+    }
+
+    .loader {
+        width: 60px;
+        aspect-ratio: 1;
+        border-radius: 50%;
+        animation: l11 2s infinite;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%,-50%);
+    }
+
+    @keyframes l11 {
+        0% {
+            background: conic-gradient(#006531 0, #0000 0)
+        }
+
+        12.5% {
+            background: conic-gradient(#006531 45deg, #0000 46deg)
+        }
+
+        25% {
+            background: conic-gradient(#006531 90deg, #0000 91deg)
+        }
+
+        37.5% {
+            background: conic-gradient(#006531 135deg, #0000 136deg)
+        }
+
+        50% {
+            background: conic-gradient(#006531 180deg, #0000 181deg)
+        }
+
+        62.5% {
+            background: conic-gradient(#006531 225deg, #0000 226deg)
+        }
+
+        75% {
+            background: conic-gradient(#006531 270deg, #0000 271deg)
+        }
+
+        87.5% {
+            background: conic-gradient(#006531 315deg, #0000 316deg)
+        }
+
+        100% {
+            background: conic-gradient(#006531 360deg, #0000 360deg)
+        }
+    }
+    .table th, .table td {
+        text-align: center;
+        vertical-align: middle;
+        background: transparent;
+    }
+
+    .hover-table td {
+        padding: 10px;
+        transition: all 0.3s ease;
+    }
+    
+    .hover-table td:hover {
+        color: blue;
+        cursor: pointer;
+        transform: scale(1.05);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+    }
+    tr:nth-child(even){
+        background: transparent !important;
+    }
+</style>
+<form method="post" class="farm-fields-form">
+    <div class="page-title">
+        <h2>Trace Module</h2>
+        {% if origin_context %}
+        <div class="action-buttons">
+            <button type="button" onclick="printDiv()" class="btn">PDF Export</button>
+            <a href="{% url 'traceability_report_all_csv_download' select_crop get_search_by search_text from_date to_date %}" class="btn">Download CSV</a>
+            <button type="submit" class="btn" name="map_view">Map View</button>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="card form-container">
+        <div class="container-fluid">
+            {% csrf_token %}
+            <div class="row mt-4 mb-4" >
+                <div class="col-md-10">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <select name="get_search_by" id="getTextid" class="form-control" required>
+                                <option value="">Select Search By</option>
+                                <option value="grower" {% if get_search_by == 'grower' %}selected{% endif %}>Grower</option>
+                                <option value="field" {% if get_search_by == 'field' %}selected{% endif %}>Field</option>
+                                <option value="processor" {% if get_search_by == 'processor' %}selected{% endif %}>Processor</option>
+                                <option value="sku_id" {% if get_search_by == 'sku_id' %}selected{% endif %}>SKU ID</option>
+                                <option value="deliveryid" {% if get_search_by == 'deliveryid' %}selected{% endif %}>Delivery ID</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-4">
+                            <input name="search_text" id="tags" value="{{ search_text }}" type="text" class="form-control" placeholder="Search..." required>
+                        </div>
+
+                        <div class="col-md-4">
+                            <select name="select_crop" class="form-control" required>
+                                <option value="">Select Crop</option>
+                                {% for crop in crops %}
+                                <option value="{{ crop.code }}" {% if select_crop == crop.code %}selected{% endif %}>{{ crop.code }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                    </div>
+
+                    <div class="row mt-3">
+                        <!-- Filter Type Selection -->
+                        <div class="col-md-4">
+                            <select name="filter_type" id="filter_type" class="form-control" onchange="toggleFilterFields()">
+                                <option value="all" {% if filter_type == "all" %}selected{% endif %}>All</option>
+                                <option value="date_range" {% if filter_type == "date_range" %}selected{% endif %}>Date Range</option>
+                                <option value="year" {% if filter_type == "year" %}selected{% endif %}>Year</option>
+                            </select>
+                        </div>
+                    
+                        <!-- Year Selection Field -->
+                        <div class="col-md-4" id="year_field" style="display: none;">
+                            <select name="crop_year" class="form-control">
+                                <option value="">Select Crop Year</option>
+                                <option value="2022" {% if crop_year == '2022' %}selected{% endif %}>2022</option>
+                                <option value="2023" {% if crop_year == '2023' %}selected{% endif %}>2023</option>
+                                <option value="2024" {% if crop_year == '2024' %}selected{% endif %}>2024</option>
+                            </select>
+                        </div>
+                    
+                        <!-- Date Range Fields -->
+                        <div class="col-md-4" id="date_range_fields" style="display: none;">
+                            <div class="row">
+                                <div class="col-6">
+                                    <input name="from_date" value="{{ from_date }}" type="date" class="form-control" placeholder="Start Date">
+                                </div>
+                                <div class="col-6">
+                                    <input name="to_date" value="{{ to_date }}" type="date" class="form-control" placeholder="End Date">
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <!-- Submit Button -->
+                        <div class="col-md-4 flex-grow-1">
+                            <input type="submit" value="Show Table" class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <input type="submit" value="Export" class="form-control h-100">
+                </div>
+            </div>
+
+            <div class="container-fluid mt-4 mb-4">
+                <table class="table">
+                    <thead>
+                      <tr>
+                        <th scope="col">Shipment Id</th>
+                        <th scope="col">Customer/Warehouse Name</th>
+                        <th scope="col">Customer/Warehouse Id</th>
+                        <th scope="col">Recive Date</th>
+                        <th scope="col">Lot Number</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <a href="#">
+                            <th scope="row">12345678</th>
+                            <td>Demo Customer</td>
+                            <td>3</td>
+                            <td>12/11/2024</td>
+                            <td>8102024</td>
+                        </a>
+                      </tr>
+                      <tr>
+                        <a href="#">
+                            <th scope="row">123456432</th>
+                            <td>Demo Customer</td>
+                            <td>4</td>
+                            <td>11/11/2024</td>
+                            <td>1502024</td>
+                        </a>
+                      </tr>
+                      <tr>
+                        <a href="#">
+                            <th scope="row">254635678</th>
+                            <td>Demo Warehouse</td>
+                            <td>6</td>
+                            <td>12/10/2024</td>
+                            <td>1102024</td>
+                        </a>
+                      </tr>
+                    </tbody>
+                  </table>
+            </div>
+
+        </div>
+    </div>
+</form>
+
+<script>
+    function toggleFilterFields() {
+        const filterType = document.getElementById('filter_type').value;
+        const yearField = document.getElementById('year_field');
+        const dateRangeFields = document.getElementById('date_range_fields');
+    
+        yearField.style.display = 'none';
+        dateRangeFields.style.display = 'none';
+    
+        if (filterType === 'year') {
+            yearField.style.display = 'block';
+        } else if (filterType === 'date_range') {
+            dateRangeFields.style.display = 'block';
+        }
+    }
+
+    // Ensure correct fields are displayed on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        toggleFilterFields();
+    });
+</script>
+
+
+
+<!--  SUSTAINABILITY METRICS Popup -->
+<div class="modal fade" id="addqueModal" aria-hidden="true" aria-labelledby="exampleModalToggleLabel22" tabindex="-1">
+    <div class="modal-dialog" style="max-width: 800px !important;">
+        <div class="modal-content">
+            <div class="modal-header" style="text-align: center;" >
+                <button type="button" class="btn-close cust-close-ds-btn close_modal_addqueModal"
+                    data-mdb-dismiss="modal" aria-label="Close" onclick="closeAddModal()" style="top:14px"></button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-center-btn-footer">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div style="text-align: center;" align="center">
+                                <h5 class="text-decoration-underline">Sustainability Metrics</h5>
+                                <!-- <div style="width:100%" id="csv_name" class="csv_name_info"></div> -->
+                            </div>
+                            <div class="simple-responsive-table">
+                                <table id="" class="table dt-responsive nowrap classing" style="width:100%">
+                                    <tbody>
+                                        <tr>
+                                            <td><strong>Pass / Fail Sustainability :</strong>&nbsp;&nbsp;<span style="padding: 5px; color:#fff" id="pf_sus"></span><br>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Claims Scores :</strong><br>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Water Savings % :</strong>&nbsp;&nbsp;<span id="water_savings"></span><br>
+                                            </td>
+                                            <td><strong>Land Use Efficiency % :</strong>&nbsp;&nbsp;<span id="land_use"></span><br>
+                                            </td>
+                                            
+                                        </tr>
+                                        
+                                        <tr>
+                                            <td><strong>Less GHG % :</strong>&nbsp;&nbsp;<span id="less_GHG"></span><br>
+                                            </td>
+                                            <td><strong>Premiums to Growers % :</strong>&nbsp;&nbsp;<span id="premiums_to_growers"></span><br>
+                                            </td>
+                                        </tr>
+                                        {% if select_crop == 'RICE' %}
+                                        <tr>
+                                            <td><strong>CO2 EQ Footprint # :</strong>&nbsp;&nbsp;<span id="co2_eQ_footprint"></span><br>
+                                            </td>
+                                            <td><strong>Pounds of Water Per Pound Savings % :</strong>&nbsp;&nbsp;<span id="water_per_pound_savings"></span><br>
+                                            </td>
+                                        </tr>
+                                        {% endif %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end -->
+<!--  •	Quality Metrics Popup -->
+<div class="modal fade" id="addQualityModal" aria-hidden="true" aria-labelledby="exampleModalToggleLabel22" tabindex="-1">
+    <div class="modal-dialog" style="max-width: 800px !important;">
+        <div class="modal-content">
+            <div class="modal-header" style="text-align: center;" >
+                <button type="button" class="btn-close cust-close-ds-btn close_modal_addqueModal"
+                    data-mdb-dismiss="modal" aria-label="Close" onclick="closeAddModal()" style="top:14px"></button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-center-btn-footer">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div style="text-align: center; margin-top: 10px;" align="center">
+                                <h5 class="text-decoration-underline">Quality Metrics</h5>
+                                <!-- <div style="width:100%" id="csv_name" class="csv_name_info"></div> -->
+                            </div>
+                            <div class="simple-responsive-table">
+                                <table id="" class="table dt-responsive nowrap classing" style="width:100%">
+                                    <tbody>
+                                        {% if select_crop == 'COTTON' %}
+                                        <tr>
+                                            <td><strong>Level :</strong>&nbsp;&nbsp;<span style="padding: 5px;" id="level"></span><br>
+                                            </td>
+                                            <td><strong>Grade :</strong>&nbsp;&nbsp;<span id="grade"></span><br>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Leaf :</strong>&nbsp;&nbsp;<span id="leaf"></span><br>
+                                            </td>
+                                            <td><strong>Staple :</strong>&nbsp;&nbsp;<span id="staple"></span><br>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Length :</strong>&nbsp;&nbsp;<span id="length"></span><br>
+                                            </td>
+                                            <td><strong>Strength :</strong>&nbsp;&nbsp;<span id="strength"></span><br>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Mic :</strong>&nbsp;&nbsp;<span id="mic"></span><br>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                        {% elif select_crop == 'RICE' %}
+                                        <tr>
+                                            <td><strong>Milling Yield :</strong>&nbsp;&nbsp;<span>{{level}}</span><br>
+                                            </td>
+                                            <td><strong>Milling Total :</strong>&nbsp;&nbsp;<span>{{level}}</span><br>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Moisture :</strong>&nbsp;&nbsp;<span>{{level}}</span><br>
+                                            </td>
+                                            <td></td>
+                                            
+                                        </tr>
+                                        {% endif %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end -->
+  </main>
+  {% include 'footer.html' %}
+</div>
+{% endblock %}
+
+{% block jquery %}
+
+
+<!-- map script start-->
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
+<script>
+    // Function to initialize maps for each transport
+    function initializeMaps() {
+        {% for transport in transports %}
+            var map = L.map('map-{{ forloop.counter }}').setView([{{ out2.origin_lat }}, {{ out2.origin_lng }}], 6);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+
+            var origin = [{{ out2.origin_lat }}, {{ out2.origin_lng }}];
+            var destination = [{{ out2.destination_lat }}, {{ out2.destination_lng }}];
+
+            L.Routing.control({
+                waypoints: [
+                    L.latLng(origin),
+                    L.latLng(destination)
+                ],
+                router: L.Routing.osrmv1({
+                    serviceUrl: 'https://router.project-osrm.org/route/v1'
+                }),
+                lineOptions: {
+                    styles: [{ color: 'blue', opacity: 0.6, weight: 4 }]
+                },
+                createMarker: function() { return null; },
+                routeWhileDragging: false,
+                addWaypoints: false
+            }).addTo(map);
+        {% endfor %}
+    }
+
+    // Initialize maps on window load
+    window.onload = initializeMaps;
+</script>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.js">
+</script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.js">
+</script>
+
+<link href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/ui-lightness/jquery-ui.css" rel="stylesheet"
+    type="text/css" />
+
+<script>
+function printDiv() {
+    var divToPrint = document.getElementById('printableArea');
+    var htmlToPrint = '' +
+        '<style type="text/css">' +
+        'table th, table td {' +
+        'border:1px solid #333;' +
+        'font-family: Arial;' +
+        'font-size: 12px;' +
+        'padding: 2px;' +
+        '}' + 'table {' +
+        'width: 95%;' +
+        'margin: 0 auto;' +
+        '}' +
+        '</style>';
+    htmlToPrint += divToPrint.outerHTML;
+    newWin = window.open("");
+    newWin.document.write(htmlToPrint);
+    newWin.print();
+    newWin.close();
+}
+
+{% if search_by %}
+var get_search_by = document.getElementById('search_by').innerHTML;
+{% endif %}
+// var deliveryid = document.getElementById('deliveryid').innerHTML;
+
+function showTraceability(field_id){
+    $.ajax({
+        type: "GET",
+                url: `/tracemodule/showsustainability_metrics/${get_search_by}/${field_id}`,
+                data: {},
+                contentType: false,
+                cache: false,
+                processData: false,
+                success: function (response){
+                    document.getElementById('pf_sus').innerHTML = "";   
+                    document.getElementById('water_savings').innerHTML = "";   
+                    document.getElementById('land_use').innerHTML = "";
+                    document.getElementById('less_GHG').innerHTML = "";
+                    document.getElementById('premiums_to_growers').innerHTML = "";
+                    
+                    {% if select_crop == 'RICE' %}
+                    document.getElementById('co2_eQ_footprint').innerHTML = "";
+                    document.getElementById('water_per_pound_savings').innerHTML = "";
+
+                    var co2_eQ_footprint = response.co2_eQ_footprint;
+                    var water_per_pound_savings = response.water_per_pound_savings;
+
+                    document.getElementById('co2_eQ_footprint').innerHTML = co2_eQ_footprint;
+                    document.getElementById('water_per_pound_savings').innerHTML = water_per_pound_savings;
+                    {% endif %}
+
+                    var water_savings = response.water_savings;
+                    var land_use = response.land_use;
+                    var less_GHG = response.less_GHG;
+                    var premiums_to_growers = response.premiums_to_growers;
+                    
+                    document.getElementById('water_savings').innerHTML = water_savings;
+                    document.getElementById('land_use').innerHTML = land_use;
+                    document.getElementById('less_GHG').innerHTML = less_GHG;
+                    document.getElementById('premiums_to_growers').innerHTML = premiums_to_growers;                  
+
+                    var pf_sus = response.pf_sus;
+                    
+                    if(pf_sus == 'Pass'){
+                        document.getElementById('pf_sus').innerHTML = pf_sus;
+                        $("#pf_sus").css("background-color", "#257a3c");
+                    }
+                    else if(pf_sus == 'Fail'){
+                        document.getElementById('pf_sus').innerHTML = pf_sus;
+                        $("#pf_sus").css("background-color", "#991f14");
+                    }
+                    else{
+                        document.getElementById('pf_sus').innerHTML = pf_sus;
+                        $("#pf_sus").css("background-color", "#000");
+                    }
+
+                }
+
+    })
+}
+
+
+function showQuality(get_deliveryid){
+    $.ajax({
+        type: "GET",
+                url: `/tracemodule/showquality_metrics/${get_search_by}/${get_deliveryid}`,
+                data: {},
+                contentType: false,
+                cache: false,
+                processData: false,
+                success: function (response){
+                    document.getElementById('level').innerHTML = ""; 
+                    document.getElementById('grade').innerHTML = ""; 
+                    document.getElementById('leaf').innerHTML = ""; 
+                    document.getElementById('staple').innerHTML = ""; 
+                    document.getElementById('length').innerHTML = ""; 
+                    document.getElementById('strength').innerHTML = ""; 
+                    document.getElementById('mic').innerHTML = "";
+
+                    var grade = response.grade;
+                    var leaf = response.leaf;
+                    var staple = response.staple;
+                    var length = response.length;
+                    var strength = response.strength;
+                    var mic = response.mic;
+                    var level = response.level;
+
+                    document.getElementById('grade').innerHTML = grade; 
+                    document.getElementById('leaf').innerHTML = leaf; 
+                    document.getElementById('staple').innerHTML = staple; 
+                    document.getElementById('length').innerHTML = length; 
+                    document.getElementById('strength').innerHTML = strength; 
+                    document.getElementById('mic').innerHTML = mic; 
+                    // background: {%if level == 'Llano Super' %}#03f4fc {% elif level == 'Gold' %}#FFD700 
+                    // {% elif level == 'Silver' %} #C0C0C0 {% elif level == 'Bronze' %} #CD7F32 {% else %} #ffffff {% endif %}"
+                    if (level == 'Llano Super'){
+                        document.getElementById('level').innerHTML = level;
+                        $("#level").css("background-color", "#03f4fc");
+                    }
+                    else if (level == 'Gold'){
+                        document.getElementById('level').innerHTML = level;
+                        $("#level").css("background-color", "#FFD700");
+                    }
+                    else if (level == 'Silver'){
+                        document.getElementById('level').innerHTML = level;
+                        $("#level").css("background-color", "#C0C0C0");
+                    }
+                    else if (level == 'Bronze'){
+                        document.getElementById('level').innerHTML = level;
+                        $("#level").css("background-color", "#CD7F32");
+                    }
+                    else{
+                        document.getElementById('level').innerHTML = level;
+                        $("#level").css("background-color", "#ffffff");
+                    }
+                    
+                }
+
+    })
+}
+
+function getText(){
+    getTextid = $("#getTextid").val();
+    select_crop_id = $("#select_crop_id").val();
+
+    if (getTextid != '' && select_crop_id != ''){
+        $.ajax({
+            type: "GET",
+                url: `/tracemodule/autocomplete_suggestions/${getTextid}/${select_crop_id}/`,
+                data: {},
+                contentType: false,
+                cache: false,
+                processData: false,
+                success: function (response){
+                    var availableTags  = response.select_search;
+                    $("#tags").autocomplete({
+                        source: availableTags
+                    });
+                }
+        })
+    }
+}
+
+
+
+</script>
+<script>
+    function removeSelectedOption() {
+      var firstSelect = document.getElementById("getTextid");
+      var secondSelect = document.getElementById("tags");
+      secondSelect.value = "";
+      
+    }
+    </script>
+    
+<script>
+    $('#Traceability-Report').addClass('activeLink');
+</script>
+
+
+<script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const mapContainers = document.querySelectorAll(".img_wapper");
+
+            mapContainers.forEach(container => {
+                const iframe = container.querySelector("iframe");
+                const loader = container.querySelector(".loader");
+
+                if (iframe && loader) {
+                    iframe.addEventListener("load", function () {
+                        loader.style.display = "none";
+                    });
+                    loader.style.display = "flex";
+                } else {
+                    console.error("Missing iframe or loader in .img_wapper", container);
+                }
+            });
+        });
+</script>  
+
+{% endblock jquery %}

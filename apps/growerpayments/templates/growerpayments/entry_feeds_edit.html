@@ -1,0 +1,218 @@
+{% extends "base.html" %} {% load static %} {% block title %} Entry Feeds Update {% endblock title %} 
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+{% block content %} {% include 'navbar.html' %}
+<div class="main-content">
+    {% include 'header.html' %} {% load crispy_forms_tags %}
+  <main>
+<style>
+.entryactive{background-color: #257a3c !important;}
+.entryactive td{color: #fff;}
+</style>
+
+    {% include '_alerts.html' %}
+    <span class="farm headingtop"> Entry Feeds Update</span>
+    <div class="card farm-fields-container">
+        <div class="container-fluid">
+            <form method="post" class="farm-fields-form">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <div>
+                            <label for="">Grower<span class="asteriskField">*</span></label>
+                            <input value="{{en.grower.name}}" type="text" name="" id="" class="textinput textInput form-control" readonly>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div>
+                            <label for="grower_crop">Crop<span class="asteriskField">*</span></label>
+                            <input value="{{en.crop}}" type="text" name="" id="crop_value" class="textinput textInput form-control" readonly>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div>
+                            <label for="contracted_payment_option">Contracted Payment Option<span class="asteriskField">*</span></label>
+                            <select onchange="divchange()" id="contracted_payment_option" name="contracted_payment_option" class="textinput textInput form-control">
+                                {% if en.contracted_payment_option == "Fixed Price" %}
+                                <option value='Fixed Price' selected>Fixed Price</option>
+                                <option value='Delivered Market Price'>Delivered Market Price</option>
+                                {% elif en.contracted_payment_option == "Delivered Market Price" %}
+                                <option value='Delivered Market Price' selected>Delivered Market Price</option>
+                                <option value='Fixed Price'>Fixed Price</option>
+                                {% elif en.contracted_payment_option == "Acreage Release" %}
+                                <option value='Acreage Release' selected>Acreage Release</option>
+                                {% endif %}
+                            </select>
+                            <p id="p3" style="color: red;"></p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div>
+                            <label for="from_date">From Date<span class="asteriskField">*</span></label>
+                            <input type="date" value="{{from_date}}" name="from_date" class="textinput textInput form-control">
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div>
+                            <label for="to_date">To Date<span class="asteriskField">*</span></label>
+                            <input type="date" value="{{to_date}}" name="to_date" class="textinput textInput form-control">
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div id="div1">
+                            <label for="contract_base_price">Contract Base Price / LBS<span class="asteriskField">*</span></label>
+                            <input value="{{en.contract_base_price}}" type="number" name="contract_base_price" id="contract_base_price" class="textinput textInput form-control" step="0.0001">
+                        </div>
+                        <p id="p4" style="color: red;"></p>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div id="div2">
+                            <label for="sustainability_premium">Sustainability Premium / LBS<span class="asteriskField">*</span></label>
+                            <input value="{{en.sustainability_premium}}" type="number" name="sustainability_premium" id="sustainability_premium" class="textinput textInput form-control" step="0.0001">
+                        </div>
+                        <p id="p5" style="color: red;"></p>
+                    </div>
+                    
+                    <!-- <div class="col-md-4 mb-3">
+                        <div>
+                            <label for="quality_premium">Quality Premium / LBS<span class="asteriskField">*</span></label>
+                            <input value="{{en.quality_premium}}" type="number" name="quality_premium" id="quality_premium" class="textinput textInput form-control" step="0.0001">
+                        </div>
+                        <p id="p6" style="color: red;"></p>
+                    </div> -->
+                </div>                
+                <div class="row">
+                    <div class="form-btn-row">
+                        <a href="{% url 'entry_feeds_list' %}" class="btn-close-cancel btn-space">Cancel</a>
+                        <input style="display: none;" id="submitBtn2" type="submit" class="btn-save-submit" value="Save"> 
+                        <input type="button" class="btn-save-submit" value="Save" onclick="activityButton1()">
+                    </div>
+                </div>
+
+                {% if show_entry %}
+                <div style="margin-top: 15px;">
+                    <table class="table table-striped dt-responsive nowrap" style="width:100%">
+                        <thead>
+                            <tr style="border-bottom: 2px solid #e0e0e0;">
+                                <th width="10%" style="text-align:center">Grower</th>
+                                <th width="10%" style="text-align:center">Crop</th>
+                                <th width="10%" style="text-align:center">From Date</th>
+                                <th width="10%" style="text-align:center">To Date</th>
+                                <th width="10%" style="text-align:center">Payment Option</th>
+                                <th width="20%" style="text-align:center">Contract Base Price /LBS</th>
+                                <th width="20%" style="text-align:center">Sustainability Premium /LBS</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for entery in show_entry %}
+                            <tr {% if entery.id == en.id %}class='entryactive'{% endif %}>
+                                <td align="center" style="vertical-align: middle;">{{ entery.grower.name }}</td>
+                                <td align="center" style="vertical-align: middle;">{{ entery.crop }}</td>
+                                <td align="center" style="vertical-align: middle;">{% if entery.from_date %}{{ entery.from_date }}{% else %}{% endif %}</td>
+                                <td align="center" style="vertical-align: middle;">{% if entery.to_date %}{{ entery.to_date }}{% else %}{% endif %}</td>
+                                <td align="center" style="vertical-align: middle;">{{ entery.contracted_payment_option }}</td>
+                                <td align="center" style="vertical-align: middle;">{{ entery.contract_base_price }}</td>
+                                <td align="center" style="vertical-align: middle;">
+                                    {% if entery.contracted_payment_option == 'Delivered Market Price' %}
+                                    0.04
+                                    {% else %}
+                                    {{ entery.sustainability_premium }}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% endif %}
+        </div>
+        </form>
+  </main>
+  {% include 'footer.html' %}
+</div>
+{% endblock %}
+
+{% block jquery %}
+<script>
+    // $(document).ready(function() {
+    // $('#growerSelction').change( function () {
+    // $('#submitBtn2').click();
+    // });
+    // });
+    crop_value = document.getElementById("crop_value").value
+    if ( crop_value == 'COTTON') {
+        $('#contracted_payment_option option').filter('[value="Delivered Market Price"]').prop('disabled', true);
+    }
+    
+
+    contracted_payment_option = document.getElementById("contracted_payment_option").value
+    if (contracted_payment_option == 'Delivered Market Price'){
+        document.getElementById("div1").style.display = "none";
+        document.getElementById("div2").style.display = "none";
+    }
+    if (contracted_payment_option == 'Acreage Release'){
+        document.getElementById("div1").style.display = "block";
+        document.getElementById("div2").style.display = "block";
+        // document.getElementById("contract_base_price").readOnly = true;
+        // document.getElementById("sustainability_premium").readOnly = true;
+    }
+
+
+    function divchange(){
+        contracted_payment_option = document.getElementById("contracted_payment_option").value
+        if (contracted_payment_option == 'Fixed Price'){
+        document.getElementById("div1").style.display = "block";
+        document.getElementById("div2").style.display = "block";
+    }if (contracted_payment_option == 'Delivered Market Price'){
+        document.getElementById("div1").style.display = "none";
+        document.getElementById("div2").style.display = "none";
+    }
+    
+    }
+
+    function activityButton1(){
+        contracted_payment_option = document.getElementById("contracted_payment_option").value
+        contract_base_price = document.getElementById("contract_base_price").value
+        sustainability_premium = document.getElementById("sustainability_premium").value
+        // quality_premium = document.getElementById("quality_premium").value
+        if (contracted_payment_option=='Delivered Market Price' && contract_base_price =="" && sustainability_premium ==""){
+            $('#submitBtn2').click();
+        }
+        else if (contract_base_price !="" && sustainability_premium !=""){
+            $('#submitBtn2').click();
+        }
+        else{
+            if (contract_base_price == ""){
+                document.getElementById("p4").innerHTML = "*Please Give Contract Base Price / LBS";
+            }
+            if (sustainability_premium == ""){
+                document.getElementById("p5").innerHTML = "*Please Give Sustainability Premium / LBS";
+            }
+            // if (quality_premium == ""){
+            //     document.getElementById("p6").innerHTML = "*Please Give Quality Premium / LBS";
+            // }
+            
+        }
+    }
+
+</script>
+<script>
+    $('#Growers-Payments-active').addClass('activeLink');
+                  
+    $('#Growers-Payments-down').addClass('down');
+    $('#Growers-Payments-sub').show();
+    
+    $('#Grower-Entry-Feeds').addClass('activeLink active-nav');
+</script>
+{% endblock jquery %}

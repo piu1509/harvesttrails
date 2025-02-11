@@ -1,0 +1,160 @@
+{% extends "base.html" %} {% load static %} {% block title %} Link Grower to Processor {% endblock title %} 
+
+{% block extrahead %}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3EWVPF7PQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y3EWVPF7PQ');
+</script>
+{% endblock extrahead %}
+
+{% block content %} {% include 'navbar.html' %}
+<style>
+  .newselect{padding: 12px 15px;
+    display: block;
+    width:352px;
+    background: #fff !important;
+    outline: none !important;
+    margin-top: 5px !important;
+    height: auto !important;
+    
+   }
+</style>
+
+<div class="main-content">
+    {% include 'header.html' %} {% load crispy_forms_tags %}
+  <main>
+    <span class="farm headingtop">Link Grower to Processor</span>
+    <div class="card farm-fields-container">
+        <div class="container-fluid">
+          <form action="" method="post" class="">
+            {% csrf_token %}
+            <div class="inline-apply-filter">
+              <div class="three-fields-with-label">
+                <label for="processorSelction">Select Processor</label>
+                <select id="processorSelction" name="processor_id" class="mb-0" style="border-radius:0px !important; width: 350px;">
+                  <option value='' selected> Select Processor</option>
+                  {% for processor in processor %}
+                  {% if processor == selectedprocessor %}
+                  <option selected value="{{ processor.pk }}">{{processor.entity_name}} - {{processor.id}}
+                  </option>
+                  {% else %}
+                  <option value="{{ processor.pk }}">{{processor.entity_name}} - {{processor.id}}</option>
+                  {% endif %}
+                  {% endfor %}
+                </select>
+              </div>
+                <br>
+                <br>
+                <br>
+                <br>
+              </div>
+            <div class="inline-apply-filter">
+              <div class="three-fields-with-label">
+                <label for="growerSelction">Select Grower</label>
+                <select id="growerSelction" name="grower_id1" class="mb-0" style="border-radius:0px !important; width:350px;">
+                  <option value='' selected> Select Grower</option>
+                  {% for grower in grower %}
+                  {% if grower == selectedgrower %}
+                  <option selected value="{{ grower.pk }}">{{grower.name}} - {{grower.id}}
+                  </option>
+                  {% else %}
+                  <option value="{{ grower.pk }}">{{grower.name}} - {{grower.id}}</option>
+                  {% endif %}
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <div id="root"></div>
+            <p id="disp0" style="color: red;"></p>
+          <div class="row">
+            <div class="form-btn-row" style="text-align:left">
+            <input type="button" class="btn-close-cancel btn-space" value="+ Add More" onclick="createSelect()">
+          </div>
+          </div>
+          <div class="row">
+            <div class="form-btn-row">
+                <a href="{% url "grower_processor_management" %}" class="btn-close-cancel btn-space">Cancel</a>
+                <input style="display: none;" type="submit" id="btn_submit" class="btn-save-submit" value="Save">
+                <input type="button" class="btn-save-submit" value="Save" onclick="save()">
+            </div>
+        </div>
+        <input style="display: none;" type="text" id="product_counter" value="1" name="counter">
+          </form>
+        </div>
+    </div>
+  </main>
+  {% include 'footer.html' %}
+</div>
+{% endblock %}
+
+{% block jquery %}
+<script>
+ function createSelect() {
+  var counter = $('#product_counter').val();
+  var counter = eval(counter)+1;
+  $('#product_counter').val(counter);
+   console.log(counter);
+   let root = document.getElementById("root");
+
+   let selectElement = document.querySelectorAll('[name=grower_id1]');
+   let optionValues = [...selectElement[0].options].map(o => o.value)
+   let optionNames = [...selectElement[0].options].map(o => o.text)
+
+   let select = document.createElement("SELECT");
+   select.setAttribute("id", "grower_id"+counter);
+   select.setAttribute("name", "grower_id"+counter);
+   select.classList.add("newselect");
+   root.appendChild(select);
+
+  for(var i = 0;i<optionNames.length;i++) {
+    var item = optionNames[i];
+    var item2 = optionValues[i]
+    var newOption = document.createElement("option");
+    newOption.setAttribute("value", item2);
+    var textNode = document.createTextNode(item);
+    newOption.appendChild(textNode);
+    select.appendChild(newOption);
+ }
+}
+</script>
+<script>
+function save(){
+  let temp_arr = []
+  let temp = document.getElementsByTagName('select')
+  temp.forEach(element => {
+       temp_arr.push(element.value)
+      if (element.value == ''){
+      $('#'+element.id).css('border-color', 'red');
+      document.getElementById("disp0").innerHTML = "*All the box should be selected";
+    }
+    else{
+        $('#'+element.id).css('border-color', '#bdbdbd');
+        document.getElementById("disp0").innerHTML = "";
+    }
+  })
+
+  let res = temp_arr.every((item)=>{
+    return item !== '';
+  })
+
+  if(res){
+    $('#btn_submit').click();
+  }
+
+}
+</script>
+<script>
+  $('#Processor-active').addClass('activeLink');
+
+  $('#Processor-down').addClass('down');
+  $('#Processor-sub').show();
+
+  $('#Grower-to-Processor').addClass('activeLink active-nav');
+
+</script>
+{% endblock jquery %}
